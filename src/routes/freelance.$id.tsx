@@ -44,7 +44,7 @@ function FreelanceProfile() {
           </Link>
           <div className="mt-6 flex flex-col items-start gap-8 md:flex-row md:items-center">
             <div className="grid size-32 shrink-0 place-items-center bg-carbon font-mono text-4xl font-black text-racing-red outline outline-2 outline-border">
-              {f.name.split(" ").map(n => n[0]).join("")}
+              {f.name.split(" ").map((n: string) => n[0]).join("")}
             </div>
             <div className="min-w-0 flex-1">
               <div className={`inline-flex items-center gap-2 border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${f.availability === "Disponibile" ? "border-success text-success" : f.availability === "Occupato" ? "border-racing-yellow text-racing-yellow" : "border-border text-muted-foreground"}`}>
@@ -90,7 +90,7 @@ function FreelanceProfile() {
           <div>
             <h2 className="mb-4 text-3xl font-black uppercase italic tracking-tighter">Skill</h2>
             <div className="flex flex-wrap gap-2">
-              {f.skills.map((s) => (
+              {f.skills.map((s: string) => (
                 <span key={s} className="border border-border bg-pit px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-widest">
                   {s}
                 </span>
