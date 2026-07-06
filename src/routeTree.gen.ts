@@ -9,38 +9,161 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ScuderieRouteImport } from './routes/scuderie'
+import { Route as RegistratiRouteImport } from './routes/registrati'
+import { Route as BachecaRouteImport } from './routes/bacheca'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FreelanceIndexRouteImport } from './routes/freelance.index'
+import { Route as ScuderiaIdRouteImport } from './routes/scuderia.$id'
+import { Route as FreelanceIdRouteImport } from './routes/freelance.$id'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScuderieRoute = ScuderieRouteImport.update({
+  id: '/scuderie',
+  path: '/scuderie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistratiRoute = RegistratiRouteImport.update({
+  id: '/registrati',
+  path: '/registrati',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BachecaRoute = BachecaRouteImport.update({
+  id: '/bacheca',
+  path: '/bacheca',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FreelanceIndexRoute = FreelanceIndexRouteImport.update({
+  id: '/freelance/',
+  path: '/freelance/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScuderiaIdRoute = ScuderiaIdRouteImport.update({
+  id: '/scuderia/$id',
+  path: '/scuderia/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreelanceIdRoute = FreelanceIdRouteImport.update({
+  id: '/freelance/$id',
+  path: '/freelance/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bacheca': typeof BachecaRoute
+  '/registrati': typeof RegistratiRoute
+  '/scuderie': typeof ScuderieRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelance/$id': typeof FreelanceIdRoute
+  '/scuderia/$id': typeof ScuderiaIdRoute
+  '/freelance/': typeof FreelanceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bacheca': typeof BachecaRoute
+  '/registrati': typeof RegistratiRoute
+  '/scuderie': typeof ScuderieRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelance/$id': typeof FreelanceIdRoute
+  '/scuderia/$id': typeof ScuderiaIdRoute
+  '/freelance': typeof FreelanceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bacheca': typeof BachecaRoute
+  '/registrati': typeof RegistratiRoute
+  '/scuderie': typeof ScuderieRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelance/$id': typeof FreelanceIdRoute
+  '/scuderia/$id': typeof ScuderiaIdRoute
+  '/freelance/': typeof FreelanceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/bacheca'
+    | '/registrati'
+    | '/scuderie'
+    | '/sitemap.xml'
+    | '/freelance/$id'
+    | '/scuderia/$id'
+    | '/freelance/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/bacheca'
+    | '/registrati'
+    | '/scuderie'
+    | '/sitemap.xml'
+    | '/freelance/$id'
+    | '/scuderia/$id'
+    | '/freelance'
+  id:
+    | '__root__'
+    | '/'
+    | '/bacheca'
+    | '/registrati'
+    | '/scuderie'
+    | '/sitemap.xml'
+    | '/freelance/$id'
+    | '/scuderia/$id'
+    | '/freelance/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BachecaRoute: typeof BachecaRoute
+  RegistratiRoute: typeof RegistratiRoute
+  ScuderieRoute: typeof ScuderieRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FreelanceIdRoute: typeof FreelanceIdRoute
+  ScuderiaIdRoute: typeof ScuderiaIdRoute
+  FreelanceIndexRoute: typeof FreelanceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scuderie': {
+      id: '/scuderie'
+      path: '/scuderie'
+      fullPath: '/scuderie'
+      preLoaderRoute: typeof ScuderieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registrati': {
+      id: '/registrati'
+      path: '/registrati'
+      fullPath: '/registrati'
+      preLoaderRoute: typeof RegistratiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bacheca': {
+      id: '/bacheca'
+      path: '/bacheca'
+      fullPath: '/bacheca'
+      preLoaderRoute: typeof BachecaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +171,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/freelance/': {
+      id: '/freelance/'
+      path: '/freelance'
+      fullPath: '/freelance/'
+      preLoaderRoute: typeof FreelanceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scuderia/$id': {
+      id: '/scuderia/$id'
+      path: '/scuderia/$id'
+      fullPath: '/scuderia/$id'
+      preLoaderRoute: typeof ScuderiaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/freelance/$id': {
+      id: '/freelance/$id'
+      path: '/freelance/$id'
+      fullPath: '/freelance/$id'
+      preLoaderRoute: typeof FreelanceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BachecaRoute: BachecaRoute,
+  RegistratiRoute: RegistratiRoute,
+  ScuderieRoute: ScuderieRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FreelanceIdRoute: FreelanceIdRoute,
+  ScuderiaIdRoute: ScuderiaIdRoute,
+  FreelanceIndexRoute: FreelanceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
