@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { initialsFor } from "@/lib/paddock";
 
-export const Route = createFileRoute("/teams")({
+export const Route = createFileRoute("/teams/")({
   component: TeamsIndex,
 });
 

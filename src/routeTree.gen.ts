@@ -10,11 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeamsIndexRouteImport } from './routes/teams.index'
+import { Route as FreelancersIndexRouteImport } from './routes/freelancers.index'
+import { Route as TeamsIdRouteImport } from './routes/teams.$id'
+import { Route as FreelancersIdRouteImport } from './routes/freelancers.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,31 +38,100 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeamsIndexRoute = TeamsIndexRouteImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreelancersIndexRoute = FreelancersIndexRouteImport.update({
+  id: '/freelancers/',
+  path: '/freelancers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamsIdRoute = TeamsIdRouteImport.update({
+  id: '/teams/$id',
+  path: '/teams/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreelancersIdRoute = FreelancersIdRouteImport.update({
+  id: '/freelancers/$id',
+  path: '/freelancers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers/': typeof FreelancersIndexRoute
+  '/teams/': typeof TeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers': typeof FreelancersIndexRoute
+  '/teams': typeof TeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers/': typeof FreelancersIndexRoute
+  '/teams/': typeof TeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/jobs'
+    | '/sitemap.xml'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers/'
+    | '/teams/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml'
-  id: '__root__' | '/' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/auth'
+    | '/jobs'
+    | '/sitemap.xml'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers'
+    | '/teams'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/jobs'
+    | '/sitemap.xml'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers/'
+    | '/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  JobsRoute: typeof JobsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FreelancersIdRoute: typeof FreelancersIdRoute
+  TeamsIdRoute: typeof TeamsIdRoute
+  FreelancersIndexRoute: typeof FreelancersIndexRoute
+  TeamsIndexRoute: typeof TeamsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +143,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +164,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teams/': {
+      id: '/teams/'
+      path: '/teams'
+      fullPath: '/teams/'
+      preLoaderRoute: typeof TeamsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/freelancers/': {
+      id: '/freelancers/'
+      path: '/freelancers'
+      fullPath: '/freelancers/'
+      preLoaderRoute: typeof FreelancersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teams/$id': {
+      id: '/teams/$id'
+      path: '/teams/$id'
+      fullPath: '/teams/$id'
+      preLoaderRoute: typeof TeamsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/freelancers/$id': {
+      id: '/freelancers/$id'
+      path: '/freelancers/$id'
+      fullPath: '/freelancers/$id'
+      preLoaderRoute: typeof FreelancersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  JobsRoute: JobsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FreelancersIdRoute: FreelancersIdRoute,
+  TeamsIdRoute: TeamsIdRoute,
+  FreelancersIndexRoute: FreelancersIndexRoute,
+  TeamsIndexRoute: TeamsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
