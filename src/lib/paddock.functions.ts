@@ -93,9 +93,14 @@ export const getMyMatches = createServerFn({ method: "GET" })
 
     // Redact counterparty details when not revealed
     const redacted = (matches ?? []).map((raw) => {
-      const m = raw as unknown as Record<string, unknown> & {
+      const m = raw as {
+        id: string;
+        freelancer_id: string;
+        team_id: string;
+        overlap_days: number;
         revealed_by_freelancer: boolean;
         revealed_by_team: boolean;
+        request: { id: string; title: string; start_date: string; end_date: string; role: string; discipline: string } | null;
         freelancer: { display_name: string; avatar_url: string | null } | null;
         team: { display_name: string; avatar_url: string | null } | null;
       };
@@ -104,7 +109,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
         if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
         if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe } as typeof m & { revealedByMe: boolean; id: string; overlap_days: number; request: Record<string, unknown> };
+      return { ...m, revealedByMe };
     });
 
     return {
