@@ -92,17 +92,19 @@ export const getMyMatches = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     // Redact counterparty details when not revealed
-    const redacted = (matches ?? []).map((m: Record<string, unknown> & { revealed_by_freelancer: boolean; revealed_by_team: boolean; freelancer: { display_name: string; avatar_url: string | null } | null; team: { display_name: string; avatar_url: string | null } | null }) => {
+    const redacted = (matches ?? []).map((raw) => {
+      const m = raw as unknown as Record<string, unknown> & {
+        revealed_by_freelancer: boolean;
+        revealed_by_team: boolean;
+        freelancer: { display_name: string; avatar_url: string | null } | null;
+        team: { display_name: string; avatar_url: string | null } | null;
+      };
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
       if (!revealedByMe) {
-        if (isFreelancer && m.team) {
-          m.team = { display_name: "Hidden Team", avatar_url: null };
-        }
-        if (!isFreelancer && m.freelancer) {
-          m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
-        }
+        if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
+        if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe };
+      return { ...m, revealedByMe } as typeof m & { revealedByMe: boolean; id: string; overlap_days: number; request: Record<string, unknown> };
     });
 
     return {
