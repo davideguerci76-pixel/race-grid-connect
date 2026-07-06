@@ -10,32 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ScuderieRouteImport } from './routes/scuderie'
-import { Route as RegistratiRouteImport } from './routes/registrati'
-import { Route as BachecaRouteImport } from './routes/bacheca'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FreelanceIndexRouteImport } from './routes/freelance.index'
-import { Route as ScuderiaIdRouteImport } from './routes/scuderia.$id'
-import { Route as FreelanceIdRouteImport } from './routes/freelance.$id'
+import { Route as TeamsIndexRouteImport } from './routes/teams.index'
+import { Route as FreelancersIndexRouteImport } from './routes/freelancers.index'
+import { Route as TeamsIdRouteImport } from './routes/teams.$id'
+import { Route as FreelancersIdRouteImport } from './routes/freelancers.$id'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
+import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
+import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
+import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ScuderieRoute = ScuderieRouteImport.update({
-  id: '/scuderie',
-  path: '/scuderie',
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegistratiRoute = RegistratiRouteImport.update({
-  id: '/registrati',
-  path: '/registrati',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BachecaRoute = BachecaRouteImport.update({
-  id: '/bacheca',
-  path: '/bacheca',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,95 +48,162 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FreelanceIndexRoute = FreelanceIndexRouteImport.update({
-  id: '/freelance/',
-  path: '/freelance/',
+const TeamsIndexRoute = TeamsIndexRouteImport.update({
+  id: '/teams/',
+  path: '/teams/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ScuderiaIdRoute = ScuderiaIdRouteImport.update({
-  id: '/scuderia/$id',
-  path: '/scuderia/$id',
+const FreelancersIndexRoute = FreelancersIndexRouteImport.update({
+  id: '/freelancers/',
+  path: '/freelancers/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FreelanceIdRoute = FreelanceIdRouteImport.update({
-  id: '/freelance/$id',
-  path: '/freelance/$id',
+const TeamsIdRoute = TeamsIdRouteImport.update({
+  id: '/teams/$id',
+  path: '/teams/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FreelancersIdRoute = FreelancersIdRouteImport.update({
+  id: '/freelancers/$id',
+  path: '/freelancers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardTokensRoute =
+  AuthenticatedDashboardTokensRouteImport.update({
+    id: '/tokens',
+    path: '/tokens',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardMatchesRoute =
+  AuthenticatedDashboardMatchesRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardEngagementsRoute =
+  AuthenticatedDashboardEngagementsRouteImport.update({
+    id: '/engagements',
+    path: '/engagements',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardCalendarRoute =
+  AuthenticatedDashboardCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/bacheca': typeof BachecaRoute
-  '/registrati': typeof RegistratiRoute
-  '/scuderie': typeof ScuderieRoute
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/freelance/$id': typeof FreelanceIdRoute
-  '/scuderia/$id': typeof ScuderiaIdRoute
-  '/freelance/': typeof FreelanceIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers/': typeof FreelancersIndexRoute
+  '/teams/': typeof TeamsIndexRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
+  '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/bacheca': typeof BachecaRoute
-  '/registrati': typeof RegistratiRoute
-  '/scuderie': typeof ScuderieRoute
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/freelance/$id': typeof FreelanceIdRoute
-  '/scuderia/$id': typeof ScuderiaIdRoute
-  '/freelance': typeof FreelanceIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers': typeof FreelancersIndexRoute
+  '/teams': typeof TeamsIndexRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
+  '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/bacheca': typeof BachecaRoute
-  '/registrati': typeof RegistratiRoute
-  '/scuderie': typeof ScuderieRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/freelance/$id': typeof FreelanceIdRoute
-  '/scuderia/$id': typeof ScuderiaIdRoute
-  '/freelance/': typeof FreelanceIndexRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
+  '/freelancers/$id': typeof FreelancersIdRoute
+  '/teams/$id': typeof TeamsIdRoute
+  '/freelancers/': typeof FreelancersIndexRoute
+  '/teams/': typeof TeamsIndexRoute
+  '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
+  '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/bacheca'
-    | '/registrati'
-    | '/scuderie'
+    | '/auth'
+    | '/jobs'
     | '/sitemap.xml'
-    | '/freelance/$id'
-    | '/scuderia/$id'
-    | '/freelance/'
+    | '/dashboard'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers/'
+    | '/teams/'
+    | '/dashboard/calendar'
+    | '/dashboard/engagements'
+    | '/dashboard/matches'
+    | '/dashboard/tokens'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/bacheca'
-    | '/registrati'
-    | '/scuderie'
+    | '/auth'
+    | '/jobs'
     | '/sitemap.xml'
-    | '/freelance/$id'
-    | '/scuderia/$id'
-    | '/freelance'
+    | '/dashboard'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers'
+    | '/teams'
+    | '/dashboard/calendar'
+    | '/dashboard/engagements'
+    | '/dashboard/matches'
+    | '/dashboard/tokens'
   id:
     | '__root__'
     | '/'
-    | '/bacheca'
-    | '/registrati'
-    | '/scuderie'
+    | '/_authenticated'
+    | '/auth'
+    | '/jobs'
     | '/sitemap.xml'
-    | '/freelance/$id'
-    | '/scuderia/$id'
-    | '/freelance/'
+    | '/_authenticated/dashboard'
+    | '/freelancers/$id'
+    | '/teams/$id'
+    | '/freelancers/'
+    | '/teams/'
+    | '/_authenticated/dashboard/calendar'
+    | '/_authenticated/dashboard/engagements'
+    | '/_authenticated/dashboard/matches'
+    | '/_authenticated/dashboard/tokens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BachecaRoute: typeof BachecaRoute
-  RegistratiRoute: typeof RegistratiRoute
-  ScuderieRoute: typeof ScuderieRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  JobsRoute: typeof JobsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  FreelanceIdRoute: typeof FreelanceIdRoute
-  ScuderiaIdRoute: typeof ScuderiaIdRoute
-  FreelanceIndexRoute: typeof FreelanceIndexRoute
+  FreelancersIdRoute: typeof FreelancersIdRoute
+  TeamsIdRoute: typeof TeamsIdRoute
+  FreelancersIndexRoute: typeof FreelancersIndexRoute
+  TeamsIndexRoute: typeof TeamsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -143,25 +215,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/scuderie': {
-      id: '/scuderie'
-      path: '/scuderie'
-      fullPath: '/scuderie'
-      preLoaderRoute: typeof ScuderieRouteImport
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/registrati': {
-      id: '/registrati'
-      path: '/registrati'
-      fullPath: '/registrati'
-      preLoaderRoute: typeof RegistratiRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bacheca': {
-      id: '/bacheca'
-      path: '/bacheca'
-      fullPath: '/bacheca'
-      preLoaderRoute: typeof BachecaRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -171,39 +243,114 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/freelance/': {
-      id: '/freelance/'
-      path: '/freelance'
-      fullPath: '/freelance/'
-      preLoaderRoute: typeof FreelanceIndexRouteImport
+    '/teams/': {
+      id: '/teams/'
+      path: '/teams'
+      fullPath: '/teams/'
+      preLoaderRoute: typeof TeamsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/scuderia/$id': {
-      id: '/scuderia/$id'
-      path: '/scuderia/$id'
-      fullPath: '/scuderia/$id'
-      preLoaderRoute: typeof ScuderiaIdRouteImport
+    '/freelancers/': {
+      id: '/freelancers/'
+      path: '/freelancers'
+      fullPath: '/freelancers/'
+      preLoaderRoute: typeof FreelancersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/freelance/$id': {
-      id: '/freelance/$id'
-      path: '/freelance/$id'
-      fullPath: '/freelance/$id'
-      preLoaderRoute: typeof FreelanceIdRouteImport
+    '/teams/$id': {
+      id: '/teams/$id'
+      path: '/teams/$id'
+      fullPath: '/teams/$id'
+      preLoaderRoute: typeof TeamsIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/freelancers/$id': {
+      id: '/freelancers/$id'
+      path: '/freelancers/$id'
+      fullPath: '/freelancers/$id'
+      preLoaderRoute: typeof FreelancersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tokens': {
+      id: '/_authenticated/dashboard/tokens'
+      path: '/tokens'
+      fullPath: '/dashboard/tokens'
+      preLoaderRoute: typeof AuthenticatedDashboardTokensRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/matches': {
+      id: '/_authenticated/dashboard/matches'
+      path: '/matches'
+      fullPath: '/dashboard/matches'
+      preLoaderRoute: typeof AuthenticatedDashboardMatchesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/engagements': {
+      id: '/_authenticated/dashboard/engagements'
+      path: '/engagements'
+      fullPath: '/dashboard/engagements'
+      preLoaderRoute: typeof AuthenticatedDashboardEngagementsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/calendar': {
+      id: '/_authenticated/dashboard/calendar'
+      path: '/calendar'
+      fullPath: '/dashboard/calendar'
+      preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
     }
   }
 }
 
+interface AuthenticatedDashboardRouteChildren {
+  AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
+  AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
+  AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
+  AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
+}
+
+const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
+  {
+    AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
+    AuthenticatedDashboardEngagementsRoute:
+      AuthenticatedDashboardEngagementsRoute,
+    AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
+    AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
+  }
+
+const AuthenticatedDashboardRouteWithChildren =
+  AuthenticatedDashboardRoute._addFileChildren(
+    AuthenticatedDashboardRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BachecaRoute: BachecaRoute,
-  RegistratiRoute: RegistratiRoute,
-  ScuderieRoute: ScuderieRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  JobsRoute: JobsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  FreelanceIdRoute: FreelanceIdRoute,
-  ScuderiaIdRoute: ScuderiaIdRoute,
-  FreelanceIndexRoute: FreelanceIndexRoute,
+  FreelancersIdRoute: FreelancersIdRoute,
+  TeamsIdRoute: TeamsIdRoute,
+  FreelancersIndexRoute: FreelancersIndexRoute,
+  TeamsIndexRoute: TeamsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
