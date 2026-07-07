@@ -274,7 +274,7 @@ export const getFreelancerRatings = createServerFn({ method: "GET" })
     const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     });
-    const { data: rows, error } = await supa.from("ratings").select("stars, comment, created_at").eq("to_user_id", data.user_id).order("created_at", { ascending: false }).limit(20);
+    const { data: rows, error } = await supa.from("ratings").select("stars, created_at").eq("to_user_id", data.user_id).order("created_at", { ascending: false }).limit(20);
     if (error) throw new Error(error.message);
     const avg = rows && rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
     return { ratings: rows ?? [], average: Math.round(avg * 10) / 10, count: rows?.length ?? 0 };
