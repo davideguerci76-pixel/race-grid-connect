@@ -21,7 +21,7 @@ function FreelancerProfile() {
   const { data, isLoading } = useQuery({
     queryKey: ["freelancer", id],
     queryFn: async () => {
-      const { data: profile } = await supabase.from("profiles").select("*, freelancer_profiles(*)").eq("id", id).maybeSingle();
+      const { data: profile } = await supabase.from("profiles").select("id, display_name, avatar_url, user_type, freelancer_profiles(*)").eq("id", id).maybeSingle();
       if (!profile) throw notFound();
       const [{ data: availability }, { data: ratings }] = await Promise.all([
         supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
