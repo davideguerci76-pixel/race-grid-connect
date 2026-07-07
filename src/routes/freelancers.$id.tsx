@@ -30,7 +30,7 @@ function FreelancerProfile() {
         supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
         supabase.from("ratings").select(ratingCols).eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
       ]);
-      const rows = (ratings ?? []) as Array<{ stars: number; created_at: string; comment?: string | null }>;
+      const rows = ((ratings ?? []) as unknown) as Array<{ stars: number; created_at: string; comment?: string | null }>;
       const avg = rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
       return { profile, availability: availability ?? [], ratings: rows, avg };
     },
