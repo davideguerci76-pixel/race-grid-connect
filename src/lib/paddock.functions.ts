@@ -243,14 +243,14 @@ export const purchaseTokensDemo = createServerFn({ method: "POST" })
       reason: "purchase",
       note: `Demo pack: ${data.pack}`,
     });
-    const { data: prof, error } = await supabase
+    const { data: current } = await supabase.rpc("my_token_balance");
+    const nextBalance = ((current as number | null) ?? 0) + amount;
+    const { error } = await supabase
       .from("profiles")
-      .update({ token_balance: (await supabase.from("profiles").select("token_balance").eq("id", userId).single()).data!.token_balance + amount })
-      .eq("id", userId)
-      .select("token_balance")
-      .single();
+      .update({ token_balance: nextBalance })
+      .eq("id", userId);
     if (error) throw new Error(error.message);
-    return { balance: prof.token_balance, added: amount };
+    return { balance: nextBalance, added: amount };
   });
 
 export const getTokenHistory = createServerFn({ method: "GET" })
