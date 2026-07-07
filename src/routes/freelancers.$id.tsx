@@ -23,12 +23,16 @@ function FreelancerProfile() {
     queryFn: async () => {
       const { data: profile } = await supabase.from("profiles").select("id, display_name, avatar_url, user_type, freelancer_profiles(*)").eq("id", id).maybeSingle();
       if (!profile) throw notFound();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const isAuthed = !!sessionData.session;
+      const ratingCols = isAuthed ? "stars, comment, created_at" : "stars, created_at";
       const [{ data: availability }, { data: ratings }] = await Promise.all([
         supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
-        supabase.from("ratings").select("stars, comment, created_at").eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
+        supabase.from("ratings").select(ratingCols).eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
       ]);
-      const avg = ratings && ratings.length ? ratings.reduce((a, r) => a + r.stars, 0) / ratings.length : 0;
-      return { profile, availability: availability ?? [], ratings: ratings ?? [], avg };
+      const rows = (ratings ?? []) as Array<{ stars: number; created_at: string; comment?: string | null }>;
+      const avg = rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
+      return { profile, availability: availability ?? [], ratings: rows, avg };
     },
   });
 
