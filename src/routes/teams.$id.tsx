@@ -19,7 +19,7 @@ function TeamProfile() {
     queryKey: ["team", id],
     queryFn: async () => {
       const [{ data: profile }, { data: requests }] = await Promise.all([
-        supabase.from("profiles").select("*, team_profiles(*)").eq("id", id).maybeSingle(),
+        supabase.from("profiles").select("id, display_name, avatar_url, user_type, team_profiles(*)").eq("id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
       ]);
       return { profile, requests: requests ?? [] };
