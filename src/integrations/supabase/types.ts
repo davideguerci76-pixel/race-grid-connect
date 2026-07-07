@@ -559,6 +559,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_token_balance: { Args: never; Returns: number }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
