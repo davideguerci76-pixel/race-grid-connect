@@ -19,6 +19,7 @@ import { Route as FreelancersIndexRouteImport } from './routes/freelancers.index
 import { Route as TeamsIdRouteImport } from './routes/teams.$id'
 import { Route as FreelancersIdRouteImport } from './routes/freelancers.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
@@ -73,6 +74,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
@@ -112,13 +119,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/jobs': typeof JobsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers': typeof FreelancersIndexRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,13 +170,13 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/tokens'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/jobs'
     | '/sitemap.xml'
-    | '/dashboard'
     | '/freelancers/$id'
     | '/teams/$id'
     | '/freelancers'
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/tokens'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
     | '/_authenticated/dashboard/tokens'
+    | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -278,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/tokens': {
       id: '/_authenticated/dashboard/tokens'
       path: '/tokens'
@@ -314,6 +332,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -323,6 +342,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardEngagementsRoute,
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
+    AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
@@ -355,3 +375,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
