@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { SUPPORTED_LANGS } from "@/i18n";
+import { SUPPORTED_LANGS, LANG_STORAGE_KEY } from "@/i18n";
 import { Globe } from "lucide-react";
 import { useState } from "react";
 
