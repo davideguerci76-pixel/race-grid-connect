@@ -24,7 +24,7 @@ export function LanguageSwitcher() {
             {SUPPORTED_LANGS.map((l) => (
               <button
                 key={l.code}
-                onClick={() => { i18n.changeLanguage(l.code); setOpen(false); }}
+                onClick={() => { void i18n.changeLanguage(l.code); try { window.localStorage.setItem(LANG_STORAGE_KEY, l.code); } catch { /* ignore */ } setOpen(false); }}
                 className={`block w-full px-3 py-2 text-left text-xs font-bold uppercase tracking-widest transition-colors hover:bg-secondary ${l.code === current.code ? "text-racing-red" : ""}`}
               >
                 {l.label}
