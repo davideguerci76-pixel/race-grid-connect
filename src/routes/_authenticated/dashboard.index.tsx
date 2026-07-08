@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Coins, Star, Users } from "lucide-react";
+import { Calendar, Coins, Star, Users, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
@@ -53,7 +53,8 @@ function DashboardHome() {
           </Link>
         )}
 
-        <div className="mt-8 grid gap-4 md:grid-cols-4">
+        <div className="mt-8 grid gap-4 md:grid-cols-5">
+          <DashCard to="/dashboard/profile" icon={User} label={t("nav.profile")} value="→" />
           <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={profile?.user_type === "team" ? t("dashboard.post_request") : t("dashboard.manage_calendar")} />
           <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(matchesCount)} />
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />

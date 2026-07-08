@@ -40,16 +40,15 @@ export function SiteHeader() {
           <Link to="/jobs" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
             {t("nav.jobs")}
           </Link>
-          <Link to="/freelancers" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-            {t("nav.freelancers")}
-          </Link>
-          <Link to="/teams" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-            {t("nav.teams")}
-          </Link>
           {user && (
-            <Link to="/dashboard" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-              {t("nav.dashboard")}
-            </Link>
+            <>
+              <Link to="/dashboard" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
+                {t("nav.dashboard")}
+              </Link>
+              <Link to="/dashboard/profile" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
+                {t("nav.profile")}
+              </Link>
+            </>
           )}
         </div>
         <div className="flex items-center gap-2">

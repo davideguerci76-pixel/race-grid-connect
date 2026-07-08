@@ -9,7 +9,7 @@ const durationEnum = z.enum(["full_season", "race_weekend", "test_session"]);
 // ---- Availability ----
 export const setAvailability = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { dates: string[]; add: boolean }) =>
+  .validator((data: { dates: string[]; add: boolean }) =>
     z.object({ dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400), add: z.boolean() }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -36,7 +36,7 @@ export const getMyAvailability = createServerFn({ method: "GET" })
 // ---- Requests ----
 export const createRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         title: z.string().min(3).max(120),
@@ -67,7 +67,7 @@ export const createRequest = createServerFn({ method: "POST" })
 
 export const deactivateRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("requests").update({ is_active: false }).eq("id", data.id).eq("team_id", context.userId);
     if (error) throw new Error(error.message);
@@ -124,7 +124,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
 
 export const revealMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { match_id: string }) => z.object({ match_id: z.string().uuid() }).parse(data))
+  .validator((data: { match_id: string }) => z.object({ match_id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: result, error } = await context.supabase.rpc("reveal_match", { _match_id: data.match_id });
     if (error) throw new Error(error.message);
@@ -134,7 +134,7 @@ export const revealMatch = createServerFn({ method: "POST" })
 // ---- Engagements ----
 export const proposeEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         match_id: z.string().uuid(),
@@ -163,7 +163,7 @@ export const proposeEngagement = createServerFn({ method: "POST" })
 
 export const confirmEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("engagements")
@@ -177,7 +177,7 @@ export const confirmEngagement = createServerFn({ method: "POST" })
 
 export const markEngagementComplete = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: e } = await supabase.from("engagements").select("*").eq("id", data.id).maybeSingle();
@@ -207,7 +207,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
 // ---- Ratings ----
 export const submitRating = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z.object({
       engagement_id: z.string().uuid(),
       to_user_id: z.string().uuid(),
@@ -230,7 +230,7 @@ export const submitRating = createServerFn({ method: "POST" })
 // ---- Tokens (mock purchase for now — Stripe wiring is a follow-up) ----
 export const purchaseTokensDemo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { pack: "small" | "medium" | "large" }) =>
+  .validator((data: { pack: "small" | "medium" | "large" }) =>
     z.object({ pack: z.enum(["small", "medium", "large"]) }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -268,7 +268,7 @@ export const getTokenHistory = createServerFn({ method: "GET" })
 
 // ---- Public profile helpers ----
 export const getFreelancerRatings = createServerFn({ method: "GET" })
-  .inputValidator((data: { user_id: string }) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .validator((data: { user_id: string }) => z.object({ user_id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
     const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
