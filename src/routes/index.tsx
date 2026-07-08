@@ -30,7 +30,7 @@ function Home() {
           <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">
-              {t("home.badge", { count: 124 })}
+              {t("home.badge", { count: 124 })} LIVE
             </span>
           </div>
           <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter md:text-8xl">
