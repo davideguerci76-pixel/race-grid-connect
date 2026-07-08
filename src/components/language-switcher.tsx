@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { SUPPORTED_LANGS } from "@/i18n";
+import { SUPPORTED_LANGS, LANG_STORAGE_KEY } from "@/i18n";
 import { Globe } from "lucide-react";
 import { useState } from "react";
 
@@ -24,7 +24,7 @@ export function LanguageSwitcher() {
             {SUPPORTED_LANGS.map((l) => (
               <button
                 key={l.code}
-                onClick={() => { i18n.changeLanguage(l.code); setOpen(false); }}
+                onClick={() => { void i18n.changeLanguage(l.code); try { window.localStorage.setItem(LANG_STORAGE_KEY, l.code); } catch { /* ignore */ } setOpen(false); }}
                 className={`block w-full px-3 py-2 text-left text-xs font-bold uppercase tracking-widest transition-colors hover:bg-secondary ${l.code === current.code ? "text-racing-red" : ""}`}
               >
                 {l.label}
