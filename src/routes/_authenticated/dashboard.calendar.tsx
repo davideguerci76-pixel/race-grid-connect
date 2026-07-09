@@ -42,7 +42,8 @@ function CalendarPage() {
     mutationFn: async (dates: Date[] | undefined) => {
       const next = dates ?? [];
       const currentSet = new Set(myDays);
-      const nextSet = new Set(next.map((d) => d.toISOString().slice(0, 10)));
+      const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const nextSet = new Set(next.map(fmt));
       const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
