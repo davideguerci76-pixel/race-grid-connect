@@ -300,6 +300,7 @@ function FreelancerSection({ profile }: { profile: any }) {
 }
 
 function TeamSection({ profile }: { profile: any }) {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -313,8 +314,10 @@ function TeamSection({ profile }: { profile: any }) {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
+      if (!form.team_name.trim()) throw new Error("Team name is required");
       const { error } = await supabase.from("team_profiles").upsert({
-        user_id: profile?.user_id,
+        user_id: user.id,
         team_name: form.team_name,
         team_type: form.team_type || null,
         location: form.location || null,
