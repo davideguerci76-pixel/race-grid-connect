@@ -130,6 +130,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 }
 
 function FreelancerSection({ profile }: { profile: any }) {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -144,8 +145,9 @@ function FreelancerSection({ profile }: { profile: any }) {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
       const { error } = await supabase.from("freelancer_profiles").upsert({
-        user_id: profile?.user_id,
+        user_id: user.id,
         role: form.role as FreelancerRole,
         headline: form.headline || null,
         disciplines: form.disciplines,
@@ -153,7 +155,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         location: form.location || null,
         bio: form.bio || null,
         travels: form.travels,
-      });
+      }, { onConflict: "user_id" });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -298,6 +300,7 @@ function FreelancerSection({ profile }: { profile: any }) {
 }
 
 function TeamSection({ profile }: { profile: any }) {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -311,15 +314,17 @@ function TeamSection({ profile }: { profile: any }) {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
+      if (!form.team_name.trim()) throw new Error("Team name is required");
       const { error } = await supabase.from("team_profiles").upsert({
-        user_id: profile?.user_id,
+        user_id: user.id,
         team_name: form.team_name,
         team_type: form.team_type || null,
         location: form.location || null,
         primary_discipline: form.primary_discipline || null,
         bio: form.bio || null,
         website: form.website || null,
-      });
+      }, { onConflict: "user_id" });
       if (error) throw error;
     },
     onSuccess: () => {

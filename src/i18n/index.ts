@@ -34,13 +34,14 @@ if (!i18n.isInitialized) {
     });
 }
 
-// After hydration, switch to user's saved language client-side only.
-if (typeof window !== "undefined") {
+// Language must only change AFTER React hydration completes,
+// otherwise SSR (always 'en') and client render diverge.
+export function applySavedLanguage() {
+  if (typeof window === "undefined") return;
   try {
     const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
     if (saved && saved !== i18n.language && SUPPORTED_LANGS.some((l) => l.code === saved)) {
-      // Defer to next tick so initial hydration matches SSR ('en').
-      setTimeout(() => { void i18n.changeLanguage(saved); }, 0);
+      void i18n.changeLanguage(saved);
     }
   } catch { /* ignore */ }
 }
