@@ -130,6 +130,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 }
 
 function FreelancerSection({ profile }: { profile: any }) {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -144,8 +145,19 @@ function FreelancerSection({ profile }: { profile: any }) {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
       const { error } = await supabase.from("freelancer_profiles").upsert({
-        user_id: profile?.user_id,
+        user_id: user.id,
+        role: form.role as FreelancerRole,
+        headline: form.headline || null,
+        disciplines: form.disciplines,
+        day_rate: form.day_rate ? parseInt(form.day_rate) : null,
+        location: form.location || null,
+        bio: form.bio || null,
+        travels: form.travels,
+      }, { onConflict: "user_id" });
+      if (error) throw error;
+    },
         role: form.role as FreelancerRole,
         headline: form.headline || null,
         disciplines: form.disciplines,
