@@ -157,6 +157,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         travels: form.travels,
       }, { onConflict: "user_id" });
       if (error) throw error;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
       toast.success("Updated");
