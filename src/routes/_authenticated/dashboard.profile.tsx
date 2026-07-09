@@ -324,7 +324,7 @@ function TeamSection({ profile }: { profile: any }) {
         primary_discipline: form.primary_discipline || null,
         bio: form.bio || null,
         website: form.website || null,
-      });
+      }, { onConflict: "user_id" });
       if (error) throw error;
     },
     onSuccess: () => {
