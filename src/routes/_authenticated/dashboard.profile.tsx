@@ -157,17 +157,6 @@ function FreelancerSection({ profile }: { profile: any }) {
         travels: form.travels,
       }, { onConflict: "user_id" });
       if (error) throw error;
-    },
-        role: form.role as FreelancerRole,
-        headline: form.headline || null,
-        disciplines: form.disciplines,
-        day_rate: form.day_rate ? parseInt(form.day_rate) : null,
-        location: form.location || null,
-        bio: form.bio || null,
-        travels: form.travels,
-      });
-      if (error) throw error;
-    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
       toast.success("Updated");
