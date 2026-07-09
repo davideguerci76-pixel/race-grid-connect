@@ -20,7 +20,7 @@ export function AvailabilityCalendar({
         onSelect={onSelect}
         disabled={disabled ?? (min ? { before: min } : undefined)}
         weekStartsOn={1}
-        showOutsideDays
+        showOutsideDays={false}
         numberOfMonths={2}
       />
       <style>{`
