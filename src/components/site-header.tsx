@@ -36,7 +36,7 @@ export function SiteHeader() {
           <span className="inline-block h-6 w-6 skew-x-[-15deg] bg-racing-red" />
           PADDOCK<span className="text-racing-red">PRO</span>
         </Link>
-        <div className="hidden gap-6 text-xs font-bold uppercase tracking-widest text-muted-foreground lg:flex">
+        <div className="hidden gap-6 text-xs font-bold uppercase tracking-widest text-muted-foreground md:flex">
           <Link to="/jobs" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
             {t("nav.jobs")}
           </Link>
