@@ -34,16 +34,40 @@ if (!i18n.isInitialized) {
     });
 }
 
-// Language must only change AFTER React hydration completes,
-// otherwise SSR (always 'en') and client render diverge.
+// Language must only change after the initial SSR hydration/paint completes,
+// otherwise SSR (always 'en') and client-rendered route text can diverge.
 export function applySavedLanguage() {
   if (typeof window === "undefined") return;
+  let cancelled = false;
+
+  const run = () => {
+    if (cancelled) return;
+    try {
+      const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved && saved !== i18n.language && SUPPORTED_LANGS.some((l) => l.code === saved)) {
+        void i18n.changeLanguage(saved);
+        document.documentElement.lang = saved;
+      }
+    } catch { /* ignore */ }
+  };
+
+  const schedule = () => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        window.setTimeout(run, 0);
+      });
+    });
+  };
+
   try {
-    const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
-    if (saved && saved !== i18n.language && SUPPORTED_LANGS.some((l) => l.code === saved)) {
-      void i18n.changeLanguage(saved);
-    }
+    if (document.readyState === "complete") schedule();
+    else window.addEventListener("load", schedule, { once: true });
   } catch { /* ignore */ }
+
+  return () => {
+    cancelled = true;
+    window.removeEventListener("load", schedule);
+  };
 }
 
 export default i18n;
