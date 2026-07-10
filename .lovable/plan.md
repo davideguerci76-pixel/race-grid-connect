@@ -1,115 +1,45 @@
-# PaddockPro v2 — Match Engine + Tokens + Ratings
+## Fix account type + multi-request system for Teams
 
-## What changes vs v1
+### 1. Bug: login mostra sempre "FREELANCER"
+Il trigger `handle_new_user` legge `raw_user_meta_data->>'user_type'`, ma il form di signup probabilmente non passa quel metadato (o usa una chiave diversa) → il default `'freelancer'` vince sempre anche quando l'utente sceglie "Team".
 
-- **Language:** switch entire UI to English, add a language switcher (EN default; IT, ES, FR, DE) via `i18next`. All existing pages get translated.
-- **New core loop:** freelancers publish **available dates**, teams publish **request dates** (with role/discipline/circuit). A matching engine finds overlaps automatically.
-- **Reveals cost tokens:** you always see *how many* matches you have. To see *who* they are (name, contact) you spend 1 token per reveal. Free tokens on signup, buy more in packs.
-- **Ratings:** 1–5 stars + comment, both directions, only unlocked after a job is marked **Completed** by both sides.
+**Fix:**
+- Verificare `src/routes/auth.tsx` (o equivalente): passare `options.data.user_type` in `supabase.auth.signUp` in base alla scelta dell'utente.
+- Aggiungere un fallback lato UI in `dashboard.profile.tsx`: se il profilo esiste già come freelancer ma l'utente vuole essere team, permettere lo switch (già fatto in parte) e assicurarsi che al primo login post-OAuth Google venga chiesto il tipo account (Google non passa `user_type`).
+- Per gli account Google: aggiungere un onboarding step "Sei freelancer o team?" alla prima visita in dashboard se `profiles.user_type` è default e nessun sub-profile è stato compilato.
 
-## New pages / surfaces
+### 2. Sistema di richieste multiple per Team (5 token/richiesta)
 
-```text
-/                       Homepage (English, refreshed hero + how-it-works + pricing teaser)
-/jobs                   (renamed from /bacheca) Job board with request-date badges
-/freelancers            (renamed from /freelance) Directory
-/teams                  (renamed from /scuderie) Directory
-/freelancers/$id        Public profile — availability calendar visible, contact HIDDEN until revealed
-/teams/$id              Public profile — request calendar visible, contact HIDDEN until revealed
-/signup                 Two-type registration
-/dashboard              Auth landing (redirects to /dashboard/freelance or /dashboard/team)
-/dashboard/calendar     Manage own availability / request dates
-/dashboard/matches      Match inbox with counts, per-match "Reveal (1 token)" action
-/dashboard/tokens       Balance, history, buy packs
-/dashboard/jobs         Active/completed engagements, mark as completed, leave rating
-/pricing                Token packs
-```
+Attualmente `dashboard.calendar.tsx` mostra un `TeamRequestForm` singolo. Va trasformato in un vero gestionale di richieste.
 
-## Feature detail
+**Nuova pagina `/dashboard/requests`** (per soli team):
+- Lista di tutte le richieste create (attive, in pausa, chiuse, completate) con: ruolo cercato, disciplina, date, n° match, stato, azioni.
+- Bottone "New request" → apre form (riuso `TeamRequestForm`).
+- Al submit: verifica saldo token ≥ 5, addebita 5 token via nuova RPC `create_request(...)` SECURITY DEFINER che fa `credit_tokens(-5, 'request_post')` in transazione con l'INSERT su `requests`.
+- Se saldo < 5: modale "Ricarica token".
+- Azioni per richiesta: **Pause/Resume** (toggle `is_active`), **Close** (`status='closed'`), **Mark completed** (chiude e mostra CTA "Crea nuova richiesta simile" che duplica il form pre-compilato).
+- Ogni richiesta ha la sua vista dettaglio con la lista match candidati (riuso logica reveal esistente).
 
-### 1. Availability & request calendars
-- Freelancer: month-view calendar, click days to toggle "Available"; each available day carries role + disciplines from profile.
-- Team: create a **Request** = role + discipline + circuit + date range + budget. Requests appear on the team calendar.
-- Recurring shortcuts: "All race weekends 2026", "Every Sat–Sun".
+**Backend:**
+- Aggiungere `token_reason` enum value `'request_post'` (migration).
+- Aggiungere colonna `status` a `requests` (`active|paused|closed|completed`) se non esiste, con default `active`.
+- Nuova RPC `create_request(payload jsonb)` che valida saldo, inserisce, addebita 5 token, ritorna la request creata. Grant EXECUTE ad `authenticated`.
+- Nuova RPC `close_request(_id uuid)` / `set_request_status(_id, _status)` con check owner.
+- Notifica "richiesta creata" e trigger già esistente `tg_recompute_on_request` continua a funzionare.
 
-### 2. Matching engine (server function, runs on write + daily cron)
-A match exists when:
-- Freelancer's available date overlaps a team's request date range, AND
-- Freelancer role matches request role, AND
-- Freelancer's disciplines include request discipline, AND
-- (optional) Location/travel filter passes.
-Match rows are stored with `freelancer_id`, `team_id`, `request_id`, `score`, `revealed_by_freelancer bool`, `revealed_by_team bool`, `created_at`.
+**Sidebar/navigation:**
+- Aggiungere link "My Requests" nella dashboard sidebar visibile solo se `user_type='team'`.
+- Rimuovere/nascondere "Manage Calendar" per i team (il calendario è concettualmente dei freelancer).
 
-### 3. Token economy
-- Signup grant: **5 free tokens**.
-- Reveal a counterparty = **1 token** (once revealed, permanent for that side).
-- Packs: 10 / 50 / 200 tokens via Stripe Checkout. Webhook credits `token_transactions`.
-- All balance changes are ledger rows; `profiles.token_balance` is a computed cache updated in the same transaction.
+**Costo indicativo:** ~35–45 crediti.
 
-### 4. Notifications
-- In-app inbox + email on: new matches count crossing thresholds (1, 5, 10…), someone revealed you, rating received, engagement confirmed.
-- Homepage teaser & dashboard banner: *"5 teams match your calendar — reveal them."*
+### File toccati
+- `src/routes/auth.tsx` (signup meta)
+- `src/routes/_authenticated/dashboard.profile.tsx` (onboarding tipo account post-Google)
+- `src/routes/_authenticated/dashboard.requests.tsx` (nuova pagina lista)
+- `src/routes/_authenticated/dashboard.requests.$id.tsx` (dettaglio richiesta + match)
+- `src/components/team-request-form.tsx` (submit via RPC, costo 5 token, redirect a lista)
+- `src/components/dashboard-sidebar.tsx` (link condizionale)
+- Migration Supabase: enum value, colonna `status`, RPC `create_request` / `set_request_status`.
 
-### 5. Ratings
-- After a reveal, either party can propose an **Engagement** (dates + fee). Both must confirm.
-- After the engagement end date, both sides get a "Mark as completed" button.
-- Once **both** mark complete → rating form unlocks for both. 1–5 stars + short comment. Ratings show on public profiles once posted.
-
-## Technical section
-
-### Stack additions
-- **Lovable Cloud** (Supabase) for DB, auth, RLS.
-- **i18n:** `i18next` + `react-i18next` + `i18next-browser-languagedetector`. Locale in URL search param `?lang=en` and persisted to `localStorage`. All copy moved to `/src/i18n/locales/{en,it,es,fr,de}.json`.
-- **Stripe (built-in Lovable Payments)** for token packs.
-- **Cron:** Supabase pg_cron nightly job to recompute matches & send digest notifications.
-
-### Data model (new tables)
-```text
-profiles(id, user_type, display_name, avatar_url, token_balance, created_at)
-freelancer_profiles(user_id PK/FK, role, disciplines[], day_rate, travels, location, bio, skills[])
-team_profiles(user_id PK/FK, name, initials, type, location, discipline, founded, size, bio)
-availability(id, freelancer_id, date, created_at)                       -- one row per available day
-requests(id, team_id, role, discipline, circuit, location, start_date, end_date, budget, duration, notes, active)
-matches(id, freelancer_id, team_id, request_id, score, revealed_by_freelancer, revealed_by_team, created_at) UNIQUE(freelancer_id, request_id)
-token_transactions(id, user_id, delta, reason, ref_id, stripe_session_id, created_at) -- ledger
-engagements(id, freelancer_id, team_id, request_id, start_date, end_date, fee, status enum('proposed','confirmed','completed','cancelled'), freelancer_confirmed_completion, team_confirmed_completion)
-ratings(id, engagement_id, from_user_id, to_user_id, stars 1-5, comment, created_at) UNIQUE(engagement_id, from_user_id)
-notifications(id, user_id, kind, payload jsonb, read_at, created_at)
-```
-- `user_roles` table + `has_role()` security-definer function per platform rules.
-- Full RLS: own-row access for calendars/tokens/notifications; matches visible to both parties but counterparty PII is redacted server-side unless the corresponding `revealed_by_*` flag is true.
-
-### Server functions (`createServerFn` + `requireSupabaseAuth`)
-- `setAvailability(dates[])`, `deleteAvailability(dates[])`
-- `createRequest(payload)`, `updateRequest`, `deactivateRequest`
-- `getMyMatches()` — returns counts + redacted rows
-- `revealMatch(match_id)` — atomic: debit token, flip reveal flag, insert notification for counterparty
-- `proposeEngagement`, `confirmEngagement`, `markCompleted`
-- `submitRating(engagement_id, stars, comment)`
-- `createTokenCheckout(pack)` → Stripe Checkout session
-- Server route `/api/public/stripe/webhook` — verifies signature, credits tokens via `token_transactions` insert, updates cache.
-
-### Matching computation
-Trigger recomputation for the affected freelancer/team on inserts to `availability` and `requests`. Nightly cron re-scans for edge cases (deletions, expired requests).
-
-### UI components
-- `<LanguageSwitcher />` in header
-- `<AvailabilityCalendar mode="freelancer|team" />` (react-day-picker, multi-select)
-- `<MatchCard revealed={bool} onReveal />` with token cost pill
-- `<TokenBadge />` in header showing balance
-- `<RatingStars value onChange? readOnly? />`
-- Rewritten `SiteHeader` / `SiteFooter` using i18n keys
-
-## Migration path
-
-1. Enable Lovable Cloud + configure auth (email/password + Google).
-2. Ship migrations + RLS + seed data (replace `src/lib/mock-data.ts`).
-3. Add i18n scaffolding and translate all existing v1 pages; rename routes (`bacheca → jobs`, `freelance → freelancers`, `scuderia → teams`).
-4. Build calendar, matches, tokens, ratings features in that order.
-5. Enable Stripe Payments and wire the token packs + webhook last.
-
-## Open question (blocking Stripe step only)
-
-Where will you be selling the token packs from (country of your business)? This affects whether Stripe full-compliance handling is available (recommended for digital packs) or tax-calc-only. If unsure, I'll default to full compliance handling and you can change it later.
-
-Everything else I'll proceed with defaults: EN first, 5 free tokens, pack sizes 10/50/200, 1 token per reveal, rating unlocks after both sides confirm completion.
+Confermi?

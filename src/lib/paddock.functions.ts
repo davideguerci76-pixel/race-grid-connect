@@ -55,14 +55,57 @@ export const createRequest = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: row, error } = await supabase
-      .from("requests")
-      .insert({ ...data, team_id: userId })
-      .select()
-      .single();
+    const payload: Record<string, unknown> = {
+      title: data.title,
+      role: data.role,
+      discipline: data.discipline,
+      duration: data.duration,
+      circuit: data.circuit ?? null,
+      location: data.location ?? null,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      budget_min: data.budget_min ?? null,
+      budget_max: data.budget_max ?? null,
+      budget_unit: data.budget_unit,
+      notes: data.notes ?? null,
+    };
+    const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
     return row;
+  });
+
+export const setRequestStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string; status: "active" | "paused" | "closed" | "completed" }) =>
+    z.object({ id: z.string().uuid(), status: z.enum(["active", "paused", "closed", "completed"]) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("set_request_status", { _id: data.id, _status: data.status });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const getMyRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("requests")
+      .select("*")
+      .eq("team_id", userId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const ids = (data ?? []).map((r) => r.id);
+    let counts: Record<string, number> = {};
+    if (ids.length) {
+      const { data: matches } = await supabase.from("matches").select("request_id").in("request_id", ids);
+      counts = (matches ?? []).reduce<Record<string, number>>((acc, m) => {
+        const rid = (m as { request_id: string }).request_id;
+        acc[rid] = (acc[rid] ?? 0) + 1;
+        return acc;
+      }, {});
+    }
+    return (data ?? []).map((r) => ({ ...r, matches_count: counts[r.id] ?? 0 }));
   });
 
 export const deactivateRequest = createServerFn({ method: "POST" })
@@ -73,6 +116,7 @@ export const deactivateRequest = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 // ---- Matches ----
 export const getMyMatches = createServerFn({ method: "GET" })

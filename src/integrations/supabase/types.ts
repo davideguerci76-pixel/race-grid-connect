@@ -377,6 +377,7 @@ export type Database = {
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           start_date: string
+          status: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
           updated_at: string
@@ -397,6 +398,7 @@ export type Database = {
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           start_date: string
+          status?: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
           updated_at?: string
@@ -417,6 +419,7 @@ export type Database = {
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           start_date?: string
+          status?: Database["public"]["Enums"]["request_status"]
           team_id?: string
           title?: string
           updated_at?: string
@@ -542,6 +545,36 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_request: {
+        Args: { _payload: Json }
+        Returns: {
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          end_date: string
+          id: string
+          is_active: boolean
+          location: string | null
+          notes: string | null
+          role: Database["public"]["Enums"]["freelancer_role"]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       credit_tokens: {
         Args: {
           _delta: number
@@ -572,6 +605,39 @@ export type Database = {
           revealed_team: string
         }[]
       }
+      set_request_status: {
+        Args: {
+          _id: string
+          _status: Database["public"]["Enums"]["request_status"]
+        }
+        Returns: {
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          end_date: string
+          id: string
+          is_active: boolean
+          location: string | null
+          notes: string | null
+          role: Database["public"]["Enums"]["freelancer_role"]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -594,6 +660,7 @@ export type Database = {
         | "engagement_completed"
         | "rating_received"
         | "tokens_credited"
+      request_status: "active" | "paused" | "closed" | "completed"
       token_reason:
         | "signup_bonus"
         | "purchase"
@@ -601,6 +668,7 @@ export type Database = {
         | "admin_credit"
         | "admin_debit"
         | "refund"
+        | "request_post"
       user_type: "freelancer" | "team"
     }
     CompositeTypes: {
@@ -751,6 +819,7 @@ export const Constants = {
         "rating_received",
         "tokens_credited",
       ],
+      request_status: ["active", "paused", "closed", "completed"],
       token_reason: [
         "signup_bonus",
         "purchase",
@@ -758,6 +827,7 @@ export const Constants = {
         "admin_credit",
         "admin_debit",
         "refund",
+        "request_post",
       ],
       user_type: ["freelancer", "team"],
     },
