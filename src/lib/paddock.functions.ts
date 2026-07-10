@@ -2,8 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const disciplineEnum = z.enum(["f1", "rally", "wec_gt", "karting"]);
-const roleEnum = z.enum(["track_engineer", "mechanic", "telemetrist", "data_analyst", "tire_specialist", "chief_mechanic", "other"]);
+// Enums are validated server-side by Postgres; keep TS-side loose to allow the extended taxonomy.
+const disciplineEnum = z.string().min(1).max(64);
+const roleEnum = z.string().min(1).max(64);
 const durationEnum = z.enum(["full_season", "race_weekend", "test_session"]);
 
 // ---- Availability ----
