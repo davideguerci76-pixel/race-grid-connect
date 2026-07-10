@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 export function SiteFooter() {
@@ -15,17 +16,31 @@ export function SiteFooter() {
         <div>
           <div className="label-mono mb-3">{t("footer.network")}</div>
           <ul className="space-y-2 text-sm">
-            <li>{t("nav.jobs")}</li>
-            <li>{t("nav.freelancers")}</li>
-            <li>{t("nav.teams")}</li>
+            <li>
+              <Link to="/jobs" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("nav.jobs")}
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
           <div className="label-mono mb-3">{t("footer.legal")}</div>
           <ul className="space-y-2 text-sm">
-            <li>{t("footer.privacy")}</li>
-            <li>{t("footer.terms")}</li>
-            <li>{t("footer.cookie")}</li>
+            <li>
+              <Link to="/legal/$doc" params={{ doc: "privacy" }} className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("footer.privacy")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/legal/$doc" params={{ doc: "terms" }} className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("footer.terms")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/legal/$doc" params={{ doc: "cookie" }} className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("footer.cookie")}
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
