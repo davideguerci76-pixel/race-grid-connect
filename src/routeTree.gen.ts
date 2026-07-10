@@ -22,6 +22,7 @@ import { Route as FreelancersIdRouteImport } from './routes/freelancers.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
+import { Route as AuthenticatedDashboardRequestsRouteImport } from './routes/_authenticated/dashboard.requests'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
@@ -93,6 +94,12 @@ const AuthenticatedDashboardTokensRoute =
     path: '/tokens',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRequestsRoute =
+  AuthenticatedDashboardRequestsRouteImport.update({
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardProfileRoute =
   AuthenticatedDashboardProfileRouteImport.update({
     id: '/profile',
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
@@ -170,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/_authenticated/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/profile'
+    | '/dashboard/requests'
     | '/dashboard/tokens'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/profile'
+    | '/dashboard/requests'
     | '/dashboard/tokens'
     | '/dashboard'
   id:
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
     | '/_authenticated/dashboard/profile'
+    | '/_authenticated/dashboard/requests'
     | '/_authenticated/dashboard/tokens'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardTokensRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/requests': {
+      id: '/_authenticated/dashboard/requests'
+      path: '/requests'
+      fullPath: '/dashboard/requests'
+      preLoaderRoute: typeof AuthenticatedDashboardRequestsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/profile': {
       id: '/_authenticated/dashboard/profile'
       path: '/profile'
@@ -372,6 +392,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
+  AuthenticatedDashboardRequestsRoute: typeof AuthenticatedDashboardRequestsRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -383,6 +404,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardEngagementsRoute,
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
+    AuthenticatedDashboardRequestsRoute: AuthenticatedDashboardRequestsRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }
