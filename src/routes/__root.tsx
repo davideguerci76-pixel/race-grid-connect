@@ -104,14 +104,17 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    applySavedLanguage();
+    const cleanupLanguage = applySavedLanguage();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
         router.invalidate();
         if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
       }
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cleanupLanguage?.();
+      sub.subscription.unsubscribe();
+    };
   }, [router, queryClient]);
 
   return (
