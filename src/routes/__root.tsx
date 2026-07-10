@@ -13,7 +13,6 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
-import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -92,9 +91,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+    <html lang="en" suppressHydrationWarning>
+      <head suppressHydrationWarning><HeadContent /></head>
+      <body suppressHydrationWarning>{children}<Scripts /></body>
     </html>
   );
 }
@@ -104,14 +103,15 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    applySavedLanguage();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
         router.invalidate();
         if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
       }
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+    };
   }, [router, queryClient]);
 
   return (
