@@ -2,8 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const disciplineEnum = z.enum(["f1", "rally", "wec_gt", "karting"]);
-const roleEnum = z.enum(["track_engineer", "mechanic", "telemetrist", "data_analyst", "tire_specialist", "chief_mechanic", "other"]);
+// Enums are validated server-side by Postgres; keep TS-side loose to allow the extended taxonomy.
+const disciplineEnum = z.string().min(1).max(64);
+const roleEnum = z.string().min(1).max(64);
 const durationEnum = z.enum(["full_season", "race_weekend", "test_session"]);
 
 // ---- Availability ----
@@ -51,6 +52,7 @@ export const createRequest = createServerFn({ method: "POST" })
         budget_unit: z.enum(["day", "event", "season"]).default("day"),
         duration: durationEnum,
         notes: z.string().max(1000).optional().nullable(),
+        season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
       })
       .parse(data),
   )
@@ -68,6 +70,7 @@ export const createRequest = createServerFn({ method: "POST" })
       budget_max: data.budget_max ?? null,
       budget_unit: data.budget_unit,
       notes: data.notes ?? null,
+      season_dates: data.season_dates ?? null,
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);

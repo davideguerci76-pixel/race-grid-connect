@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -10,8 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINES, DURATIONS, ROLES, type Discipline, type DurationType, type FreelancerRole } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, type DurationType } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -20,7 +21,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
   component: NewRequestPage,
 });
 
-const COST = 5;
+const COST_SINGLE = 5;
+const COST_SEASON = 15;
+
+function fmt(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 function NewRequestPage() {
   const { t } = useTranslation();
@@ -48,7 +54,6 @@ function NewRequestPage() {
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);
 
-  // Pre-fill from a previous request when ?from=<uuid>
   const { data: existing } = useQuery({
     queryKey: ["my-requests", user?.id],
     enabled: !!user && !!from,
@@ -58,8 +63,8 @@ function NewRequestPage() {
 
   const [form, setForm] = useState({
     title: "",
-    role: "mechanic" as FreelancerRole,
-    discipline: "f1" as Discipline,
+    role: "race_mechanics" as string,
+    discipline: "formula_1" as string,
     duration: "race_weekend" as DurationType,
     circuit: "",
     location: "",
@@ -70,13 +75,14 @@ function NewRequestPage() {
     budget_unit: "day" as "day" | "event" | "season",
     notes: "",
   });
+  const [seasonDates, setSeasonDates] = useState<Date[]>([]);
 
   useEffect(() => {
     if (!source) return;
     setForm({
       title: source.title,
-      role: source.role as FreelancerRole,
-      discipline: source.discipline as Discipline,
+      role: source.role as string,
+      discipline: source.discipline as string,
       duration: source.duration as DurationType,
       circuit: source.circuit ?? "",
       location: source.location ?? "",
@@ -87,7 +93,15 @@ function NewRequestPage() {
       budget_unit: (source.budget_unit as "day" | "event" | "season") ?? "day",
       notes: source.notes ?? "",
     });
+    setSeasonDates([]);
   }, [source]);
+
+  const isSeason = form.duration === "full_season";
+  const cost = isSeason ? COST_SEASON : COST_SINGLE;
+  const balance = profile?.token_balance ?? 0;
+  const canAfford = balance >= cost;
+
+  const seasonDatesIso = useMemo(() => seasonDates.map(fmt).sort(), [seasonDates]);
 
   const mut = useMutation({
     mutationFn: () =>
@@ -99,13 +113,14 @@ function NewRequestPage() {
           duration: form.duration,
           circuit: form.circuit || null,
           location: form.location || null,
-          start_date: form.start_date,
-          end_date: form.end_date,
+          start_date: isSeason ? seasonDatesIso[0] : form.start_date,
+          end_date: isSeason ? seasonDatesIso[seasonDatesIso.length - 1] : form.end_date,
           budget_min: form.budget_min ? parseInt(form.budget_min) : null,
           budget_max: form.budget_max ? parseInt(form.budget_max) : null,
-          budget_unit: form.budget_unit,
+          budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
-        },
+          ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+        } as never,
       }),
     onSuccess: () => {
       toast.success(t("requests.posted"));
@@ -114,9 +129,6 @@ function NewRequestPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-
-  const balance = profile?.token_balance ?? 0;
-  const canAfford = balance >= COST;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -132,9 +144,9 @@ function NewRequestPage() {
           </Link>
         </div>
 
-        <div className="mt-4 flex items-center gap-3 border border-border bg-card p-4 text-sm">
+        <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
           <span className="font-mono text-xs uppercase text-muted-foreground">{t("requests.cost")}:</span>
-          <span className="font-bold text-racing-red">{COST} tokens</span>
+          <span className="font-bold text-racing-red">{cost} tokens</span>
           <span className="ml-auto font-mono text-xs uppercase text-muted-foreground">{t("requests.balance")}:</span>
           <span className={`font-bold ${canAfford ? "text-foreground" : "text-racing-red"}`}>{balance}</span>
           {!canAfford && (
@@ -151,6 +163,10 @@ function NewRequestPage() {
               toast.error(t("requests.insufficient"));
               return;
             }
+            if (isSeason && seasonDatesIso.length === 0) {
+              toast.error("Select at least one working day for the season");
+              return;
+            }
             mut.mutate();
           }}
           className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
@@ -163,25 +179,48 @@ function NewRequestPage() {
               maxLength={120}
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="e.g. GT3 mechanic – Spa 6h"
+              placeholder="e.g. GT3 race mechanic – Spa 6h"
               className="mt-1 w-full border border-border bg-background px-3 py-2"
             />
           </div>
-          <SelectField label={t("jobs.filters.role")} value={form.role} onChange={(v) => setForm({ ...form, role: v as FreelancerRole })} options={ROLES.map((r) => [r, t(`role.${r}`)])} />
-          <SelectField label={t("jobs.filters.discipline")} value={form.discipline} onChange={(v) => setForm({ ...form, discipline: v as Discipline })} options={DISCIPLINES.map((r) => [r, t(`discipline.${r}`)])} />
-          <SelectField label={t("jobs.filters.duration")} value={form.duration} onChange={(v) => setForm({ ...form, duration: v as DurationType })} options={DURATIONS.map((r) => [r, t(`duration.${r}`)])} />
+
+          <SelectField
+            label={t("jobs.filters.role")}
+            value={form.role}
+            onChange={(v) => setForm({ ...form, role: v })}
+            options={ROLE_OPTIONS}
+          />
+          <SelectField
+            label={t("jobs.filters.discipline")}
+            value={form.discipline}
+            onChange={(v) => setForm({ ...form, discipline: v })}
+            options={DISCIPLINE_OPTIONS}
+          />
+
+          <SelectField
+            label={t("jobs.filters.duration")}
+            value={form.duration}
+            onChange={(v) => setForm({ ...form, duration: v as DurationType })}
+            options={DURATIONS.map((r) => ({ value: r, label: t(`duration.${r}`) }))}
+          />
           <div>
             <label className="label-mono">Circuit</label>
             <input value={form.circuit} onChange={(e) => setForm({ ...form, circuit: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
-          <div>
-            <label className="label-mono">Start date</label>
-            <input type="date" required value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
-          </div>
-          <div>
-            <label className="label-mono">End date</label>
-            <input type="date" required value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
-          </div>
+
+          {!isSeason && (
+            <>
+              <div>
+                <label className="label-mono">Start date</label>
+                <input type="date" required={!isSeason} value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+              </div>
+              <div>
+                <label className="label-mono">End date</label>
+                <input type="date" required={!isSeason} value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="label-mono">Budget min (€)</label>
             <input type="number" min="0" value={form.budget_min} onChange={(e) => setForm({ ...form, budget_min: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
@@ -190,16 +229,31 @@ function NewRequestPage() {
             <label className="label-mono">Budget max (€)</label>
             <input type="number" min="0" value={form.budget_max} onChange={(e) => setForm({ ...form, budget_max: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
+
+          {isSeason && (
+            <div className="md:col-span-2">
+              <label className="label-mono">Season working days</label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Click every day you need the specialist on the ground across the season. Matches are computed against these exact days.
+              </p>
+              <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
+              <div className="mt-3">
+                <AvailabilityCalendar selected={seasonDates} onSelect={(d) => setSeasonDates(d ?? [])} min={new Date()} />
+              </div>
+            </div>
+          )}
+
           <div className="md:col-span-2">
             <label className="label-mono">Notes</label>
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
+
           <button
             type="submit"
-            disabled={mut.isPending || !canAfford}
+            disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
-            {mut.isPending ? "…" : `${t("requests.post_for")} ${COST} tokens`}
+            {mut.isPending ? "…" : `${t("requests.post_for")} ${cost} tokens`}
           </button>
         </form>
       </div>
@@ -208,14 +262,24 @@ function NewRequestPage() {
   );
 }
 
-function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: [string, string][] }) {
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
   return (
     <div>
       <label className="label-mono">{label}</label>
       <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2">
-        {options.map(([v, l]) => (
-          <option key={v} value={v}>
-            {l}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
           </option>
         ))}
       </select>

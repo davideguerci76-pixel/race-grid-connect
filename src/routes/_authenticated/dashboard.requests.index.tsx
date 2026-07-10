@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
+import { roleLabel, disciplineLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -86,7 +87,7 @@ function RequestsPage() {
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
                     <span className="font-mono text-[11px] uppercase text-muted-foreground">
-                      {r.role.replace("_", " ")} · {r.discipline}
+                      {roleLabel(r.role)} · {disciplineLabel(r.discipline)}
                     </span>
                   </div>
                   <h2 className="mt-1 text-xl font-bold">{r.title}</h2>
