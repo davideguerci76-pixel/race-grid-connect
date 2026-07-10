@@ -1,16 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { setAvailability, getMyAvailability, createRequest } from "@/lib/paddock.functions";
-import { DISCIPLINES, DURATIONS, ROLES, type Discipline, type DurationType, type FreelancerRole } from "@/lib/paddock";
+import { setAvailability, getMyAvailability } from "@/lib/paddock.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
