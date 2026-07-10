@@ -1,12 +1,15 @@
 import { useTranslation } from "react-i18next";
+import { useHydrated } from "@tanstack/react-router";
 import { SUPPORTED_LANGS, LANG_STORAGE_KEY } from "@/i18n";
 import { Globe } from "lucide-react";
 import { useState } from "react";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
+  const hydrated = useHydrated();
   const [open, setOpen] = useState(false);
-  const current = SUPPORTED_LANGS.find((l) => l.code === i18n.resolvedLanguage) ?? SUPPORTED_LANGS[0];
+  const currentCode = hydrated ? i18n.resolvedLanguage : "en";
+  const current = SUPPORTED_LANGS.find((l) => l.code === currentCode) ?? SUPPORTED_LANGS[0];
 
   return (
     <div className="relative">
