@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINES, ROLES, type Discipline, type FreelancerRole } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, disciplineLabel, roleLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -188,9 +188,9 @@ function FreelancerSection({ profile }: { profile: any }) {
       if (!user?.id) throw new Error("Not authenticated");
       const { error } = await supabase.from("freelancer_profiles").upsert({
         user_id: user.id,
-        role: form.role as FreelancerRole,
+        role: form.role as never,
         headline: form.headline || null,
-        disciplines: form.disciplines,
+        disciplines: form.disciplines as never,
         day_rate: form.day_rate ? parseInt(form.day_rate) : null,
         location: form.location || null,
         bio: form.bio || null,
@@ -217,8 +217,8 @@ function FreelancerSection({ profile }: { profile: any }) {
               onChange={(e) => setForm({ ...form, role: e.target.value })}
               className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
             >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>{r.replace("_", " ")}</option>
+              {ROLE_OPTIONS.map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
               ))}
             </select>
           </div>
@@ -233,22 +233,22 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Disciplines</label>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {DISCIPLINES.map((d) => (
-                <label key={d} className="flex items-center gap-1">
+            <div className="mt-1 max-h-64 overflow-y-auto flex flex-wrap gap-2 border border-border p-2">
+              {DISCIPLINE_OPTIONS.map((d) => (
+                <label key={d.value} className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    checked={form.disciplines.includes(d)}
+                    checked={form.disciplines.includes(d.value)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setForm({ ...form, disciplines: [...form.disciplines, d] });
+                        setForm({ ...form, disciplines: [...form.disciplines, d.value] });
                       } else {
-                        setForm({ ...form, disciplines: form.disciplines.filter((x: Discipline) => x !== d) });
+                        setForm({ ...form, disciplines: form.disciplines.filter((x: string) => x !== d.value) });
                       }
                     }}
                     className="accent-racing-red"
                   />
-                  <span className="text-xs uppercase">{d}</span>
+                  <span className="text-xs">{d.label}</span>
                 </label>
               ))}
             </div>
@@ -304,7 +304,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         <>
           <div className="text-sm">
             <span className="text-muted-foreground">Role:</span>
-            <span className="ml-2 font-mono uppercase">{profile?.role ?? "—"}</span>
+            <span className="ml-2">{profile?.role ? roleLabel(profile.role) : "—"}</span>
           </div>
           <div className="text-sm">
             <span className="text-muted-foreground">Headline:</span>
@@ -312,7 +312,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div className="text-sm">
             <span className="text-muted-foreground">Disciplines:</span>
-            <span className="ml-2 font-mono uppercase">{profile?.disciplines?.join(", ") ?? "—"}</span>
+            <span className="ml-2">{profile?.disciplines?.length ? profile.disciplines.map(disciplineLabel).join(", ") : "—"}</span>
           </div>
           <div className="text-sm">
             <span className="text-muted-foreground">Day rate:</span>
