@@ -13,7 +13,6 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
-import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -104,7 +103,6 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const cleanupLanguage = applySavedLanguage();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
         router.invalidate();
@@ -112,7 +110,6 @@ function RootComponent() {
       }
     });
     return () => {
-      cleanupLanguage?.();
       sub.subscription.unsubscribe();
     };
   }, [router, queryClient]);
