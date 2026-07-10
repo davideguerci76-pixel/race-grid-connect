@@ -52,6 +52,7 @@ export const createRequest = createServerFn({ method: "POST" })
         budget_unit: z.enum(["day", "event", "season"]).default("day"),
         duration: durationEnum,
         notes: z.string().max(1000).optional().nullable(),
+        season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
       })
       .parse(data),
   )
@@ -69,6 +70,7 @@ export const createRequest = createServerFn({ method: "POST" })
       budget_max: data.budget_max ?? null,
       budget_unit: data.budget_unit,
       notes: data.notes ?? null,
+      season_dates: data.season_dates ?? null,
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
