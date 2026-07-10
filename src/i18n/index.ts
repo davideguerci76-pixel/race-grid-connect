@@ -32,6 +32,8 @@ if (!i18n.isInitialized) {
       supportedLngs: SUPPORTED_LANGS.map((l) => l.code),
       interpolation: { escapeValue: false },
     });
+} else if (i18n.language !== "en") {
+  void i18n.changeLanguage("en");
 }
 
 // Language must only change after the initial SSR hydration/paint completes,
