@@ -1,20 +1,241 @@
 {
-  "nav": { "jobs": "Ofertas", "freelancers": "Freelancers", "teams": "Equipos", "dashboard": "Panel", "profile": "Mi perfil", "signin": "Iniciar sesión", "signup": "Únete", "signout": "Salir", "tokens": "Tokens", "matches": "Coincidencias", "calendar": "Calendario", "engagements": "Contratos", "pricing": "Precios" },
-  "home": { "badge": "En vivo · {{count}} puestos", "hero_1": "Encuentra tu", "hero_2": "próximo fin de semana de carrera.", "sub": "La red de élite para mecánicos, ingenieros de pista, telemetristas y analistas del motorsport.", "cta_freelancer_title": "Soy Freelance", "cta_freelancer_body": "Publica disponibilidad y recibe matches", "cta_team_title": "Somos un Equipo", "cta_team_body": "Publica fechas y encuentra talento", "how_title": "Cómo funciona el motor de matching", "how_1_t": "Publica tu calendario", "how_1_b": "Los freelance marcan días. Los equipos publican fines de semana.", "how_2_t": "Matches automáticos", "how_2_b": "El motor encuentra todos los solapamientos.", "how_3_t": "Gasta un token para revelar", "how_3_b": "Ves cuántos matches tienes. Gasta 1 token para saber quién.", "how_4_t": "Valoraciones", "how_4_b": "Tras un contrato confirmado, ambas partes valoran.", "stats": { "specialists": "Especialistas", "teams": "Equipos", "countries": "Países", "rate": "Tarifa media" }, "featured_jobs": "Solicitudes abiertas", "featured_freelancers": "Talento verificado", "see_all": "Ver todo", "cta_ready": "¿Listo para la parrilla?", "cta_free": "Regístrate gratis · 5 tokens", "cta_start": "Empieza →" },
-  "jobs": { "title": "Solicitudes abiertas", "sub": "{{filtered}} de {{total}} solicitudes.", "filters": { "discipline": "Disciplina", "role": "Rol", "duration": "Duración", "search_placeholder": "Buscar..." }, "budget": "Presupuesto", "apply": "Postular", "post_request": "Publicar solicitud", "empty": "Sin resultados" },
-  "freelancers": { "title": "Freelancers", "sub": "{{count}} especialistas verificados.", "filters": { "role": "Rol", "discipline": "Disciplina", "travels": "Viaja fines de semana" } },
-  "teams": { "title": "Equipos", "sub": "Equipos y factorías en la red." },
-  "duration": { "full_season": "Temporada completa", "race_weekend": "Fin de semana", "test_session": "Sesión de test" },
-  "role": { "track_engineer": "Ing. de Pista", "mechanic": "Mecánico", "telemetrist": "Telemetrista", "data_analyst": "Analista", "tire_specialist": "Neumáticos", "chief_mechanic": "Jefe Mecánico", "other": "Otro" },
-  "discipline": { "f1": "F1", "rally": "Rally", "wec_gt": "WEC / GT", "karting": "Karting" },
-  "availability": { "available": "Disponible", "booked": "Ocupado", "week": "Esta semana", "next_race": "Próximo GP" },
-  "auth": { "signin_title": "Inicia sesión", "signup_title": "Únete al paddock", "email": "Email", "password": "Contraseña", "display_name": "Nombre", "team_name": "Nombre del equipo", "continue_email": "Continuar con email", "continue_google": "Continuar con Google", "no_account": "¿Nuevo?", "have_account": "¿Ya tienes cuenta?", "create_account": "Crear cuenta", "type_freelancer": "Soy especialista", "type_freelancer_desc": "Mecánico, ingeniero, telemetrista.", "type_team": "Somos un equipo", "type_team_desc": "Escudería, factoría, garage.", "which_are_you": "¿Qué te describe mejor?", "signed_in_as": "Sesión: {{email}}" },
-  "dashboard": { "title": "Panel", "welcome": "Hola, {{name}}", "tokens_balance": "Saldo de tokens", "buy_tokens": "Comprar tokens", "your_matches": "Tus matches", "new_matches_pill": "{{count}} nuevos matches", "manage_calendar": "Gestionar calendario", "post_request": "Publicar solicitud", "requests_active": "Solicitudes activas", "engagements": "Contratos", "rating_average": "Valoración" },
-  "calendar": { "title": "Calendario disponibilidad", "team_title": "Calendario solicitudes", "instructions_freelancer": "Haz clic para activar la disponibilidad.", "instructions_team": "Añade una solicitud con rol y fechas.", "available_days": "{{count}} días disponibles", "quick": { "next_weekend": "Próximo fin de semana", "clear_month": "Limpiar mes", "all_weekends": "Todos los fines de semana" } },
-  "matches": { "title": "Matches", "empty": "Sin matches todavía.", "empty_team": "Sin matches. Publica una solicitud.", "hidden_name": "Revela para ver el nombre", "reveal_1_token": "Revelar (1 token)", "reveal_confirm": "¿Gastar 1 token para revelar {{who}}?", "already_revealed": "Revelado", "propose_engagement": "Proponer contrato", "insufficient_tokens": "Tokens insuficientes.", "counts_banner": "{{count}} {{who}} coinciden con tu calendario." },
-  "tokens": { "title": "Tokens", "sub": "1 token por revelación.", "history": "Historial", "packs": { "small": "Starter", "medium": "Team", "large": "Season" }, "buy": "Comprar", "reasons": { "signup_bonus": "Bonus registro", "purchase": "Compra", "reveal_spend": "Revelación", "admin_credit": "Crédito admin", "admin_debit": "Débito admin", "refund": "Reembolso" } },
-  "engagements": { "title": "Contratos", "status": { "proposed": "Propuesto", "confirmed": "Confirmado", "completed": "Completado", "cancelled": "Cancelado" }, "confirm": "Confirmar", "mark_complete": "Marcar completado", "cancel": "Cancelar", "rate": "Valorar", "rating_locked": "Se desbloquea al confirmar ambas partes", "rate_them": "Valorar {{name}}" },
-  "rating": { "title": "Valoración", "comment_placeholder": "Comparte tu experiencia...", "submit": "Enviar", "submitted": "Valoración enviada", "no_ratings": "Sin valoraciones" },
-  "common": { "loading": "Cargando...", "save": "Guardar", "cancel": "Cancelar", "close": "Cerrar", "next": "Siguiente", "back": "Atrás", "email_placeholder": "tu@paddock.pro", "day_short": "d", "per_day": "/día", "per_event": "/evento", "per_season": "/temporada" },
-  "footer": { "tagline": "La red profesional del paddock.", "network": "Red", "legal": "Legal", "privacy": "Privacidad", "terms": "Términos", "cookie": "Cookies" }
+  "nav": {
+    "jobs": "Ofertas",
+    "freelancers": "Freelancers",
+    "teams": "Equipos",
+    "dashboard": "Panel",
+    "profile": "Mi perfil",
+    "signin": "Iniciar sesión",
+    "signup": "Únete",
+    "signout": "Salir",
+    "tokens": "Tokens",
+    "matches": "Coincidencias",
+    "calendar": "Calendario",
+    "engagements": "Contratos",
+    "pricing": "Precios"
+  },
+  "home": {
+    "badge": "En vivo · {{count}} puestos",
+    "hero_1": "Encuentra tu",
+    "hero_2": "próximo fin de semana de carrera.",
+    "sub": "La red de élite para mecánicos, ingenieros de pista, telemetristas y analistas del motorsport.",
+    "cta_freelancer_title": "Soy Freelance",
+    "cta_freelancer_body": "Publica disponibilidad y recibe matches",
+    "cta_team_title": "Somos un Equipo",
+    "cta_team_body": "Publica fechas y encuentra talento",
+    "how_title": "Cómo funciona el motor de matching",
+    "how_1_t": "Publica tu calendario",
+    "how_1_b": "Los freelance marcan días. Los equipos publican fines de semana.",
+    "how_2_t": "Matches automáticos",
+    "how_2_b": "El motor encuentra todos los solapamientos.",
+    "how_3_t": "Gasta un token para revelar",
+    "how_3_b": "Ves cuántos matches tienes. Gasta 1 token para saber quién.",
+    "how_4_t": "Valoraciones",
+    "how_4_b": "Tras un contrato confirmado, ambas partes valoran.",
+    "stats": {
+      "specialists": "Especialistas",
+      "teams": "Equipos",
+      "countries": "Países",
+      "rate": "Tarifa media"
+    },
+    "featured_jobs": "Solicitudes abiertas",
+    "featured_freelancers": "Talento verificado",
+    "see_all": "Ver todo",
+    "cta_ready": "¿Listo para la parrilla?",
+    "cta_free": "Regístrate gratis · 5 tokens",
+    "cta_start": "Empieza →"
+  },
+  "jobs": {
+    "title": "Solicitudes abiertas",
+    "sub": "{{filtered}} de {{total}} solicitudes.",
+    "filters": {
+      "discipline": "Disciplina",
+      "role": "Rol",
+      "duration": "Duración",
+      "search_placeholder": "Buscar..."
+    },
+    "budget": "Presupuesto",
+    "apply": "Postular",
+    "post_request": "Publicar solicitud",
+    "empty": "Sin resultados"
+  },
+  "freelancers": {
+    "title": "Freelancers",
+    "sub": "{{count}} especialistas verificados.",
+    "filters": {
+      "role": "Rol",
+      "discipline": "Disciplina",
+      "travels": "Viaja fines de semana"
+    }
+  },
+  "teams": {
+    "title": "Equipos",
+    "sub": "Equipos y factorías en la red."
+  },
+  "duration": {
+    "full_season": "Temporada completa",
+    "race_weekend": "Fin de semana",
+    "test_session": "Sesión de test"
+  },
+  "role": {
+    "track_engineer": "Ing. de Pista",
+    "mechanic": "Mecánico",
+    "telemetrist": "Telemetrista",
+    "data_analyst": "Analista",
+    "tire_specialist": "Neumáticos",
+    "chief_mechanic": "Jefe Mecánico",
+    "other": "Otro"
+  },
+  "discipline": {
+    "f1": "F1",
+    "rally": "Rally",
+    "wec_gt": "WEC / GT",
+    "karting": "Karting"
+  },
+  "availability": {
+    "available": "Disponible",
+    "booked": "Ocupado",
+    "week": "Esta semana",
+    "next_race": "Próximo GP"
+  },
+  "auth": {
+    "signin_title": "Inicia sesión",
+    "signup_title": "Únete al paddock",
+    "email": "Email",
+    "password": "Contraseña",
+    "display_name": "Nombre",
+    "team_name": "Nombre del equipo",
+    "continue_email": "Continuar con email",
+    "continue_google": "Continuar con Google",
+    "no_account": "¿Nuevo?",
+    "have_account": "¿Ya tienes cuenta?",
+    "create_account": "Crear cuenta",
+    "type_freelancer": "Soy especialista",
+    "type_freelancer_desc": "Mecánico, ingeniero, telemetrista.",
+    "type_team": "Somos un equipo",
+    "type_team_desc": "Escudería, factoría, garage.",
+    "which_are_you": "¿Qué te describe mejor?",
+    "signed_in_as": "Sesión: {{email}}"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Hola, {{name}}",
+    "tokens_balance": "Saldo de tokens",
+    "buy_tokens": "Comprar tokens",
+    "your_matches": "Tus matches",
+    "new_matches_pill": "{{count}} nuevos matches",
+    "manage_calendar": "Gestionar calendario",
+    "post_request": "Publicar solicitud",
+    "requests_active": "Solicitudes activas",
+    "engagements": "Contratos",
+    "rating_average": "Valoración"
+  },
+  "calendar": {
+    "title": "Calendario disponibilidad",
+    "team_title": "Calendario solicitudes",
+    "instructions_freelancer": "Haz clic para activar la disponibilidad.",
+    "instructions_team": "Añade una solicitud con rol y fechas.",
+    "available_days": "{{count}} días disponibles",
+    "quick": {
+      "next_weekend": "Próximo fin de semana",
+      "clear_month": "Limpiar mes",
+      "all_weekends": "Todos los fines de semana"
+    }
+  },
+  "matches": {
+    "title": "Matches",
+    "empty": "Sin matches todavía.",
+    "empty_team": "Sin matches. Publica una solicitud.",
+    "hidden_name": "Revela para ver el nombre",
+    "reveal_1_token": "Revelar (1 token)",
+    "reveal_confirm": "¿Gastar 1 token para revelar {{who}}?",
+    "already_revealed": "Revelado",
+    "propose_engagement": "Proponer contrato",
+    "insufficient_tokens": "Tokens insuficientes.",
+    "counts_banner": "{{count}} {{who}} coinciden con tu calendario."
+  },
+  "tokens": {
+    "title": "Tokens",
+    "sub": "1 token por revelación.",
+    "history": "Historial",
+    "packs": {
+      "small": "Starter",
+      "medium": "Team",
+      "large": "Season"
+    },
+    "buy": "Comprar",
+    "reasons": {
+      "signup_bonus": "Bonus registro",
+      "purchase": "Compra",
+      "reveal_spend": "Revelación",
+      "admin_credit": "Crédito admin",
+      "admin_debit": "Débito admin",
+      "refund": "Reembolso"
+    }
+  },
+  "engagements": {
+    "title": "Contratos",
+    "status": {
+      "proposed": "Propuesto",
+      "confirmed": "Confirmado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "confirm": "Confirmar",
+    "mark_complete": "Marcar completado",
+    "cancel": "Cancelar",
+    "rate": "Valorar",
+    "rating_locked": "Se desbloquea al confirmar ambas partes",
+    "rate_them": "Valorar {{name}}"
+  },
+  "rating": {
+    "title": "Valoración",
+    "comment_placeholder": "Comparte tu experiencia...",
+    "submit": "Enviar",
+    "submitted": "Valoración enviada",
+    "no_ratings": "Sin valoraciones"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "email_placeholder": "tu@paddock.pro",
+    "day_short": "d",
+    "per_day": "/día",
+    "per_event": "/evento",
+    "per_season": "/temporada"
+  },
+  "footer": {
+    "tagline": "La red profesional del paddock.",
+    "network": "Red",
+    "legal": "Legal",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookie": "Cookies"
+  },
+  "requests": {
+    "title": "Mis solicitudes",
+    "subtitle": "Una solicitud por puesto. 5 tokens cada una.",
+    "new": "Nueva solicitud",
+    "empty": "Sin solicitudes. Publica una para empezar.",
+    "matches": "Matches",
+    "view_matches": "Ver matches",
+    "pause": "Pausar",
+    "resume": "Reanudar",
+    "complete": "Marcar completada",
+    "close": "Cerrar",
+    "confirm_close": "¿Cerrar esta solicitud?",
+    "repost": "Publicar similar",
+    "status_updated": "Estado actualizado",
+    "posted": "Publicada. 5 tokens debitados.",
+    "cost": "Coste",
+    "balance": "Saldo",
+    "top_up": "Recargar",
+    "insufficient": "Tokens insuficientes",
+    "post_for": "Publicar por",
+    "back": "Atrás"
+  }
 }

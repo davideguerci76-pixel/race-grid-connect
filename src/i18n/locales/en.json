@@ -215,5 +215,27 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "cookie": "Cookie"
+  },
+  "requests": {
+    "title": "My requests",
+    "subtitle": "Post one request per role. 5 tokens each.",
+    "new": "New request",
+    "empty": "No requests yet. Post one to start matching freelancers.",
+    "matches": "Matches",
+    "view_matches": "View matches",
+    "pause": "Pause",
+    "resume": "Resume",
+    "complete": "Mark completed",
+    "close": "Close",
+    "confirm_close": "Close this request? It will stop matching.",
+    "repost": "Post similar",
+    "status_updated": "Status updated",
+    "posted": "Request posted. 5 tokens debited.",
+    "cost": "Cost",
+    "balance": "Balance",
+    "top_up": "Top up",
+    "insufficient": "Not enough tokens",
+    "post_for": "Post for",
+    "back": "Back"
   }
 }

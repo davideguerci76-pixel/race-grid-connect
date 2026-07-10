@@ -215,5 +215,27 @@
     "privacy": "Privacy",
     "terms": "Termini",
     "cookie": "Cookie"
+  },
+  "requests": {
+    "title": "Le mie richieste",
+    "subtitle": "Una richiesta per ogni ruolo cercato. 5 token ciascuna.",
+    "new": "Nuova richiesta",
+    "empty": "Nessuna richiesta. Pubblicane una per iniziare a ricevere match.",
+    "matches": "Match",
+    "view_matches": "Vedi match",
+    "pause": "Pausa",
+    "resume": "Riprendi",
+    "complete": "Segna completata",
+    "close": "Chiudi",
+    "confirm_close": "Chiudere questa richiesta? Smetterà di generare match.",
+    "repost": "Ripubblica simile",
+    "status_updated": "Stato aggiornato",
+    "posted": "Richiesta pubblicata. Addebitati 5 token.",
+    "cost": "Costo",
+    "balance": "Saldo",
+    "top_up": "Ricarica",
+    "insufficient": "Token insufficienti",
+    "post_for": "Pubblica per",
+    "back": "Indietro"
   }
 }
