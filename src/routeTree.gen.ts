@@ -27,6 +27,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -124,6 +125,12 @@ const AuthenticatedDashboardCalendarRoute =
     path: '/calendar',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRequestsNewRoute =
+  AuthenticatedDashboardRequestsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedDashboardRequestsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,9 +147,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
-  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
+  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRouteWithChildren
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -158,9 +166,10 @@ export interface FileRoutesByTo {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
-  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
+  '/dashboard/requests': typeof AuthenticatedDashboardRequestsRouteWithChildren
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,9 +188,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
-  '/_authenticated/dashboard/requests': typeof AuthenticatedDashboardRequestsRoute
+  '/_authenticated/dashboard/requests': typeof AuthenticatedDashboardRequestsRouteWithChildren
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/dashboard/requests'
     | '/dashboard/tokens'
     | '/dashboard/'
+    | '/dashboard/requests/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/dashboard/requests'
     | '/dashboard/tokens'
     | '/dashboard'
+    | '/dashboard/requests/new'
   id:
     | '__root__'
     | '/'
@@ -241,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/requests'
     | '/_authenticated/dashboard/tokens'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/requests/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -384,15 +397,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/requests/new': {
+      id: '/_authenticated/dashboard/requests/new'
+      path: '/new'
+      fullPath: '/dashboard/requests/new'
+      preLoaderRoute: typeof AuthenticatedDashboardRequestsNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardRequestsRoute
+    }
   }
 }
+
+interface AuthenticatedDashboardRequestsRouteChildren {
+  AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
+}
+
+const AuthenticatedDashboardRequestsRouteChildren: AuthenticatedDashboardRequestsRouteChildren =
+  {
+    AuthenticatedDashboardRequestsNewRoute:
+      AuthenticatedDashboardRequestsNewRoute,
+  }
+
+const AuthenticatedDashboardRequestsRouteWithChildren =
+  AuthenticatedDashboardRequestsRoute._addFileChildren(
+    AuthenticatedDashboardRequestsRouteChildren,
+  )
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
-  AuthenticatedDashboardRequestsRoute: typeof AuthenticatedDashboardRequestsRoute
+  AuthenticatedDashboardRequestsRoute: typeof AuthenticatedDashboardRequestsRouteWithChildren
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -404,7 +439,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardEngagementsRoute,
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
-    AuthenticatedDashboardRequestsRoute: AuthenticatedDashboardRequestsRoute,
+    AuthenticatedDashboardRequestsRoute:
+      AuthenticatedDashboardRequestsRouteWithChildren,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   }

@@ -13,7 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
 import { DISCIPLINES, DURATIONS, ROLES, type Discipline, type DurationType, type FreelancerRole } from "@/lib/paddock";
 
-const search = z.object({ from: fallback(z.string().optional(), undefined).default(undefined) });
+const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
   validateSearch: zodValidator(search),
