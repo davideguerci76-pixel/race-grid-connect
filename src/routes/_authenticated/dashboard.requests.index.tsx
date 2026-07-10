@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/requests")({
+export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
 });
 
