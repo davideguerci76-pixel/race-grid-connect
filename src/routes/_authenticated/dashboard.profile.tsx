@@ -66,18 +66,33 @@ function ProfilePage() {
 }
 
 function PersonalInfoSection({ profile }: { profile: any }) {
-  const { t } = useTranslation();
   const qc = useQueryClient();
+  const { user } = useAuth();
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
+  const [userType, setUserType] = useState<"freelancer" | "team">(profile?.user_type ?? "freelancer");
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: displayName })
-        .eq("id", profile.id);
+        .update({ display_name: displayName, user_type: userType })
+        .eq("id", user.id);
       if (error) throw error;
+
+      // Ensure the matching sub-profile row exists so the correct section renders next
+      if (userType === "team") {
+        await supabase.from("team_profiles").upsert(
+          { user_id: user.id, team_name: displayName || "New team" },
+          { onConflict: "user_id", ignoreDuplicates: true },
+        );
+      } else {
+        await supabase.from("freelancer_profiles").upsert(
+          { user_id: user.id },
+          { onConflict: "user_id", ignoreDuplicates: true },
+        );
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -93,33 +108,58 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="text-muted-foreground">Email:</span>
         <span className="ml-2 font-mono">{profile?.email ?? "—"}</span>
       </div>
-      <div className="text-sm">
-        <span className="text-muted-foreground">User type:</span>
-        <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
-      </div>
       {editing ? (
-        <div className="flex gap-2">
-          <input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className="flex-1 border border-border bg-background px-3 py-2 text-sm"
-            placeholder="Display name"
-          />
-          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-            Save
-          </button>
-          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-            Cancel
-          </button>
-        </div>
+        <>
+          <div>
+            <label className="text-xs text-muted-foreground">Account type</label>
+            <div className="mt-1 grid grid-cols-2 gap-2">
+              {(["freelancer", "team"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setUserType(v)}
+                  className={`border p-2 text-xs font-bold uppercase transition-colors ${
+                    userType === v ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">
+              {userType === "team" ? "Team name" : "Display name"}
+            </label>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
+              Save
+            </button>
+            <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
+              Cancel
+            </button>
+          </div>
+        </>
       ) : (
-        <div className="text-sm">
-          <span className="text-muted-foreground">Display name:</span>
-          <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
-          <button onClick={() => { setDisplayName(profile?.display_name ?? ""); setEditing(true); }} className="ml-2 text-xs text-racing-red hover:underline">
+        <>
+          <div className="text-sm">
+            <span className="text-muted-foreground">Account type:</span>
+            <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
+          </div>
+          <div className="text-sm">
+            <span className="text-muted-foreground">Display name:</span>
+            <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
+          </div>
+          <button onClick={() => { setDisplayName(profile?.display_name ?? ""); setUserType(profile?.user_type ?? "freelancer"); setEditing(true); }} className="text-xs text-racing-red hover:underline">
             Edit
           </button>
-        </div>
+        </>
       )}
       <div className="text-sm">
         <span className="text-muted-foreground">Tokens:</span>
