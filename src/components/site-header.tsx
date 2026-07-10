@@ -38,15 +38,15 @@ export function SiteHeader() {
         </Link>
         <div className="hidden gap-6 text-xs font-bold uppercase tracking-widest text-muted-foreground md:flex">
           <Link to="/jobs" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-            {t("nav.jobs")}
+            <span suppressHydrationWarning>{t("nav.jobs")}</span>
           </Link>
           {user && (
             <>
               <Link to="/dashboard" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-                {t("nav.dashboard")}
+                <span suppressHydrationWarning>{t("nav.dashboard")}</span>
               </Link>
               <Link to="/dashboard/profile" className="transition-colors hover:text-racing-red" activeProps={{ className: "text-foreground" }}>
-                {t("nav.profile")}
+                <span suppressHydrationWarning>{t("nav.profile")}</span>
               </Link>
             </>
           )}
@@ -60,16 +60,16 @@ export function SiteHeader() {
                 onClick={handleSignOut}
                 className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors hover:bg-secondary"
               >
-                {t("nav.signout")}
+                <span suppressHydrationWarning>{t("nav.signout")}</span>
               </button>
             </>
           ) : (
             <>
               <Link to="/auth" search={{ mode: "signin" as const }} className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors hover:bg-secondary">
-                {t("nav.signin")}
+                <span suppressHydrationWarning>{t("nav.signin")}</span>
               </Link>
               <Link to="/auth" search={{ mode: "signup" as const }} className="bg-racing-red px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-white transition-colors hover:brightness-110">
-                {t("nav.signup")}
+                <span suppressHydrationWarning>{t("nav.signup")}</span>
               </Link>
             </>
           )}
