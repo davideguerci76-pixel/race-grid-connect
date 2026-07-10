@@ -412,8 +412,8 @@ function TeamSection({ profile }: { profile: any }) {
               className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Select...</option>
-              {DISCIPLINES.map((d) => (
-                <option key={d} value={d}>{d.toUpperCase()}</option>
+              {DISCIPLINE_OPTIONS.map((d) => (
+                <option key={d.value} value={d.value}>{d.label}</option>
               ))}
             </select>
           </div>
