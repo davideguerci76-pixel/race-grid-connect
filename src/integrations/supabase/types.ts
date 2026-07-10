@@ -376,6 +376,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          season_dates: string[] | null
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -397,6 +398,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          season_dates?: string[] | null
           start_date: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -418,6 +420,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
+          season_dates?: string[] | null
           start_date?: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id?: string
@@ -562,6 +565,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          season_dates: string[] | null
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -625,6 +629,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          season_dates: string[] | null
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -641,7 +646,52 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
-      discipline: "f1" | "rally" | "wec_gt" | "karting"
+      discipline:
+        | "f1"
+        | "rally"
+        | "wec_gt"
+        | "karting"
+        | "formula_1"
+        | "formula_2"
+        | "formula_3"
+        | "freca"
+        | "formula_regional_americas"
+        | "formula_regional_japanese"
+        | "formula_regional_oceania"
+        | "formula_regional_middle_east"
+        | "gb3_championship"
+        | "euroformula_open"
+        | "f4_italian"
+        | "f4_british"
+        | "f4_spanish"
+        | "usf_pro_2000"
+        | "usf2000"
+        | "indycar"
+        | "indy_nxt"
+        | "super_formula"
+        | "wec_hypercar"
+        | "lmp2"
+        | "gt3"
+        | "gt4"
+        | "dtm"
+        | "tcr"
+        | "wrc_rally1"
+        | "rally2"
+        | "rally3"
+        | "rally4"
+        | "rally5"
+        | "rallycross"
+        | "nascar_cup"
+        | "nascar_xfinity"
+        | "nascar_truck"
+        | "supercars"
+        | "sprint_cars"
+        | "midget_cars"
+        | "autocross"
+        | "hillclimb_specials"
+        | "drift_cars"
+        | "trophy_trucks"
+        | "dakar_rally"
       duration_type: "full_season" | "race_weekend" | "test_session"
       engagement_status: "proposed" | "confirmed" | "completed" | "cancelled"
       freelancer_role:
@@ -652,6 +702,38 @@ export type Database = {
         | "tire_specialist"
         | "chief_mechanic"
         | "other"
+        | "accounting_finance"
+        | "assembly_sub_assembly"
+        | "composite_design_engineer"
+        | "composite_staff"
+        | "control_systems_engineer"
+        | "design_engineer"
+        | "driver_management"
+        | "electric_vehicles"
+        | "electronics_engineer"
+        | "engine_powertrain"
+        | "events"
+        | "finance"
+        | "hospitality_staff"
+        | "inspector_quality_control"
+        | "it_computer_engineer"
+        | "logistics"
+        | "managers"
+        | "marketing"
+        | "performance_engineer"
+        | "procurement_buyer"
+        | "production_engineer"
+        | "production_manager"
+        | "project_engineer"
+        | "project_planner"
+        | "rd_development_engineer"
+        | "race_mechanics"
+        | "simulation_engineer"
+        | "stores_parts_coordinator"
+        | "technicians"
+        | "test_engineers"
+        | "truck_driver"
+        | "vehicle_dynamics_engineer"
       notif_kind:
         | "new_matches"
         | "revealed_by"
@@ -798,7 +880,53 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
-      discipline: ["f1", "rally", "wec_gt", "karting"],
+      discipline: [
+        "f1",
+        "rally",
+        "wec_gt",
+        "karting",
+        "formula_1",
+        "formula_2",
+        "formula_3",
+        "freca",
+        "formula_regional_americas",
+        "formula_regional_japanese",
+        "formula_regional_oceania",
+        "formula_regional_middle_east",
+        "gb3_championship",
+        "euroformula_open",
+        "f4_italian",
+        "f4_british",
+        "f4_spanish",
+        "usf_pro_2000",
+        "usf2000",
+        "indycar",
+        "indy_nxt",
+        "super_formula",
+        "wec_hypercar",
+        "lmp2",
+        "gt3",
+        "gt4",
+        "dtm",
+        "tcr",
+        "wrc_rally1",
+        "rally2",
+        "rally3",
+        "rally4",
+        "rally5",
+        "rallycross",
+        "nascar_cup",
+        "nascar_xfinity",
+        "nascar_truck",
+        "supercars",
+        "sprint_cars",
+        "midget_cars",
+        "autocross",
+        "hillclimb_specials",
+        "drift_cars",
+        "trophy_trucks",
+        "dakar_rally",
+      ],
       duration_type: ["full_season", "race_weekend", "test_session"],
       engagement_status: ["proposed", "confirmed", "completed", "cancelled"],
       freelancer_role: [
@@ -809,6 +937,38 @@ export const Constants = {
         "tire_specialist",
         "chief_mechanic",
         "other",
+        "accounting_finance",
+        "assembly_sub_assembly",
+        "composite_design_engineer",
+        "composite_staff",
+        "control_systems_engineer",
+        "design_engineer",
+        "driver_management",
+        "electric_vehicles",
+        "electronics_engineer",
+        "engine_powertrain",
+        "events",
+        "finance",
+        "hospitality_staff",
+        "inspector_quality_control",
+        "it_computer_engineer",
+        "logistics",
+        "managers",
+        "marketing",
+        "performance_engineer",
+        "procurement_buyer",
+        "production_engineer",
+        "production_manager",
+        "project_engineer",
+        "project_planner",
+        "rd_development_engineer",
+        "race_mechanics",
+        "simulation_engineer",
+        "stores_parts_coordinator",
+        "technicians",
+        "test_engineers",
+        "truck_driver",
+        "vehicle_dynamics_engineer",
       ],
       notif_kind: [
         "new_matches",
