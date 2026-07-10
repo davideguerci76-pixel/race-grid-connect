@@ -15,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 function DashboardHome() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const qc = useQueryClient();
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
     enabled: !!user,
@@ -26,6 +27,39 @@ function DashboardHome() {
       return p ? { ...p, token_balance: (balance as number | null) ?? 0 } : null;
     },
   });
+
+  // Sync pending user_type saved before OAuth (Google sign-up doesn't pass metadata)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!user?.id || !profile) return;
+    const pending = window.sessionStorage.getItem("pendingUserType");
+    if (!pending) return;
+    if (pending !== "freelancer" && pending !== "team") {
+      window.sessionStorage.removeItem("pendingUserType");
+      return;
+    }
+    if (pending === profile.user_type) {
+      window.sessionStorage.removeItem("pendingUserType");
+      return;
+    }
+    (async () => {
+      const { error } = await supabase.from("profiles").update({ user_type: pending }).eq("id", user.id);
+      if (!error) {
+        if (pending === "team") {
+          await supabase
+            .from("team_profiles")
+            .upsert({ user_id: user.id, team_name: profile.display_name || "New team" }, { onConflict: "user_id", ignoreDuplicates: true });
+        } else {
+          await supabase
+            .from("freelancer_profiles")
+            .upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true });
+        }
+        window.sessionStorage.removeItem("pendingUserType");
+        qc.invalidateQueries({ queryKey: ["profile"] });
+      }
+    })();
+  }, [user?.id, profile, qc]);
+
   const { data: matchesCount = 0 } = useQuery({
     queryKey: ["matches-count", user?.id],
     enabled: !!user && !!profile,
@@ -36,6 +70,8 @@ function DashboardHome() {
       return count ?? 0;
     },
   });
+
+  const isTeam = profile?.user_type === "team";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -56,7 +92,11 @@ function DashboardHome() {
 
         <div className="mt-8 grid gap-4 md:grid-cols-5">
           <DashCard to="/dashboard/profile" icon={User} label={t("nav.profile")} value="→" />
-          <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={profile?.user_type === "team" ? t("dashboard.post_request") : t("dashboard.manage_calendar")} />
+          {isTeam ? (
+            <DashCard to="/dashboard/requests" icon={Briefcase} label={t("requests.title")} value={t("requests.new")} />
+          ) : (
+            <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={t("dashboard.manage_calendar")} />
+          )}
           <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(matchesCount)} />
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value="→" />
