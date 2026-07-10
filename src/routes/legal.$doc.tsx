@@ -69,7 +69,7 @@ function LegalPage() {
         <div className="label-mono">[LEGAL]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{doc.title}</h1>
         <div className="mt-8 max-w-2xl space-y-4 text-sm text-muted-foreground">
-          {doc.body.map((p, i) => <p key={i}>{p}</p>)}
+          {doc.body.map((p: string, i: number) => <p key={i}>{p}</p>)}
         </div>
       </div>
       <SiteFooter />
