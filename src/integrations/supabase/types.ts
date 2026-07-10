@@ -377,6 +377,7 @@ export type Database = {
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           start_date: string
+          status: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
           updated_at: string
@@ -397,6 +398,7 @@ export type Database = {
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           start_date: string
+          status?: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
           updated_at?: string
@@ -417,6 +419,7 @@ export type Database = {
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           start_date?: string
+          status?: Database["public"]["Enums"]["request_status"]
           team_id?: string
           title?: string
           updated_at?: string
@@ -594,6 +597,7 @@ export type Database = {
         | "engagement_completed"
         | "rating_received"
         | "tokens_credited"
+      request_status: "active" | "paused" | "closed" | "completed"
       token_reason:
         | "signup_bonus"
         | "purchase"
@@ -601,6 +605,7 @@ export type Database = {
         | "admin_credit"
         | "admin_debit"
         | "refund"
+        | "request_post"
       user_type: "freelancer" | "team"
     }
     CompositeTypes: {
@@ -751,6 +756,7 @@ export const Constants = {
         "rating_received",
         "tokens_credited",
       ],
+      request_status: ["active", "paused", "closed", "completed"],
       token_reason: [
         "signup_bonus",
         "purchase",
@@ -758,6 +764,7 @@ export const Constants = {
         "admin_credit",
         "admin_debit",
         "refund",
+        "request_post",
       ],
       user_type: ["freelancer", "team"],
     },
