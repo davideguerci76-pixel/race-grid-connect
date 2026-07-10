@@ -1,17 +1,24 @@
-// Shared type helpers
+// Shared taxonomy for roles / disciplines / durations.
+// Values must match the Postgres enums (freelancer_role, discipline, duration_type).
+// Labels are display-only.
+
+export type DurationType = "full_season" | "race_weekend" | "test_session";
+export const DURATIONS: DurationType[] = ["full_season", "race_weekend", "test_session"];
+
+// Kept for backward compat — now loose strings.
 export type Discipline = string;
 export type FreelancerRole = string;
-export type DurationType = "full_season" | "race_weekend" | "test_session";
 
-// Full role taxonomy (label -> enum slug)
-export const ROLE_OPTIONS: { value: string; label: string }[] = [
-  { value: "accounting_finance", label: "Accounting/Finance" },
+export type Option = { value: string; label: string };
+
+export const ROLE_OPTIONS: Option[] = [
+  { value: "accounting_finance", label: "Accounting / Finance" },
   { value: "assembly_sub_assembly", label: "Assembly / Sub Assembly" },
   { value: "composite_design_engineer", label: "Composite Design Engineer" },
   { value: "composite_staff", label: "Composite Staff" },
   { value: "control_systems_engineer", label: "Control Systems Engineer" },
   { value: "design_engineer", label: "Design Engineer" },
-  { value: "driver_management", label: "Driver management" },
+  { value: "driver_management", label: "Driver Management" },
   { value: "electric_vehicles", label: "Electric Vehicles" },
   { value: "electronics_engineer", label: "Electronics Engineer" },
   { value: "engine_powertrain", label: "Engine / Powertrain" },
@@ -32,7 +39,7 @@ export const ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "rd_development_engineer", label: "R&D / Development Engineer" },
   { value: "race_mechanics", label: "Race Mechanics" },
   { value: "simulation_engineer", label: "Simulation Engineer" },
-  { value: "stores_parts_coordinator", label: "Stores / Parts coordinator" },
+  { value: "stores_parts_coordinator", label: "Stores / Parts Coordinator" },
   { value: "technicians", label: "Technicians" },
   { value: "test_engineers", label: "Test Engineers" },
   { value: "track_engineer", label: "Track Engineer" },
@@ -40,11 +47,11 @@ export const ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "vehicle_dynamics_engineer", label: "Vehicle Dynamics Engineer" },
 ];
 
-export const DISCIPLINE_OPTIONS: { value: string; label: string }[] = [
+export const DISCIPLINE_OPTIONS: Option[] = [
   { value: "formula_1", label: "Formula 1" },
   { value: "formula_2", label: "Formula 2" },
   { value: "formula_3", label: "Formula 3" },
-  { value: "freca", label: "Formula Regional European Championship by Alpine (FRECA)" },
+  { value: "freca", label: "Formula Regional European Championship (FRECA)" },
   { value: "formula_regional_americas", label: "Formula Regional Americas" },
   { value: "formula_regional_japanese", label: "Formula Regional Japanese Championship" },
   { value: "formula_regional_oceania", label: "Formula Regional Oceania" },
@@ -73,7 +80,7 @@ export const DISCIPLINE_OPTIONS: { value: string; label: string }[] = [
   { value: "rallycross", label: "Rallycross" },
   { value: "nascar_cup", label: "NASCAR Cup Series" },
   { value: "nascar_xfinity", label: "NASCAR Xfinity Series" },
-  { value: "nascar_truck", label: "NASCAR Craftsman Truck Series" },
+  { value: "nascar_craftsman_truck", label: "NASCAR Craftsman Truck Series" },
   { value: "supercars", label: "Supercars Championship" },
   { value: "sprint_cars", label: "Sprint Cars" },
   { value: "midget_cars", label: "Midget Cars" },
@@ -85,38 +92,22 @@ export const DISCIPLINE_OPTIONS: { value: string; label: string }[] = [
   { value: "dakar_rally", label: "Dakar Rally (T1+, T2, T3, T4, T5)" },
 ];
 
-export const ROLE_LABELS: Record<string, string> = Object.fromEntries(ROLE_OPTIONS.map((o) => [o.value, o.label]));
-export const DISCIPLINE_LABELS: Record<string, string> = Object.fromEntries(DISCIPLINE_OPTIONS.map((o) => [o.value, o.label]));
-
-// Legacy label fallbacks so historical mock rows still render nicely
-const LEGACY_ROLES: Record<string, string> = {
-  mechanic: "Mechanic",
-  telemetrist: "Telemetrist",
-  data_analyst: "Data Analyst",
-  tire_specialist: "Tire Specialist",
-  chief_mechanic: "Chief Mechanic",
-  other: "Other",
-};
-const LEGACY_DISCIPLINES: Record<string, string> = {
-  f1: "Formula 1",
-  rally: "Rally",
-  wec_gt: "WEC / GT",
-};
-
-export function roleLabel(slug: string | null | undefined): string {
-  if (!slug) return "";
-  return ROLE_LABELS[slug] ?? LEGACY_ROLES[slug] ?? slug.replace(/_/g, " ");
-}
-export function disciplineLabel(slug: string | null | undefined): string {
-  if (!slug) return "";
-  return DISCIPLINE_LABELS[slug] ?? LEGACY_DISCIPLINES[slug] ?? slug.replace(/_/g, " ");
-}
-
-export const DURATIONS: DurationType[] = ["full_season", "race_weekend", "test_session"];
-
-// Backwards-compat exports (some legacy pages import these)
+// Backward-compat arrays of values.
 export const ROLES: string[] = ROLE_OPTIONS.map((o) => o.value);
 export const DISCIPLINES: string[] = DISCIPLINE_OPTIONS.map((o) => o.value);
+
+const ROLE_MAP = new Map(ROLE_OPTIONS.map((o) => [o.value, o.label]));
+const DISCIPLINE_MAP = new Map(DISCIPLINE_OPTIONS.map((o) => [o.value, o.label]));
+
+export function roleLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return ROLE_MAP.get(value) ?? value.replace(/_/g, " ");
+}
+
+export function disciplineLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
+}
 
 export function initialsFor(name: string): string {
   return name
