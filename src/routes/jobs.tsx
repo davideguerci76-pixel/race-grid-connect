@@ -86,7 +86,7 @@ function JobsPage() {
                   </div>
                   <div className="text-lg font-bold">{r.title}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {r.team?.display_name ?? "Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
+                    {r.team?.team_name ?? "Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
                   </div>
                   <div className="mt-2 font-mono text-xs text-muted-foreground">
                     {r.start_date} → {r.end_date}
