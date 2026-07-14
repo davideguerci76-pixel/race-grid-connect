@@ -121,6 +121,7 @@ function NewRequestPage() {
           budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+          skills,
         } as never,
       }),
     onSuccess: () => {
