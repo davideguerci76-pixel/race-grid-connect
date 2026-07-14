@@ -23,11 +23,17 @@ function JobsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("*, team:team_profiles!requests_team_id_fkey(user_id, team_name, initials)")
+        .select("*")
         .eq("is_active", true)
         .order("start_date", { ascending: true });
       if (error) throw error;
-      return data;
+      const teamIds = Array.from(new Set((data ?? []).map((r) => r.team_id)));
+      const teamsMap = new Map<string, { team_name: string; initials: string | null }>();
+      if (teamIds.length > 0) {
+        const { data: teams } = await supabase.from("team_profiles").select("user_id, team_name, initials").in("user_id", teamIds);
+        (teams ?? []).forEach((t) => teamsMap.set(t.user_id, { team_name: t.team_name, initials: t.initials }));
+      }
+      return (data ?? []).map((r) => ({ ...r, team: teamsMap.get(r.team_id) ?? null }));
     },
   });
 
