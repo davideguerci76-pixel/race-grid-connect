@@ -33,13 +33,21 @@ function DashboardHome() {
     if (typeof window === "undefined") return;
     if (!user?.id || !profile) return;
     const pending = window.sessionStorage.getItem("pendingUserType");
+    const pendingAt = Number(window.sessionStorage.getItem("pendingUserTypeAt") ?? 0);
     if (!pending) return;
+    if (!pendingAt || Date.now() - pendingAt > 10 * 60 * 1000) {
+      window.sessionStorage.removeItem("pendingUserType");
+      window.sessionStorage.removeItem("pendingUserTypeAt");
+      return;
+    }
     if (pending !== "freelancer" && pending !== "team") {
       window.sessionStorage.removeItem("pendingUserType");
+      window.sessionStorage.removeItem("pendingUserTypeAt");
       return;
     }
     if (pending === profile.user_type) {
       window.sessionStorage.removeItem("pendingUserType");
+      window.sessionStorage.removeItem("pendingUserTypeAt");
       return;
     }
     (async () => {
@@ -55,6 +63,7 @@ function DashboardHome() {
             .upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true });
         }
         window.sessionStorage.removeItem("pendingUserType");
+        window.sessionStorage.removeItem("pendingUserTypeAt");
         qc.invalidateQueries({ queryKey: ["profile"] });
       }
     })();
