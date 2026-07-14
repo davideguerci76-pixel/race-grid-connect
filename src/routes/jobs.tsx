@@ -23,7 +23,7 @@ function JobsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("*, team:profiles!requests_team_id_fkey(id, display_name, avatar_url)")
+        .select("*, team:team_profiles!requests_team_id_fkey(user_id, team_name, initials)")
         .eq("is_active", true)
         .order("start_date", { ascending: true });
       if (error) throw error;
