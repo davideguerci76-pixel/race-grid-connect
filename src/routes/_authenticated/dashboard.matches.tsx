@@ -70,7 +70,7 @@ function MatchesPage() {
                               {cp.website && <div><span className="text-muted-foreground">Website:</span> <a href={cp.website} target="_blank" rel="noopener" className="font-medium text-racing-red hover:underline">{cp.website}</a></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
                               <div className="mt-2">
-                                <a href={`/teams/${m.team_id}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View full team profile →</a>
+                                <a href={`/teams/${m.team_id}?req=${m.request?.id ?? ""}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View team profile →</a>
                               </div>
                             </>
                           ) : (
