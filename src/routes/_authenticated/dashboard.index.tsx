@@ -81,11 +81,11 @@ function DashboardHome() {
     enabled: !!user && !!profile,
     queryFn: async () => {
       const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
-      const rev = profile!.user_type === "freelancer" ? "revealed_by_freelancer" : "revealed_by_team";
-      const { count } = await supabase.from("matches").select("*", { count: "exact", head: true }).eq(col, user!.id).eq(rev, false);
+      const { count } = await supabase.from("matches").select("*", { count: "exact", head: true }).eq(col, user!.id);
       return count ?? 0;
     },
   });
+
 
   const isTeam = profile?.user_type === "team";
 

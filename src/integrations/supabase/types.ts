@@ -360,6 +360,35 @@ export type Database = {
           },
         ]
       }
+      request_team_reveals: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_team_reveals_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           budget_max: number | null
@@ -634,6 +663,7 @@ export type Database = {
           revealed_team: string
         }[]
       }
+      reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
       set_request_status: {
         Args: {

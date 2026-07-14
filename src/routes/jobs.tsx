@@ -21,7 +21,7 @@ function JobsPage() {
   const [role, setRole] = useState<FreelancerRole | "all">("all");
   const [disc, setDisc] = useState<Discipline | "all">("all");
   const [dur, setDur] = useState<DurationType | "all">("all");
-  const [confirmTeamId, setConfirmTeamId] = useState<string | null>(null);
+  const [confirmRequestId, setConfirmRequestId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { data: profile } = useQuery({
@@ -33,13 +33,14 @@ function JobsPage() {
   const isFreelancer = profile?.user_type === "freelancer";
 
   const { data: reveals = [] } = useQuery({
-    queryKey: ["team-reveals", user?.id],
+    queryKey: ["request-reveals", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("team_reveals").select("team_id").eq("user_id", user!.id);
-      return (data ?? []).map((r) => r.team_id);
+      const { data } = await supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id);
+      return (data ?? []).map((r) => r.request_id);
     },
   });
+
   const revealedSet = new Set(reveals);
 
   const { data: requests = [] } = useQuery({
@@ -62,17 +63,18 @@ function JobsPage() {
   });
 
   const revealMutation = useMutation({
-    mutationFn: async (teamId: string) => {
-      const { data, error } = await supabase.rpc("reveal_team", { _team_id: teamId });
+    mutationFn: async (requestId: string) => {
+      const { data, error } = await supabase.rpc("reveal_request", { _request_id: requestId });
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: (_data, teamId) => {
-      setConfirmTeamId(null);
+    onSuccess: (_data, requestId) => {
+      setConfirmRequestId(null);
       setError(null);
-      qc.invalidateQueries({ queryKey: ["team-reveals"] });
+      qc.invalidateQueries({ queryKey: ["request-reveals"] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile"] });
-      navigate({ to: "/teams/$id", params: { id: teamId } });
+      const req = requests.find((r) => r.id === requestId);
+      if (req) navigate({ to: "/teams/$id", params: { id: req.team_id } });
     },
     onError: (e: Error) => setError(e.message),
   });
@@ -85,18 +87,19 @@ function JobsPage() {
     return true;
   });
 
-  function handleViewTeam(teamId: string) {
+  function handleViewRequest(r: { id: string; team_id: string }) {
     if (!user) {
       navigate({ to: "/auth" });
       return;
     }
-    if (isTeam || revealedSet.has(teamId)) {
-      navigate({ to: "/teams/$id", params: { id: teamId } });
+    if (isTeam || revealedSet.has(r.id)) {
+      navigate({ to: "/teams/$id", params: { id: r.team_id } });
       return;
     }
     setError(null);
-    setConfirmTeamId(teamId);
+    setConfirmRequestId(r.id);
   }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -132,7 +135,7 @@ function JobsPage() {
         ) : (
           <div className="grid gap-3">
             {filtered.map((r) => {
-              const canSeeTeam = isTeam || revealedSet.has(r.team_id);
+              const canSeeTeam = isTeam || revealedSet.has(r.id);
               return (
               <div key={r.id} className="grid gap-4 border border-border bg-card p-5 md:grid-cols-[1fr,auto] md:items-center">
                 <div>
@@ -157,7 +160,7 @@ function JobsPage() {
                   ) : null}
                   <button
                     type="button"
-                    onClick={() => handleViewTeam(r.team_id)}
+                    onClick={() => handleViewRequest(r)}
                     className="mt-2 inline-block bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white"
                   >
                     {canSeeTeam ? "View team" : "Reveal team (2 tokens)"}
@@ -169,8 +172,8 @@ function JobsPage() {
         )}
       </div>
 
-      {confirmTeamId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !revealMutation.isPending && setConfirmTeamId(null)}>
+      {confirmRequestId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !revealMutation.isPending && setConfirmRequestId(null)}>
           <div className="w-full max-w-md border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
             <div className="label-mono">[REVEAL TEAM]</div>
             <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Spend 2 tokens?</h2>
@@ -180,12 +183,12 @@ function JobsPage() {
             {isFreelancer === false && !isTeam ? null : null}
             {error && <div className="mt-3 border border-racing-red/40 bg-racing-red/10 p-3 text-xs text-racing-red">{error}</div>}
             <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={() => setConfirmTeamId(null)} disabled={revealMutation.isPending} className="border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-muted">
+              <button type="button" onClick={() => setConfirmRequestId(null)} disabled={revealMutation.isPending} className="border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-muted">
                 Cancel
               </button>
               <button
                 type="button"
-                onClick={() => revealMutation.mutate(confirmTeamId)}
+                onClick={() => revealMutation.mutate(confirmRequestId)}
                 disabled={revealMutation.isPending}
                 className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
               >
