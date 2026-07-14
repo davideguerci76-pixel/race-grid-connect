@@ -36,6 +36,10 @@ function AuthPage() {
     try {
       if (isSignup && typeof window !== "undefined") {
         window.sessionStorage.setItem("pendingUserType", userType);
+        window.sessionStorage.setItem("pendingUserTypeAt", String(Date.now()));
+      } else if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem("pendingUserType");
+        window.sessionStorage.removeItem("pendingUserTypeAt");
       }
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if (result.error) {
@@ -68,6 +72,10 @@ function AuthPage() {
         toast.success("Welcome to the paddock! 5 tokens credited.");
         navigate({ to: "/dashboard" });
       } else {
+        if (typeof window !== "undefined") {
+          window.sessionStorage.removeItem("pendingUserType");
+          window.sessionStorage.removeItem("pendingUserTypeAt");
+        }
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate({ to: "/dashboard" });

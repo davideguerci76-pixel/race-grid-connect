@@ -34,6 +34,111 @@ export const getMyAvailability = createServerFn({ method: "GET" })
     return (data ?? []).map((r) => r.day);
   });
 
+// ---- Profile saving ----
+export const updateMyDisplayName = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({ display_name: z.string().trim().min(2).max(80) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("profiles")
+      .update({ display_name: data.display_name })
+      .eq("id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        role: roleEnum,
+        headline: z.string().max(140).optional().nullable(),
+        disciplines: z.array(disciplineEnum).max(80),
+        skills: z.array(z.string().max(64)).max(80).optional(),
+        day_rate: z.number().int().min(0).optional().nullable(),
+        location: z.string().max(140).optional().nullable(),
+        bio: z.string().max(1200).optional().nullable(),
+        travels: z.boolean(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: profile, error: profileError } = await context.supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if (profileError) throw new Error(profileError.message);
+    if (profile?.user_type !== "freelancer") throw new Error("This account is not a freelancer profile");
+
+    const { error } = await context.supabase.from("freelancer_profiles").upsert(
+      {
+        user_id: context.userId,
+        role: data.role,
+        headline: data.headline || null,
+        disciplines: data.disciplines,
+        skills: data.skills ?? [],
+        day_rate: data.day_rate ?? null,
+        location: data.location || null,
+        bio: data.bio || null,
+        travels: data.travels,
+      } as never,
+      { onConflict: "user_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updateMyTeamProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        team_name: z.string().trim().min(2).max(120),
+        team_type: z.string().max(120).optional().nullable(),
+        location: z.string().max(140).optional().nullable(),
+        primary_discipline: disciplineEnum.optional().nullable(),
+        bio: z.string().max(1200).optional().nullable(),
+        website: z.string().max(200).optional().nullable(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: profile, error: profileError } = await context.supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if (profileError) throw new Error(profileError.message);
+    if (profile?.user_type !== "team") throw new Error("This account is not a team profile");
+
+    const initials = data.team_name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((s) => s[0]?.toUpperCase() ?? "")
+      .join("");
+
+    const { error } = await context.supabase.from("team_profiles").upsert(
+      {
+        user_id: context.userId,
+        team_name: data.team_name,
+        initials,
+        team_type: data.team_type || null,
+        location: data.location || null,
+        primary_discipline: data.primary_discipline || null,
+        bio: data.bio || null,
+        website: data.website || null,
+      } as never,
+      { onConflict: "user_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // ---- Requests ----
 export const createRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
