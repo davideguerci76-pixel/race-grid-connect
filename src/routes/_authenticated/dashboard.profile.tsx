@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
