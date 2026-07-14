@@ -41,12 +41,14 @@ export const updateMyDisplayName = createServerFn({ method: "POST" })
     z.object({ display_name: z.string().trim().min(2).max(80) }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
+    const { data: row, error } = await context.supabase
       .from("profiles")
       .update({ display_name: data.display_name })
-      .eq("id", context.userId);
+      .eq("id", context.userId)
+      .select("id, display_name, avatar_url, user_type, preferred_language, created_at, updated_at")
+      .single();
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return row;
   });
 
 export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
@@ -74,7 +76,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     if (profileError) throw new Error(profileError.message);
     if (profile?.user_type !== "freelancer") throw new Error("This account is not a freelancer profile");
 
-    const { error } = await context.supabase.from("freelancer_profiles").upsert(
+    const { data: row, error } = await context.supabase.from("freelancer_profiles").upsert(
       {
         user_id: context.userId,
         role: data.role,
@@ -87,9 +89,9 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         travels: data.travels,
       } as never,
       { onConflict: "user_id" },
-    );
+    ).select("*").single();
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return row;
   });
 
 export const updateMyTeamProfile = createServerFn({ method: "POST" })
@@ -122,7 +124,7 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
       .map((s) => s[0]?.toUpperCase() ?? "")
       .join("");
 
-    const { error } = await context.supabase.from("team_profiles").upsert(
+    const { data: row, error } = await context.supabase.from("team_profiles").upsert(
       {
         user_id: context.userId,
         team_name: data.team_name,
@@ -134,9 +136,9 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         website: data.website || null,
       } as never,
       { onConflict: "user_id" },
-    );
+    ).select("*").single();
     if (error) throw new Error(error.message);
-    return { ok: true };
+    return row;
   });
 
 // ---- Requests ----
