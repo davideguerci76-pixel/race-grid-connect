@@ -20,14 +20,17 @@ function ProfilePage() {
   const { user } = useAuth();
 
   const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["profile-detail", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: p }, { data: fp }, { data: tp }] = await Promise.all([
+      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
         supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
       ]);
+      if (pError) throw new Error(pError.message);
+      if (fpError) throw new Error(fpError.message);
+      if (tpError) throw new Error(tpError.message);
       return { ...p, freelancerProfile: fp, teamProfile: tp };
     },
   });
@@ -88,10 +91,15 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      await saveDisplayName({ data: { display_name: displayName } });
+      return saveDisplayName({ data: { display_name: displayName } });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["profile"] });
+    onSuccess: (saved) => {
+      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
+      qc.setQueryData(["profile-summary", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
+      qc.setQueryData(["dashboard-profile", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
+      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
+      qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
       toast.success("Updated");
       setEditing(false);
     },
@@ -183,7 +191,7 @@ function FreelancerSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      await saveFreelancerProfile({
+      return saveFreelancerProfile({
         data: {
           role: form.role,
           headline: form.headline || null,
@@ -196,8 +204,9 @@ function FreelancerSection({ profile }: { profile: any }) {
         },
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["profile"] });
+    onSuccess: (saved) => {
+      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, freelancerProfile: saved } : old));
+      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       toast.success("Freelancer profile saved");
       setEditing(false);
     },
@@ -304,7 +313,7 @@ function TeamSection({ profile }: { profile: any }) {
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
       if (!form.team_name.trim()) throw new Error("Team name is required");
-      await saveTeamProfile({
+      return saveTeamProfile({
         data: {
           team_name: form.team_name,
           team_type: form.team_type || null,
@@ -315,8 +324,11 @@ function TeamSection({ profile }: { profile: any }) {
         },
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["profile"] });
+    onSuccess: (saved) => {
+      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, teamProfile: saved } : old));
+      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
+      qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
       toast.success("Team profile saved");
       setEditing(false);
     },

@@ -36,7 +36,7 @@ function NewRequestPage() {
   const { from } = Route.useSearch();
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["request-profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
       const [{ data: p }, { data: balance }] = await Promise.all([
