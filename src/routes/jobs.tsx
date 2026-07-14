@@ -21,7 +21,7 @@ function JobsPage() {
   const [role, setRole] = useState<FreelancerRole | "all">("all");
   const [disc, setDisc] = useState<Discipline | "all">("all");
   const [dur, setDur] = useState<DurationType | "all">("all");
-  const [confirmTeamId, setConfirmTeamId] = useState<string | null>(null);
+  const [confirmRequestId, setConfirmRequestId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { data: profile } = useQuery({
@@ -33,13 +33,14 @@ function JobsPage() {
   const isFreelancer = profile?.user_type === "freelancer";
 
   const { data: reveals = [] } = useQuery({
-    queryKey: ["team-reveals", user?.id],
+    queryKey: ["request-reveals", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("team_reveals").select("team_id").eq("user_id", user!.id);
-      return (data ?? []).map((r) => r.team_id);
+      const { data } = await supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id);
+      return (data ?? []).map((r) => r.request_id);
     },
   });
+
   const revealedSet = new Set(reveals);
 
   const { data: requests = [] } = useQuery({
