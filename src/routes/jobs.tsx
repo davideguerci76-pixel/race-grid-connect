@@ -63,17 +63,18 @@ function JobsPage() {
   });
 
   const revealMutation = useMutation({
-    mutationFn: async (teamId: string) => {
-      const { data, error } = await supabase.rpc("reveal_team", { _team_id: teamId });
+    mutationFn: async (requestId: string) => {
+      const { data, error } = await supabase.rpc("reveal_request", { _request_id: requestId });
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: (_data, teamId) => {
-      setConfirmTeamId(null);
+    onSuccess: (_data, requestId) => {
+      setConfirmRequestId(null);
       setError(null);
-      qc.invalidateQueries({ queryKey: ["team-reveals"] });
+      qc.invalidateQueries({ queryKey: ["request-reveals"] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile"] });
-      navigate({ to: "/teams/$id", params: { id: teamId } });
+      const req = requests.find((r) => r.id === requestId);
+      if (req) navigate({ to: "/teams/$id", params: { id: req.team_id } });
     },
     onError: (e: Error) => setError(e.message),
   });
@@ -86,18 +87,19 @@ function JobsPage() {
     return true;
   });
 
-  function handleViewTeam(teamId: string) {
+  function handleViewRequest(r: { id: string; team_id: string }) {
     if (!user) {
       navigate({ to: "/auth" });
       return;
     }
-    if (isTeam || revealedSet.has(teamId)) {
-      navigate({ to: "/teams/$id", params: { id: teamId } });
+    if (isTeam || revealedSet.has(r.id)) {
+      navigate({ to: "/teams/$id", params: { id: r.team_id } });
       return;
     }
     setError(null);
-    setConfirmTeamId(teamId);
+    setConfirmRequestId(r.id);
   }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
