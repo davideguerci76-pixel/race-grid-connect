@@ -252,6 +252,25 @@ function NewRequestPage() {
           )}
 
           <div className="md:col-span-2">
+            <label className="label-mono">Required skills <span className="text-racing-red">({skills.length})</span></label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {SKILL_OPTIONS.map((o) => {
+                const checked = skills.includes(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setSkills(checked ? skills.filter((s) => s !== o.value) : [...skills, o.value])}
+                    className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
             <label className="label-mono">Notes</label>
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
