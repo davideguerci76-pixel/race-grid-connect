@@ -236,7 +236,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Location</label>
-            <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="Milan, Italy" />
+            <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Milan, Italy" />
           </div>
         </div>
         <div>
