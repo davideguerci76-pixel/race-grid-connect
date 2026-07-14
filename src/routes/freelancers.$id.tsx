@@ -1,11 +1,12 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingStars } from "@/components/rating-stars";
-import { initialsFor } from "@/lib/paddock";
+import { disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -17,29 +18,41 @@ export const Route = createFileRoute("/freelancers/$id")({
 function FreelancerProfile() {
   const { id } = Route.useParams();
   const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["freelancer", id],
+    queryKey: ["freelancer-detail", id],
+    enabled: !!user,
     queryFn: async () => {
-      const { data: profile } = await supabase.from("profiles").select("id, display_name, avatar_url, user_type, freelancer_profiles(*)").eq("id", id).maybeSingle();
-      if (!profile) throw notFound();
-      const { data: sessionData } = await supabase.auth.getSession();
-      const isAuthed = !!sessionData.session;
-      const ratingCols = isAuthed ? "stars, comment, created_at" : "stars, created_at";
+      const { data: fp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", id).maybeSingle();
+      if (!fp) throw notFound();
       const [{ data: availability }, { data: ratings }] = await Promise.all([
         supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
-        supabase.from("ratings").select(ratingCols).eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
+        supabase.from("ratings").select("stars, comment, created_at").eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
       ]);
       const rows = ((ratings ?? []) as unknown) as Array<{ stars: number; created_at: string; comment?: string | null }>;
       const avg = rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
-      return { profile, availability: availability ?? [], ratings: rows, avg };
+      return { fp, availability: availability ?? [], ratings: rows, avg };
     },
   });
 
+  if (authLoading) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-16 text-center">
+          <div className="label-mono">[LOCKED]</div>
+          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Sign in to view freelancer</h1>
+          <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">Sign in / Register</Link>
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
 
-  const { profile, availability, ratings, avg } = data;
-  const fp = Array.isArray(profile.freelancer_profiles) ? profile.freelancer_profiles[0] : profile.freelancer_profiles;
+  const { fp, availability, ratings, avg } = data;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -47,39 +60,42 @@ function FreelancerProfile() {
       <div className="container-page py-12">
         <div className="border border-border bg-card p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex gap-4">
-              <div className="flex size-20 items-center justify-center bg-racing-red font-mono text-xl font-black text-white">
-                {initialsFor(profile.display_name)}
+            <div>
+              <h1 className="text-3xl font-black uppercase italic tracking-tighter">{fp.headline || roleLabel(fp.role)}</h1>
+              <div className="mt-1 text-sm text-muted-foreground">
+                {roleLabel(fp.role)} · {fp.location ?? "—"}
               </div>
-              <div>
-                <h1 className="text-3xl font-black uppercase italic tracking-tighter">{profile.display_name}</h1>
-                <div className="mt-1 text-sm text-muted-foreground">
-                  {fp && t(`role.${fp.role}`)} · {fp?.location ?? "—"}
+              {ratings.length > 0 && (
+                <div className="mt-2 flex items-center gap-2">
+                  <RatingStars value={Math.round(avg)} readOnly size={16} />
+                  <span className="font-mono text-xs text-muted-foreground">{avg.toFixed(1)} ({ratings.length})</span>
                 </div>
-                {ratings.length > 0 && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <RatingStars value={Math.round(avg)} readOnly size={16} />
-                    <span className="font-mono text-xs text-muted-foreground">{avg.toFixed(1)} ({ratings.length})</span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-            {fp?.day_rate && (
+            {fp.day_rate && (
               <div className="text-right">
                 <div className="label-mono">Day rate</div>
                 <div className="mt-1 font-mono text-2xl font-black text-racing-yellow">{fp.currency} {fp.day_rate}</div>
               </div>
             )}
           </div>
-          {fp?.headline && <p className="mt-6 text-lg">{fp.headline}</p>}
-          {fp?.bio && <p className="mt-3 text-sm text-muted-foreground">{fp.bio}</p>}
+          {fp.bio && <p className="mt-3 text-sm text-muted-foreground">{fp.bio}</p>}
           <div className="mt-6 flex flex-wrap gap-2">
-            {fp?.disciplines?.map((d: string) => (
+            {fp.disciplines?.map((d: string) => (
               <span key={d} className="border border-racing-red/40 bg-racing-red/10 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">
-                {t(`discipline.${d}`)}
+                {disciplineLabel(d)}
               </span>
             ))}
           </div>
+          {fp.skills && fp.skills.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {fp.skills.map((s: string) => (
+                <span key={s} className="border border-border bg-secondary/40 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  {skillLabel(s)}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">

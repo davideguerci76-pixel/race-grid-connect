@@ -23,11 +23,17 @@ function JobsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("*, team:profiles!requests_team_id_fkey(id, display_name, avatar_url)")
+        .select("*")
         .eq("is_active", true)
         .order("start_date", { ascending: true });
       if (error) throw error;
-      return data;
+      const teamIds = Array.from(new Set((data ?? []).map((r) => r.team_id)));
+      const teamsMap = new Map<string, { team_name: string; initials: string | null }>();
+      if (teamIds.length > 0) {
+        const { data: teams } = await supabase.from("team_profiles").select("user_id, team_name, initials").in("user_id", teamIds);
+        (teams ?? []).forEach((t) => teamsMap.set(t.user_id, { team_name: t.team_name, initials: t.initials }));
+      }
+      return (data ?? []).map((r) => ({ ...r, team: teamsMap.get(r.team_id) ?? null }));
     },
   });
 
@@ -80,7 +86,7 @@ function JobsPage() {
                   </div>
                   <div className="text-lg font-bold">{r.title}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {r.team?.display_name ?? "Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
+                    {r.team?.team_name ?? "Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
                   </div>
                   <div className="mt-2 font-mono text-xs text-muted-foreground">
                     {r.start_date} → {r.end_date}

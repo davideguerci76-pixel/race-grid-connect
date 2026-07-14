@@ -6,14 +6,62 @@ export function AvailabilityCalendar({
   onSelect,
   disabled,
   min,
+  legend,
+  showBulkActions = true,
+  bulkMonths = 6,
 }: {
   selected: Date[];
   onSelect: (dates: Date[] | undefined) => void;
   disabled?: (d: Date) => boolean;
   min?: Date;
+  legend?: string;
+  showBulkActions?: boolean;
+  bulkMonths?: number;
 }) {
+  const selectAll = () => {
+    const start = min ? new Date(min) : new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + bulkMonths);
+    const all: Date[] = [];
+    const cur = new Date(start);
+    while (cur <= end) {
+      if (!disabled || !disabled(cur)) all.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    onSelect(all);
+  };
+
   return (
     <div className="paddock-calendar bg-card border border-border p-4">
+      {(legend || showBulkActions) && (
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          {legend ? (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="inline-block size-3 bg-racing-red" />
+              <span>{legend}</span>
+            </div>
+          ) : <span />}
+          {showBulkActions && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={selectAll}
+                className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
+              >
+                Select all ({bulkMonths}m)
+              </button>
+              <button
+                type="button"
+                onClick={() => onSelect([])}
+                className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
+              >
+                Deselect all
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <DayPicker
         mode="multiple"
         selected={selected}

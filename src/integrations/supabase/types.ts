@@ -377,6 +377,7 @@ export type Database = {
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           season_dates: string[] | null
+          skills: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -399,6 +400,7 @@ export type Database = {
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           season_dates?: string[] | null
+          skills?: string[]
           start_date: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -421,6 +423,7 @@ export type Database = {
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           season_dates?: string[] | null
+          skills?: string[]
           start_date?: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id?: string
@@ -566,6 +569,7 @@ export type Database = {
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           season_dates: string[] | null
+          skills: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
@@ -630,6 +634,7 @@ export type Database = {
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           season_dates: string[] | null
+          skills: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string

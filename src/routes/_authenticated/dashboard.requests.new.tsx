@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, type DurationType } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, SKILL_OPTIONS, type DurationType } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -76,6 +76,7 @@ function NewRequestPage() {
     notes: "",
   });
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
+  const [skills, setSkills] = useState<string[]>([]);
 
   useEffect(() => {
     if (!source) return;
@@ -120,6 +121,7 @@ function NewRequestPage() {
           budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+          skills,
         } as never,
       }),
     onSuccess: () => {
@@ -238,10 +240,35 @@ function NewRequestPage() {
               </p>
               <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
               <div className="mt-3">
-                <AvailabilityCalendar selected={seasonDates} onSelect={(d) => setSeasonDates(d ?? [])} min={new Date()} />
+                <AvailabilityCalendar
+                  selected={seasonDates}
+                  onSelect={(d) => setSeasonDates(d ?? [])}
+                  min={new Date()}
+                  legend="Selected (red) days = days you need the professional on-site."
+                />
+
               </div>
             </div>
           )}
+
+          <div className="md:col-span-2">
+            <label className="label-mono">Required skills <span className="text-racing-red">({skills.length})</span></label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {SKILL_OPTIONS.map((o) => {
+                const checked = skills.includes(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setSkills(checked ? skills.filter((s) => s !== o.value) : [...skills, o.value])}
+                    className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div className="md:col-span-2">
             <label className="label-mono">Notes</label>

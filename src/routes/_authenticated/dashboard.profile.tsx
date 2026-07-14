@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, disciplineLabel, roleLabel } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
 function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const qc = useQueryClient();
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -41,13 +40,11 @@ function ProfilePage() {
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
-          {/* Personal Info */}
           <div className="border border-border bg-card p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">Personal Info</h2>
             <PersonalInfoSection profile={profile} />
           </div>
 
-          {/* Role-specific info */}
           <div className="border border-border bg-card p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">
               {isFreelancer ? "Freelancer Info" : "Team Info"}
@@ -69,30 +66,20 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
-  const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
-  const [userType, setUserType] = useState<"freelancer" | "team">(profile?.user_type ?? "freelancer");
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    if (!editing && profile) setDisplayName(profile.display_name ?? "");
+  }, [profile, editing]);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: displayName, user_type: userType })
+        .update({ display_name: displayName })
         .eq("id", user.id);
       if (error) throw error;
-
-      // Ensure the matching sub-profile row exists so the correct section renders next
-      if (userType === "team") {
-        await supabase.from("team_profiles").upsert(
-          { user_id: user.id, team_name: displayName || "New team" },
-          { onConflict: "user_id", ignoreDuplicates: true },
-        );
-      } else {
-        await supabase.from("freelancer_profiles").upsert(
-          { user_id: user.id },
-          { onConflict: "user_id", ignoreDuplicates: true },
-        );
-      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -108,28 +95,16 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="text-muted-foreground">Email:</span>
         <span className="ml-2 font-mono">{profile?.email ?? "—"}</span>
       </div>
+      <div className="text-sm">
+        <span className="text-muted-foreground">Account type:</span>
+        <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
+        <span className="ml-2 text-[11px] text-muted-foreground">(cannot be changed)</span>
+      </div>
       {editing ? (
         <>
           <div>
-            <label className="text-xs text-muted-foreground">Account type</label>
-            <div className="mt-1 grid grid-cols-2 gap-2">
-              {(["freelancer", "team"] as const).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setUserType(v)}
-                  className={`border p-2 text-xs font-bold uppercase transition-colors ${
-                    userType === v ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
             <label className="text-xs text-muted-foreground">
-              {userType === "team" ? "Team name" : "Display name"}
+              {profile?.user_type === "team" ? "Team name" : "Display name"}
             </label>
             <input
               value={displayName}
@@ -149,14 +124,10 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       ) : (
         <>
           <div className="text-sm">
-            <span className="text-muted-foreground">Account type:</span>
-            <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
-          </div>
-          <div className="text-sm">
             <span className="text-muted-foreground">Display name:</span>
             <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
           </div>
-          <button onClick={() => { setDisplayName(profile?.display_name ?? ""); setUserType(profile?.user_type ?? "freelancer"); setEditing(true); }} className="text-xs text-racing-red hover:underline">
+          <button onClick={() => setEditing(true)} className="text-xs text-racing-red hover:underline">
             Edit
           </button>
         </>
@@ -174,167 +145,122 @@ function FreelancerSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    role: profile?.role ?? "other",
-    headline: profile?.headline ?? "",
-    disciplines: profile?.disciplines ?? [],
-    day_rate: profile?.day_rate ?? "",
-    location: profile?.location ?? "",
-    bio: profile?.bio ?? "",
-    travels: profile?.travels ?? true,
+    role: "other" as string,
+    headline: "",
+    disciplines: [] as string[],
+    skills: [] as string[],
+    day_rate: "" as string,
+    location: "",
+    bio: "",
+    travels: true,
   });
+
+  // Sync form state whenever the underlying profile refreshes (query completes / refetches).
+  useEffect(() => {
+    if (editing) return;
+    setForm({
+      role: profile?.role ?? "other",
+      headline: profile?.headline ?? "",
+      disciplines: profile?.disciplines ?? [],
+      skills: profile?.skills ?? [],
+      day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
+      location: profile?.location ?? "",
+      bio: profile?.bio ?? "",
+      travels: profile?.travels ?? true,
+    });
+  }, [profile, editing]);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      const { error } = await supabase.from("freelancer_profiles").upsert({
+      const payload: Record<string, unknown> = {
         user_id: user.id,
-        role: form.role as never,
+        role: form.role,
         headline: form.headline || null,
-        disciplines: form.disciplines as never,
+        disciplines: form.disciplines,
+        skills: form.skills,
         day_rate: form.day_rate ? parseInt(form.day_rate) : null,
         location: form.location || null,
         bio: form.bio || null,
         travels: form.travels,
-      }, { onConflict: "user_id" });
+      };
+      const { error } = await supabase.from("freelancer_profiles").upsert(payload as never, { onConflict: "user_id" });
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Updated");
+      toast.success("Freelancer profile saved");
       setEditing(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  return (
-    <div className="mt-4 space-y-3">
-      {editing ? (
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs text-muted-foreground">Role</label>
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            >
-              {ROLE_OPTIONS.map((r) => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Headline</label>
-            <input
-              value={form.headline}
-              onChange={(e) => setForm({ ...form, headline: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="e.g. F1 Mechanic with 10 years experience"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Disciplines</label>
-            <div className="mt-1 max-h-64 overflow-y-auto flex flex-wrap gap-2 border border-border p-2">
-              {DISCIPLINE_OPTIONS.map((d) => (
-                <label key={d.value} className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    checked={form.disciplines.includes(d.value)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setForm({ ...form, disciplines: [...form.disciplines, d.value] });
-                      } else {
-                        setForm({ ...form, disciplines: form.disciplines.filter((x: string) => x !== d.value) });
-                      }
-                    }}
-                    className="accent-racing-red"
-                  />
-                  <span className="text-xs">{d.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+  if (editing) {
+    return (
+      <div className="mt-4 space-y-4">
+        <div>
+          <label className="text-xs text-muted-foreground">Role</label>
+          <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
+            {ROLE_OPTIONS.map((r) => (<option key={r.value} value={r.value}>{r.label}</option>))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Headline</label>
+          <input value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="e.g. F1 Mechanic – 10 yrs" />
+        </div>
+        <MultiCheckboxBox label="Disciplines / Championships" options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
+        <MultiCheckboxBox label="Skills" options={SKILL_OPTIONS} value={form.skills} onChange={(v) => setForm({ ...form, skills: v })} />
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-muted-foreground">Day Rate (EUR)</label>
-            <input
-              type="number"
-              value={form.day_rate}
-              onChange={(e) => setForm({ ...form, day_rate: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="e.g. 450"
-            />
+            <input type="number" value={form.day_rate} onChange={(e) => setForm({ ...form, day_rate: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="450" />
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Location</label>
-            <input
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="e.g. Milan, Italy"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Bio</label>
-            <textarea
-              value={form.bio}
-              onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              rows={3}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="Short bio..."
-            />
-          </div>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.travels}
-              onChange={(e) => setForm({ ...form, travels: e.target.checked })}
-              className="accent-racing-red"
-            />
-            <span className="text-sm">Available to travel for race weekends</span>
-          </label>
-          <div className="flex gap-2">
-            <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-              Save
-            </button>
-            <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-              Cancel
-            </button>
+            <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="Milan, Italy" />
           </div>
         </div>
-      ) : (
-        <>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Role:</span>
-            <span className="ml-2">{profile?.role ? roleLabel(profile.role) : "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Headline:</span>
-            <span className="ml-2">{profile?.headline ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Disciplines:</span>
-            <span className="ml-2">{profile?.disciplines?.length ? profile.disciplines.map(disciplineLabel).join(", ") : "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Day rate:</span>
-            <span className="ml-2 font-mono">{profile?.day_rate ? `€${profile.day_rate}/day` : "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Location:</span>
-            <span className="ml-2">{profile?.location ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Travels:</span>
-            <span className="ml-2">{profile?.travels ? "Yes" : "No"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Bio:</span>
-            <p className="mt-1">{profile?.bio ?? "—"}</p>
-          </div>
-          <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">
-            Edit Freelancer Info
-          </button>
-        </>
-      )}
+        <div>
+          <label className="text-xs text-muted-foreground">Bio</label>
+          <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
+          <span className="text-sm">Available to travel for race weekends</span>
+        </label>
+        <div className="flex gap-2">
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">Save</button>
+          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-3">
+      <Row label="Role" value={roleLabel(profile?.role)} />
+      <Row label="Headline" value={profile?.headline ?? "—"} />
+      <div>
+        <div className="text-xs text-muted-foreground">Disciplines</div>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {profile?.disciplines?.length ? profile.disciplines.map((d: string) => (
+            <span key={d} className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(d)}</span>
+          )) : <span className="text-sm">—</span>}
+        </div>
+      </div>
+      <div>
+        <div className="text-xs text-muted-foreground">Skills</div>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {profile?.skills?.length ? profile.skills.map((s: string) => (
+            <span key={s} className="border border-border bg-secondary/40 px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{skillLabel(s)}</span>
+          )) : <span className="text-sm">—</span>}
+        </div>
+      </div>
+      <Row label="Day rate" value={profile?.day_rate ? `€${profile.day_rate}/day` : "—"} mono />
+      <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
+      <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
+      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Freelancer Info</button>
     </div>
   );
 }
@@ -344,19 +270,31 @@ function TeamSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    team_name: profile?.team_name ?? "",
-    team_type: profile?.team_type ?? "",
-    location: profile?.location ?? "",
-    primary_discipline: profile?.primary_discipline ?? "",
-    bio: profile?.bio ?? "",
-    website: profile?.website ?? "",
+    team_name: "",
+    team_type: "",
+    location: "",
+    primary_discipline: "",
+    bio: "",
+    website: "",
   });
+
+  useEffect(() => {
+    if (editing) return;
+    setForm({
+      team_name: profile?.team_name ?? "",
+      team_type: profile?.team_type ?? "",
+      location: profile?.location ?? "",
+      primary_discipline: profile?.primary_discipline ?? "",
+      bio: profile?.bio ?? "",
+      website: profile?.website ?? "",
+    });
+  }, [profile, editing]);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
       if (!form.team_name.trim()) throw new Error("Team name is required");
-      const { error } = await supabase.from("team_profiles").upsert({
+      const payload: Record<string, unknown> = {
         user_id: user.id,
         team_name: form.team_name,
         team_type: form.team_type || null,
@@ -364,117 +302,135 @@ function TeamSection({ profile }: { profile: any }) {
         primary_discipline: form.primary_discipline || null,
         bio: form.bio || null,
         website: form.website || null,
-      }, { onConflict: "user_id" });
+      };
+      const { error } = await supabase.from("team_profiles").upsert(payload as never, { onConflict: "user_id" });
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Updated");
+      toast.success("Team profile saved");
       setEditing(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  if (editing) {
+    return (
+      <div className="mt-4 space-y-4">
+        <div>
+          <label className="text-xs text-muted-foreground">Team Name</label>
+          <input value={form.team_name} onChange={(e) => setForm({ ...form, team_name: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Team Type</label>
+          <input value={form.team_type} onChange={(e) => setForm({ ...form, team_type: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="e.g. F2 Team, GT Team, Factory" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Location</label>
+          <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Primary Discipline</label>
+          <select value={form.primary_discipline} onChange={(e) => setForm({ ...form, primary_discipline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
+            <option value="">Select…</option>
+            {DISCIPLINE_OPTIONS.map((d) => (<option key={d.value} value={d.value}>{d.label}</option>))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Bio</label>
+          <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">Website</label>
+          <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="https://…" />
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">Save</button>
+          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 space-y-3">
-      {editing ? (
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs text-muted-foreground">Team Name</label>
-            <input
-              value={form.team_name}
-              onChange={(e) => setForm({ ...form, team_name: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Team Type</label>
-            <input
-              value={form.team_type}
-              onChange={(e) => setForm({ ...form, team_type: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="e.g. F2 Team, GT Team, Factory"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Location</label>
-            <input
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Primary Discipline</label>
-            <select
-              value={form.primary_discipline}
-              onChange={(e) => setForm({ ...form, primary_discipline: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Select...</option>
-              {DISCIPLINE_OPTIONS.map((d) => (
-                <option key={d.value} value={d.value}>{d.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Bio</label>
-            <textarea
-              value={form.bio}
-              onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              rows={3}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Website</label>
-            <input
-              value={form.website}
-              onChange={(e) => setForm({ ...form, website: e.target.value })}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-              placeholder="https://..."
-            />
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-              Save
-            </button>
-            <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-              Cancel
-            </button>
-          </div>
+      <Row label="Team name" value={profile?.team_name ?? "—"} bold />
+      <Row label="Type" value={profile?.team_type ?? "—"} />
+      <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label="Discipline" value={disciplineLabel(profile?.primary_discipline)} mono />
+      <div className="text-sm">
+        <span className="text-muted-foreground">Website:</span>
+        <span className="ml-2">{profile?.website ? <a href={profile.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{profile.website}</a> : "—"}</span>
+      </div>
+      <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
+      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Team Info</button>
+    </div>
+  );
+}
+
+function Row({ label, value, mono, bold }: { label: string; value: string; mono?: boolean; bold?: boolean }) {
+  return (
+    <div className="text-sm">
+      <span className="text-muted-foreground">{label}:</span>
+      <span className={`ml-2 ${mono ? "font-mono" : ""} ${bold ? "font-bold" : ""}`}>{value}</span>
+    </div>
+  );
+}
+
+function MultiCheckboxBox({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const [q, setQ] = useState("");
+  const filtered = options.filter((o) => o.label.toLowerCase().includes(q.toLowerCase()));
+  const allSelected = filtered.length > 0 && filtered.every((o) => value.includes(o.value));
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs text-muted-foreground">{label} <span className="text-racing-red">({value.length})</span></label>
+        <button
+          type="button"
+          onClick={() => {
+            const filteredVals = filtered.map((o) => o.value);
+            if (allSelected) onChange(value.filter((v) => !filteredVals.includes(v)));
+            else onChange(Array.from(new Set([...value, ...filteredVals])));
+          }}
+          className="text-[10px] font-bold uppercase text-racing-red hover:underline"
+        >
+          {allSelected ? "Deselect all" : "Select all"}
+        </button>
+      </div>
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Filter…"
+        className="mt-1 w-full border border-border bg-background px-2 py-1 text-xs"
+      />
+      <div className="mt-1 max-h-56 overflow-y-auto border border-border p-2">
+        <div className="flex flex-wrap gap-1.5">
+          {filtered.map((o) => {
+            const checked = value.includes(o.value);
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => onChange(checked ? value.filter((v) => v !== o.value) : [...value, o.value])}
+                className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+          {filtered.length === 0 && <div className="text-xs text-muted-foreground">No matches.</div>}
         </div>
-      ) : (
-        <>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Team name:</span>
-            <span className="ml-2 font-bold">{profile?.team_name ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Type:</span>
-            <span className="ml-2">{profile?.team_type ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Location:</span>
-            <span className="ml-2">{profile?.location ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Discipline:</span>
-            <span className="ml-2 font-mono uppercase">{profile?.primary_discipline ?? "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Website:</span>
-            <span className="ml-2">{profile?.website ? <a href={profile.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{profile.website}</a> : "—"}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">Bio:</span>
-            <p className="mt-1">{profile?.bio ?? "—"}</p>
-          </div>
-          <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">
-            Edit Team Info
-          </button>
-        </>
-      )}
+      </div>
     </div>
   );
 }

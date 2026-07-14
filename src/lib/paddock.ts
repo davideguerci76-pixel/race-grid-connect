@@ -80,7 +80,7 @@ export const DISCIPLINE_OPTIONS: Option[] = [
   { value: "rallycross", label: "Rallycross" },
   { value: "nascar_cup", label: "NASCAR Cup Series" },
   { value: "nascar_xfinity", label: "NASCAR Xfinity Series" },
-  { value: "nascar_craftsman_truck", label: "NASCAR Craftsman Truck Series" },
+  { value: "nascar_truck", label: "NASCAR Craftsman Truck Series" },
   { value: "supercars", label: "Supercars Championship" },
   { value: "sprint_cars", label: "Sprint Cars" },
   { value: "midget_cars", label: "Midget Cars" },
@@ -92,9 +92,63 @@ export const DISCIPLINE_OPTIONS: Option[] = [
   { value: "dakar_rally", label: "Dakar Rally (T1+, T2, T3, T4, T5)" },
 ];
 
+// Motorsport-specific skills (multi-select in freelancer profile & team requests)
+export const SKILL_OPTIONS: Option[] = [
+  { value: "chassis_builder", label: "Chassis Builder (Telaista)" },
+  { value: "gearbox_specialist", label: "Gearbox Specialist (Cambista)" },
+  { value: "engine_builder", label: "Engine Builder (Motorista)" },
+  { value: "welder_tig", label: "TIG Welder" },
+  { value: "welder_mig", label: "MIG Welder" },
+  { value: "lathe_operator", label: "Lathe Operator (Tornitore)" },
+  { value: "milling_operator", label: "Milling Operator (Fresatore)" },
+  { value: "cnc_programmer", label: "CNC Programmer" },
+  { value: "composite_layup", label: "Composite Lay-up / Autoclave" },
+  { value: "carbon_repair", label: "Carbon Fibre Repair" },
+  { value: "hydraulics", label: "Hydraulics Specialist" },
+  { value: "pneumatics", label: "Pneumatics Specialist" },
+  { value: "electrical_wiring", label: "Electrical Harness / Wiring" },
+  { value: "electronics_ecu", label: "ECU / Electronics Mapping" },
+  { value: "damper_specialist", label: "Damper Rebuild & Setup" },
+  { value: "corner_weights_setup", label: "Setup / Corner Weights / Alignment" },
+  { value: "tyre_management", label: "Tyre Management" },
+  { value: "fuel_systems", label: "Fuel Systems" },
+  { value: "brake_specialist", label: "Brake Systems Specialist" },
+  { value: "telemetry_analysis", label: "Telemetry Analysis" },
+  { value: "data_acquisition", label: "Data Acquisition (MoTeC, Cosworth, Bosch)" },
+  { value: "motec_i2", label: "MoTeC i2 Pro" },
+  { value: "matlab_simulink", label: "MATLAB / Simulink" },
+  { value: "python_data", label: "Python (Data / Automation)" },
+  { value: "vehicle_dynamics_sim", label: "Vehicle Dynamics Simulation" },
+  { value: "cfd", label: "CFD (Aerodynamics)" },
+  { value: "fea", label: "FEA (Structural Analysis)" },
+  { value: "catia", label: "CAD - CATIA V5/V6" },
+  { value: "solidworks", label: "CAD - SolidWorks" },
+  { value: "siemens_nx", label: "CAD - Siemens NX" },
+  { value: "autocad", label: "CAD - AutoCAD" },
+  { value: "rhino", label: "CAD - Rhino" },
+  { value: "office_suite", label: "MS Office / Google Workspace" },
+  { value: "logistics_freight", label: "Freight & Motorsport Logistics" },
+  { value: "carnet_ata", label: "Carnet ATA / Customs" },
+  { value: "hospitality_ops", label: "Hospitality Operations" },
+  { value: "team_management", label: "Team Management" },
+  { value: "driver_coaching", label: "Driver Coaching" },
+  { value: "race_engineering", label: "Race Engineering" },
+  { value: "strategy_engineer", label: "Race Strategy" },
+  { value: "pit_stop_crew", label: "Pit Stop Crew" },
+  { value: "truckie", label: "Truckie / Transporter Driver" },
+  { value: "graphics_wrap", label: "Livery / Wrap Application" },
+];
+
 // Backward-compat arrays of values.
 export const ROLES: string[] = ROLE_OPTIONS.map((o) => o.value);
 export const DISCIPLINES: string[] = DISCIPLINE_OPTIONS.map((o) => o.value);
+export const SKILLS: string[] = SKILL_OPTIONS.map((o) => o.value);
+
+const SKILL_MAP = new Map(SKILL_OPTIONS.map((o) => [o.value, o.label]));
+export function skillLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return SKILL_MAP.get(value) ?? value.replace(/_/g, " ");
+}
 
 const ROLE_MAP = new Map(ROLE_OPTIONS.map((o) => [o.value, o.label]));
 const DISCIPLINE_MAP = new Map(DISCIPLINE_OPTIONS.map((o) => [o.value, o.label]));
