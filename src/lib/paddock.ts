@@ -80,7 +80,7 @@ export const DISCIPLINE_OPTIONS: Option[] = [
   { value: "rallycross", label: "Rallycross" },
   { value: "nascar_cup", label: "NASCAR Cup Series" },
   { value: "nascar_xfinity", label: "NASCAR Xfinity Series" },
-  { value: "nascar_craftsman_truck", label: "NASCAR Craftsman Truck Series" },
+  { value: "nascar_truck", label: "NASCAR Craftsman Truck Series" },
   { value: "supercars", label: "Supercars Championship" },
   { value: "sprint_cars", label: "Sprint Cars" },
   { value: "midget_cars", label: "Midget Cars" },
