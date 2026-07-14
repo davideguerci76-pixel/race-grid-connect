@@ -53,6 +53,7 @@ export const createRequest = createServerFn({ method: "POST" })
         duration: durationEnum,
         notes: z.string().max(1000).optional().nullable(),
         season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
+        skills: z.array(z.string().max(64)).max(50).optional(),
       })
       .parse(data),
   )
