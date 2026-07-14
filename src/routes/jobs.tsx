@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { DISCIPLINES, DURATIONS, ROLES, type Discipline, type DurationType, type FreelancerRole } from "@/lib/paddock";
@@ -13,10 +14,33 @@ export const Route = createFileRoute("/jobs")({
 
 function JobsPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [role, setRole] = useState<FreelancerRole | "all">("all");
   const [disc, setDisc] = useState<Discipline | "all">("all");
   const [dur, setDur] = useState<DurationType | "all">("all");
+  const [confirmTeamId, setConfirmTeamId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const { data: profile } = useQuery({
+    queryKey: ["account-type", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await supabase.from("profiles").select("user_type").eq("id", user!.id).maybeSingle()).data,
+  });
+  const isTeam = profile?.user_type === "team";
+  const isFreelancer = profile?.user_type === "freelancer";
+
+  const { data: reveals = [] } = useQuery({
+    queryKey: ["team-reveals", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("team_reveals").select("team_id").eq("user_id", user!.id);
+      return (data ?? []).map((r) => r.team_id);
+    },
+  });
+  const revealedSet = new Set(reveals);
 
   const { data: requests = [] } = useQuery({
     queryKey: ["public-requests"],
@@ -37,6 +61,22 @@ function JobsPage() {
     },
   });
 
+  const revealMutation = useMutation({
+    mutationFn: async (teamId: string) => {
+      const { data, error } = await supabase.rpc("reveal_team", { _team_id: teamId });
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: (_data, teamId) => {
+      setConfirmTeamId(null);
+      setError(null);
+      qc.invalidateQueries({ queryKey: ["team-reveals"] });
+      qc.invalidateQueries({ queryKey: ["dashboard-profile"] });
+      navigate({ to: "/teams/$id", params: { id: teamId } });
+    },
+    onError: (e: Error) => setError(e.message),
+  });
+
   const filtered = requests.filter((r) => {
     if (role !== "all" && r.role !== role) return false;
     if (disc !== "all" && r.discipline !== disc) return false;
@@ -44,6 +84,19 @@ function JobsPage() {
     if (q && !`${r.title} ${r.circuit ?? ""} ${r.location ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
   });
+
+  function handleViewTeam(teamId: string) {
+    if (!user) {
+      navigate({ to: "/auth" });
+      return;
+    }
+    if (isTeam || revealedSet.has(teamId)) {
+      navigate({ to: "/teams/$id", params: { id: teamId } });
+      return;
+    }
+    setError(null);
+    setConfirmTeamId(teamId);
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -55,9 +108,11 @@ function JobsPage() {
             <h1 className="text-5xl font-black uppercase italic tracking-tighter">{t("jobs.title")}</h1>
             <p className="mt-2 text-sm text-muted-foreground">{t("jobs.sub", { filtered: filtered.length, total: requests.length })}</p>
           </div>
-          <Link to="/dashboard/calendar" className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-            {t("jobs.post_request")}
-          </Link>
+          {isTeam ? (
+            <Link to="/dashboard/requests/new" className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+              {t("jobs.post_request")}
+            </Link>
+          ) : null}
         </div>
 
         <div className="mb-6 grid gap-3 md:grid-cols-4">
@@ -76,7 +131,9 @@ function JobsPage() {
           <div className="border border-border bg-card p-12 text-center text-sm text-muted-foreground">{t("jobs.empty")}</div>
         ) : (
           <div className="grid gap-3">
-            {filtered.map((r) => (
+            {filtered.map((r) => {
+              const canSeeTeam = isTeam || revealedSet.has(r.team_id);
+              return (
               <div key={r.id} className="grid gap-4 border border-border bg-card p-5 md:grid-cols-[1fr,auto] md:items-center">
                 <div>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -86,7 +143,7 @@ function JobsPage() {
                   </div>
                   <div className="text-lg font-bold">{r.title}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {r.team?.team_name ?? "Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
+                    {canSeeTeam ? (r.team?.team_name ?? "Team") : "Hidden Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
                   </div>
                   <div className="mt-2 font-mono text-xs text-muted-foreground">
                     {r.start_date} → {r.end_date}
@@ -98,15 +155,47 @@ function JobsPage() {
                       {r.currency} {r.budget_min ?? ""}{r.budget_max ? `–${r.budget_max}` : ""} <span className="text-[10px] text-muted-foreground">/{r.budget_unit}</span>
                     </div>
                   ) : null}
-                  <Link to="/teams/$id" params={{ id: r.team_id }} className="mt-2 inline-block bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white">
-                    View team
-                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleViewTeam(r.team_id)}
+                    className="mt-2 inline-block bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white"
+                  >
+                    {canSeeTeam ? "View team" : "Reveal team (2 tokens)"}
+                  </button>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
         )}
       </div>
+
+      {confirmTeamId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !revealMutation.isPending && setConfirmTeamId(null)}>
+          <div className="w-full max-w-md border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="label-mono">[REVEAL TEAM]</div>
+            <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Spend 2 tokens?</h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Revealing costs 2 tokens. After paying you can view the full team profile any time — no additional charge.
+            </p>
+            {isFreelancer === false && !isTeam ? null : null}
+            {error && <div className="mt-3 border border-racing-red/40 bg-racing-red/10 p-3 text-xs text-racing-red">{error}</div>}
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setConfirmTeamId(null)} disabled={revealMutation.isPending} className="border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-muted">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => revealMutation.mutate(confirmTeamId)}
+                disabled={revealMutation.isPending}
+                className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+              >
+                {revealMutation.isPending ? "Revealing…" : "Reveal (2 tokens)"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <SiteFooter />
     </div>
   );

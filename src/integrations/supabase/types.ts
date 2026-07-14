@@ -490,6 +490,27 @@ export type Database = {
           },
         ]
       }
+      team_reveals: {
+        Row: {
+          created_at: string
+          id: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       token_transactions: {
         Row: {
           created_at: string
@@ -613,6 +634,7 @@ export type Database = {
           revealed_team: string
         }[]
       }
+      reveal_team: { Args: { _team_id: string }; Returns: number }
       set_request_status: {
         Args: {
           _id: string
@@ -756,6 +778,7 @@ export type Database = {
         | "admin_debit"
         | "refund"
         | "request_post"
+        | "team_reveal_spend"
       user_type: "freelancer" | "team"
     }
     CompositeTypes: {
@@ -993,6 +1016,7 @@ export const Constants = {
         "admin_debit",
         "refund",
         "request_post",
+        "team_reveal_spend",
       ],
       user_type: ["freelancer", "team"],
     },
