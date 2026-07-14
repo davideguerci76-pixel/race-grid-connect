@@ -293,7 +293,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
             bio: tp.bio,
             primary_discipline: tp.primary_discipline,
             initials: tp.initials,
-            contact_email: m.team?.email ?? null,
+            contact_email: emailsById.get(m.team_id) ?? null,
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
@@ -306,7 +306,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            contact_email: m.freelancer?.email ?? null,
+            contact_email: emailsById.get(m.freelancer_id) ?? null,
           } : null;
         }
       } else {
