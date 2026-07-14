@@ -45,17 +45,50 @@ function MatchesPage() {
           </div>
         ) : (
           <div className="mt-8 grid gap-3">
-            {matches.map((m) => {
+            {matches.map((m: any) => {
               const counterparty = isFreelancer ? m.team : m.freelancer;
+              const cp = m.counterparty;
               return (
-                <div key={m.id} className="grid gap-4 border border-border bg-card p-5 md:grid-cols-[1fr,auto] md:items-center">
+                <div key={m.id} className="grid gap-4 border border-border bg-card p-5 md:grid-cols-[1fr,auto] md:items-start">
                   <div className="flex items-start gap-4">
-                    <div className={`flex size-12 items-center justify-center font-mono text-sm font-black ${m.revealedByMe ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
-                      {m.revealedByMe ? initialsFor(counterparty?.display_name ?? "?") : <Lock className="size-4" />}
+                    <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${m.revealedByMe ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
+                      {m.revealedByMe ? initialsFor((isFreelancer ? cp?.team_name : counterparty?.display_name) ?? counterparty?.display_name ?? "?") : <Lock className="size-4" />}
                     </div>
-                    <div>
-                      <div className="font-bold">{m.revealedByMe ? counterparty?.display_name : t("matches.hidden_name")}</div>
-                      <div className="mt-1 text-xs text-muted-foreground">{m.request?.title}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-lg font-bold">
+                        {m.revealedByMe
+                          ? (isFreelancer ? (cp?.team_name ?? counterparty?.display_name) : (counterparty?.display_name))
+                          : t("matches.hidden_name")}
+                      </div>
+                      {m.revealedByMe && cp && (
+                        <div className="mt-2 grid gap-1 text-xs">
+                          {isFreelancer ? (
+                            <>
+                              {cp.team_type && <div><span className="text-muted-foreground">Type:</span> <span className="font-medium">{cp.team_type}</span></div>}
+                              {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
+                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
+                              {cp.website && <div><span className="text-muted-foreground">Website:</span> <a href={cp.website} target="_blank" rel="noopener" className="font-medium text-racing-red hover:underline">{cp.website}</a></div>}
+                              {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
+                              <div className="mt-2">
+                                <a href={`/teams/${m.team_id}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View full team profile →</a>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {cp.headline && <div className="font-medium">{cp.headline}</div>}
+                              {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
+                              {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">Day rate:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
+                              {cp.travels !== null && <div><span className="text-muted-foreground">Travels:</span> <span className="font-medium">{cp.travels ? "Yes" : "No"}</span></div>}
+                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
+                              {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
+                              <div className="mt-2">
+                                <a href={`/freelancers/${m.freelancer_id}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View full profile →</a>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      <div className="mt-3 border-t border-border pt-2 text-xs text-muted-foreground">{m.request?.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
                         {m.request?.start_date} → {m.request?.end_date} · {t(`role.${m.request?.role}`)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
