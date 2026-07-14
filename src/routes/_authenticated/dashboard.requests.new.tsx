@@ -76,6 +76,7 @@ function NewRequestPage() {
     notes: "",
   });
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
+  const [skills, setSkills] = useState<string[]>([]);
 
   useEffect(() => {
     if (!source) return;
