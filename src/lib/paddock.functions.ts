@@ -242,37 +242,68 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const col = isFreelancer ? "freelancer_id" : "team_id";
     const { data: matches, error } = await supabase
       .from("matches")
-      .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url), team:profiles!matches_team_id_fkey(id, display_name, avatar_url)")
+      .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url, email), team:profiles!matches_team_id_fkey(id, display_name, avatar_url, email)")
       .eq(col, userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    // Redact counterparty details when not revealed
-    const redacted = (matches ?? []).map((raw) => {
-      const m = raw as {
-        id: string;
-        freelancer_id: string;
-        team_id: string;
-        overlap_days: number;
-        revealed_by_freelancer: boolean;
-        revealed_by_team: boolean;
-        request: { id: string; title: string; start_date: string; end_date: string; role: string; discipline: string } | null;
-        freelancer: { display_name: string; avatar_url: string | null } | null;
-        team: { display_name: string; avatar_url: string | null } | null;
-      };
+    const rawMatches = (matches ?? []) as any[];
+    const otherIds = Array.from(new Set(rawMatches.map((m) => (isFreelancer ? m.team_id : m.freelancer_id))));
+
+    const teamProfilesById = new Map<string, any>();
+    const freelancerProfilesById = new Map<string, any>();
+    if (otherIds.length) {
+      if (isFreelancer) {
+        const { data: tps } = await supabase.from("team_profiles").select("*").in("user_id", otherIds);
+        (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
+      } else {
+        const { data: fps } = await supabase.from("freelancer_profiles").select("*").in("user_id", otherIds);
+        (fps ?? []).forEach((p: any) => freelancerProfilesById.set(p.user_id, p));
+      }
+    }
+
+    const redacted = rawMatches.map((m: any) => {
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
-      if (!revealedByMe) {
+      let counterparty: any = null;
+      if (revealedByMe) {
+        if (isFreelancer) {
+          const tp = teamProfilesById.get(m.team_id);
+          counterparty = tp ? {
+            team_name: tp.team_name,
+            team_type: tp.team_type,
+            location: tp.location,
+            website: tp.website,
+            bio: tp.bio,
+            primary_discipline: tp.primary_discipline,
+            initials: tp.initials,
+            contact_email: m.team?.email ?? null,
+          } : null;
+        } else {
+          const fp = freelancerProfilesById.get(m.freelancer_id);
+          counterparty = fp ? {
+            headline: fp.headline,
+            role: fp.role,
+            disciplines: fp.disciplines,
+            skills: fp.skills,
+            location: fp.location,
+            day_rate: fp.day_rate,
+            bio: fp.bio,
+            travels: fp.travels,
+            contact_email: m.freelancer?.email ?? null,
+          } : null;
+        }
+      } else {
         if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
         if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe };
+      return { ...m, revealedByMe, counterparty };
     });
 
     return {
       matches: redacted,
       counts: {
         total: redacted.length,
-        revealed: redacted.filter((m) => m.revealedByMe).length,
+        revealed: redacted.filter((m: any) => m.revealedByMe).length,
       },
       userType: profile.user_type,
     };
