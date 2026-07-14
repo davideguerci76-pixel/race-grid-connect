@@ -242,7 +242,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const col = isFreelancer ? "freelancer_id" : "team_id";
     const { data: matches, error } = await supabase
       .from("matches")
-      .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url, email), team:profiles!matches_team_id_fkey(id, display_name, avatar_url, email)")
+      .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url), team:profiles!matches_team_id_fkey(id, display_name, avatar_url)")
       .eq(col, userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -252,6 +252,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
 
     const teamProfilesById = new Map<string, any>();
     const freelancerProfilesById = new Map<string, any>();
+    const emailsById = new Map<string, string | null>();
     if (otherIds.length) {
       if (isFreelancer) {
         const { data: tps } = await supabase.from("team_profiles").select("*").in("user_id", otherIds);
@@ -259,6 +260,22 @@ export const getMyMatches = createServerFn({ method: "GET" })
       } else {
         const { data: fps } = await supabase.from("freelancer_profiles").select("*").in("user_id", otherIds);
         (fps ?? []).forEach((p: any) => freelancerProfilesById.set(p.user_id, p));
+      }
+      const revealedOtherIds = Array.from(new Set(
+        rawMatches
+          .filter((m) => (isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team))
+          .map((m) => (isFreelancer ? m.team_id : m.freelancer_id))
+      ));
+      if (revealedOtherIds.length) {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          await Promise.all(revealedOtherIds.map(async (uid) => {
+            const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
+            emailsById.set(uid, data?.user?.email ?? null);
+          }));
+        } catch (_e) {
+          // ignore email lookup failures
+        }
       }
     }
 
