@@ -74,7 +74,7 @@ function JobsPage() {
       qc.invalidateQueries({ queryKey: ["request-reveals"] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile"] });
       const req = requests.find((r) => r.id === requestId);
-      if (req) navigate({ to: "/teams/$id", params: { id: req.team_id } });
+      if (req) navigate({ to: "/teams/$id", params: { id: req.team_id }, search: { req: requestId } });
     },
     onError: (e: Error) => setError(e.message),
   });
@@ -93,12 +93,13 @@ function JobsPage() {
       return;
     }
     if (isTeam || revealedSet.has(r.id)) {
-      navigate({ to: "/teams/$id", params: { id: r.team_id } });
+      navigate({ to: "/teams/$id", params: { id: r.team_id }, search: { req: r.id } });
       return;
     }
     setError(null);
     setConfirmRequestId(r.id);
   }
+
 
 
   return (
