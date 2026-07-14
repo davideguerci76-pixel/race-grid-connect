@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, type DurationType } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, SKILL_OPTIONS, type DurationType } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
