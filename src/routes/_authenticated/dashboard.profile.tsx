@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -235,7 +236,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Location</label>
-            <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="Milan, Italy" />
+            <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Milan, Italy" />
           </div>
         </div>
         <div>
@@ -348,7 +349,7 @@ function TeamSection({ profile }: { profile: any }) {
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Location</label>
-          <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+          <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Primary Discipline</label>
