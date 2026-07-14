@@ -77,7 +77,12 @@ function CalendarPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
         <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.length })}</p>
         <div className="mt-6">
-          <AvailabilityCalendar selected={selectedDates} onSelect={(d) => mutation.mutate(d)} min={new Date()} />
+          <AvailabilityCalendar
+            selected={selectedDates}
+            onSelect={(d) => mutation.mutate(d)}
+            min={new Date()}
+            legend="Selected (red) days = days you are available for work."
+          />
         </div>
       </div>
       <SiteFooter />
