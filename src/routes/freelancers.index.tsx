@@ -16,12 +16,15 @@ function FreelancersIndex() {
     queryKey: ["public-freelancers"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url, freelancer_profiles!inner(role, disciplines, day_rate, currency, location, headline, travels)")
-        .eq("user_type", "freelancer")
+        .from("freelancer_profiles")
+        .select("user_id, role, disciplines, day_rate, currency, location, headline, travels, skills")
         .limit(48);
       if (error) throw error;
-      return data;
+      return (data ?? []).map((r) => ({
+        id: r.user_id,
+        display_name: r.headline || r.role,
+        freelancer_profiles: r,
+      }));
     },
   });
 
