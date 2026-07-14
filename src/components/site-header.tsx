@@ -15,7 +15,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["profile-summary", user?.id],
     enabled: !!user,
     queryFn: async () => {
       if (!user) return null;

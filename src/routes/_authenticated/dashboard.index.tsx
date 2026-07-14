@@ -17,7 +17,7 @@ function DashboardHome() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["dashboard-profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
       const [{ data: p }, { data: balance }] = await Promise.all([
@@ -69,7 +69,9 @@ function DashboardHome() {
         }
         window.sessionStorage.removeItem("pendingUserType");
         window.sessionStorage.removeItem("pendingUserTypeAt");
-        qc.invalidateQueries({ queryKey: ["profile"] });
+        qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
+        qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
+        qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       }
     })();
   }, [user?.id, profile, qc]);

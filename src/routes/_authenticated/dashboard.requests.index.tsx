@@ -22,7 +22,7 @@ function RequestsPage() {
   const qc = useQueryClient();
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: ["account-type", user?.id],
     enabled: !!user,
     queryFn: async () => (await supabase.from("profiles").select("user_type").eq("id", user!.id).maybeSingle()).data,
   });
