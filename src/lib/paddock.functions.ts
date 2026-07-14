@@ -56,7 +56,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
       .object({
         role: roleEnum,
         headline: z.string().max(140).optional().nullable(),
-        disciplines: z.array(disciplineEnum).min(1).max(80),
+        disciplines: z.array(disciplineEnum).max(80),
         skills: z.array(z.string().max(64)).max(80).optional(),
         day_rate: z.number().int().min(0).optional().nullable(),
         location: z.string().max(140).optional().nullable(),

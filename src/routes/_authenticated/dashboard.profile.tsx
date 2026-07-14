@@ -19,7 +19,7 @@ function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -33,6 +33,16 @@ function ProfilePage() {
   });
 
   const isFreelancer = profile?.user_type === "freelancer";
+
+  if (profileLoading || !profile?.user_type) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12 text-sm text-muted-foreground">Loading…</div>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
