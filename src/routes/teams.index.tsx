@@ -16,12 +16,15 @@ function TeamsIndex() {
     queryKey: ["public-teams"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, team_profiles!inner(team_name, initials, team_type, location, primary_discipline, bio, size)")
-        .eq("user_type", "team")
+        .from("team_profiles")
+        .select("user_id, team_name, initials, team_type, location, primary_discipline, bio, size")
         .limit(48);
       if (error) throw error;
-      return data;
+      return (data ?? []).map((r) => ({
+        id: r.user_id,
+        display_name: r.team_name,
+        team_profiles: r,
+      }));
     },
   });
 
