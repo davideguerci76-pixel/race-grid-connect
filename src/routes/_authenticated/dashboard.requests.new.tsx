@@ -238,7 +238,13 @@ function NewRequestPage() {
               </p>
               <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
               <div className="mt-3">
-                <AvailabilityCalendar selected={seasonDates} onSelect={(d) => setSeasonDates(d ?? [])} min={new Date()} />
+                <AvailabilityCalendar
+                  selected={seasonDates}
+                  onSelect={(d) => setSeasonDates(d ?? [])}
+                  min={new Date()}
+                  legend="Selected (red) days = days you need the professional on-site."
+                />
+
               </div>
             </div>
           )}
