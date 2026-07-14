@@ -72,6 +72,7 @@ export const createRequest = createServerFn({ method: "POST" })
       budget_unit: data.budget_unit,
       notes: data.notes ?? null,
       season_dates: data.season_dates ?? null,
+      skills: data.skills ?? [],
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
