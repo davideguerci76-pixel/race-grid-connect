@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -65,6 +67,7 @@ function ProfilePage() {
 function PersonalInfoSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const saveDisplayName = useServerFn(updateMyDisplayName);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState("");
 
@@ -75,11 +78,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      const { error } = await supabase
-        .from("profiles")
-        .update({ display_name: displayName })
-        .eq("id", user.id);
-      if (error) throw error;
+      await saveDisplayName({ data: { display_name: displayName } });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -143,6 +142,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 function FreelancerSection({ profile }: { profile: any }) {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     role: "other" as string,
@@ -173,19 +173,18 @@ function FreelancerSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      const payload: Record<string, unknown> = {
-        user_id: user.id,
-        role: form.role,
-        headline: form.headline || null,
-        disciplines: form.disciplines,
-        skills: form.skills,
-        day_rate: form.day_rate ? parseInt(form.day_rate) : null,
-        location: form.location || null,
-        bio: form.bio || null,
-        travels: form.travels,
-      };
-      const { error } = await supabase.from("freelancer_profiles").upsert(payload as never, { onConflict: "user_id" });
-      if (error) throw error;
+      await saveFreelancerProfile({
+        data: {
+          role: form.role,
+          headline: form.headline || null,
+          disciplines: form.disciplines,
+          skills: form.skills,
+          day_rate: form.day_rate ? parseInt(form.day_rate) : null,
+          location: form.location || null,
+          bio: form.bio || null,
+          travels: form.travels,
+        },
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
@@ -268,6 +267,7 @@ function FreelancerSection({ profile }: { profile: any }) {
 function TeamSection({ profile }: { profile: any }) {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const saveTeamProfile = useServerFn(updateMyTeamProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     team_name: "",
@@ -294,17 +294,16 @@ function TeamSection({ profile }: { profile: any }) {
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
       if (!form.team_name.trim()) throw new Error("Team name is required");
-      const payload: Record<string, unknown> = {
-        user_id: user.id,
-        team_name: form.team_name,
-        team_type: form.team_type || null,
-        location: form.location || null,
-        primary_discipline: form.primary_discipline || null,
-        bio: form.bio || null,
-        website: form.website || null,
-      };
-      const { error } = await supabase.from("team_profiles").upsert(payload as never, { onConflict: "user_id" });
-      if (error) throw error;
+      await saveTeamProfile({
+        data: {
+          team_name: form.team_name,
+          team_type: form.team_type || null,
+          location: form.location || null,
+          primary_discipline: form.primary_discipline || null,
+          bio: form.bio || null,
+          website: form.website || null,
+        },
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
