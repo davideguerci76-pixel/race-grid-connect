@@ -135,6 +135,7 @@ export type Database = {
           currency: string
           day_rate: number | null
           disciplines: Database["public"]["Enums"]["discipline"][]
+          education: string | null
           headline: string | null
           location: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
@@ -149,6 +150,7 @@ export type Database = {
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
+          education?: string | null
           headline?: string | null
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
@@ -163,6 +165,7 @@ export type Database = {
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
+          education?: string | null
           headline?: string | null
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
