@@ -233,9 +233,9 @@ function FreelancerSection({ profile }: { profile: any }) {
         <MultiCheckboxBox label="Disciplines / Championships" options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
         <MultiCheckboxBox label="Skills" options={SKILL_OPTIONS} value={form.skills} onChange={(v) => setForm({ ...form, skills: v })} />
         <div>
-          <label className="text-xs text-muted-foreground">Education</label>
+          <label className="text-xs text-muted-foreground">{t("education.label")}</label>
           <select value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
-            <option value="">Select…</option>
+            <option value="">{t("education.placeholder")}</option>
             {EDUCATION_OPTIONS.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
           </select>
         </div>
