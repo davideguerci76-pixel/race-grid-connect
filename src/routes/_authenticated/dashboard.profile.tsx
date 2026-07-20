@@ -168,6 +168,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     headline: "",
     disciplines: [] as string[],
     skills: [] as string[],
+    education: "" as string,
     day_rate: "" as string,
     location: "",
     bio: "",
