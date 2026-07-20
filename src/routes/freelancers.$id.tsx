@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingStars } from "@/components/rating-stars";
-import { disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
