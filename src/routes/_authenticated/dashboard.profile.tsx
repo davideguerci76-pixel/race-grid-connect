@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 
@@ -159,6 +159,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 }
 
 function FreelancerSection({ profile }: { profile: any }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
@@ -168,6 +169,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     headline: "",
     disciplines: [] as string[],
     skills: [] as string[],
+    education: "" as string,
     day_rate: "" as string,
     location: "",
     bio: "",
@@ -182,6 +184,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       headline: profile?.headline ?? "",
       disciplines: profile?.disciplines ?? [],
       skills: profile?.skills ?? [],
+      education: profile?.education ?? "",
       day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
@@ -198,6 +201,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           headline: form.headline || null,
           disciplines: form.disciplines,
           skills: form.skills,
+          education: form.education || null,
           day_rate: form.day_rate ? parseInt(form.day_rate) : null,
           location: form.location || null,
           bio: form.bio || null,
@@ -229,6 +233,13 @@ function FreelancerSection({ profile }: { profile: any }) {
         </div>
         <MultiCheckboxBox label="Disciplines / Championships" options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
         <MultiCheckboxBox label="Skills" options={SKILL_OPTIONS} value={form.skills} onChange={(v) => setForm({ ...form, skills: v })} />
+        <div>
+          <label className="text-xs text-muted-foreground">{t("education.label")}</label>
+          <select value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
+            <option value="">{t("education.placeholder")}</option>
+            {EDUCATION_OPTIONS.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+          </select>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs text-muted-foreground">Day Rate (EUR)</label>
@@ -277,6 +288,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       </div>
       <Row label="Day rate" value={profile?.day_rate ? `€${profile.day_rate}/day` : "—"} mono />
       <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
       <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
       <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Freelancer Info</button>

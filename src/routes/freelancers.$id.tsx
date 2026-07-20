@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingStars } from "@/components/rating-stars";
-import { disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -65,6 +65,11 @@ function FreelancerProfile() {
               <div className="mt-1 text-sm text-muted-foreground">
                 {roleLabel(fp.role)} · {fp.location ?? "—"}
               </div>
+              {fp.education && (
+                <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                  {educationLabel(fp.education)}
+                </div>
+              )}
               {ratings.length > 0 && (
                 <div className="mt-2 flex items-center gap-2">
                   <RatingStars value={Math.round(avg)} readOnly size={16} />

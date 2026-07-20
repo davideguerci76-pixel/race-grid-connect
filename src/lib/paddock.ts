@@ -90,6 +90,21 @@ export const DISCIPLINE_OPTIONS: Option[] = [
   { value: "drift_cars", label: "Drift Cars" },
   { value: "trophy_trucks", label: "Trophy Trucks" },
   { value: "dakar_rally", label: "Dakar Rally (T1+, T2, T3, T4, T5)" },
+  { value: "other", label: "Other / Not listed" },
+];
+
+// Education levels (single-select on the freelancer profile).
+export const EDUCATION_OPTIONS: Option[] = [
+  { value: "middle_school", label: "Middle School / Secondary" },
+  { value: "high_school", label: "High School Diploma" },
+  { value: "vocational_motorsport", label: "Vocational Motorsport School" },
+  { value: "technical_diploma", label: "Technical / Mechanical Diploma" },
+  { value: "bachelor_equivalent", label: "Bachelor Equivalent (experience)" },
+  { value: "bachelor", label: "Bachelor's Degree" },
+  { value: "master", label: "Master's Degree" },
+  { value: "master_motorsport", label: "Master's in Motorsport Engineering" },
+  { value: "phd", label: "PhD / Doctorate" },
+  { value: "other", label: "Other" },
 ];
 
 // Motorsport-specific skills (multi-select in freelancer profile & team requests)
@@ -161,6 +176,12 @@ export function roleLabel(value: string | null | undefined): string {
 export function disciplineLabel(value: string | null | undefined): string {
   if (!value) return "—";
   return DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
+}
+
+const EDUCATION_MAP = new Map(EDUCATION_OPTIONS.map((o) => [o.value, o.label]));
+export function educationLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return EDUCATION_MAP.get(value) ?? value.replace(/_/g, " ");
 }
 
 export function initialsFor(name: string): string {

@@ -1,0 +1,1 @@
+ALTER TABLE public.freelancer_profiles ADD COLUMN IF NOT EXISTS education text NULL;
