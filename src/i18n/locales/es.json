@@ -90,7 +90,8 @@
     "f1": "F1",
     "rally": "Rally",
     "wec_gt": "WEC / GT",
-    "karting": "Karting"
+    "karting": "Karting",
+    "other": "Otro / No listado"
   },
   "availability": {
     "available": "Disponible",
@@ -237,5 +238,9 @@
     "insufficient": "Tokens insuficientes",
     "post_for": "Publicar por",
     "back": "Atrás"
+  },
+  "education": {
+    "label": "Formación",
+    "placeholder": "Selecciona tu formación"
   }
 }

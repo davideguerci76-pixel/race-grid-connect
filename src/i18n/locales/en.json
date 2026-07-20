@@ -90,7 +90,8 @@
     "f1": "F1",
     "rally": "Rally",
     "wec_gt": "WEC / GT",
-    "karting": "Karting"
+    "karting": "Karting",
+    "other": "Other / Not listed"
   },
   "availability": {
     "available": "Available",
@@ -237,5 +238,9 @@
     "insufficient": "Not enough tokens",
     "post_for": "Post for",
     "back": "Back"
+  },
+  "education": {
+    "label": "Education",
+    "placeholder": "Select your education"
   }
 }
