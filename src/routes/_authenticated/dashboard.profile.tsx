@@ -183,6 +183,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       headline: profile?.headline ?? "",
       disciplines: profile?.disciplines ?? [],
       skills: profile?.skills ?? [],
+      education: profile?.education ?? "",
       day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
