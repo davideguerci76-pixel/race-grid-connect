@@ -200,6 +200,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           headline: form.headline || null,
           disciplines: form.disciplines,
           skills: form.skills,
+          education: form.education || null,
           day_rate: form.day_rate ? parseInt(form.day_rate) : null,
           location: form.location || null,
           bio: form.bio || null,
