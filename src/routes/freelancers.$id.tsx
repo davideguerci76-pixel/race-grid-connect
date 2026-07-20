@@ -65,6 +65,11 @@ function FreelancerProfile() {
               <div className="mt-1 text-sm text-muted-foreground">
                 {roleLabel(fp.role)} · {fp.location ?? "—"}
               </div>
+              {fp.education && (
+                <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                  {educationLabel(fp.education)}
+                </div>
+              )}
               {ratings.length > 0 && (
                 <div className="mt-2 flex items-center gap-2">
                   <RatingStars value={Math.round(avg)} readOnly size={16} />
