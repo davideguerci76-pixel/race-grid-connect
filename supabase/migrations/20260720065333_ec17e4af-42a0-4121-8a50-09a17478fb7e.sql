@@ -1,0 +1,1 @@
+ALTER TYPE public.discipline ADD VALUE IF NOT EXISTS 'other';
