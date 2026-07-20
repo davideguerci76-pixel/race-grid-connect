@@ -178,6 +178,12 @@ export function disciplineLabel(value: string | null | undefined): string {
   return DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
 }
 
+const EDUCATION_MAP = new Map(EDUCATION_OPTIONS.map((o) => [o.value, o.label]));
+export function educationLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  return EDUCATION_MAP.get(value) ?? value.replace(/_/g, " ");
+}
+
 export function initialsFor(name: string): string {
   return name
     .split(/\s+/)
