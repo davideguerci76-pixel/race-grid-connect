@@ -159,6 +159,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 }
 
 function FreelancerSection({ profile }: { profile: any }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
