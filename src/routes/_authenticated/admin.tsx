@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
+import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
