@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { adminListFreelancers, adminListTeams, adminSetAdminRole } from "@/lib/admin.functions";
+import { exportToExcel } from "@/lib/export-xlsx";
 
 export const Route = createFileRoute("/_authenticated/admin/permissions")({
   component: AdminPermissions,
