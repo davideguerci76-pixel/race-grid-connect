@@ -77,6 +77,7 @@ function NewRequestPage() {
   });
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
 
   useEffect(() => {
     if (!source) return;
