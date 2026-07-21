@@ -9,6 +9,7 @@ import {
   adminSetBlocked,
   adminDeleteUser,
 } from "@/lib/admin.functions";
+import { exportToExcel } from "@/lib/export-xlsx";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminFreelancers,
@@ -91,6 +92,27 @@ function AdminFreelancers() {
             <option key={r} value={r}>{r}</option>
           ))}
         </select>
+        <button
+          onClick={() =>
+            exportToExcel("freelancers", "Freelancers", rows.map((r: any) => ({
+              Name: r.display_name,
+              Email: r.email ?? "",
+              Role: r.freelancer?.role ?? "",
+              Disciplines: (r.freelancer?.disciplines ?? []).join(", "),
+              Skills: (r.freelancer?.skills ?? []).join(", "),
+              Education: r.freelancer?.education ?? "",
+              Location: r.freelancer?.location ?? "",
+              DayRate: r.freelancer?.day_rate ?? "",
+              Tokens: r.token_balance,
+              Status: r.blocked_at ? "Blocked" : "Active",
+              Roles: (r.roles ?? []).join(", "),
+              CreatedAt: r.created_at,
+            })))
+          }
+          className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+        >
+          Export to Excel
+        </button>
         <div className="ml-auto text-xs text-muted-foreground self-center">{rows.length} freelancers</div>
       </div>
       {isLoading ? (

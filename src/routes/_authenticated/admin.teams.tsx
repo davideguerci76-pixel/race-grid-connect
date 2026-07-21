@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { adminListTeams, adminSetTokens, adminSetBlocked, adminDeleteUser } from "@/lib/admin.functions";
+import { exportToExcel } from "@/lib/export-xlsx";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: AdminTeams,
@@ -73,6 +74,25 @@ function AdminTeams() {
           placeholder="Search team, contact, email…"
           className="min-w-[220px] flex-1 border border-border bg-background px-3 py-2 text-sm"
         />
+        <button
+          onClick={() =>
+            exportToExcel("teams", "Teams", rows.map((r: any) => ({
+              Team: r.team?.team_name ?? r.display_name,
+              Contact: r.display_name,
+              Email: r.email ?? "",
+              Discipline: r.team?.primary_discipline ?? "",
+              Location: r.team?.location ?? "",
+              Website: r.team?.website ?? "",
+              Tokens: r.token_balance,
+              Status: r.blocked_at ? "Blocked" : "Active",
+              Roles: (r.roles ?? []).join(", "),
+              CreatedAt: r.created_at,
+            })))
+          }
+          className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+        >
+          Export to Excel
+        </button>
         <div className="ml-auto text-xs text-muted-foreground self-center">{rows.length} teams</div>
       </div>
       {isLoading ? (
