@@ -27,6 +27,16 @@ export function SiteHeader() {
     },
   });
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+  });
+
   async function handleSignOut() {
     setOpen(false);
     await supabase.auth.signOut();
