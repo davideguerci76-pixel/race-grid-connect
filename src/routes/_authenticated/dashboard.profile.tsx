@@ -495,3 +495,73 @@ function MultiCheckboxBox({
     </div>
   );
 }
+
+function ExperienceEditor({
+  value,
+  onChange,
+}: {
+  value: FreelancerExperience[];
+  onChange: (v: FreelancerExperience[]) => void;
+}) {
+  const canAdd = value.length < MAX_FREELANCER_EXPERIENCES;
+  const update = (i: number, patch: Partial<FreelancerExperience>) => {
+    const next = value.map((e, idx) => (idx === i ? { ...e, ...patch } : e));
+    onChange(next);
+  };
+  const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+  const add = () => {
+    if (!canAdd) return;
+    onChange([...value, { discipline: DISCIPLINE_OPTIONS[0].value, years: 1 }]);
+  };
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs text-muted-foreground">
+          Motorsport experience <span className="text-racing-red">({value.length}/{MAX_FREELANCER_EXPERIENCES})</span>
+        </label>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        Add up to {MAX_FREELANCER_EXPERIENCES} past championships/categories and the years you spent in each. Pick "No experience" if you're new to motorsport.
+      </p>
+      <div className="mt-2 space-y-2">
+        {value.map((e, i) => (
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_140px_auto]">
+            <select
+              value={e.discipline}
+              onChange={(ev) => update(i, { discipline: ev.target.value })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {DISCIPLINE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <select
+              value={String(e.years)}
+              onChange={(ev) => update(i, { years: parseInt(ev.target.value) })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {EXPERIENCE_YEARS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        disabled={!canAdd}
+        className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+      >
+        {value.length === 0 ? "+ Add experience" : "+ Add another experience"}
+      </button>
+    </div>
+  );
+}
