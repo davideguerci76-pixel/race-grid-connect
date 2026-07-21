@@ -2,17 +2,20 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
 import { useQuery } from "@tanstack/react-query";
+import { checkAmIAdmin } from "@/lib/admin.functions";
 
 export function SiteHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const checkAdmin = useServerFn(checkAmIAdmin);
 
   const { data: profile } = useQuery({
     queryKey: ["profile-summary", user?.id],
@@ -30,11 +33,7 @@ export function SiteHeader() {
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      if (!user) return false;
-      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-      return !!data;
-    },
+    queryFn: async () => (await checkAdmin()).isAdmin,
   });
 
   async function handleSignOut() {
