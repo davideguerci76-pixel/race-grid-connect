@@ -67,6 +67,11 @@ export function SiteHeader() {
               <Link to="/dashboard/profile" className={navLinkCls} activeProps={activeCls}>
                 <span suppressHydrationWarning>{t("nav.profile")}</span>
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-racing-red transition-colors hover:brightness-125" activeProps={activeCls}>
+                  ADMIN
+                </Link>
+              )}
             </>
           )}
         </div>
