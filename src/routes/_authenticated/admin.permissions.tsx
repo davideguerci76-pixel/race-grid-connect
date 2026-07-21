@@ -48,6 +48,20 @@ function AdminPermissions() {
           placeholder="Search users…"
           className="min-w-[220px] flex-1 border border-border bg-background px-3 py-2 text-sm"
         />
+        <button
+          onClick={() =>
+            exportToExcel("permissions", "Users", rows.map((r: any) => ({
+              Name: r.display_name,
+              Email: r.email ?? "",
+              Type: r.user_type,
+              Roles: (r.roles ?? []).join(", ") || "user",
+              IsAdmin: (r.roles ?? []).includes("admin") ? "Yes" : "No",
+            })))
+          }
+          className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+        >
+          Export to Excel
+        </button>
         <div className="ml-auto text-xs text-muted-foreground self-center">{rows.length} users</div>
       </div>
       <div className="overflow-auto border border-border">
