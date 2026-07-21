@@ -123,6 +123,7 @@ function NewRequestPage() {
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           skills,
+          experience_requirements: experienceReqs,
         } as never,
       }),
     onSuccess: () => {
