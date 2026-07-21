@@ -136,6 +136,7 @@ export type Database = {
           day_rate: number | null
           disciplines: Database["public"]["Enums"]["discipline"][]
           education: string | null
+          experiences: Json
           headline: string | null
           location: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
@@ -151,6 +152,7 @@ export type Database = {
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
           education?: string | null
+          experiences?: Json
           headline?: string | null
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
@@ -166,6 +168,7 @@ export type Database = {
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
           education?: string | null
+          experiences?: Json
           headline?: string | null
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
@@ -403,6 +406,7 @@ export type Database = {
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
           end_date: string
+          experience_requirements: Json
           id: string
           is_active: boolean
           location: string | null
@@ -426,6 +430,7 @@ export type Database = {
           discipline: Database["public"]["Enums"]["discipline"]
           duration?: Database["public"]["Enums"]["duration_type"]
           end_date: string
+          experience_requirements?: Json
           id?: string
           is_active?: boolean
           location?: string | null
@@ -449,6 +454,7 @@ export type Database = {
           discipline?: Database["public"]["Enums"]["discipline"]
           duration?: Database["public"]["Enums"]["duration_type"]
           end_date?: string
+          experience_requirements?: Json
           id?: string
           is_active?: boolean
           location?: string | null
@@ -616,6 +622,7 @@ export type Database = {
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
           end_date: string
+          experience_requirements: Json
           id: string
           is_active: boolean
           location: string | null
@@ -683,6 +690,7 @@ export type Database = {
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
           end_date: string
+          experience_requirements: Json
           id: string
           is_active: boolean
           location: string | null
