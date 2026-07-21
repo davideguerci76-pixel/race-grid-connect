@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
+import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -28,6 +29,8 @@ function AdminLayout() {
   ];
 
   return (
+    <>
+    <SiteHeader />
     <div className="container-page py-8">
       <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
         <div>
@@ -53,5 +56,6 @@ function AdminLayout() {
       </div>
       <Outlet />
     </div>
+    </>
   );
 }

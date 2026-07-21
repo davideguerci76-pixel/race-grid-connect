@@ -141,10 +141,14 @@ function AdminFreelancers() {
                         View
                       </a>
                       <button onClick={() => onEditTokens(r.id, r.token_balance)} className="border border-border px-2 py-1 text-[10px] font-bold uppercase hover:bg-secondary">Tokens</button>
-                      <button onClick={() => onToggleBlock(r.id, !!r.blocked_at)} className="border border-border px-2 py-1 text-[10px] font-bold uppercase hover:bg-secondary">
-                        {r.blocked_at ? "Unblock" : "Block"}
-                      </button>
-                      <button onClick={() => onDelete(r.id, r.display_name)} className="border border-racing-red px-2 py-1 text-[10px] font-bold uppercase text-racing-red hover:bg-racing-red/10">Delete</button>
+                      {(r.email ?? "").toLowerCase() !== "davideguerci76@gmail.com" && (
+                        <>
+                          <button onClick={() => onToggleBlock(r.id, !!r.blocked_at)} className="border border-border px-2 py-1 text-[10px] font-bold uppercase hover:bg-secondary">
+                            {r.blocked_at ? "Unblock" : "Block"}
+                          </button>
+                          <button onClick={() => onDelete(r.id, r.display_name)} className="border border-racing-red px-2 py-1 text-[10px] font-bold uppercase text-racing-red hover:bg-racing-red/10">Delete</button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

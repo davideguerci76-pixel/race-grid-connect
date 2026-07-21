@@ -63,6 +63,7 @@ function AdminPermissions() {
           <tbody>
             {rows.map((r: any) => {
               const isAdmin = (r.roles ?? []).includes("admin");
+              const isPrimary = (r.email ?? "").toLowerCase() === "davideguerci76@gmail.com";
               return (
                 <tr key={r.id} className="border-t border-border/60 hover:bg-secondary/40">
                   <td className="px-2 py-2">{r.display_name}</td>
@@ -72,14 +73,18 @@ function AdminPermissions() {
                     {isAdmin ? <span className="font-bold text-racing-red">ADMIN</span> : <span className="text-muted-foreground">user</span>}
                   </td>
                   <td className="px-2 py-2 text-right">
-                    <button
-                      onClick={() => onToggle(r.id, isAdmin, r.display_name)}
-                      className={`border px-2 py-1 text-[10px] font-bold uppercase ${
-                        isAdmin ? "border-border hover:bg-secondary" : "border-racing-red text-racing-red hover:bg-racing-red/10"
-                      }`}
-                    >
-                      {isAdmin ? "Revoke admin" : "Grant admin"}
-                    </button>
+                    {isAdmin && isPrimary ? (
+                      <span className="text-[10px] uppercase text-muted-foreground">Primary admin</span>
+                    ) : (
+                      <button
+                        onClick={() => onToggle(r.id, isAdmin, r.display_name)}
+                        className={`border px-2 py-1 text-[10px] font-bold uppercase ${
+                          isAdmin ? "border-border hover:bg-secondary" : "border-racing-red text-racing-red hover:bg-racing-red/10"
+                        }`}
+                      >
+                        {isAdmin ? "Revoke admin" : "Grant admin"}
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
