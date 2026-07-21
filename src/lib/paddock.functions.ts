@@ -65,6 +65,15 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: z.string().max(140).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
+        experiences: z
+          .array(
+            z.object({
+              discipline: disciplineEnum,
+              years: z.number().int().min(0).max(11),
+            }),
+          )
+          .max(5)
+          .optional(),
       })
       .parse(data),
   )
@@ -89,6 +98,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: data.location || null,
         bio: data.bio || null,
         travels: data.travels,
+        experiences: data.experiences ?? [],
       } as never,
       { onConflict: "user_id" },
     ).select("*").single();
