@@ -104,7 +104,7 @@ export const adminSetTokens = createServerFn({ method: "POST" })
       await supabaseAdmin.from("token_transactions").insert({
         user_id: data.user_id,
         delta,
-        reason: "admin_grant",
+        reason: delta > 0 ? "admin_credit" : "admin_debit",
         note: `Admin adjustment by ${context.userId}`,
       } as never);
     }
