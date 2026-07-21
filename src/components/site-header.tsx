@@ -130,6 +130,11 @@ export function SiteHeader() {
                 <Link to="/dashboard/profile" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
                   <span suppressHydrationWarning>{t("nav.profile")}</span>
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 text-racing-red hover:brightness-125" activeProps={activeCls}>
+                    ADMIN
+                  </Link>
+                )}
               </>
             )}
             <div className="flex items-center justify-between gap-2 pt-4">
