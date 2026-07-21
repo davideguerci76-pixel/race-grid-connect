@@ -29,6 +29,8 @@ function AdminLayout() {
   ];
 
   return (
+    <>
+    <SiteHeader />
     <div className="container-page py-8">
       <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
         <div>
