@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, ROLE_OPTIONS, SKILL_OPTIONS, type DurationType } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, ROLE_OPTIONS, SKILL_OPTIONS, type DurationType, type RequestExperienceRequirement } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -77,6 +77,7 @@ function NewRequestPage() {
   });
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
 
   useEffect(() => {
     if (!source) return;
@@ -122,6 +123,7 @@ function NewRequestPage() {
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           skills,
+          experience_requirements: experienceReqs,
         } as never,
       }),
     onSuccess: () => {
@@ -269,6 +271,65 @@ function NewRequestPage() {
               })}
             </div>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="label-mono">
+              Experience requirements <span className="text-racing-red">({experienceReqs.length}/{MAX_REQUEST_EXPERIENCE_REQS})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Add up to {MAX_REQUEST_EXPERIENCE_REQS} categories with minimum years. Mark each as <span className="text-racing-red font-bold">HARD</span> (freelancers who don't meet it are excluded from matches) or leave as <span className="font-bold">SOFT</span> preference.
+            </p>
+            <div className="mt-2 space-y-2">
+              {experienceReqs.map((req, i) => (
+                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_140px_120px_auto]">
+                  <select
+                    value={req.discipline}
+                    onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, discipline: ev.target.value } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {DISCIPLINE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={String(req.min_years)}
+                    onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, min_years: parseInt(ev.target.value) } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {EXPERIENCE_YEARS_OPTIONS.filter((o) => o.value !== "0").map((o) => (
+                      <option key={o.value} value={o.value}>min {o.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
+                    className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+                  >
+                    {req.hard ? "Hard" : "Soft"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExperienceReqs(experienceReqs.filter((_, idx) => idx !== i))}
+                    className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS) return;
+                setExperienceReqs([...experienceReqs, { discipline: DISCIPLINE_OPTIONS[0].value, min_years: 1, hard: true }]);
+              }}
+              disabled={experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS}
+              className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+            >
+              {experienceReqs.length === 0 ? "+ Add experience requirement" : "+ Add another experience requirement"}
+            </button>
+          </div>
+
 
           <div className="md:col-span-2">
             <label className="label-mono">Notes</label>

@@ -107,6 +107,36 @@ export const EDUCATION_OPTIONS: Option[] = [
   { value: "other", label: "Other" },
 ];
 
+// Experience years options (1..10, then "10+" as value 11, plus "none" = 0).
+// value = numeric years used for matching; 11 means "10+" (>= 10) — the recompute compares >= min_years.
+export const EXPERIENCE_YEARS_OPTIONS: Option[] = [
+  { value: "0", label: "No experience" },
+  { value: "1", label: "1 year" },
+  { value: "2", label: "2 years" },
+  { value: "3", label: "3 years" },
+  { value: "4", label: "4 years" },
+  { value: "5", label: "5 years" },
+  { value: "6", label: "6 years" },
+  { value: "7", label: "7 years" },
+  { value: "8", label: "8 years" },
+  { value: "9", label: "9 years" },
+  { value: "10", label: "10 years" },
+  { value: "11", label: "10+ years" },
+];
+
+export function experienceYearsLabel(years: number | null | undefined): string {
+  if (years == null) return "—";
+  if (years <= 0) return "No experience";
+  if (years >= 11) return "10+ years";
+  return `${years} year${years === 1 ? "" : "s"}`;
+}
+
+export const MAX_FREELANCER_EXPERIENCES = 5;
+export const MAX_REQUEST_EXPERIENCE_REQS = 3;
+
+export type FreelancerExperience = { discipline: string; years: number };
+export type RequestExperienceRequirement = { discipline: string; min_years: number; hard: boolean };
+
 // Motorsport-specific skills (multi-select in freelancer profile & team requests)
 export const SKILL_OPTIONS: Option[] = [
   { value: "chassis_builder", label: "Chassis Builder (Telaista)" },

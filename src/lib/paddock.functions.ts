@@ -65,6 +65,15 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: z.string().max(140).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
+        experiences: z
+          .array(
+            z.object({
+              discipline: disciplineEnum,
+              years: z.number().int().min(0).max(11),
+            }),
+          )
+          .max(5)
+          .optional(),
       })
       .parse(data),
   )
@@ -89,6 +98,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: data.location || null,
         bio: data.bio || null,
         travels: data.travels,
+        experiences: data.experiences ?? [],
       } as never,
       { onConflict: "user_id" },
     ).select("*").single();
@@ -163,6 +173,16 @@ export const createRequest = createServerFn({ method: "POST" })
         notes: z.string().max(1000).optional().nullable(),
         season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
         skills: z.array(z.string().max(64)).max(50).optional(),
+        experience_requirements: z
+          .array(
+            z.object({
+              discipline: disciplineEnum,
+              min_years: z.number().int().min(0).max(11),
+              hard: z.boolean(),
+            }),
+          )
+          .max(3)
+          .optional(),
       })
       .parse(data),
   )
@@ -182,6 +202,7 @@ export const createRequest = createServerFn({ method: "POST" })
       notes: data.notes ?? null,
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
+      experience_requirements: data.experience_requirements ?? [],
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);

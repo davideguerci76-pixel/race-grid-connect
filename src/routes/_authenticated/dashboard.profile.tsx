@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, MAX_FREELANCER_EXPERIENCES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, roleLabel, skillLabel, type FreelancerExperience } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 
@@ -174,6 +174,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     bio: "",
     travels: true,
+    experiences: [] as FreelancerExperience[],
   });
 
   // Sync form state whenever the underlying profile refreshes (query completes / refetches).
@@ -189,6 +190,12 @@ function FreelancerSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
+      experiences: Array.isArray(profile?.experiences)
+        ? (profile.experiences as any[])
+            .filter((e) => e && typeof e === "object" && typeof e.discipline === "string")
+            .map((e) => ({ discipline: String(e.discipline), years: Number(e.years) || 0 }))
+            .slice(0, MAX_FREELANCER_EXPERIENCES)
+        : [],
     });
   }, [profile, editing]);
 
@@ -206,6 +213,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           location: form.location || null,
           bio: form.bio || null,
           travels: form.travels,
+          experiences: form.experiences,
         },
       });
     },
@@ -254,6 +262,10 @@ function FreelancerSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">Bio</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
+        <ExperienceEditor
+          value={form.experiences}
+          onChange={(v) => setForm({ ...form, experiences: v })}
+        />
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
           <span className="text-sm">Available to travel for race weekends</span>
@@ -290,6 +302,21 @@ function FreelancerSection({ profile }: { profile: any }) {
       <Row label="Location" value={profile?.location ?? "—"} />
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
+      <div>
+        <div className="text-xs text-muted-foreground">Motorsport experience</div>
+        <div className="mt-1 space-y-1">
+          {Array.isArray(profile?.experiences) && profile.experiences.length ? (
+            profile.experiences.map((e: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(e.discipline)}</span>
+                <span className="font-mono text-xs text-muted-foreground">{experienceYearsLabel(Number(e.years))}</span>
+              </div>
+            ))
+          ) : (
+            <span className="text-sm">—</span>
+          )}
+        </div>
+      </div>
       <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
       <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Freelancer Info</button>
     </div>
@@ -465,6 +492,76 @@ function MultiCheckboxBox({
           {filtered.length === 0 && <div className="text-xs text-muted-foreground">No matches.</div>}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ExperienceEditor({
+  value,
+  onChange,
+}: {
+  value: FreelancerExperience[];
+  onChange: (v: FreelancerExperience[]) => void;
+}) {
+  const canAdd = value.length < MAX_FREELANCER_EXPERIENCES;
+  const update = (i: number, patch: Partial<FreelancerExperience>) => {
+    const next = value.map((e, idx) => (idx === i ? { ...e, ...patch } : e));
+    onChange(next);
+  };
+  const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+  const add = () => {
+    if (!canAdd) return;
+    onChange([...value, { discipline: DISCIPLINE_OPTIONS[0].value, years: 1 }]);
+  };
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs text-muted-foreground">
+          Motorsport experience <span className="text-racing-red">({value.length}/{MAX_FREELANCER_EXPERIENCES})</span>
+        </label>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        Add up to {MAX_FREELANCER_EXPERIENCES} past championships/categories and the years you spent in each. Pick "No experience" if you're new to motorsport.
+      </p>
+      <div className="mt-2 space-y-2">
+        {value.map((e, i) => (
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_140px_auto]">
+            <select
+              value={e.discipline}
+              onChange={(ev) => update(i, { discipline: ev.target.value })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {DISCIPLINE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <select
+              value={String(e.years)}
+              onChange={(ev) => update(i, { years: parseInt(ev.target.value) })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {EXPERIENCE_YEARS_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        disabled={!canAdd}
+        className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+      >
+        {value.length === 0 ? "+ Add experience" : "+ Add another experience"}
+      </button>
     </div>
   );
 }
