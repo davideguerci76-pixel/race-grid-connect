@@ -262,6 +262,10 @@ function FreelancerSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">Bio</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
+        <ExperienceEditor
+          value={form.experiences}
+          onChange={(v) => setForm({ ...form, experiences: v })}
+        />
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
           <span className="text-sm">Available to travel for race weekends</span>
