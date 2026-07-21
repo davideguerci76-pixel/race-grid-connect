@@ -174,6 +174,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     bio: "",
     travels: true,
+    experiences: [] as FreelancerExperience[],
   });
 
   // Sync form state whenever the underlying profile refreshes (query completes / refetches).
