@@ -9,6 +9,7 @@ import {
   adminSetBlocked,
   adminDeleteUser,
 } from "@/lib/admin.functions";
+import { exportToExcel } from "@/lib/export-xlsx";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminFreelancers,
