@@ -27,6 +27,16 @@ export function SiteHeader() {
     },
   });
 
+  const { data: isAdmin } = useQuery({
+    queryKey: ["is-admin", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      return !!data;
+    },
+  });
+
   async function handleSignOut() {
     setOpen(false);
     await supabase.auth.signOut();
@@ -57,6 +67,11 @@ export function SiteHeader() {
               <Link to="/dashboard/profile" className={navLinkCls} activeProps={activeCls}>
                 <span suppressHydrationWarning>{t("nav.profile")}</span>
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-racing-red transition-colors hover:brightness-125" activeProps={activeCls}>
+                  ADMIN
+                </Link>
+              )}
             </>
           )}
         </div>
@@ -115,6 +130,11 @@ export function SiteHeader() {
                 <Link to="/dashboard/profile" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
                   <span suppressHydrationWarning>{t("nav.profile")}</span>
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 text-racing-red hover:brightness-125" activeProps={activeCls}>
+                    ADMIN
+                  </Link>
+                )}
               </>
             )}
             <div className="flex items-center justify-between gap-2 pt-4">
