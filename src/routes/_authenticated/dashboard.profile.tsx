@@ -190,6 +190,12 @@ function FreelancerSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
+      experiences: Array.isArray(profile?.experiences)
+        ? (profile.experiences as any[])
+            .filter((e) => e && typeof e === "object" && typeof e.discipline === "string")
+            .map((e) => ({ discipline: String(e.discipline), years: Number(e.years) || 0 }))
+            .slice(0, MAX_FREELANCER_EXPERIENCES)
+        : [],
     });
   }, [profile, editing]);
 
@@ -207,6 +213,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           location: form.location || null,
           bio: form.bio || null,
           travels: form.travels,
+          experiences: form.experiences,
         },
       });
     },
