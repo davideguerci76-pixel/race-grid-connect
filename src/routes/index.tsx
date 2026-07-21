@@ -1,9 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import heroImg from "@/assets/hero-pit.jpg";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -11,6 +13,15 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { t } = useTranslation();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate({ to: "/dashboard", replace: true });
+    }
+  }, [loading, user, navigate]);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-racing-red selection:text-white">
