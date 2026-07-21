@@ -20,7 +20,7 @@ function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const { data: profile, isLoading: profileLoading } = useQuery({
+  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ["profile-detail", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -37,6 +37,18 @@ function ProfilePage() {
   });
 
   const isFreelancer = profile?.user_type === "freelancer";
+
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12 text-sm text-racing-red">
+          {profileError instanceof Error ? profileError.message : "Profile could not be loaded."}
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   if (profileLoading || !profile?.user_type) {
     return (
