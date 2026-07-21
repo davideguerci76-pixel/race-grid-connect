@@ -273,6 +273,65 @@ function NewRequestPage() {
           </div>
 
           <div className="md:col-span-2">
+            <label className="label-mono">
+              Experience requirements <span className="text-racing-red">({experienceReqs.length}/{MAX_REQUEST_EXPERIENCE_REQS})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Add up to {MAX_REQUEST_EXPERIENCE_REQS} categories with minimum years. Mark each as <span className="text-racing-red font-bold">HARD</span> (freelancers who don't meet it are excluded from matches) or leave as <span className="font-bold">SOFT</span> preference.
+            </p>
+            <div className="mt-2 space-y-2">
+              {experienceReqs.map((req, i) => (
+                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_140px_120px_auto]">
+                  <select
+                    value={req.discipline}
+                    onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, discipline: ev.target.value } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {DISCIPLINE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={String(req.min_years)}
+                    onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, min_years: parseInt(ev.target.value) } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {EXPERIENCE_YEARS_OPTIONS.filter((o) => o.value !== "0").map((o) => (
+                      <option key={o.value} value={o.value}>min {o.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
+                    className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+                  >
+                    {req.hard ? "Hard" : "Soft"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExperienceReqs(experienceReqs.filter((_, idx) => idx !== i))}
+                    className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS) return;
+                setExperienceReqs([...experienceReqs, { discipline: DISCIPLINE_OPTIONS[0].value, min_years: 1, hard: true }]);
+              }}
+              disabled={experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS}
+              className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+            >
+              {experienceReqs.length === 0 ? "+ Add experience requirement" : "+ Add another experience requirement"}
+            </button>
+          </div>
+
+
+          <div className="md:col-span-2">
             <label className="label-mono">Notes</label>
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
