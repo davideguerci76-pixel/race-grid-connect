@@ -302,6 +302,21 @@ function FreelancerSection({ profile }: { profile: any }) {
       <Row label="Location" value={profile?.location ?? "—"} />
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
+      <div>
+        <div className="text-xs text-muted-foreground">Motorsport experience</div>
+        <div className="mt-1 space-y-1">
+          {Array.isArray(profile?.experiences) && profile.experiences.length ? (
+            profile.experiences.map((e: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(e.discipline)}</span>
+                <span className="font-mono text-xs text-muted-foreground">{experienceYearsLabel(Number(e.years))}</span>
+              </div>
+            ))
+          ) : (
+            <span className="text-sm">—</span>
+          )}
+        </div>
+      </div>
       <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
       <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Freelancer Info</button>
     </div>
