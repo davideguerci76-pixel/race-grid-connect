@@ -337,6 +337,74 @@ function NewRequestPage() {
             </button>
           </div>
 
+          <div className="md:col-span-2">
+            <label className="label-mono">
+              Required languages <span className="text-racing-red">({languageReqs.length}/{MAX_REQUEST_LANGUAGES})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Add up to {MAX_REQUEST_LANGUAGES} required languages and their minimum level. Mark as <span className="text-racing-red font-bold">HARD</span> to exclude freelancers who don't meet it, or leave <span className="font-bold">SOFT</span> as preference.
+            </p>
+            <div className="mt-2 space-y-2">
+              {languageReqs.map((req, i) => (
+                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_1fr_120px_auto]">
+                  <select
+                    value={req.code}
+                    onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {LANGUAGE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={req.level}
+                    onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, level: ev.target.value as LanguageLevel } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {LANGUAGE_LEVELS.map((lv) => (
+                      <option key={lv} value={lv}>min {languageLevelLabel(lv)}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
+                    className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+                  >
+                    {req.hard ? "Hard" : "Soft"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguageReqs(languageReqs.filter((_, idx) => idx !== i))}
+                    className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+                  >
+                    Remove
+                  </button>
+                  {req.code === "other" && (
+                    <input
+                      value={req.custom ?? ""}
+                      onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, custom: ev.target.value } : r))}
+                      placeholder="Language name"
+                      className="md:col-span-4 border border-border bg-background px-2 py-1 text-sm"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (languageReqs.length >= MAX_REQUEST_LANGUAGES) return;
+                setLanguageReqs([...languageReqs, { code: "en", level: "fluent", hard: true }]);
+              }}
+              disabled={languageReqs.length >= MAX_REQUEST_LANGUAGES}
+              className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+            >
+              {languageReqs.length === 0 ? "+ Add language requirement" : "+ Add another language requirement"}
+            </button>
+          </div>
+
+
+
 
           <div className="md:col-span-2">
             <label className="label-mono">Notes</label>
