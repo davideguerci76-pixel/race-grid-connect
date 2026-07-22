@@ -290,6 +290,10 @@ function FreelancerSection({ profile }: { profile: any }) {
           value={form.experiences}
           onChange={(v) => setForm({ ...form, experiences: v })}
         />
+        <LanguagesEditor
+          value={form.languages}
+          onChange={(v) => setForm({ ...form, languages: v })}
+        />
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
           <span className="text-sm">Available to travel for race weekends</span>
@@ -334,6 +338,21 @@ function FreelancerSection({ profile }: { profile: any }) {
               <div key={i} className="flex items-center gap-2 text-sm">
                 <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(e.discipline)}</span>
                 <span className="font-mono text-xs text-muted-foreground">{experienceYearsLabel(Number(e.years))}</span>
+              </div>
+            ))
+          ) : (
+            <span className="text-sm">—</span>
+          )}
+        </div>
+      </div>
+      <div>
+        <div className="text-xs text-muted-foreground">Languages</div>
+        <div className="mt-1 space-y-1">
+          {Array.isArray(profile?.languages) && profile.languages.length ? (
+            profile.languages.map((l: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="border border-border bg-secondary/40 px-2 py-0.5 font-mono text-[10px] uppercase">{languageLabel(l.code, l.custom)}</span>
+                <span className="font-mono text-xs text-muted-foreground">{languageLevelLabel(l.level)}</span>
               </div>
             ))
           ) : (
