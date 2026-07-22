@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, MAX_FREELANCER_EXPERIENCES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, roleLabel, skillLabel, type FreelancerExperience } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 
@@ -187,6 +187,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
+    languages: [] as FreelancerLanguage[],
   });
 
   // Sync form state whenever the underlying profile refreshes (query completes / refetches).
@@ -208,6 +209,12 @@ function FreelancerSection({ profile }: { profile: any }) {
             .map((e) => ({ discipline: String(e.discipline), years: Number(e.years) || 0 }))
             .slice(0, MAX_FREELANCER_EXPERIENCES)
         : [],
+      languages: Array.isArray(profile?.languages)
+        ? (profile.languages as any[])
+            .filter((l) => l && typeof l === "object" && typeof l.code === "string")
+            .map((l) => ({ code: String(l.code), level: (String(l.level || "basic") as LanguageLevel), custom: l.custom ? String(l.custom) : undefined }))
+            .slice(0, MAX_FREELANCER_LANGUAGES)
+        : [],
     });
   }, [profile, editing]);
 
@@ -226,6 +233,11 @@ function FreelancerSection({ profile }: { profile: any }) {
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
+          languages: form.languages.map((l) => ({
+            code: l.code,
+            level: l.level,
+            custom: l.code === "other" ? (l.custom ?? null) : null,
+          })),
         },
       });
     },
