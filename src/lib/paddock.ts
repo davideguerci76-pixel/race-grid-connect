@@ -192,18 +192,16 @@ export const SKILLS: string[] = SKILL_OPTIONS.map((o) => o.value);
 
 const SKILL_MAP = new Map(SKILL_OPTIONS.map((o) => [o.value, o.label]));
 
-// Lazy access to i18n to avoid pulling react-i18next into shared module init order issues.
+// Lazy access to i18n so this module stays usable on the server (where the singleton
+// may not have translations loaded). Static import is fine — i18n has no DOM deps.
+import i18n from "@/i18n";
 function tryTranslate(key: string): string | null {
   try {
-    // Dynamic require via ESM import cache — i18n is a singleton.
-     
-    const mod = require("@/i18n") as { default: { t: (k: string) => string; exists?: (k: string) => boolean } };
-    const i = mod.default;
-    if (i && typeof i.t === "function") {
-      const has = typeof i.exists === "function" ? i.exists(key) : true;
+    if (i18n && typeof i18n.t === "function") {
+      const has = typeof i18n.exists === "function" ? i18n.exists(key) : true;
       if (!has) return null;
-      const out = i.t(key);
-      if (out && out !== key) return out;
+      const out = i18n.t(key);
+      if (typeof out === "string" && out && out !== key) return out;
     }
   } catch { /* ignore */ }
   return null;
