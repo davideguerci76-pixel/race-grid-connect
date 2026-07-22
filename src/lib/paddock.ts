@@ -139,6 +139,46 @@ export const MAX_REQUEST_EXPERIENCE_REQS = 3;
 export type FreelancerExperience = { discipline: string; years: number };
 export type RequestExperienceRequirement = { discipline: string; min_years: number; hard: boolean };
 
+// ---- Languages ----
+export type LanguageLevel = "basic" | "intermediate" | "advanced" | "fluent" | "native";
+export const LANGUAGE_LEVELS: LanguageLevel[] = ["basic", "intermediate", "advanced", "fluent", "native"];
+export const LANGUAGE_LEVEL_RANK: Record<LanguageLevel, number> = {
+  basic: 1, intermediate: 2, advanced: 3, fluent: 4, native: 5,
+};
+// Language codes. English fallback labels; translated versions live under "languages.<code>" in locales.
+export const LANGUAGE_OPTIONS: Option[] = [
+  { value: "en", label: "English" },
+  { value: "fr", label: "French" },
+  { value: "es", label: "Spanish" },
+  { value: "de", label: "German" },
+  { value: "it", label: "Italian" },
+  { value: "zh", label: "Mandarin Chinese" },
+  { value: "ja", label: "Japanese" },
+  { value: "ar", label: "Arabic" },
+  { value: "hi", label: "Hindi" },
+  { value: "other", label: "Other" },
+];
+export const MAX_FREELANCER_LANGUAGES = 10;
+export const MAX_REQUEST_LANGUAGES = 6;
+
+export type FreelancerLanguage = { code: string; level: LanguageLevel; custom?: string };
+export type RequestLanguageRequirement = { code: string; level: LanguageLevel; hard: boolean; custom?: string };
+
+const LANGUAGE_MAP = new Map(LANGUAGE_OPTIONS.map((o) => [o.value, o.label]));
+export function languageLabel(code: string | null | undefined, custom?: string | null): string {
+  if (!code) return "—";
+  if (code === "other") return (custom && custom.trim()) || tryTranslate("languages.other") || "Other";
+  const t = tryTranslate(`languages.${code}`);
+  if (t) return t;
+  return LANGUAGE_MAP.get(code) ?? code;
+}
+export function languageLevelLabel(level: string | null | undefined): string {
+  if (!level) return "—";
+  const t = tryTranslate(`language_levels.${level}`);
+  if (t) return t;
+  return level.charAt(0).toUpperCase() + level.slice(1);
+}
+
 // Motorsport-specific skills (multi-select in freelancer profile & team requests)
 // English labels below are the fallback; translated labels live in src/i18n/locales/*.json under "skills.<value>".
 export const SKILL_OPTIONS: Option[] = [
