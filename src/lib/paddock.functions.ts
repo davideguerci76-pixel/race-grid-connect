@@ -74,6 +74,16 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
           )
           .max(5)
           .optional(),
+        languages: z
+          .array(
+            z.object({
+              code: z.string().min(1).max(24),
+              level: z.enum(["basic", "intermediate", "advanced", "fluent", "native"]),
+              custom: z.string().max(60).optional().nullable(),
+            }),
+          )
+          .max(10)
+          .optional(),
       })
       .parse(data),
   )
