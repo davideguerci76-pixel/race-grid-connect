@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, ROLE_OPTIONS, SKILL_OPTIONS, type DurationType, type RequestExperienceRequirement } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, ROLE_OPTIONS, SKILL_OPTIONS, skillLabel, type DurationType, type RequestExperienceRequirement } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -265,7 +265,7 @@ function NewRequestPage() {
                     onClick={() => setSkills(checked ? skills.filter((s) => s !== o.value) : [...skills, o.value])}
                     className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
                   >
-                    {o.label}
+                    {skillLabel(o.value)}
                   </button>
                 );
               })}
