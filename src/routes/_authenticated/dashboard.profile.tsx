@@ -608,3 +608,82 @@ function ExperienceEditor({
     </div>
   );
 }
+
+function LanguagesEditor({
+  value,
+  onChange,
+}: {
+  value: FreelancerLanguage[];
+  onChange: (v: FreelancerLanguage[]) => void;
+}) {
+  const canAdd = value.length < MAX_FREELANCER_LANGUAGES;
+  const update = (i: number, patch: Partial<FreelancerLanguage>) => {
+    onChange(value.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+  };
+  const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+  const add = () => {
+    if (!canAdd) return;
+    const used = new Set(value.map((l) => l.code));
+    const nextCode = LANGUAGE_OPTIONS.find((o) => !used.has(o.value))?.value ?? "en";
+    onChange([...value, { code: nextCode, level: "intermediate" }]);
+  };
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs text-muted-foreground">
+          Languages spoken <span className="text-racing-red">({value.length}/{MAX_FREELANCER_LANGUAGES})</span>
+        </label>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        Pick each language you speak and its level. Teams can require specific languages on their job requests.
+      </p>
+      <div className="mt-2 space-y-2">
+        {value.map((l, i) => (
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_1fr_auto]">
+            <select
+              value={l.code}
+              onChange={(ev) => update(i, { code: ev.target.value })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {LANGUAGE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+              ))}
+            </select>
+            <select
+              value={l.level}
+              onChange={(ev) => update(i, { level: ev.target.value as LanguageLevel })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {LANGUAGE_LEVELS.map((lv) => (
+                <option key={lv} value={lv}>{languageLevelLabel(lv)}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+            >
+              Remove
+            </button>
+            {l.code === "other" && (
+              <input
+                value={l.custom ?? ""}
+                onChange={(ev) => update(i, { custom: ev.target.value })}
+                placeholder="Language name"
+                className="sm:col-span-3 border border-border bg-background px-2 py-1 text-sm"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        disabled={!canAdd}
+        className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+      >
+        {value.length === 0 ? "+ Add language" : "+ Add another language"}
+      </button>
+    </div>
+  );
+}
