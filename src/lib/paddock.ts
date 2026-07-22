@@ -138,14 +138,15 @@ export type FreelancerExperience = { discipline: string; years: number };
 export type RequestExperienceRequirement = { discipline: string; min_years: number; hard: boolean };
 
 // Motorsport-specific skills (multi-select in freelancer profile & team requests)
+// English labels below are the fallback; translated labels live in src/i18n/locales/*.json under "skills.<value>".
 export const SKILL_OPTIONS: Option[] = [
-  { value: "chassis_builder", label: "Chassis Builder (Telaista)" },
-  { value: "gearbox_specialist", label: "Gearbox Specialist (Cambista)" },
-  { value: "engine_builder", label: "Engine Builder (Motorista)" },
+  { value: "chassis_builder", label: "Chassis Builder" },
+  { value: "gearbox_specialist", label: "Gearbox Specialist" },
+  { value: "engine_builder", label: "Engine Builder" },
   { value: "welder_tig", label: "TIG Welder" },
   { value: "welder_mig", label: "MIG Welder" },
-  { value: "lathe_operator", label: "Lathe Operator (Tornitore)" },
-  { value: "milling_operator", label: "Milling Operator (Fresatore)" },
+  { value: "lathe_operator", label: "Lathe Operator" },
+  { value: "milling_operator", label: "Milling Operator" },
   { value: "cnc_programmer", label: "CNC Programmer" },
   { value: "composite_layup", label: "Composite Lay-up / Autoclave" },
   { value: "carbon_repair", label: "Carbon Fibre Repair" },
@@ -190,9 +191,34 @@ export const DISCIPLINES: string[] = DISCIPLINE_OPTIONS.map((o) => o.value);
 export const SKILLS: string[] = SKILL_OPTIONS.map((o) => o.value);
 
 const SKILL_MAP = new Map(SKILL_OPTIONS.map((o) => [o.value, o.label]));
+
+// Lazy access to i18n to avoid pulling react-i18next into shared module init order issues.
+function tryTranslate(key: string): string | null {
+  try {
+    // Dynamic require via ESM import cache — i18n is a singleton.
+     
+    const mod = require("@/i18n") as { default: { t: (k: string) => string; exists?: (k: string) => boolean } };
+    const i = mod.default;
+    if (i && typeof i.t === "function") {
+      const has = typeof i.exists === "function" ? i.exists(key) : true;
+      if (!has) return null;
+      const out = i.t(key);
+      if (out && out !== key) return out;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
 export function skillLabel(value: string | null | undefined): string {
   if (!value) return "—";
+  const t = tryTranslate(`skills.${value}`);
+  if (t) return t;
   return SKILL_MAP.get(value) ?? value.replace(/_/g, " ");
+}
+
+/** Returns SKILL_OPTIONS with labels translated for the current i18n language. */
+export function getTranslatedSkillOptions(): Option[] {
+  return SKILL_OPTIONS.map((o) => ({ value: o.value, label: skillLabel(o.value) }));
 }
 
 const ROLE_MAP = new Map(ROLE_OPTIONS.map((o) => [o.value, o.label]));
