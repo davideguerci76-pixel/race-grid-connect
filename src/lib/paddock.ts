@@ -195,8 +195,7 @@ export const SKILLS: string[] = SKILL_OPTIONS.map((o) => o.value);
 const SKILL_MAP = new Map(SKILL_OPTIONS.map((o) => [o.value, o.label]));
 
 // Lazy access to i18n so this module stays usable on the server (where the singleton
-// may not have translations loaded). Static import is fine — i18n has no DOM deps.
-import i18n from "@/i18n";
+// may not have translations loaded).
 function tryTranslate(key: string): string | null {
   try {
     if (i18n && typeof i18n.t === "function") {
