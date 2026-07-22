@@ -100,6 +100,7 @@ function AdminFreelancers() {
               Role: r.freelancer?.role ?? "",
               Disciplines: (r.freelancer?.disciplines ?? []).join(", "),
               Skills: (r.freelancer?.skills ?? []).join(", "),
+              Languages: (r.freelancer?.languages ?? []).map((l: any) => `${l.code === "other" ? (l.custom || "Other") : l.code}(${l.level})`).join(", "),
               Education: r.freelancer?.education ?? "",
               Location: r.freelancer?.location ?? "",
               DayRate: r.freelancer?.day_rate ?? "",
@@ -127,6 +128,7 @@ function AdminFreelancers() {
                 <th className="px-2 py-2 text-left">Role</th>
                 <th className="px-2 py-2 text-left">Disciplines</th>
                 <th className="px-2 py-2 text-left">Skills</th>
+                <th className="px-2 py-2 text-left">Languages</th>
                 <th className="px-2 py-2 text-left">Location</th>
                 <th className="px-2 py-2 text-right">Rate</th>
                 <th className="px-2 py-2 text-right">Tokens</th>
@@ -142,6 +144,7 @@ function AdminFreelancers() {
                   <td className="px-2 py-2">{r.freelancer?.role ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.disciplines ?? []).join(", ")}</td>
                   <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.skills ?? []).slice(0, 5).join(", ")}{(r.freelancer?.skills ?? []).length > 5 ? "…" : ""}</td>
+                  <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.languages ?? []).map((l: any) => `${l.code === "other" ? (l.custom || "Other") : l.code}(${l.level?.[0] ?? "?"})`).join(", ")}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.freelancer?.location ?? "—"}</td>
                   <td className="px-2 py-2 text-right">{r.freelancer?.day_rate ?? "—"}</td>
                   <td className="px-2 py-2 text-right font-bold">{r.token_balance}</td>
