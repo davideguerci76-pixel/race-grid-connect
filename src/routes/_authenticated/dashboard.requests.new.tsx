@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, ROLE_OPTIONS, SKILL_OPTIONS, skillLabel, type DurationType, type RequestExperienceRequirement } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -78,6 +78,7 @@ function NewRequestPage() {
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
+  const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
 
   useEffect(() => {
     if (!source) return;
@@ -124,6 +125,12 @@ function NewRequestPage() {
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           skills,
           experience_requirements: experienceReqs,
+          languages: languageReqs.map((l) => ({
+            code: l.code,
+            level: l.level,
+            hard: l.hard,
+            custom: l.code === "other" ? (l.custom ?? null) : null,
+          })),
         } as never,
       }),
     onSuccess: () => {
