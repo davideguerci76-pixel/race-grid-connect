@@ -74,6 +74,16 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
           )
           .max(5)
           .optional(),
+        languages: z
+          .array(
+            z.object({
+              code: z.string().min(1).max(24),
+              level: z.enum(["basic", "intermediate", "advanced", "fluent", "native"]),
+              custom: z.string().max(60).optional().nullable(),
+            }),
+          )
+          .max(10)
+          .optional(),
       })
       .parse(data),
   )
@@ -99,6 +109,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         bio: data.bio || null,
         travels: data.travels,
         experiences: data.experiences ?? [],
+        languages: data.languages ?? [],
       } as never,
       { onConflict: "user_id" },
     ).select("*").single();
@@ -183,6 +194,17 @@ export const createRequest = createServerFn({ method: "POST" })
           )
           .max(3)
           .optional(),
+        languages: z
+          .array(
+            z.object({
+              code: z.string().min(1).max(24),
+              level: z.enum(["basic", "intermediate", "advanced", "fluent", "native"]),
+              hard: z.boolean(),
+              custom: z.string().max(60).optional().nullable(),
+            }),
+          )
+          .max(6)
+          .optional(),
       })
       .parse(data),
   )
@@ -203,6 +225,7 @@ export const createRequest = createServerFn({ method: "POST" })
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
       experience_requirements: data.experience_requirements ?? [],
+      languages: data.languages ?? [],
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);

@@ -153,6 +153,7 @@ export type Database = {
           education: string | null
           experiences: Json
           headline: string | null
+          languages: Json
           location: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           skills: string[]
@@ -169,6 +170,7 @@ export type Database = {
           education?: string | null
           experiences?: Json
           headline?: string | null
+          languages?: Json
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
@@ -185,6 +187,7 @@ export type Database = {
           education?: string | null
           experiences?: Json
           headline?: string | null
+          languages?: Json
           location?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
@@ -427,6 +430,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          languages: Json
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
@@ -451,6 +455,7 @@ export type Database = {
           experience_requirements?: Json
           id?: string
           is_active?: boolean
+          languages?: Json
           location?: string | null
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
@@ -475,6 +480,7 @@ export type Database = {
           experience_requirements?: Json
           id?: string
           is_active?: boolean
+          languages?: Json
           location?: string | null
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
@@ -643,6 +649,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          languages: Json
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
@@ -711,6 +718,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          languages: Json
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]

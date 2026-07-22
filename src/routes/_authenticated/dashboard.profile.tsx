@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, MAX_FREELANCER_EXPERIENCES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, roleLabel, skillLabel, type FreelancerExperience } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 
@@ -187,6 +187,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
+    languages: [] as FreelancerLanguage[],
   });
 
   // Sync form state whenever the underlying profile refreshes (query completes / refetches).
@@ -208,6 +209,12 @@ function FreelancerSection({ profile }: { profile: any }) {
             .map((e) => ({ discipline: String(e.discipline), years: Number(e.years) || 0 }))
             .slice(0, MAX_FREELANCER_EXPERIENCES)
         : [],
+      languages: Array.isArray(profile?.languages)
+        ? (profile.languages as any[])
+            .filter((l) => l && typeof l === "object" && typeof l.code === "string")
+            .map((l) => ({ code: String(l.code), level: (String(l.level || "basic") as LanguageLevel), custom: l.custom ? String(l.custom) : undefined }))
+            .slice(0, MAX_FREELANCER_LANGUAGES)
+        : [],
     });
   }, [profile, editing]);
 
@@ -226,6 +233,11 @@ function FreelancerSection({ profile }: { profile: any }) {
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
+          languages: form.languages.map((l) => ({
+            code: l.code,
+            level: l.level,
+            custom: l.code === "other" ? (l.custom ?? null) : null,
+          })),
         },
       });
     },
@@ -278,6 +290,10 @@ function FreelancerSection({ profile }: { profile: any }) {
           value={form.experiences}
           onChange={(v) => setForm({ ...form, experiences: v })}
         />
+        <LanguagesEditor
+          value={form.languages}
+          onChange={(v) => setForm({ ...form, languages: v })}
+        />
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
           <span className="text-sm">Available to travel for race weekends</span>
@@ -322,6 +338,21 @@ function FreelancerSection({ profile }: { profile: any }) {
               <div key={i} className="flex items-center gap-2 text-sm">
                 <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(e.discipline)}</span>
                 <span className="font-mono text-xs text-muted-foreground">{experienceYearsLabel(Number(e.years))}</span>
+              </div>
+            ))
+          ) : (
+            <span className="text-sm">—</span>
+          )}
+        </div>
+      </div>
+      <div>
+        <div className="text-xs text-muted-foreground">Languages</div>
+        <div className="mt-1 space-y-1">
+          {Array.isArray(profile?.languages) && profile.languages.length ? (
+            profile.languages.map((l: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="border border-border bg-secondary/40 px-2 py-0.5 font-mono text-[10px] uppercase">{languageLabel(l.code, l.custom)}</span>
+                <span className="font-mono text-xs text-muted-foreground">{languageLevelLabel(l.level)}</span>
               </div>
             ))
           ) : (
@@ -573,6 +604,85 @@ function ExperienceEditor({
         className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
       >
         {value.length === 0 ? "+ Add experience" : "+ Add another experience"}
+      </button>
+    </div>
+  );
+}
+
+function LanguagesEditor({
+  value,
+  onChange,
+}: {
+  value: FreelancerLanguage[];
+  onChange: (v: FreelancerLanguage[]) => void;
+}) {
+  const canAdd = value.length < MAX_FREELANCER_LANGUAGES;
+  const update = (i: number, patch: Partial<FreelancerLanguage>) => {
+    onChange(value.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+  };
+  const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+  const add = () => {
+    if (!canAdd) return;
+    const used = new Set(value.map((l) => l.code));
+    const nextCode = LANGUAGE_OPTIONS.find((o) => !used.has(o.value))?.value ?? "en";
+    onChange([...value, { code: nextCode, level: "intermediate" }]);
+  };
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-xs text-muted-foreground">
+          Languages spoken <span className="text-racing-red">({value.length}/{MAX_FREELANCER_LANGUAGES})</span>
+        </label>
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        Pick each language you speak and its level. Teams can require specific languages on their job requests.
+      </p>
+      <div className="mt-2 space-y-2">
+        {value.map((l, i) => (
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_1fr_auto]">
+            <select
+              value={l.code}
+              onChange={(ev) => update(i, { code: ev.target.value })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {LANGUAGE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+              ))}
+            </select>
+            <select
+              value={l.level}
+              onChange={(ev) => update(i, { level: ev.target.value as LanguageLevel })}
+              className="border border-border bg-background px-2 py-1 text-sm"
+            >
+              {LANGUAGE_LEVELS.map((lv) => (
+                <option key={lv} value={lv}>{languageLevelLabel(lv)}</option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+            >
+              Remove
+            </button>
+            {l.code === "other" && (
+              <input
+                value={l.custom ?? ""}
+                onChange={(ev) => update(i, { custom: ev.target.value })}
+                placeholder="Language name"
+                className="sm:col-span-3 border border-border bg-background px-2 py-1 text-sm"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={add}
+        disabled={!canAdd}
+        className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+      >
+        {value.length === 0 ? "+ Add language" : "+ Add another language"}
       </button>
     </div>
   );

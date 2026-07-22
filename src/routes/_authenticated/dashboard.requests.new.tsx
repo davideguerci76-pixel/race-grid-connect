@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, ROLE_OPTIONS, SKILL_OPTIONS, skillLabel, type DurationType, type RequestExperienceRequirement } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -78,6 +78,7 @@ function NewRequestPage() {
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
+  const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
 
   useEffect(() => {
     if (!source) return;
@@ -124,6 +125,12 @@ function NewRequestPage() {
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           skills,
           experience_requirements: experienceReqs,
+          languages: languageReqs.map((l) => ({
+            code: l.code,
+            level: l.level,
+            hard: l.hard,
+            custom: l.code === "other" ? (l.custom ?? null) : null,
+          })),
         } as never,
       }),
     onSuccess: () => {
@@ -329,6 +336,74 @@ function NewRequestPage() {
               {experienceReqs.length === 0 ? "+ Add experience requirement" : "+ Add another experience requirement"}
             </button>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="label-mono">
+              Required languages <span className="text-racing-red">({languageReqs.length}/{MAX_REQUEST_LANGUAGES})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Add up to {MAX_REQUEST_LANGUAGES} required languages and their minimum level. Mark as <span className="text-racing-red font-bold">HARD</span> to exclude freelancers who don't meet it, or leave <span className="font-bold">SOFT</span> as preference.
+            </p>
+            <div className="mt-2 space-y-2">
+              {languageReqs.map((req, i) => (
+                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_1fr_120px_auto]">
+                  <select
+                    value={req.code}
+                    onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {LANGUAGE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={req.level}
+                    onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, level: ev.target.value as LanguageLevel } : r))}
+                    className="border border-border bg-background px-2 py-1 text-sm"
+                  >
+                    {LANGUAGE_LEVELS.map((lv) => (
+                      <option key={lv} value={lv}>min {languageLevelLabel(lv)}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
+                    className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+                  >
+                    {req.hard ? "Hard" : "Soft"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguageReqs(languageReqs.filter((_, idx) => idx !== i))}
+                    className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
+                  >
+                    Remove
+                  </button>
+                  {req.code === "other" && (
+                    <input
+                      value={req.custom ?? ""}
+                      onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, custom: ev.target.value } : r))}
+                      placeholder="Language name"
+                      className="md:col-span-4 border border-border bg-background px-2 py-1 text-sm"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (languageReqs.length >= MAX_REQUEST_LANGUAGES) return;
+                setLanguageReqs([...languageReqs, { code: "en", level: "fluent", hard: true }]);
+              }}
+              disabled={languageReqs.length >= MAX_REQUEST_LANGUAGES}
+              className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+            >
+              {languageReqs.length === 0 ? "+ Add language requirement" : "+ Add another language requirement"}
+            </button>
+          </div>
+
+
 
 
           <div className="md:col-span-2">

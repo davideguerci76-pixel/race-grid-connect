@@ -287,5 +287,27 @@
     "pit_stop_crew": "Equipo de pit stop",
     "truckie": "Conductor de transporte",
     "graphics_wrap": "Aplicación de vinilos / wrap"
+  },
+  "languages": {
+    "label": "Idiomas hablados",
+    "required": "Idiomas requeridos",
+    "en": "Inglés",
+    "fr": "Francés",
+    "es": "Español",
+    "de": "Alemán",
+    "it": "Italiano",
+    "zh": "Chino mandarín",
+    "ja": "Japonés",
+    "ar": "Árabe",
+    "hi": "Hindi",
+    "other": "Otro"
+  },
+  "language_levels": {
+    "label": "Nivel",
+    "basic": "Básico",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+    "fluent": "Fluido",
+    "native": "Nativo"
   }
 }

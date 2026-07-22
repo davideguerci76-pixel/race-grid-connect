@@ -287,5 +287,27 @@
     "pit_stop_crew": "Pit crew",
     "truckie": "Autista trasportatore",
     "graphics_wrap": "Applicazione livree / wrap"
+  },
+  "languages": {
+    "label": "Lingue parlate",
+    "required": "Lingue richieste",
+    "en": "Inglese",
+    "fr": "Francese",
+    "es": "Spagnolo",
+    "de": "Tedesco",
+    "it": "Italiano",
+    "zh": "Cinese mandarino",
+    "ja": "Giapponese",
+    "ar": "Arabo",
+    "hi": "Hindi",
+    "other": "Altro"
+  },
+  "language_levels": {
+    "label": "Livello",
+    "basic": "Base",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzato",
+    "fluent": "Fluente",
+    "native": "Madrelingua"
   }
 }

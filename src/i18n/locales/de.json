@@ -287,5 +287,27 @@
     "pit_stop_crew": "Boxencrew",
     "truckie": "LKW-Fahrer / Transporter",
     "graphics_wrap": "Beklebung / Folierung"
+  },
+  "languages": {
+    "label": "Gesprochene Sprachen",
+    "required": "Erforderliche Sprachen",
+    "en": "Englisch",
+    "fr": "Französisch",
+    "es": "Spanisch",
+    "de": "Deutsch",
+    "it": "Italienisch",
+    "zh": "Mandarin-Chinesisch",
+    "ja": "Japanisch",
+    "ar": "Arabisch",
+    "hi": "Hindi",
+    "other": "Andere"
+  },
+  "language_levels": {
+    "label": "Niveau",
+    "basic": "Grundkenntnisse",
+    "intermediate": "Mittelstufe",
+    "advanced": "Fortgeschritten",
+    "fluent": "Fließend",
+    "native": "Muttersprachlich"
   }
 }
