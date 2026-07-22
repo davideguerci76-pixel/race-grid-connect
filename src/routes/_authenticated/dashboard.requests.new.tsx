@@ -265,7 +265,7 @@ function NewRequestPage() {
                     onClick={() => setSkills(checked ? skills.filter((s) => s !== o.value) : [...skills, o.value])}
                     className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
                   >
-                    {o.label}
+                    {skillLabel(o.value)}
                   </button>
                 );
               })}
