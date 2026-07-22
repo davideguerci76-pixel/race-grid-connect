@@ -287,5 +287,27 @@
     "pit_stop_crew": "Pit Stop Crew",
     "truckie": "Truckie / Transporter Driver",
     "graphics_wrap": "Livery / Wrap Application"
+  },
+  "languages": {
+    "label": "Languages spoken",
+    "required": "Required languages",
+    "en": "English",
+    "fr": "French",
+    "es": "Spanish",
+    "de": "German",
+    "it": "Italian",
+    "zh": "Mandarin Chinese",
+    "ja": "Japanese",
+    "ar": "Arabic",
+    "hi": "Hindi",
+    "other": "Other"
+  },
+  "language_levels": {
+    "label": "Level",
+    "basic": "Basic",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "fluent": "Fluent",
+    "native": "Native"
   }
 }
