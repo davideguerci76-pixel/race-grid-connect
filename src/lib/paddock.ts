@@ -1,6 +1,8 @@
 // Shared taxonomy for roles / disciplines / durations.
 // Values must match the Postgres enums (freelancer_role, discipline, duration_type).
-// Labels are display-only.
+// Labels are display-only; translated variants live in src/i18n/locales/*.json.
+import i18n from "@/i18n";
+
 
 export type DurationType = "full_season" | "race_weekend" | "test_session";
 export const DURATIONS: DurationType[] = ["full_season", "race_weekend", "test_session"];
