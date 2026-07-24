@@ -274,8 +274,6 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     bio: "",
     travels: true,
-    phone_dial_code: "+39",
-    phone_number: "",
     experiences: [] as FreelancerExperience[],
     languages: [] as FreelancerLanguage[],
   });
