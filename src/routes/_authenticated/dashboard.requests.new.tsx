@@ -345,6 +345,31 @@ function NewRequestPage() {
 
           <div className="md:col-span-2">
             <label className="label-mono">
+              Preferred education <span className="text-racing-red">({education.length})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Soft preference only — freelancers with other education levels can still match. Click to toggle.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {EDUCATION_OPTIONS.map((o) => {
+                const checked = education.includes(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setEducation(checked ? education.filter((s) => s !== o.value) : [...education, o.value])}
+                    className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-yellow-500 bg-yellow-500/15 text-yellow-500" : "border-border hover:bg-secondary"}`}
+                  >
+                    {educationLabel(o.value)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+
+          <div className="md:col-span-2">
+            <label className="label-mono">
               Experience requirements <span className="text-racing-red">({experienceReqs.length}/{MAX_REQUEST_EXPERIENCE_REQS})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
