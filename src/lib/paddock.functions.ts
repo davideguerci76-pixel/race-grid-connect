@@ -284,15 +284,32 @@ export const getMyRequests = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (data ?? []).map((r) => r.id);
     let counts: Record<string, number> = {};
+    let confirmedMap: Record<string, string> = {};
     if (ids.length) {
-      const { data: matches } = await supabase.from("matches").select("request_id").in("request_id", ids);
+      const [{ data: matches }, { data: engs }] = await Promise.all([
+        supabase.from("matches").select("request_id").in("request_id", ids),
+        supabase
+          .from("engagements")
+          .select("id, request_id, status")
+          .in("request_id", ids)
+          .eq("status", "confirmed"),
+      ]);
       counts = (matches ?? []).reduce<Record<string, number>>((acc, m) => {
         const rid = (m as { request_id: string }).request_id;
         acc[rid] = (acc[rid] ?? 0) + 1;
         return acc;
       }, {});
+      confirmedMap = (engs ?? []).reduce<Record<string, string>>((acc, e: any) => {
+        if (e.request_id) acc[e.request_id] = e.id;
+        return acc;
+      }, {});
     }
-    return (data ?? []).map((r) => ({ ...r, matches_count: counts[r.id] ?? 0 }));
+    return (data ?? []).map((r) => ({
+      ...r,
+      matches_count: counts[r.id] ?? 0,
+      confirmed_engagement_id: confirmedMap[r.id] ?? null,
+    }));
+
   });
 
 export const deactivateRequest = createServerFn({ method: "POST" })
