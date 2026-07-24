@@ -139,9 +139,10 @@ function RequestMatchesPage() {
                 <MatchCard
                   key={m.match_id}
                   match={m}
-                  requestFilled={data.request.status === "filled"}
+                  requestFilled={data.request.status === "filled" || data.request.status === "completed"}
                   onUnlock={() => unlockMut.mutate(m.match_id)}
                   onConfirm={() => {
+
                     if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) {
                       confirmMut.mutate(m.match_id);
                     }
