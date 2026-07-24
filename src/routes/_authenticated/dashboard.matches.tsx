@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, requestMatchConfirmation, confirmEngagement } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
 
@@ -51,14 +53,21 @@ function MissingCriteria({ list }: { list: any[] }) {
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
-  const confirmFn = useServerFn(requestMatchConfirmation);
   const acceptFn = useServerFn(confirmEngagement);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
   const isFreelancer = data?.userType === "freelancer";
+
+  // Teams manage their matches per-request from the Requests dashboard.
+  useEffect(() => {
+    if (data && data.userType === "team") {
+      navigate({ to: "/dashboard/requests", replace: true });
+    }
+  }, [data, navigate]);
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
@@ -66,16 +75,11 @@ function MatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : t("matches.insufficient_tokens")),
   });
 
-  const confirmMut = useMutation({
-    mutationFn: (id: string) => confirmFn({ data: { match_id: id } }),
-    onSuccess: () => { toast.success("Confirmation request sent"); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-
   const acceptMut = useMutation({
     mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
     onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+
   });
 
   return (
@@ -165,23 +169,13 @@ function MatchesPage() {
                         {t("matches.reveal_1_token")}
                       </button>
                     )}
-                    {!isFreelancer && m.revealedByMe && !requestFilled && (
-                      <button
-                        onClick={() => { if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) confirmMut.mutate(m.id); }}
-                        disabled={confirmMut.isPending}
-                        className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
-                      >
-                        Request confirmation
-                      </button>
-                    )}
-                    {!isFreelancer && requestFilled && (
-                      <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        Request filled
-                      </span>
-                    )}
                     {isFreelancer && m.pending_engagement_id && !requestFilled && (
                       <button
-                        onClick={() => { if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) acceptMut.mutate(m.pending_engagement_id); }}
+                        onClick={() => {
+                          if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) {
+                            acceptMut.mutate(m.pending_engagement_id);
+                          }
+                        }}
                         disabled={acceptMut.isPending}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
@@ -193,15 +187,7 @@ function MatchesPage() {
                         Request filled
                       </span>
                     )}
-                    {!isFreelancer && m.request?.id && (
-                      <Link
-                        to="/dashboard/requests/$id/matches"
-                        params={{ id: m.request.id }}
-                        className="inline-flex items-center justify-center border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
-                      >
-                        Open request
-                      </Link>
-                    )}
+
                   </div>
                 </div>
               );
