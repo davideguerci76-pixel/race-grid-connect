@@ -124,6 +124,7 @@ function NewRequestPage() {
           budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+          role_hard: roleHard,
           skills,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
