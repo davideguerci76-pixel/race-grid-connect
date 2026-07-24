@@ -3,23 +3,50 @@ import { useEffect, useRef, useState } from "react";
 const BROWSER_KEY = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 const CHANNEL = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as string | undefined;
 
-let mapsLoader: Promise<any> | null = null;
-function loadMaps(): Promise<any> {
-  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
+// Google's official inline dynamic loader. Idempotent and callback-free —
+// works with `importLibrary('places')` without needing `libraries=` or
+// `callback=` URL params.
+let bootstrapped = false;
+function bootstrapMaps() {
+  if (bootstrapped) return;
+  if (typeof window === "undefined") return;
   const w = window as any;
-  if (w.google?.maps?.importLibrary) return Promise.resolve(w.google.maps);
-  if (mapsLoader) return mapsLoader;
-  if (!BROWSER_KEY) return Promise.reject(new Error("Missing Google Maps browser key"));
-  mapsLoader = new Promise((resolve, reject) => {
-    w.__lovableMapsInit = () => resolve((window as any).google.maps);
-    const s = document.createElement("script");
-    const channel = CHANNEL ? `&channel=${encodeURIComponent(CHANNEL)}` : "";
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${BROWSER_KEY}&v=weekly&libraries=places&loading=async&callback=__lovableMapsInit${channel}`;
-    s.async = true;
-    s.onerror = () => reject(new Error("Failed to load Google Maps"));
-    document.head.appendChild(s);
-  });
-  return mapsLoader;
+  if (w.google?.maps?.importLibrary) { bootstrapped = true; return; }
+  if (!BROWSER_KEY) return;
+  bootstrapped = true;
+  // eslint-disable-next-line
+  ((g: any) => {
+    let h: Promise<any> | undefined;
+    const c = "google" as const;
+    const l = "importLibrary";
+    const q = "__ib__";
+    const m = document;
+    let b: any = window;
+    b = b[c] || (b[c] = {});
+    const d: any = b.maps || (b.maps = {});
+    const r = new Set<string>();
+    const e = new URLSearchParams();
+    const u = () => h || (h = new Promise<void>(async (f, n) => {
+      const a = m.createElement("script");
+      e.set("libraries", [...r].join(","));
+      for (const k in g) e.set(k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()), g[k]);
+      e.set("callback", c + ".maps." + q);
+      a.src = `https://maps.googleapis.com/maps/api/js?` + e.toString();
+      d[q] = f;
+      a.onerror = () => { h = undefined; n(new Error("Google Maps could not load.")); };
+      a.nonce = (m.querySelector("script[nonce]") as HTMLScriptElement | null)?.nonce || "";
+      m.head.append(a);
+    }));
+    if (d[l]) { /* already loaded */ }
+    else d[l] = (f: string, ...n: any[]) => (r.add(f), u().then(() => d[l](f, ...n)));
+  })({ key: BROWSER_KEY, v: "weekly", ...(CHANNEL ? { channel: CHANNEL } : {}) });
+}
+
+async function loadPlaces(): Promise<any> {
+  bootstrapMaps();
+  const w = window as any;
+  if (!w.google?.maps?.importLibrary) throw new Error("Google Maps not available");
+  return await w.google.maps.importLibrary("places");
 }
 
 export function LocationAutocomplete({
@@ -37,6 +64,7 @@ export function LocationAutocomplete({
   const [suggestions, setSuggestions] = useState<Array<{ text: string; placeId: string }>>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const placesRef = useRef<any>(null);
   const sessionRef = useRef<any>(null);
   const debRef = useRef<number | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -45,12 +73,11 @@ export function LocationAutocomplete({
 
   useEffect(() => {
     let cancelled = false;
-    loadMaps()
-      .then(async (maps) => {
-        const places = await maps.importLibrary("places");
+    loadPlaces()
+      .then((places) => {
         if (cancelled) return;
+        placesRef.current = places;
         sessionRef.current = new places.AutocompleteSessionToken();
-        (window as any).__lovablePlaces = places;
         setReady(true);
       })
       .catch(() => setReady(false));
@@ -70,7 +97,7 @@ export function LocationAutocomplete({
     debRef.current = window.setTimeout(async () => {
       if (!ready || text.trim().length < 2) { setSuggestions([]); return; }
       try {
-        const places = (window as any).__lovablePlaces;
+        const places = placesRef.current;
         const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
           input: text,
           sessionToken: sessionRef.current,
@@ -94,8 +121,7 @@ export function LocationAutocomplete({
     setInput(s.text);
     onChange(s.text);
     setOpen(false);
-    // reset session for billing
-    const places = (window as any).__lovablePlaces;
+    const places = placesRef.current;
     if (places) sessionRef.current = new places.AutocompleteSessionToken();
   };
 
