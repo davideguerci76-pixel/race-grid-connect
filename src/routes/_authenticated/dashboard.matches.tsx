@@ -169,23 +169,13 @@ function MatchesPage() {
                         {t("matches.reveal_1_token")}
                       </button>
                     )}
-                    {!isFreelancer && m.revealedByMe && !requestFilled && (
-                      <button
-                        onClick={() => { if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) confirmMut.mutate(m.id); }}
-                        disabled={confirmMut.isPending}
-                        className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
-                      >
-                        Request confirmation
-                      </button>
-                    )}
-                    {!isFreelancer && requestFilled && (
-                      <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        Request filled
-                      </span>
-                    )}
                     {isFreelancer && m.pending_engagement_id && !requestFilled && (
                       <button
-                        onClick={() => { if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) acceptMut.mutate(m.pending_engagement_id); }}
+                        onClick={() => {
+                          if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) {
+                            acceptMut.mutate(m.pending_engagement_id);
+                          }
+                        }}
                         disabled={acceptMut.isPending}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
@@ -197,15 +187,7 @@ function MatchesPage() {
                         Request filled
                       </span>
                     )}
-                    {!isFreelancer && m.request?.id && (
-                      <Link
-                        to="/dashboard/requests/$id/matches"
-                        params={{ id: m.request.id }}
-                        className="inline-flex items-center justify-center border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
-                      >
-                        Open request
-                      </Link>
-                    )}
+
                   </div>
                 </div>
               );
