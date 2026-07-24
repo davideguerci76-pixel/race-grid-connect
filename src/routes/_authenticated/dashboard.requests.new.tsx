@@ -95,25 +95,43 @@ function NewRequestPage() {
 
   useEffect(() => {
     if (!source) return;
+    const s: any = source;
     setForm({
-      title: source.title,
-      role: source.role as string,
-      discipline: source.discipline as string,
-      duration: source.duration as DurationType,
-      circuit: source.circuit ?? "",
-      location: source.location ?? "",
-      start_date: "",
-      end_date: "",
-      budget_min: source.budget_min ? String(source.budget_min) : "",
-      budget_max: source.budget_max ? String(source.budget_max) : "",
-      budget_unit: (source.budget_unit as "day" | "event" | "season") ?? "day",
-      notes: source.notes ?? "",
+      title: s.title,
+      role: s.role as string,
+      discipline: s.discipline as string,
+      duration: s.duration as DurationType,
+      circuit: s.circuit ?? "",
+      location: s.location ?? "",
+      start_date: identical ? (s.start_date ?? "") : "",
+      end_date: identical ? (s.end_date ?? "") : "",
+      budget_min: s.budget_min ? String(s.budget_min) : "",
+      budget_max: s.budget_max ? String(s.budget_max) : "",
+      budget_unit: (s.budget_unit as "day" | "event" | "season") ?? "day",
+      notes: s.notes ?? "",
     });
-    setSeasonDates([]);
-  }, [source]);
+    setRoleHard(s.role_hard ?? true);
+    setTravelRequired(s.travel_required ?? true);
+    setSkills(Array.isArray(s.skills) ? s.skills : []);
+    setSkillsHard(Array.isArray(s.skills_hard) ? s.skills_hard : []);
+    setEducation(Array.isArray(s.education) ? s.education : []);
+    setExperienceReqs(Array.isArray(s.experience_requirements) ? s.experience_requirements : []);
+    setLanguageReqs(Array.isArray(s.languages) ? s.languages : []);
+    if (Array.isArray(s.season_dates)) {
+      setSeasonDates(s.season_dates.map((d: string) => {
+        const [y, m, day] = d.split("-").map(Number);
+        return new Date(y, m - 1, day);
+      }));
+    } else {
+      setSeasonDates([]);
+    }
+  }, [source, identical]);
 
   const isSeason = form.duration === "full_season";
-  const cost = isSeason ? COST_SEASON : COST_SINGLE;
+  const baseCost = isSeason ? COST_SEASON : COST_SINGLE;
+  const repostCost = isSeason ? COST_SEASON_REPOST : COST_SINGLE_REPOST;
+  const cost = identical ? repostCost : baseCost;
+
   const balance = profile?.token_balance ?? 0;
   const canAfford = balance >= cost;
 
