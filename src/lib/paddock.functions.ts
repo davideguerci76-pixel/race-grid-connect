@@ -256,6 +256,8 @@ export const createRequest = createServerFn({ method: "POST" })
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
       travel_required: data.travel_required ?? true,
+      repost_of: data.repost_of ?? null,
+
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
