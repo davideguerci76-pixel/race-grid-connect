@@ -647,14 +647,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const pageRows = rows.slice(start, start + pageSize);
 
     const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
-    const [{ data: fps }, { data: profs }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select("*").in("user_id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
-      supabase.from("profiles").select("id, display_name, avatar_url").in("id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"]),
+    const ids4 = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
+    const matchIds4 = pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"];
+    let profs: any[] = [];
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", ids4);
+      profs = data ?? [];
+    } catch { /* ignore */ }
+    const [{ data: fps }, { data: unlocks }] = await Promise.all([
+      supabase.from("freelancer_profiles").select("*").in("user_id", ids4),
+      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", matchIds4),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
-    const profMap = new Map((profs ?? []).map((r: any) => [r.id, r]));
+    const profMap = new Map(profs.map((r: any) => [r.id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+
 
     // Fetch emails/phones only for unlocked candidates
     const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
