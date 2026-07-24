@@ -230,6 +230,7 @@ export const createRequest = createServerFn({ method: "POST" })
           )
           .max(6)
           .optional(),
+        repost_of: z.string().uuid().optional().nullable(),
       })
       .parse(data),
   )
