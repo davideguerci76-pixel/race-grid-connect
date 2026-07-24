@@ -666,7 +666,7 @@ function LanguagesEditor({
       </p>
       <div className="mt-2 space-y-2">
         {value.map((l, i) => (
-          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_1fr_auto]">
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
             <select
               value={l.code}
               onChange={(ev) => update(i, { code: ev.target.value })}
