@@ -54,6 +54,7 @@ function MatchesPage() {
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
   const confirmFn = useServerFn(requestMatchConfirmation);
+  const acceptFn = useServerFn(confirmEngagement);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
@@ -68,6 +69,12 @@ function MatchesPage() {
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { match_id: id } }),
     onSuccess: () => { toast.success("Confirmation request sent"); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const acceptMut = useMutation({
+    mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
+    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
