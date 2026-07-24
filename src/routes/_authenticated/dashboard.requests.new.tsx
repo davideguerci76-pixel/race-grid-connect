@@ -76,8 +76,10 @@ function NewRequestPage() {
     notes: "",
   });
   const [roleHard, setRoleHard] = useState(true);
+  const [travelRequired, setTravelRequired] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [skillsHard, setSkillsHard] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
 
@@ -125,7 +127,9 @@ function NewRequestPage() {
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           role_hard: roleHard,
+          travel_required: travelRequired,
           skills,
+          skills_hard: skillsHard,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
             code: l.code,
@@ -278,19 +282,59 @@ function NewRequestPage() {
             </div>
           )}
 
+          <div className="md:col-span-2 border border-border bg-background/40 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="label-mono">Available to travel</div>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Always a <span className="font-bold text-racing-red">HARD</span> requirement — only freelancers who marked themselves as available to travel will be matched.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTravelRequired(!travelRequired)}
+                className={`border px-3 py-2 text-[11px] font-bold uppercase ${travelRequired ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+              >
+                {travelRequired ? "Required (HARD)" : "Not required"}
+              </button>
+            </div>
+          </div>
+
           <div className="md:col-span-2">
-            <label className="label-mono">Required skills <span className="text-racing-red">({skills.length})</span></label>
+            <label className="label-mono">
+              Required skills <span className="text-racing-red">({skills.length + skillsHard.length})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Click a skill once for <span className="font-bold text-yellow-500">SOFT</span> (preference), twice for <span className="font-bold text-racing-red">HARD</span> (freelancer must have it), a third time to deselect.
+            </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {SKILL_OPTIONS.map((o) => {
-                const checked = skills.includes(o.value);
+                const isSoft = skills.includes(o.value);
+                const isHard = skillsHard.includes(o.value);
+                const cycle = () => {
+                  if (!isSoft && !isHard) {
+                    setSkills([...skills, o.value]);
+                  } else if (isSoft) {
+                    setSkills(skills.filter((s) => s !== o.value));
+                    setSkillsHard([...skillsHard, o.value]);
+                  } else {
+                    setSkillsHard(skillsHard.filter((s) => s !== o.value));
+                  }
+                };
+                const cls = isHard
+                  ? "border-racing-red bg-racing-red/15 text-racing-red"
+                  : isSoft
+                  ? "border-yellow-500 bg-yellow-500/15 text-yellow-500"
+                  : "border-border hover:bg-secondary";
                 return (
                   <button
                     key={o.value}
                     type="button"
-                    onClick={() => setSkills(checked ? skills.filter((s) => s !== o.value) : [...skills, o.value])}
-                    className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border hover:bg-secondary"}`}
+                    onClick={cycle}
+                    title={isHard ? "HARD — required" : isSoft ? "SOFT — preferred" : "Not selected"}
+                    className={`border px-2 py-1 text-[11px] font-bold transition-colors ${cls}`}
                   >
-                    {skillLabel(o.value)}
+                    {skillLabel(o.value)}{isHard ? " ●" : isSoft ? " ○" : ""}
                   </button>
                 );
               })}

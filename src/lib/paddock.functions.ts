@@ -206,6 +206,8 @@ export const createRequest = createServerFn({ method: "POST" })
         notes: z.string().max(1000).optional().nullable(),
         season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
         skills: z.array(z.string().max(64)).max(50).optional(),
+        skills_hard: z.array(z.string().max(64)).max(50).optional(),
+        travel_required: z.boolean().optional().default(true),
         experience_requirements: z
           .array(
             z.object({
@@ -246,9 +248,11 @@ export const createRequest = createServerFn({ method: "POST" })
       notes: data.notes ?? null,
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
+      skills_hard: data.skills_hard ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
+      travel_required: data.travel_required ?? true,
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);

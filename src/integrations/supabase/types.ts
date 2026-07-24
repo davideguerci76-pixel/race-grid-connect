@@ -461,10 +461,12 @@ export type Database = {
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
+          skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
+          travel_required: boolean
           updated_at: string
         }
         Insert: {
@@ -487,10 +489,12 @@ export type Database = {
           role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
+          skills_hard?: string[]
           start_date: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
+          travel_required?: boolean
           updated_at?: string
         }
         Update: {
@@ -513,10 +517,12 @@ export type Database = {
           role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
+          skills_hard?: string[]
           start_date?: string
           status?: Database["public"]["Enums"]["request_status"]
           team_id?: string
           title?: string
+          travel_required?: boolean
           updated_at?: string
         }
         Relationships: [
@@ -683,10 +689,12 @@ export type Database = {
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
+          skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
+          travel_required: boolean
           updated_at: string
         }
         SetofOptions: {
@@ -760,10 +768,12 @@ export type Database = {
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
+          skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
           team_id: string
           title: string
+          travel_required: boolean
           updated_at: string
         }
         SetofOptions: {
