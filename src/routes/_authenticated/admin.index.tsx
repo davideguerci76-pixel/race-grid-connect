@@ -10,6 +10,7 @@ import {
   adminDeleteUser,
 } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
+import { useSort } from "@/lib/use-sort";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminFreelancers,
