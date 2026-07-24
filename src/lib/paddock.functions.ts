@@ -481,11 +481,28 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name)")
+      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const rows = (data ?? []) as any[];
+    const teamIds = Array.from(new Set(rows.map((r) => r.team_id)));
+    const freelancerIds = Array.from(new Set(rows.map((r) => r.freelancer_id)));
+    const [tpsRes, fpsRes] = await Promise.all([
+      teamIds.length
+        ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
+        : Promise.resolve({ data: [] as any[] } as any),
+      freelancerIds.length
+        ? supabase.from("freelancer_profiles").select("user_id, headline, role, location, day_rate, disciplines, skills, bio, travels").in("user_id", freelancerIds)
+        : Promise.resolve({ data: [] as any[] } as any),
+    ]);
+    const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
+    const fpMap = new Map(((fpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
+    return rows.map((r) => ({
+      ...r,
+      team_profile: tpMap.get(r.team_id) ?? null,
+      freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
+    }));
   });
 
 // ---- Ratings ----
