@@ -65,8 +65,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: z.string().max(140).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
-        phone_dial_code: z.string().trim().regex(/^\+\d{1,4}$/, "Invalid dial code").max(6),
-        phone_number: z.string().trim().min(4, "Phone number is required").max(30).regex(/^[0-9 ()\-./]+$/, "Invalid phone number"),
+        // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
         experiences: z
           .array(
             z.object({
