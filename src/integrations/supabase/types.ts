@@ -450,6 +450,7 @@ export type Database = {
           currency: string
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
           end_date: string
           experience_requirements: Json
           id: string
@@ -478,6 +479,7 @@ export type Database = {
           currency?: string
           discipline: Database["public"]["Enums"]["discipline"]
           duration?: Database["public"]["Enums"]["duration_type"]
+          education?: string[]
           end_date: string
           experience_requirements?: Json
           id?: string
@@ -506,6 +508,7 @@ export type Database = {
           currency?: string
           discipline?: Database["public"]["Enums"]["discipline"]
           duration?: Database["public"]["Enums"]["duration_type"]
+          education?: string[]
           end_date?: string
           experience_requirements?: Json
           id?: string
@@ -678,6 +681,7 @@ export type Database = {
           currency: string
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
           end_date: string
           experience_requirements: Json
           id: string
@@ -757,6 +761,7 @@ export type Database = {
           currency: string
           discipline: Database["public"]["Enums"]["discipline"]
           duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
           end_date: string
           experience_requirements: Json
           id: string
