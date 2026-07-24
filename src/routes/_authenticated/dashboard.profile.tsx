@@ -251,8 +251,10 @@ function FreelancerSection({ profile }: { profile: any }) {
         },
       });
     },
-    onSuccess: (saved) => {
-      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, freelancerProfile: saved } : old));
+    onSuccess: (saved: any) => {
+      // The server upsert returns non-phone columns only; merge back the values just submitted so the UI doesn't blank the phone until the next refetch.
+      const merged = saved ? { ...saved, phone_dial_code: form.phone_dial_code, phone_number: form.phone_number } : saved;
+      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, freelancerProfile: merged } : old));
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       toast.success("Freelancer profile saved");
       setEditing(false);
