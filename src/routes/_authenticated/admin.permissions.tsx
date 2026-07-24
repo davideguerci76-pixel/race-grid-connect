@@ -28,6 +28,8 @@ function AdminPermissions() {
     return all.filter((r: any) => [r.display_name, r.email].filter(Boolean).some((v: string) => String(v).toLowerCase().includes(s)));
   }, [all, q]);
 
+  const { sorted, toggle, indicator } = useSort<any>(rows);
+
   async function onToggle(user_id: string, isAdmin: boolean, name: string) {
     if (!confirm(isAdmin ? `Revoke admin from ${name}?` : `Grant admin to ${name}?`)) return;
     try {
