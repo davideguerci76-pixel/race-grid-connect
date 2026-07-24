@@ -558,3 +558,123 @@ export const getFreelancerRatings = createServerFn({ method: "GET" })
     const avg = rows && rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
     return { ratings: rows ?? [], average: Math.round(avg * 10) / 10, count: rows?.length ?? 0 };
   });
+
+// ---- Team match view per request (v2 scoring + token unlocks) ----
+export const getRequestMatches = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string; page?: number }) =>
+    z.object({ request_id: z.string().uuid(), page: z.number().int().min(1).max(200).optional() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const page = data.page ?? 1;
+    const pageSize = 10;
+
+    const { data: req, error: reqErr } = await supabase
+      .from("requests")
+      .select("*")
+      .eq("id", data.request_id)
+      .maybeSingle();
+    if (reqErr) throw new Error(reqErr.message);
+    if (!req) throw new Error("Request not found");
+    if (req.team_id !== userId) throw new Error("Not owner of this request");
+
+    const { data: allMatches, error: mErr } = await supabase
+      .from("matches")
+      .select("*")
+      .eq("request_id", data.request_id)
+      .order("match_score", { ascending: false })
+      .order("created_at", { ascending: true });
+    if (mErr) throw new Error(mErr.message);
+
+    const rows = allMatches ?? [];
+    const total = rows.length;
+    const topThreeIds = new Set(rows.slice(0, 3).map((m: any) => m.id));
+
+    const start = (page - 1) * pageSize;
+    const pageRows = rows.slice(start, start + pageSize);
+
+    const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
+    const [{ data: fps }, { data: profs }, { data: unlocks }] = await Promise.all([
+      supabase.from("freelancer_profiles").select("*").in("user_id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
+      supabase.from("profiles").select("id, display_name, avatar_url").in("id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
+      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"]),
+    ]);
+    const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
+    const profMap = new Map((profs ?? []).map((r: any) => [r.id, r]));
+    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+
+    // Fetch emails/phones only for unlocked candidates
+    const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
+    const emailMap = new Map<string, string | null>();
+    const phoneMap = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
+    if (unlockedIds.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: contacts } = await supabaseAdmin
+          .from("freelancer_contacts")
+          .select("user_id, phone_dial_code, phone_number")
+          .in("user_id", unlockedIds);
+        (contacts ?? []).forEach((c: any) => phoneMap.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number }));
+        await Promise.all(unlockedIds.map(async (uid) => {
+          const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
+          emailMap.set(uid, data?.user?.email ?? null);
+        }));
+      } catch {
+        // ignore
+      }
+    }
+
+    const items = pageRows.map((m: any) => {
+      const unlocked = unlockMap.has(m.id) || topThreeIds.has(m.id);
+      const wasFree = unlockMap.get(m.id)?.free_preview ?? topThreeIds.has(m.id);
+      const prof = profMap.get(m.freelancer_id);
+      const fp = fpMap.get(m.freelancer_id);
+      return {
+        match_id: m.id,
+        match_score: Number(m.match_score ?? 0),
+        is_perfect: m.is_perfect,
+        overlap_days: m.overlap_days,
+        missing_criteria: m.missing_criteria ?? [],
+        unlocked,
+        free_preview: wasFree,
+        freelancer_id: m.freelancer_id,
+        profile: unlocked
+          ? {
+              display_name: prof?.display_name ?? "Freelancer",
+              avatar_url: prof?.avatar_url ?? null,
+              headline: fp?.headline ?? null,
+              role: fp?.role ?? null,
+              disciplines: fp?.disciplines ?? [],
+              skills: fp?.skills ?? [],
+              location: fp?.location ?? null,
+              day_rate: fp?.day_rate ?? null,
+              bio: fp?.bio ?? null,
+              travels: fp?.travels ?? false,
+              education: fp?.education ?? null,
+              experiences: fp?.experiences ?? [],
+              languages: fp?.languages ?? [],
+              contact_email: emailMap.get(m.freelancer_id) ?? null,
+              phone_dial_code: phoneMap.get(m.freelancer_id)?.phone_dial_code ?? null,
+              phone_number: phoneMap.get(m.freelancer_id)?.phone_number ?? null,
+            }
+          : null,
+      };
+    });
+
+    return {
+      request: req,
+      items,
+      pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
+    };
+  });
+
+export const unlockMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { match_id: string }) => z.object({ match_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: balance, error } = await context.supabase.rpc("unlock_match_for_team", { _match_id: data.match_id });
+    if (error) throw new Error(error.message);
+    return { balance: balance as number };
+  });
+
