@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bell } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -9,6 +9,8 @@ import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
 import { useQuery } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
+import { getUnreadNotificationCount } from "@/lib/paddock.functions";
+
 
 export function SiteHeader() {
   const { t } = useTranslation();
@@ -35,6 +37,15 @@ export function SiteHeader() {
     enabled: !!user,
     queryFn: async () => (await checkAdmin()).isAdmin,
   });
+
+  const getUnread = useServerFn(getUnreadNotificationCount);
+  const { data: unread } = useQuery({
+    queryKey: ["unread-notifications", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await getUnread()).count,
+    refetchInterval: 30000,
+  });
+
 
   async function handleSignOut() {
     setOpen(false);
@@ -81,6 +92,18 @@ export function SiteHeader() {
           {user ? (
             <>
               <TokenBadge balance={profile?.token_balance ?? 0} />
+              <Link
+                to="/dashboard/engagements"
+                aria-label="Notifications"
+                className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
+              >
+                <Bell className="size-4" />
+                {(unread ?? 0) > 0 && (
+                  <span className="absolute -right-1 -top-1 grid min-h-[18px] min-w-[18px] place-items-center rounded-full bg-racing-red px-1 font-mono text-[10px] font-black text-white">
+                    {unread}
+                  </span>
+                )}
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors hover:bg-secondary"
@@ -88,6 +111,7 @@ export function SiteHeader() {
                 <span suppressHydrationWarning>{t("nav.signout")}</span>
               </button>
             </>
+
           ) : (
             <>
               <Link to="/auth" search={{ mode: "signin" as const }} className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors hover:bg-secondary">
@@ -103,6 +127,20 @@ export function SiteHeader() {
         {/* Mobile/tablet: token badge + hamburger */}
         <div className="flex items-center gap-2 lg:hidden">
           {user && <TokenBadge balance={profile?.token_balance ?? 0} />}
+          {user && (
+            <Link
+              to="/dashboard/engagements"
+              aria-label="Notifications"
+              className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
+            >
+              <Bell className="size-4" />
+              {(unread ?? 0) > 0 && (
+                <span className="absolute -right-1 -top-1 grid min-h-[18px] min-w-[18px] place-items-center rounded-full bg-racing-red px-1 font-mono text-[10px] font-black text-white">
+                  {unread}
+                </span>
+              )}
+            </Link>
+          )}
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
@@ -112,6 +150,7 @@ export function SiteHeader() {
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
+
       </div>
 
       {/* Mobile/tablet dropdown */}

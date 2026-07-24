@@ -218,6 +218,20 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               </>
             )}
           </div>
+          <div className="md:col-span-2 border-t border-border pt-4">
+            <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {match.missing_criteria.length === 0 ? "Criteria" : "Missing / partial criteria"}</div>
+            {match.missing_criteria.length === 0 ? (
+              <div className="font-mono text-[11px] text-racing-yellow">All soft criteria satisfied — 100% match</div>
+            ) : (
+              <div className="flex flex-wrap gap-1">
+                {match.missing_criteria.map((c: any, i: number) => (
+                  <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
+                    {formatCriterion(c)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="mt-4 border-t border-border pt-4">
@@ -238,6 +252,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           </div>
         </div>
       )}
+
     </div>
   );
 }
