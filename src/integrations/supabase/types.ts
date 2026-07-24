@@ -458,6 +458,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           start_date: string
@@ -483,6 +484,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
           start_date: string
@@ -508,6 +510,7 @@ export type Database = {
           location?: string | null
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
+          role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
           start_date?: string
@@ -677,6 +680,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           start_date: string
@@ -753,6 +757,7 @@ export type Database = {
           location: string | null
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
+          role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           start_date: string
