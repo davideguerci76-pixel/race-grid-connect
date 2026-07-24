@@ -691,6 +691,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_freelancer_phone: {
+        Args: never
+        Returns: {
+          phone_dial_code: string
+          phone_number: string
+        }[]
+      }
       my_token_balance: { Args: never; Returns: number }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
