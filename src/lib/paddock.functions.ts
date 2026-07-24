@@ -354,6 +354,19 @@ export const getMyMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // Fetch pending "proposed" engagements addressed to the current user
+    const matchIds = rawMatches.map((m: any) => m.id);
+    const pendingByMatchId = new Map<string, string>();
+    if (matchIds.length) {
+      const { data: eng } = await supabase
+        .from("engagements")
+        .select("id, match_id, status, proposed_by")
+        .in("match_id", matchIds)
+        .eq("status", "proposed")
+        .neq("proposed_by", userId);
+      (eng ?? []).forEach((e: any) => { if (e.match_id) pendingByMatchId.set(e.match_id, e.id); });
+    }
+
     const redacted = rawMatches.map((m: any) => {
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
       let counterparty: any = null;
@@ -388,7 +401,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
         if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
         if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe, counterparty };
+      return { ...m, revealedByMe, counterparty, pending_engagement_id: pendingByMatchId.get(m.id) ?? null };
     });
 
     return {
