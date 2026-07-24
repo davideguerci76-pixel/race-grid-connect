@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingStars } from "@/components/rating-stars";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRating } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRating, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
@@ -22,8 +22,13 @@ function EngagementsPage() {
   const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
   const rateFn = useServerFn(submitRating);
+  const markRead = useServerFn(markAllNotificationsRead);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
+
+  useEffect(() => {
+    markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
+  }, [markRead, qc]);
   const [ratingFor, setRatingFor] = useState<string | null>(null);
   const [stars, setStars] = useState(5);
   const [comment, setComment] = useState("");
