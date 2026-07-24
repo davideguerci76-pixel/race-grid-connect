@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bell } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -9,6 +9,8 @@ import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
 import { useQuery } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
+import { getUnreadNotificationCount } from "@/lib/paddock.functions";
+
 
 export function SiteHeader() {
   const { t } = useTranslation();
