@@ -69,6 +69,41 @@ function RequestMatchesPage() {
               </p>
             </div>
 
+            {data.hired && (
+              <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
+                <div className="label-mono text-racing-yellow">[HIRED FREELANCER]</div>
+                <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
+                      {data.hired.display_name?.slice(0, 2) ?? "?"}
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black italic tracking-tighter">{data.hired.display_name}</div>
+                      {data.hired.headline && <div className="text-sm text-muted-foreground">{data.hired.headline}</div>}
+                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
+                        {data.hired.role && <>{roleLabel(data.hired.role)}</>}
+                        {data.hired.location && <> · 📍 {data.hired.location}</>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="min-w-[240px] space-y-1 font-mono text-xs">
+                    <div className="label-mono">[CONTACT]</div>
+                    {data.hired.contact_email ? (
+                      <a href={`mailto:${data.hired.contact_email}`} className="flex items-center gap-2 text-racing-red hover:underline">
+                        <Mail className="size-3" /> {data.hired.contact_email}
+                      </a>
+                    ) : <div className="text-muted-foreground">No email on file</div>}
+                    {data.hired.phone_number ? (
+                      <a href={`tel:${(data.hired.phone_dial_code ?? "")}${data.hired.phone_number}`} className="flex items-center gap-2 text-racing-red hover:underline">
+                        <Phone className="size-3" /> {data.hired.phone_dial_code} {data.hired.phone_number}
+                      </a>
+                    ) : <div className="text-muted-foreground">No phone on file</div>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+
             <div className="mt-6 flex items-center justify-between">
               <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                 {data.pagination.total} candidate{data.pagination.total === 1 ? "" : "s"}
@@ -104,9 +139,10 @@ function RequestMatchesPage() {
                 <MatchCard
                   key={m.match_id}
                   match={m}
-                  requestFilled={data.request.status === "filled"}
+                  requestFilled={data.request.status === "filled" || data.request.status === "completed"}
                   onUnlock={() => unlockMut.mutate(m.match_id)}
                   onConfirm={() => {
+
                     if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) {
                       confirmMut.mutate(m.match_id);
                     }

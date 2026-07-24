@@ -169,7 +169,8 @@ function StatusBadge({ status }: { status: string }) {
     active: "bg-racing-red/15 text-racing-red border-racing-red",
     paused: "bg-yellow-500/10 text-yellow-500 border-yellow-500",
     closed: "bg-muted text-muted-foreground border-border",
-    completed: "bg-green-500/10 text-green-500 border-green-500",
+    completed: "bg-racing-yellow/10 text-racing-yellow border-racing-yellow",
+    filled: "bg-racing-yellow/10 text-racing-yellow border-racing-yellow",
   };
   return (
     <span className={`border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${styles[status] ?? ""}`}>
@@ -177,3 +178,4 @@ function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+

@@ -697,12 +697,60 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       };
     });
 
+    // If request has been completed/filled, surface the confirmed freelancer's contacts
+    let hired: any = null;
+    if (req.status === "completed" || req.status === "filled") {
+      const { data: eng } = await supabase
+        .from("engagements")
+        .select("*")
+        .eq("request_id", data.request_id)
+        .eq("status", "confirmed")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (eng) {
+        const fid = (eng as any).freelancer_id as string;
+        const [{ data: hProf }, { data: hFp }] = await Promise.all([
+          supabase.from("profiles").select("id, display_name, avatar_url").eq("id", fid).maybeSingle(),
+          supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle(),
+        ]);
+        let hEmail: string | null = null;
+        let hPhone: { phone_dial_code: string | null; phone_number: string | null } = { phone_dial_code: null, phone_number: null };
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: c } = await supabaseAdmin.from("freelancer_contacts").select("phone_dial_code, phone_number").eq("user_id", fid).maybeSingle();
+          if (c) hPhone = { phone_dial_code: (c as any).phone_dial_code, phone_number: (c as any).phone_number };
+          const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
+          hEmail = u?.user?.email ?? null;
+        } catch { /* ignore */ }
+        hired = {
+          freelancer_id: fid,
+          engagement_id: (eng as any).id,
+          confirmed_at: (eng as any).updated_at,
+          display_name: hProf?.display_name ?? "Freelancer",
+          avatar_url: hProf?.avatar_url ?? null,
+          headline: (hFp as any)?.headline ?? null,
+          role: (hFp as any)?.role ?? null,
+          location: (hFp as any)?.location ?? null,
+          day_rate: (hFp as any)?.day_rate ?? null,
+          bio: (hFp as any)?.bio ?? null,
+          disciplines: (hFp as any)?.disciplines ?? [],
+          skills: (hFp as any)?.skills ?? [],
+          contact_email: hEmail,
+          phone_dial_code: hPhone.phone_dial_code,
+          phone_number: hPhone.phone_number,
+        };
+      }
+    }
+
     return {
       request: req,
       items,
+      hired,
       pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
     };
   });
+
 
 export const unlockMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
