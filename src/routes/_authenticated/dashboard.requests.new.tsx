@@ -312,7 +312,7 @@ function NewRequestPage() {
                 Click every day you need the specialist on the ground across the season. Matches are computed against these exact days.
               </p>
               <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
-              <div className="mt-3">
+              <div className={`mt-3 ${identical ? "pointer-events-none opacity-70" : ""}`}>
                 <AvailabilityCalendar
                   selected={seasonDates}
                   onSelect={(d) => setSeasonDates(d ?? [])}
