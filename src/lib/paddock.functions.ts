@@ -683,3 +683,29 @@ export const unlockMatch = createServerFn({ method: "POST" })
     return { balance: balance as number };
   });
 
+// ---- Notifications ----
+export const getUnreadNotificationCount = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { count, error } = await context.supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", context.userId)
+      .is("read_at", null);
+    if (error) throw new Error(error.message);
+    return { count: count ?? 0 };
+  });
+
+export const markAllNotificationsRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { error } = await context.supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("user_id", context.userId)
+      .is("read_at", null);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+
