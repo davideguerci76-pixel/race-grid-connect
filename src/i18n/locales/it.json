@@ -309,5 +309,11 @@
     "advanced": "Avanzato",
     "fluent": "Fluente",
     "native": "Madrelingua"
+  },
+  "phone": {
+    "label": "Telefono",
+    "invalid": "Inserire un numero di telefono valido",
+    "save": "Salva telefono",
+    "edit": "Modifica telefono"
   }
 }
