@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 
 const search = z.object({ from: fallback(z.string().optional(), undefined) });
 
@@ -80,6 +80,7 @@ function NewRequestPage() {
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [skillsHard, setSkillsHard] = useState<string[]>([]);
+  const [education, setEducation] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
 
@@ -130,6 +131,7 @@ function NewRequestPage() {
           travel_required: travelRequired,
           skills,
           skills_hard: skillsHard,
+          education,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
             code: l.code,
@@ -340,6 +342,31 @@ function NewRequestPage() {
               })}
             </div>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="label-mono">
+              Preferred education <span className="text-racing-red">({education.length})</span>
+            </label>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Soft preference only — freelancers with other education levels can still match. Click to toggle.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {EDUCATION_OPTIONS.map((o) => {
+                const checked = education.includes(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setEducation(checked ? education.filter((s) => s !== o.value) : [...education, o.value])}
+                    className={`border px-2 py-1 text-[11px] transition-colors ${checked ? "border-yellow-500 bg-yellow-500/15 text-yellow-500" : "border-border hover:bg-secondary"}`}
+                  >
+                    {educationLabel(o.value)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           <div className="md:col-span-2">
             <label className="label-mono">

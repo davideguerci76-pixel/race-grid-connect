@@ -207,6 +207,7 @@ export const createRequest = createServerFn({ method: "POST" })
         season_dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400).optional(),
         skills: z.array(z.string().max(64)).max(50).optional(),
         skills_hard: z.array(z.string().max(64)).max(50).optional(),
+        education: z.array(z.string().max(64)).max(20).optional(),
         travel_required: z.boolean().optional().default(true),
         experience_requirements: z
           .array(
@@ -249,6 +250,7 @@ export const createRequest = createServerFn({ method: "POST" })
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
       skills_hard: data.skills_hard ?? [],
+      education: data.education ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
