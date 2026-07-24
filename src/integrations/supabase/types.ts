@@ -760,6 +760,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_match_confirmation: {
+        Args: { _engagement_id: string }
+        Returns: {
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          id: string
+          match_id: string | null
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_id: string
+          team_marked_complete: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -826,6 +853,33 @@ export type Database = {
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
+      }
+      request_match_confirmation: {
+        Args: { _match_id: string }
+        Returns: {
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          id: string
+          match_id: string | null
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_id: string
+          team_marked_complete: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       reveal_match: {
         Args: { _match_id: string }
@@ -979,7 +1033,7 @@ export type Database = {
         | "engagement_completed"
         | "rating_received"
         | "tokens_credited"
-      request_status: "active" | "paused" | "closed" | "completed"
+      request_status: "active" | "paused" | "closed" | "completed" | "filled"
       token_reason:
         | "signup_bonus"
         | "purchase"
@@ -1218,7 +1272,7 @@ export const Constants = {
         "rating_received",
         "tokens_credited",
       ],
-      request_status: ["active", "paused", "closed", "completed"],
+      request_status: ["active", "paused", "closed", "completed", "filled"],
       token_reason: [
         "signup_bonus",
         "purchase",
