@@ -595,7 +595,7 @@ function ExperienceEditor({
       </p>
       <div className="mt-2 space-y-2">
         {value.map((e, i) => (
-          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_140px_auto]">
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_140px_auto]">
             <select
               value={e.discipline}
               onChange={(ev) => update(i, { discipline: ev.target.value })}
