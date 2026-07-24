@@ -236,6 +236,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           location: form.location || null,
           bio: form.bio || null,
           travels: form.travels,
+          phone_dial_code: form.phone_dial_code,
+          phone_number: form.phone_number,
           experiences: form.experiences,
           languages: form.languages.map((l) => ({
             code: l.code,
