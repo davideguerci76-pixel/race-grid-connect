@@ -230,11 +230,59 @@ export type Database = {
           },
         ]
       }
+      match_unlocks: {
+        Row: {
+          free_preview: boolean
+          freelancer_id: string
+          id: string
+          match_id: string
+          request_id: string
+          team_id: string
+          unlocked_at: string
+        }
+        Insert: {
+          free_preview?: boolean
+          freelancer_id: string
+          id?: string
+          match_id: string
+          request_id: string
+          team_id: string
+          unlocked_at?: string
+        }
+        Update: {
+          free_preview?: boolean
+          freelancer_id?: string
+          id?: string
+          match_id?: string
+          request_id?: string
+          team_id?: string
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_unlocks_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_unlocks_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string
           freelancer_id: string
           id: string
+          is_perfect: boolean
+          match_score: number
+          missing_criteria: Json
           overlap_days: number
           request_id: string
           revealed_by_freelancer: boolean
@@ -246,6 +294,9 @@ export type Database = {
           created_at?: string
           freelancer_id: string
           id?: string
+          is_perfect?: boolean
+          match_score?: number
+          missing_criteria?: Json
           overlap_days?: number
           request_id: string
           revealed_by_freelancer?: boolean
@@ -257,6 +308,9 @@ export type Database = {
           created_at?: string
           freelancer_id?: string
           id?: string
+          is_perfect?: boolean
+          match_score?: number
+          missing_criteria?: Json
           overlap_days?: number
           request_id?: string
           revealed_by_freelancer?: boolean
@@ -287,6 +341,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      matching_weights: {
+        Row: {
+          day_rate_weight: number
+          disciplines_weight: number
+          education_weight: number
+          id: boolean
+          languages_weight: number
+          location_weight: number
+          role_weight: number
+          skills_weight: number
+          updated_at: string
+        }
+        Insert: {
+          day_rate_weight?: number
+          disciplines_weight?: number
+          education_weight?: number
+          id?: boolean
+          languages_weight?: number
+          location_weight?: number
+          role_weight?: number
+          skills_weight?: number
+          updated_at?: string
+        }
+        Update: {
+          day_rate_weight?: number
+          disciplines_weight?: number
+          education_weight?: number
+          id?: boolean
+          languages_weight?: number
+          location_weight?: number
+          role_weight?: number
+          skills_weight?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -788,6 +878,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      unlock_match_for_team: { Args: { _match_id: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
