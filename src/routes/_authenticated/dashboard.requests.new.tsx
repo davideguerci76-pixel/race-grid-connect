@@ -40,7 +40,9 @@ function NewRequestPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { from } = Route.useSearch();
+  const { from, mode } = Route.useSearch();
+  const identical = mode === "identical" && !!from;
+
 
   const { data: profile } = useQuery({
     queryKey: ["request-profile", user?.id],
