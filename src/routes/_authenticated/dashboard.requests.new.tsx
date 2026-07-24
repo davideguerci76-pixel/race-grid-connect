@@ -76,8 +76,10 @@ function NewRequestPage() {
     notes: "",
   });
   const [roleHard, setRoleHard] = useState(true);
+  const [travelRequired, setTravelRequired] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [skillsHard, setSkillsHard] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
 
