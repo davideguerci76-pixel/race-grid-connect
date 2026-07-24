@@ -206,6 +206,11 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         </>
       )}
 
+      <div className="text-sm">
+        <span className="text-muted-foreground">Tokens:</span>
+        <span className="ml-2 font-mono text-racing-red font-bold">{profile?.token_balance ?? 0}</span>
+      </div>
+
       {isFreelancer && (
         <div className="border-t border-border pt-3">
           {editingPhone ? (
