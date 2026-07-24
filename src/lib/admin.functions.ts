@@ -38,16 +38,20 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     const ids = (profiles ?? []).map((p) => p.id);
-    const [{ data: fps }, { data: roles }] = await Promise.all([
+    const [{ data: fps }, { data: roles }, { data: contacts }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select("*").in("user_id", ids),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids),
+      supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", ids),
     ]);
     const emails: Record<string, string> = {};
     for (const id of ids) {
       const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
       if (u?.user?.email) emails[id] = u.user.email;
     }
-    const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
+    const contactMap = new Map((contacts ?? []).map((c: any) => [c.user_id, c]));
+    const fpMap = new Map(
+      (fps ?? []).map((r: any) => [r.user_id, { ...r, phone_dial_code: contactMap.get(r.user_id)?.phone_dial_code ?? null, phone_number: contactMap.get(r.user_id)?.phone_number ?? null }]),
+    );
     const roleMap = new Map<string, string[]>();
     for (const r of roles ?? []) {
       const arr = roleMap.get((r as any).user_id) ?? [];

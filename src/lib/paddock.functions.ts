@@ -110,14 +110,20 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: data.location || null,
         bio: data.bio || null,
         travels: data.travels,
-        phone_dial_code: data.phone_dial_code,
-        phone_number: data.phone_number,
         experiences: data.experiences ?? [],
         languages: data.languages ?? [],
       } as never,
       { onConflict: "user_id" },
     ).select("*").single();
     if (error) throw new Error(error.message);
+
+    // Phone lives in the owner-only freelancer_contacts table (kept out of the broadly readable profile row).
+    const { error: contactError } = await context.supabase.from("freelancer_contacts").upsert(
+      { user_id: context.userId, phone_dial_code: data.phone_dial_code, phone_number: data.phone_number } as never,
+      { onConflict: "user_id" },
+    );
+    if (contactError) throw new Error(contactError.message);
+
     return row;
   });
 
