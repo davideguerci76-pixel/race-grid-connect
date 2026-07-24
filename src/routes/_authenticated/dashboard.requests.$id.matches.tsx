@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, Star, ArrowLeft } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
@@ -33,6 +33,17 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Unlock failed"),
+  });
+
+  const confirmFn = useServerFn(requestMatchConfirmation);
+  const confirmMut = useMutation({
+    mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
+    onSuccess: () => {
+      toast.success("Confirmation request sent to freelancer");
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   return (
@@ -90,7 +101,18 @@ function RequestMatchesPage() {
                 </div>
               )}
               {data.items.map((m) => (
-                <MatchCard key={m.match_id} match={m} onUnlock={() => unlockMut.mutate(m.match_id)} loading={unlockMut.isPending} />
+                <MatchCard
+                  key={m.match_id}
+                  match={m}
+                  requestFilled={data.request.status === "filled"}
+                  onUnlock={() => unlockMut.mutate(m.match_id)}
+                  onConfirm={() => {
+                    if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) {
+                      confirmMut.mutate(m.match_id);
+                    }
+                  }}
+                  loading={unlockMut.isPending || confirmMut.isPending}
+                />
               ))}
             </div>
           </>
@@ -101,7 +123,7 @@ function RequestMatchesPage() {
   );
 }
 
-function MatchCard({ match, onUnlock, loading }: { match: any; onUnlock: () => void; loading: boolean }) {
+function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean }) {
   const pct = Math.round(match.match_score);
   const perfect = match.is_perfect;
 
@@ -120,15 +142,31 @@ function MatchCard({ match, onUnlock, loading }: { match: any; onUnlock: () => v
             </div>
           </div>
         </div>
-        {!match.unlocked && (
-          <button
-            onClick={onUnlock}
-            disabled={loading}
-            className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-          >
-            <Unlock className="size-3" /> Unlock profile (1 token)
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {!match.unlocked && (
+            <button
+              onClick={onUnlock}
+              disabled={loading}
+              className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+            >
+              <Unlock className="size-3" /> Unlock profile (1 token)
+            </button>
+          )}
+          {match.unlocked && !requestFilled && (
+            <button
+              onClick={onConfirm}
+              disabled={loading}
+              className="flex items-center gap-2 bg-racing-yellow px-4 py-2 text-xs font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
+            >
+              Request confirmation
+            </button>
+          )}
+          {requestFilled && (
+            <span className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+              Request filled
+            </span>
+          )}
+        </div>
       </div>
 
       {match.unlocked && match.profile ? (

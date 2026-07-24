@@ -444,12 +444,17 @@ export const confirmEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await context.supabase
-      .from("engagements")
-      .update({ status: "confirmed" })
-      .eq("id", data.id)
-      .select()
-      .single();
+    // Uses the accept RPC which also fills the request and auto-unlocks contacts
+    const { data: row, error } = await context.supabase.rpc("accept_match_confirmation", { _engagement_id: data.id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const requestMatchConfirmation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { match_id: string }) => z.object({ match_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("request_match_confirmation", { _match_id: data.match_id });
     if (error) throw new Error(error.message);
     return row;
   });
