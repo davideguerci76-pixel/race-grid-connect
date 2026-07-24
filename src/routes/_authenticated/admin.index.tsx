@@ -103,6 +103,7 @@ function AdminFreelancers() {
               Languages: (r.freelancer?.languages ?? []).map((l: any) => `${l.code === "other" ? (l.custom || "Other") : l.code}(${l.level})`).join(", "),
               Education: r.freelancer?.education ?? "",
               Location: r.freelancer?.location ?? "",
+              Phone: r.freelancer?.phone_number ? `${r.freelancer?.phone_dial_code ?? ""} ${r.freelancer?.phone_number}`.trim() : "",
               DayRate: r.freelancer?.day_rate ?? "",
               Tokens: r.token_balance,
               Status: r.blocked_at ? "Blocked" : "Active",
