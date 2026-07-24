@@ -131,6 +131,7 @@ function NewRequestPage() {
           travel_required: travelRequired,
           skills,
           skills_hard: skillsHard,
+          education,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
             code: l.code,
