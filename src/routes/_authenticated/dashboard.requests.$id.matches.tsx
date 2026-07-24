@@ -123,7 +123,7 @@ function RequestMatchesPage() {
   );
 }
 
-function MatchCard({ match, onUnlock, loading }: { match: any; onUnlock: () => void; loading: boolean }) {
+function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean }) {
   const pct = Math.round(match.match_score);
   const perfect = match.is_perfect;
 
@@ -142,15 +142,31 @@ function MatchCard({ match, onUnlock, loading }: { match: any; onUnlock: () => v
             </div>
           </div>
         </div>
-        {!match.unlocked && (
-          <button
-            onClick={onUnlock}
-            disabled={loading}
-            className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-          >
-            <Unlock className="size-3" /> Unlock profile (1 token)
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {!match.unlocked && (
+            <button
+              onClick={onUnlock}
+              disabled={loading}
+              className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+            >
+              <Unlock className="size-3" /> Unlock profile (1 token)
+            </button>
+          )}
+          {match.unlocked && !requestFilled && (
+            <button
+              onClick={onConfirm}
+              disabled={loading}
+              className="flex items-center gap-2 bg-racing-yellow px-4 py-2 text-xs font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
+            >
+              Request confirmation
+            </button>
+          )}
+          {requestFilled && (
+            <span className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+              Request filled
+            </span>
+          )}
+        </div>
       </div>
 
       {match.unlocked && match.profile ? (
