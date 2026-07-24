@@ -127,6 +127,20 @@ export function SiteHeader() {
         {/* Mobile/tablet: token badge + hamburger */}
         <div className="flex items-center gap-2 lg:hidden">
           {user && <TokenBadge balance={profile?.token_balance ?? 0} />}
+          {user && (
+            <Link
+              to="/dashboard/engagements"
+              aria-label="Notifications"
+              className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
+            >
+              <Bell className="size-4" />
+              {(unread ?? 0) > 0 && (
+                <span className="absolute -right-1 -top-1 grid min-h-[18px] min-w-[18px] place-items-center rounded-full bg-racing-red px-1 font-mono text-[10px] font-black text-white">
+                  {unread}
+                </span>
+              )}
+            </Link>
+          )}
           <button
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
@@ -136,6 +150,7 @@ export function SiteHeader() {
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
+
       </div>
 
       {/* Mobile/tablet dropdown */}
