@@ -105,19 +105,19 @@ function AdminTeams() {
           <table className="w-full min-w-[1100px] text-xs">
             <thead className="bg-secondary text-[10px] font-bold uppercase tracking-widest">
               <tr>
-                <th className="px-2 py-2 text-left">Team</th>
-                <th className="px-2 py-2 text-left">Contact</th>
-                <th className="px-2 py-2 text-left">Email</th>
-                <th className="px-2 py-2 text-left">Discipline</th>
-                <th className="px-2 py-2 text-left">Location</th>
-                <th className="px-2 py-2 text-left">Website</th>
-                <th className="px-2 py-2 text-right">Tokens</th>
-                <th className="px-2 py-2 text-left">Status</th>
+                <Th onClick={() => toggle("team.team_name")} label={`Team${indicator("team.team_name")}`} />
+                <Th onClick={() => toggle("display_name")} label={`Contact${indicator("display_name")}`} />
+                <Th onClick={() => toggle("email")} label={`Email${indicator("email")}`} />
+                <Th onClick={() => toggle("team.primary_discipline")} label={`Discipline${indicator("team.primary_discipline")}`} />
+                <Th onClick={() => toggle("team.location")} label={`Location${indicator("team.location")}`} />
+                <Th onClick={() => toggle("team.website")} label={`Website${indicator("team.website")}`} />
+                <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
+                <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r: any) => (
+              {sorted.map((r: any) => (
                 <tr key={r.id} className="border-t border-border/60 hover:bg-secondary/40">
                   <td className="px-2 py-2 font-bold">{r.team?.team_name ?? r.display_name}</td>
                   <td className="px-2 py-2">{r.display_name}</td>
