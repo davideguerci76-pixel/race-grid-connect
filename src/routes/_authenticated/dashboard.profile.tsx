@@ -289,6 +289,26 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
         </div>
         <div>
+          <label className="text-xs text-muted-foreground">Phone (required)</label>
+          <div className="mt-1 flex gap-2">
+            <select
+              value={form.phone_dial_code}
+              onChange={(e) => setForm({ ...form, phone_dial_code: e.target.value })}
+              className="w-32 min-w-0 border border-border bg-background px-2 py-2 text-sm"
+            >
+              {DIAL_CODES.map((d) => (<option key={d.code} value={d.code}>{d.label}</option>))}
+            </select>
+            <input
+              type="tel"
+              value={form.phone_number}
+              onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+              className="flex-1 min-w-0 border border-border bg-background px-3 py-2 text-sm"
+              placeholder="333 123 4567"
+              required
+            />
+          </div>
+        </div>
+        <div>
           <label className="text-xs text-muted-foreground">Bio</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
