@@ -540,6 +540,10 @@ function NewRequestPage() {
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
 
+          </fieldset>
+
+
+
           <button
             type="submit"
             disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
