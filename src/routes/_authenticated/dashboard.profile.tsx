@@ -95,15 +95,30 @@ function ProfilePage() {
 }
 
 function PersonalInfoSection({ profile }: { profile: any }) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { user } = useAuth();
   const saveDisplayName = useServerFn(updateMyDisplayName);
+  const savePhone = useServerFn(updateMyPhone);
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneDial, setPhoneDial] = useState("+39");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const isFreelancer = profile?.user_type === "freelancer";
+  const fp = profile?.freelancerProfile;
 
   useEffect(() => {
     if (!editing && profile) setDisplayName(profile.display_name ?? "");
   }, [profile, editing]);
+
+  useEffect(() => {
+    if (!editingPhone) {
+      setPhoneDial(fp?.phone_dial_code ?? "+39");
+      setPhoneNumber(fp?.phone_number ?? "");
+    }
+  }, [fp, editingPhone]);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -121,6 +136,30 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       setEditing(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const phoneMutation = useMutation({
+    mutationFn: async () => {
+      // Client-side validation with a localized message — mirrors the server-side zod check.
+      const dialOk = /^\+\d{1,4}$/.test(phoneDial.trim());
+      const numTrim = phoneNumber.trim();
+      const numOk = numTrim.length >= 4 && numTrim.length <= 30 && /^[0-9 ()\-./]+$/.test(numTrim);
+      if (!dialOk || !numOk) throw new Error(t("phone.invalid"));
+      return savePhone({ data: { phone_dial_code: phoneDial.trim(), phone_number: numTrim } });
+    },
+    onSuccess: () => {
+      qc.setQueryData(["profile-detail", user?.id], (old: any) =>
+        old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), phone_dial_code: phoneDial.trim(), phone_number: phoneNumber.trim() } } : old,
+      );
+      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      toast.success(t("phone.save"));
+      setEditingPhone(false);
+    },
+    onError: (e) => {
+      // Server-side zod failures come through with the "INVALID_PHONE" sentinel — always show the localized copy.
+      const raw = e instanceof Error ? e.message : "";
+      toast.error(raw && !raw.includes("INVALID_PHONE") && !raw.includes("Phone number") && !raw.includes("Invalid") ? raw : t("phone.invalid"));
+    },
   });
 
   return (
@@ -166,10 +205,50 @@ function PersonalInfoSection({ profile }: { profile: any }) {
           </button>
         </>
       )}
-      <div className="text-sm">
-        <span className="text-muted-foreground">Tokens:</span>
-        <span className="ml-2 font-mono text-racing-red font-bold">{profile?.token_balance ?? 0}</span>
-      </div>
+
+      {isFreelancer && (
+        <div className="border-t border-border pt-3">
+          {editingPhone ? (
+            <>
+              <label className="text-xs text-muted-foreground">{t("phone.label")}</label>
+              <div className="mt-1 flex gap-2">
+                <select
+                  value={phoneDial}
+                  onChange={(e) => setPhoneDial(e.target.value)}
+                  className="w-32 min-w-0 border border-border bg-background px-2 py-2 text-sm"
+                >
+                  {DIAL_CODES.map((d) => (<option key={d.code} value={d.code}>{d.label}</option>))}
+                </select>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="flex-1 min-w-0 border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="333 123 4567"
+                />
+              </div>
+              <div className="mt-2 flex gap-2">
+                <button onClick={() => phoneMutation.mutate()} disabled={phoneMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
+                  {t("phone.save")}
+                </button>
+                <button onClick={() => setEditingPhone(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm">
+                <span className="text-muted-foreground">{t("phone.label")}:</span>
+                <span className="ml-2 font-mono">{fp?.phone_number ? `${fp.phone_dial_code ?? ""} ${fp.phone_number}`.trim() : "—"}</span>
+              </div>
+              <button onClick={() => setEditingPhone(true)} className="mt-1 text-xs text-racing-red hover:underline">
+                {t("phone.edit")}
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
