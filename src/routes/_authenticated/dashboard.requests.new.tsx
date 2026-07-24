@@ -127,7 +127,9 @@ function NewRequestPage() {
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
           role_hard: roleHard,
+          travel_required: travelRequired,
           skills,
+          skills_hard: skillsHard,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
             code: l.code,
