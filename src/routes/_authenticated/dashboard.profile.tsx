@@ -166,7 +166,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
     <div className="mt-4 space-y-3">
       <div className="text-sm">
         <span className="text-muted-foreground">Email:</span>
-        <span className="ml-2 font-mono">{profile?.email ?? "—"}</span>
+        <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
       <div className="text-sm">
         <span className="text-muted-foreground">Account type:</span>
