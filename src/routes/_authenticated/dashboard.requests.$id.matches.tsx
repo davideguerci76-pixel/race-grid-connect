@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, Star, ArrowLeft } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
