@@ -193,6 +193,7 @@ export const createRequest = createServerFn({ method: "POST" })
       .object({
         title: z.string().min(3).max(120),
         role: roleEnum,
+        role_hard: z.boolean().optional().default(true),
         discipline: disciplineEnum,
         circuit: z.string().max(120).optional().nullable(),
         location: z.string().max(120).optional().nullable(),
