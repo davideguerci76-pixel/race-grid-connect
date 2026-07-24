@@ -204,6 +204,15 @@ function NewRequestPage() {
           )}
         </div>
 
+        {identical && (
+          <div className="mt-4 border-2 border-racing-yellow bg-racing-yellow/5 p-4">
+            <div className="label-mono text-racing-yellow">[IDENTICAL REPOST]</div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              All fields below are locked to guarantee the discounted price ({repostCost} tokens instead of {baseCost}). Need to change something? Use <span className="font-bold">Repost similar</span> instead.
+            </p>
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -219,6 +228,8 @@ function NewRequestPage() {
           }}
           className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
         >
+          <fieldset disabled={identical} className="contents">
+
           <div className="md:col-span-2">
             <label className="label-mono">Title</label>
             <input
