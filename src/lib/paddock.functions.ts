@@ -727,19 +727,20 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         .maybeSingle();
       if (eng) {
         const fid = (eng as any).freelancer_id as string;
-        const [{ data: hProf }, { data: hFp }] = await Promise.all([
-          supabase.from("profiles").select("id, display_name, avatar_url").eq("id", fid).maybeSingle(),
-          supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle(),
-        ]);
+        const { data: hFp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle();
         let hEmail: string | null = null;
         let hPhone: { phone_dial_code: string | null; phone_number: string | null } = { phone_dial_code: null, phone_number: null };
+        let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: p } = await supabaseAdmin.from("profiles").select("display_name, avatar_url").eq("id", fid).maybeSingle();
+          if (p) hProf = p as any;
           const { data: c } = await supabaseAdmin.from("freelancer_contacts").select("phone_dial_code, phone_number").eq("user_id", fid).maybeSingle();
           if (c) hPhone = { phone_dial_code: (c as any).phone_dial_code, phone_number: (c as any).phone_number };
           const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
           hEmail = u?.user?.email ?? null;
         } catch { /* ignore */ }
+
         hired = {
           freelancer_id: fid,
           engagement_id: (eng as any).id,
