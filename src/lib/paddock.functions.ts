@@ -250,6 +250,7 @@ export const createRequest = createServerFn({ method: "POST" })
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
       skills_hard: data.skills_hard ?? [],
+      education: data.education ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
