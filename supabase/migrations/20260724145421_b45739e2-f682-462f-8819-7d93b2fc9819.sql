@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.unlock_match_for_team(uuid) FROM PUBLIC, anon;
