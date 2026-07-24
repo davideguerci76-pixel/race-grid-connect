@@ -38,6 +38,15 @@ export function SiteHeader() {
     queryFn: async () => (await checkAdmin()).isAdmin,
   });
 
+  const getUnread = useServerFn(getUnreadNotificationCount);
+  const { data: unread } = useQuery({
+    queryKey: ["unread-notifications", user?.id],
+    enabled: !!user,
+    queryFn: async () => (await getUnread()).count,
+    refetchInterval: 30000,
+  });
+
+
   async function handleSignOut() {
     setOpen(false);
     await supabase.auth.signOut();
