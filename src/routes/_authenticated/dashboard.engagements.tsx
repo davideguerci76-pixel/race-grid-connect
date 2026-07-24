@@ -174,11 +174,12 @@ function EngagementsPage() {
                       {t("engagements.confirm")}
                     </button>
                   )}
-                  {e.status === "confirmed" && !iMarked && (
+                  {e.status === "confirmed" && !iMarked && !isFreelancer && (
                     <button onClick={() => completeMut.mutate(e.id)} className="bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white">
                       {t("engagements.mark_complete")}
                     </button>
                   )}
+
                   {e.status === "completed" && (
                     ratingFor === e.id ? (
                       <div className="w-full border border-border bg-background p-4">

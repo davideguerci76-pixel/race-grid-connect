@@ -99,7 +99,12 @@ function RequestsPage() {
                 </div>
                 <div className="text-right">
                   <div className="font-mono text-[11px] uppercase text-muted-foreground">{t("requests.matches")}</div>
-                  <div className="text-2xl font-black text-racing-red">{r.matches_count ?? 0}</div>
+                  <div className="text-2xl font-black text-racing-red">
+                    {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id ? 1 : (r.matches_count ?? 0)}
+                  </div>
+                  {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id && (
+                    <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">Confirmed · Filled</div>
+                  )}
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">
@@ -108,7 +113,9 @@ function RequestsPage() {
                   params={{ id: r.id }}
                   className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                 >
-                  {t("requests.view_matches")} ({r.matches_count ?? 0})
+                  {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id
+                    ? `${t("requests.view_matches")} (1) — Confirmed · Filled`
+                    : `${t("requests.view_matches")} (${r.matches_count ?? 0})`}
                 </Link>
 
                 {r.status === "active" && (
@@ -145,15 +152,25 @@ function RequestsPage() {
                     </button>
                   </>
                 )}
-                {(r.status === "completed" || r.status === "closed") && (
-                  <Link
-                    to="/dashboard/requests/new"
-                    search={{ from: r.id }}
-                    className="border border-racing-red px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-                  >
-                    {t("requests.repost")}
-                  </Link>
+                {(r.status === "completed" || r.status === "closed" || r.status === "filled") && (
+                  <>
+                    <Link
+                      to="/dashboard/requests/new"
+                      search={{ from: r.id }}
+                      className="border border-racing-red px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
+                    >
+                      Repost similar
+                    </Link>
+                    <Link
+                      to="/dashboard/requests/new"
+                      search={{ from: r.id, mode: "identical" }}
+                      className="border border-racing-yellow px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+                    >
+                      Repost identical (discount)
+                    </Link>
+                  </>
                 )}
+
               </div>
             </div>
           ))}

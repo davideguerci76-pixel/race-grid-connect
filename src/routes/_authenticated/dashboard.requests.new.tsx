@@ -14,7 +14,11 @@ import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 
-const search = z.object({ from: fallback(z.string().optional(), undefined) });
+const search = z.object({
+  from: fallback(z.string().optional(), undefined),
+  mode: fallback(z.enum(["similar", "identical"]).optional(), undefined),
+});
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
   validateSearch: zodValidator(search),
@@ -23,6 +27,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
 
 const COST_SINGLE = 5;
 const COST_SEASON = 15;
+const COST_SINGLE_REPOST = 3;
+const COST_SEASON_REPOST = 10;
+
 
 function fmt(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -33,7 +40,9 @@ function NewRequestPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { from } = Route.useSearch();
+  const { from, mode } = Route.useSearch();
+  const identical = mode === "identical" && !!from;
+
 
   const { data: profile } = useQuery({
     queryKey: ["request-profile", user?.id],
@@ -86,25 +95,43 @@ function NewRequestPage() {
 
   useEffect(() => {
     if (!source) return;
+    const s: any = source;
     setForm({
-      title: source.title,
-      role: source.role as string,
-      discipline: source.discipline as string,
-      duration: source.duration as DurationType,
-      circuit: source.circuit ?? "",
-      location: source.location ?? "",
-      start_date: "",
-      end_date: "",
-      budget_min: source.budget_min ? String(source.budget_min) : "",
-      budget_max: source.budget_max ? String(source.budget_max) : "",
-      budget_unit: (source.budget_unit as "day" | "event" | "season") ?? "day",
-      notes: source.notes ?? "",
+      title: s.title,
+      role: s.role as string,
+      discipline: s.discipline as string,
+      duration: s.duration as DurationType,
+      circuit: s.circuit ?? "",
+      location: s.location ?? "",
+      start_date: identical ? (s.start_date ?? "") : "",
+      end_date: identical ? (s.end_date ?? "") : "",
+      budget_min: s.budget_min ? String(s.budget_min) : "",
+      budget_max: s.budget_max ? String(s.budget_max) : "",
+      budget_unit: (s.budget_unit as "day" | "event" | "season") ?? "day",
+      notes: s.notes ?? "",
     });
-    setSeasonDates([]);
-  }, [source]);
+    setRoleHard(s.role_hard ?? true);
+    setTravelRequired(s.travel_required ?? true);
+    setSkills(Array.isArray(s.skills) ? s.skills : []);
+    setSkillsHard(Array.isArray(s.skills_hard) ? s.skills_hard : []);
+    setEducation(Array.isArray(s.education) ? s.education : []);
+    setExperienceReqs(Array.isArray(s.experience_requirements) ? s.experience_requirements : []);
+    setLanguageReqs(Array.isArray(s.languages) ? s.languages : []);
+    if (Array.isArray(s.season_dates)) {
+      setSeasonDates(s.season_dates.map((d: string) => {
+        const [y, m, day] = d.split("-").map(Number);
+        return new Date(y, m - 1, day);
+      }));
+    } else {
+      setSeasonDates([]);
+    }
+  }, [source, identical]);
 
   const isSeason = form.duration === "full_season";
-  const cost = isSeason ? COST_SEASON : COST_SINGLE;
+  const baseCost = isSeason ? COST_SEASON : COST_SINGLE;
+  const repostCost = isSeason ? COST_SEASON_REPOST : COST_SINGLE_REPOST;
+  const cost = identical ? repostCost : baseCost;
+
   const balance = profile?.token_balance ?? 0;
   const canAfford = balance >= cost;
 
@@ -139,6 +166,8 @@ function NewRequestPage() {
             hard: l.hard,
             custom: l.code === "other" ? (l.custom ?? null) : null,
           })),
+          ...(identical && from ? { repost_of: from } : {}),
+
         } as never,
       }),
     onSuccess: () => {
@@ -175,6 +204,15 @@ function NewRequestPage() {
           )}
         </div>
 
+        {identical && (
+          <div className="mt-4 border-2 border-racing-yellow bg-racing-yellow/5 p-4">
+            <div className="label-mono text-racing-yellow">[IDENTICAL REPOST]</div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              All fields below are locked to guarantee the discounted price ({repostCost} tokens instead of {baseCost}). Need to change something? Use <span className="font-bold">Repost similar</span> instead.
+            </p>
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -190,6 +228,8 @@ function NewRequestPage() {
           }}
           className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
         >
+          <fieldset disabled={identical} className="contents">
+
           <div className="md:col-span-2">
             <label className="label-mono">Title</label>
             <input
@@ -272,7 +312,7 @@ function NewRequestPage() {
                 Click every day you need the specialist on the ground across the season. Matches are computed against these exact days.
               </p>
               <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
-              <div className="mt-3">
+              <div className={`mt-3 ${identical ? "pointer-events-none opacity-70" : ""}`}>
                 <AvailabilityCalendar
                   selected={seasonDates}
                   onSelect={(d) => setSeasonDates(d ?? [])}
@@ -499,6 +539,10 @@ function NewRequestPage() {
             <label className="label-mono">Notes</label>
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
+
+          </fieldset>
+
+
 
           <button
             type="submit"

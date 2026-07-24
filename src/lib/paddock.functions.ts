@@ -230,6 +230,7 @@ export const createRequest = createServerFn({ method: "POST" })
           )
           .max(6)
           .optional(),
+        repost_of: z.string().uuid().optional().nullable(),
       })
       .parse(data),
   )
@@ -255,6 +256,8 @@ export const createRequest = createServerFn({ method: "POST" })
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
       travel_required: data.travel_required ?? true,
+      repost_of: data.repost_of ?? null,
+
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
@@ -284,15 +287,32 @@ export const getMyRequests = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (data ?? []).map((r) => r.id);
     let counts: Record<string, number> = {};
+    let confirmedMap: Record<string, string> = {};
     if (ids.length) {
-      const { data: matches } = await supabase.from("matches").select("request_id").in("request_id", ids);
+      const [{ data: matches }, { data: engs }] = await Promise.all([
+        supabase.from("matches").select("request_id").in("request_id", ids),
+        supabase
+          .from("engagements")
+          .select("id, request_id, status")
+          .in("request_id", ids)
+          .eq("status", "confirmed"),
+      ]);
       counts = (matches ?? []).reduce<Record<string, number>>((acc, m) => {
         const rid = (m as { request_id: string }).request_id;
         acc[rid] = (acc[rid] ?? 0) + 1;
         return acc;
       }, {});
+      confirmedMap = (engs ?? []).reduce<Record<string, string>>((acc, e: any) => {
+        if (e.request_id) acc[e.request_id] = e.id;
+        return acc;
+      }, {});
     }
-    return (data ?? []).map((r) => ({ ...r, matches_count: counts[r.id] ?? 0 }));
+    return (data ?? []).map((r) => ({
+      ...r,
+      matches_count: counts[r.id] ?? 0,
+      confirmed_engagement_id: confirmedMap[r.id] ?? null,
+    }));
+
   });
 
 export const deactivateRequest = createServerFn({ method: "POST" })
@@ -630,14 +650,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const pageRows = rows.slice(start, start + pageSize);
 
     const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
-    const [{ data: fps }, { data: profs }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select("*").in("user_id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
-      supabase.from("profiles").select("id, display_name, avatar_url").in("id", freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"]),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"]),
+    const ids4 = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
+    const matchIds4 = pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"];
+    let profs: any[] = [];
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", ids4);
+      profs = data ?? [];
+    } catch { /* ignore */ }
+    const [{ data: fps }, { data: unlocks }] = await Promise.all([
+      supabase.from("freelancer_profiles").select("*").in("user_id", ids4),
+      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", matchIds4),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
-    const profMap = new Map((profs ?? []).map((r: any) => [r.id, r]));
+    const profMap = new Map(profs.map((r: any) => [r.id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+
 
     // Fetch emails/phones only for unlocked candidates
     const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
@@ -710,19 +738,20 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         .maybeSingle();
       if (eng) {
         const fid = (eng as any).freelancer_id as string;
-        const [{ data: hProf }, { data: hFp }] = await Promise.all([
-          supabase.from("profiles").select("id, display_name, avatar_url").eq("id", fid).maybeSingle(),
-          supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle(),
-        ]);
+        const { data: hFp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle();
         let hEmail: string | null = null;
         let hPhone: { phone_dial_code: string | null; phone_number: string | null } = { phone_dial_code: null, phone_number: null };
+        let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: p } = await supabaseAdmin.from("profiles").select("display_name, avatar_url").eq("id", fid).maybeSingle();
+          if (p) hProf = p as any;
           const { data: c } = await supabaseAdmin.from("freelancer_contacts").select("phone_dial_code, phone_number").eq("user_id", fid).maybeSingle();
           if (c) hPhone = { phone_dial_code: (c as any).phone_dial_code, phone_number: (c as any).phone_number };
           const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
           hEmail = u?.user?.email ?? null;
         } catch { /* ignore */ }
+
         hired = {
           freelancer_id: fid,
           engagement_id: (eng as any).id,
