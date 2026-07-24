@@ -354,6 +354,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       </div>
       <Row label="Day rate" value={profile?.day_rate ? `€${profile.day_rate}/day` : "—"} mono />
       <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label="Phone" value={profile?.phone_number ? `${profile.phone_dial_code ?? ""} ${profile.phone_number}`.trim() : "—"} mono />
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
       <div>
