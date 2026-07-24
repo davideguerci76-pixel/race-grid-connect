@@ -75,6 +75,7 @@ function NewRequestPage() {
     budget_unit: "day" as "day" | "event" | "season",
     notes: "",
   });
+  const [roleHard, setRoleHard] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
