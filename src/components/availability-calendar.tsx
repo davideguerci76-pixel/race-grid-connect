@@ -1,5 +1,12 @@
-import { DayPicker } from "react-day-picker";
+import { DayPicker, type MonthCaptionProps } from "react-day-picker";
 import "react-day-picker/style.css";
+
+function ymd(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 export function AvailabilityCalendar({
   selected,
@@ -18,6 +25,12 @@ export function AvailabilityCalendar({
   showBulkActions?: boolean;
   bulkMonths?: number;
 }) {
+  const isDisabled = (d: Date) => {
+    if (disabled) return disabled(d);
+    if (min) return d < min;
+    return false;
+  };
+
   const selectAll = () => {
     const start = min ? new Date(min) : new Date();
     start.setHours(0, 0, 0, 0);
@@ -26,10 +39,63 @@ export function AvailabilityCalendar({
     const all: Date[] = [];
     const cur = new Date(start);
     while (cur <= end) {
-      if (!disabled || !disabled(cur)) all.push(new Date(cur));
+      if (!isDisabled(cur)) all.push(new Date(cur));
       cur.setDate(cur.getDate() + 1);
     }
     onSelect(all);
+  };
+
+  const monthDates = (year: number, month: number): Date[] => {
+    const out: Date[] = [];
+    const cur = new Date(year, month, 1);
+    while (cur.getMonth() === month) {
+      if (!isDisabled(cur)) out.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  };
+
+  const selectMonth = (year: number, month: number) => {
+    const add = monthDates(year, month);
+    const keySet = new Set(selected.map((d) => ymd(d)));
+    add.forEach((d) => keySet.add(ymd(d)));
+    const merged: Date[] = [];
+    const seen = new Set<string>();
+    [...selected, ...add].forEach((d) => {
+      const k = ymd(d);
+      if (!seen.has(k) && keySet.has(k)) { seen.add(k); merged.push(d); }
+    });
+    onSelect(merged);
+  };
+
+  const deselectMonth = (year: number, month: number) => {
+    onSelect(selected.filter((d) => !(d.getFullYear() === year && d.getMonth() === month)));
+  };
+
+  const monthLabel = (year: number, month: number) =>
+    new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+
+  const MonthCaption = (props: MonthCaptionProps) => {
+    const d = props.calendarMonth.date;
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    const total = monthDates(y, m).length;
+    const chosen = selected.filter((x) => x.getFullYear() === y && x.getMonth() === m).length;
+    const allChosen = total > 0 && chosen >= total;
+    return (
+      <div className="flex flex-col items-center gap-1 py-1">
+        <div className="font-mono text-[11px] font-bold uppercase tracking-widest">{monthLabel(y, m)}</div>
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => (allChosen ? deselectMonth(y, m) : selectMonth(y, m))}
+            className="border border-border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
+          >
+            {allChosen ? "Deselect month" : "Select month"}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -70,6 +136,7 @@ export function AvailabilityCalendar({
         weekStartsOn={1}
         showOutsideDays={false}
         numberOfMonths={2}
+        components={{ MonthCaption }}
       />
       <style>{`
         .paddock-calendar .rdp-root {

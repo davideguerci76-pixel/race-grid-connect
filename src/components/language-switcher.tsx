@@ -4,7 +4,7 @@ import { SUPPORTED_LANGS, LANG_STORAGE_KEY } from "@/i18n";
 import { Globe } from "lucide-react";
 import { useState } from "react";
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ align = "right" }: { align?: "left" | "right" }) {
   const { i18n } = useTranslation();
   const hydrated = useHydrated();
   const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1 min-w-[100px] border border-border bg-card shadow-lg">
+          <div className={`absolute top-full z-50 mt-1 min-w-[100px] border border-border bg-card shadow-lg ${align === "left" ? "left-0" : "right-0"}`}>
             {SUPPORTED_LANGS.map((l) => (
               <button
                 key={l.code}

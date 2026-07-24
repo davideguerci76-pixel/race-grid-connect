@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
+import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 
@@ -186,6 +186,8 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     bio: "",
     travels: true,
+    phone_dial_code: "+39",
+    phone_number: "",
     experiences: [] as FreelancerExperience[],
     languages: [] as FreelancerLanguage[],
   });
@@ -203,6 +205,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
+      phone_dial_code: profile?.phone_dial_code ?? "+39",
+      phone_number: profile?.phone_number ?? "",
       experiences: Array.isArray(profile?.experiences)
         ? (profile.experiences as any[])
             .filter((e) => e && typeof e === "object" && typeof e.discipline === "string")
@@ -232,6 +236,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           location: form.location || null,
           bio: form.bio || null,
           travels: form.travels,
+          phone_dial_code: form.phone_dial_code,
+          phone_number: form.phone_number,
           experiences: form.experiences,
           languages: form.languages.map((l) => ({
             code: l.code,
@@ -283,6 +289,26 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
         </div>
         <div>
+          <label className="text-xs text-muted-foreground">Phone (required)</label>
+          <div className="mt-1 flex gap-2">
+            <select
+              value={form.phone_dial_code}
+              onChange={(e) => setForm({ ...form, phone_dial_code: e.target.value })}
+              className="w-32 min-w-0 border border-border bg-background px-2 py-2 text-sm"
+            >
+              {DIAL_CODES.map((d) => (<option key={d.code} value={d.code}>{d.label}</option>))}
+            </select>
+            <input
+              type="tel"
+              value={form.phone_number}
+              onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+              className="flex-1 min-w-0 border border-border bg-background px-3 py-2 text-sm"
+              placeholder="333 123 4567"
+              required
+            />
+          </div>
+        </div>
+        <div>
           <label className="text-xs text-muted-foreground">Bio</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
@@ -328,6 +354,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       </div>
       <Row label="Day rate" value={profile?.day_rate ? `€${profile.day_rate}/day` : "—"} mono />
       <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label="Phone" value={profile?.phone_number ? `${profile.phone_dial_code ?? ""} ${profile.phone_number}`.trim() : "—"} mono />
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
       <div>
@@ -568,7 +595,7 @@ function ExperienceEditor({
       </p>
       <div className="mt-2 space-y-2">
         {value.map((e, i) => (
-          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_140px_auto]">
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_140px_auto]">
             <select
               value={e.discipline}
               onChange={(ev) => update(i, { discipline: ev.target.value })}
@@ -639,7 +666,7 @@ function LanguagesEditor({
       </p>
       <div className="mt-2 space-y-2">
         {value.map((l, i) => (
-          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 sm:grid-cols-[1fr_1fr_auto]">
+          <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
             <select
               value={l.code}
               onChange={(ev) => update(i, { code: ev.target.value })}

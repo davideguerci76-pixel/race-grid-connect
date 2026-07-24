@@ -137,7 +137,7 @@ export function SiteHeader() {
               </>
             )}
             <div className="flex items-center justify-between gap-2 pt-4">
-              <LanguageSwitcher />
+              <LanguageSwitcher align="left" />
               {user ? (
                 <button
                   onClick={handleSignOut}

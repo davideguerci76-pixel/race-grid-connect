@@ -65,6 +65,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: z.string().max(140).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
+        phone_dial_code: z.string().trim().regex(/^\+\d{1,4}$/, "Invalid dial code").max(6),
+        phone_number: z.string().trim().min(4, "Phone number is required").max(30).regex(/^[0-9 ()\-./]+$/, "Invalid phone number"),
         experiences: z
           .array(
             z.object({
@@ -108,6 +110,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location: data.location || null,
         bio: data.bio || null,
         travels: data.travels,
+        phone_dial_code: data.phone_dial_code,
+        phone_number: data.phone_number,
         experiences: data.experiences ?? [],
         languages: data.languages ?? [],
       } as never,
