@@ -169,3 +169,41 @@ export const adminSetAdminRole = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const adminGetMatchingWeights = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data, error } = await context.supabase.from("matching_weights").select("*").eq("id", true).maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+export const adminUpdateMatchingWeights = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      role_weight: z.number().min(0).max(100),
+      skills_weight: z.number().min(0).max(100),
+      disciplines_weight: z.number().min(0).max(100),
+      day_rate_weight: z.number().min(0).max(100),
+      languages_weight: z.number().min(0).max(100),
+      education_weight: z.number().min(0).max(100),
+      location_weight: z.number().min(0).max(100),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const total = data.role_weight + data.skills_weight + data.disciplines_weight + data.day_rate_weight + data.languages_weight + data.education_weight + data.location_weight;
+    if (Math.abs(total - 100) > 0.01) throw new Error(`Weights must sum to 100 (currently ${total.toFixed(2)})`);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("matching_weights")
+      .update({ ...data, updated_at: new Date().toISOString() } as never)
+      .eq("id", true);
+    if (error) throw new Error(error.message);
+    // Recompute all matches with new weights
+    await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: null } as never);
+    return { ok: true };
+  });
+
