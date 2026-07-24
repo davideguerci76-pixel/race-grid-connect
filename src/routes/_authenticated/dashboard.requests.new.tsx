@@ -166,6 +166,8 @@ function NewRequestPage() {
             hard: l.hard,
             custom: l.code === "other" ? (l.custom ?? null) : null,
           })),
+          ...(identical && from ? { repost_of: from } : {}),
+
         } as never,
       }),
     onSuccess: () => {
