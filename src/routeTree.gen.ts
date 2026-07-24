@@ -30,8 +30,10 @@ import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
+import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authenticated/admin.matching'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
+import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './routes/_authenticated/dashboard.requests.$id.matches'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -144,6 +146,12 @@ const AuthenticatedAdminPermissionsRoute =
     path: '/permissions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminMatchingRoute =
+  AuthenticatedAdminMatchingRouteImport.update({
+    id: '/matching',
+    path: '/matching',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedDashboardRequestsIndexRoute =
   AuthenticatedDashboardRequestsIndexRouteImport.update({
     id: '/requests/',
@@ -154,6 +162,12 @@ const AuthenticatedDashboardRequestsNewRoute =
   AuthenticatedDashboardRequestsNewRouteImport.update({
     id: '/requests/new',
     path: '/requests/new',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardRequestsIdMatchesRoute =
+  AuthenticatedDashboardRequestsIdMatchesRouteImport.update({
+    id: '/requests/$id/matches',
+    path: '/requests/$id/matches',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 
@@ -169,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
+  '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -180,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -191,6 +207,7 @@ export interface FileRoutesByTo {
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers': typeof FreelancersIndexRoute
   '/teams': typeof TeamsIndexRoute
+  '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -202,6 +219,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/dashboard/requests': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -217,6 +235,7 @@ export interface FileRoutesById {
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
+  '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -228,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/_authenticated/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/_authenticated/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -243,6 +263,7 @@ export interface FileRouteTypes {
     | '/teams/$id'
     | '/freelancers/'
     | '/teams/'
+    | '/admin/matching'
     | '/admin/permissions'
     | '/admin/teams'
     | '/dashboard/calendar'
@@ -254,6 +275,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/requests/new'
     | '/dashboard/requests/'
+    | '/dashboard/requests/$id/matches'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,6 +287,7 @@ export interface FileRouteTypes {
     | '/teams/$id'
     | '/freelancers'
     | '/teams'
+    | '/admin/matching'
     | '/admin/permissions'
     | '/admin/teams'
     | '/dashboard/calendar'
@@ -276,6 +299,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/requests/new'
     | '/dashboard/requests'
+    | '/dashboard/requests/$id/matches'
   id:
     | '__root__'
     | '/'
@@ -290,6 +314,7 @@ export interface FileRouteTypes {
     | '/teams/$id'
     | '/freelancers/'
     | '/teams/'
+    | '/_authenticated/admin/matching'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/teams'
     | '/_authenticated/dashboard/calendar'
@@ -301,6 +326,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/requests/new'
     | '/_authenticated/dashboard/requests/'
+    | '/_authenticated/dashboard/requests/$id/matches'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -465,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/matching': {
+      id: '/_authenticated/admin/matching'
+      path: '/matching'
+      fullPath: '/admin/matching'
+      preLoaderRoute: typeof AuthenticatedAdminMatchingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/dashboard/requests/': {
       id: '/_authenticated/dashboard/requests/'
       path: '/requests'
@@ -479,16 +512,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRequestsNewRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/requests/$id/matches': {
+      id: '/_authenticated/dashboard/requests/$id/matches'
+      path: '/requests/$id/matches'
+      fullPath: '/dashboard/requests/$id/matches'
+      preLoaderRoute: typeof AuthenticatedDashboardRequestsIdMatchesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminMatchingRoute: typeof AuthenticatedAdminMatchingRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminMatchingRoute: AuthenticatedAdminMatchingRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -506,6 +548,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
   AuthenticatedDashboardRequestsIndexRoute: typeof AuthenticatedDashboardRequestsIndexRoute
+  AuthenticatedDashboardRequestsIdMatchesRoute: typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -521,6 +564,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardRequestsNewRoute,
     AuthenticatedDashboardRequestsIndexRoute:
       AuthenticatedDashboardRequestsIndexRoute,
+    AuthenticatedDashboardRequestsIdMatchesRoute:
+      AuthenticatedDashboardRequestsIdMatchesRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
@@ -556,13 +601,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

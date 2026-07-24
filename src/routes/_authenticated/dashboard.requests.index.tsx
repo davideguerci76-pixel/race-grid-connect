@@ -104,11 +104,13 @@ function RequestsPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3">
                 <Link
-                  to="/dashboard/matches"
+                  to="/dashboard/requests/$id/matches"
+                  params={{ id: r.id }}
                   className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                 >
-                  {t("requests.view_matches")}
+                  {t("requests.view_matches")} ({r.matches_count ?? 0})
                 </Link>
+
                 {r.status === "active" && (
                   <button
                     onClick={() => statusMut.mutate({ id: r.id, status: "paused" })}
