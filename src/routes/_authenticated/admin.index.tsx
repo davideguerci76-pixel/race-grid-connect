@@ -127,22 +127,22 @@ function AdminFreelancers() {
           <table className="w-full min-w-[1100px] text-xs">
             <thead className="bg-secondary text-[10px] font-bold uppercase tracking-widest">
               <tr>
-                <th className="px-2 py-2 text-left">Name</th>
-                <th className="px-2 py-2 text-left">Email</th>
-                <th className="px-2 py-2 text-left">Role</th>
-                <th className="px-2 py-2 text-left">Disciplines</th>
-                <th className="px-2 py-2 text-left">Skills</th>
-                <th className="px-2 py-2 text-left">Languages</th>
-                <th className="px-2 py-2 text-left">Location</th>
-                <th className="px-2 py-2 text-left">Phone</th>
-                <th className="px-2 py-2 text-right">Rate</th>
-                <th className="px-2 py-2 text-right">Tokens</th>
-                <th className="px-2 py-2 text-left">Status</th>
+                <Th onClick={() => toggle("display_name")} label={`Name${indicator("display_name")}`} />
+                <Th onClick={() => toggle("email")} label={`Email${indicator("email")}`} />
+                <Th onClick={() => toggle("freelancer.role")} label={`Role${indicator("freelancer.role")}`} />
+                <Th onClick={() => toggle("freelancer.disciplines")} label={`Disciplines${indicator("freelancer.disciplines")}`} />
+                <Th onClick={() => toggle("freelancer.skills")} label={`Skills${indicator("freelancer.skills")}`} />
+                <Th onClick={() => toggle("freelancer.languages")} label={`Languages${indicator("freelancer.languages")}`} />
+                <Th onClick={() => toggle("freelancer.location")} label={`Location${indicator("freelancer.location")}`} />
+                <Th onClick={() => toggle("freelancer.phone_number")} label={`Phone${indicator("freelancer.phone_number")}`} />
+                <Th onClick={() => toggle("freelancer.day_rate")} label={`Rate${indicator("freelancer.day_rate")}`} align="right" />
+                <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
+                <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r: any) => (
+              {sorted.map((r: any) => (
                 <tr key={r.id} className="border-t border-border/60 hover:bg-secondary/40">
                   <td className="px-2 py-2">{r.display_name}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.email}</td>
