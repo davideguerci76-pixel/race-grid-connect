@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, requestMatchConfirmation, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
 
