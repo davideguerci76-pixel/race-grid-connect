@@ -186,6 +186,8 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     bio: "",
     travels: true,
+    phone_dial_code: "+39",
+    phone_number: "",
     experiences: [] as FreelancerExperience[],
     languages: [] as FreelancerLanguage[],
   });
@@ -203,6 +205,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
+      phone_dial_code: profile?.phone_dial_code ?? "+39",
+      phone_number: profile?.phone_number ?? "",
       experiences: Array.isArray(profile?.experiences)
         ? (profile.experiences as any[])
             .filter((e) => e && typeof e === "object" && typeof e.discipline === "string")
