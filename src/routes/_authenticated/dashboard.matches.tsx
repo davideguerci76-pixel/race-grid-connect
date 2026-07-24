@@ -1,23 +1,59 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch } from "@/lib/paddock.functions";
-import { Eye, Lock } from "lucide-react";
+import { getMyMatches, revealMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
+import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
 });
 
+function formatCriterion(c: any): string {
+  switch (c.kind) {
+    case "role": return `Role: ${c.label ?? ""}`;
+    case "skill": return `Skill: ${c.label}`;
+    case "language": return `Lang: ${c.code} (${c.level})`;
+    case "education": return "Education";
+    case "day_rate": return "Day rate over budget";
+    case "location": return `Location: ${c.label ?? "distant"}`;
+    default: return c.kind ?? "criterion";
+  }
+}
+
+function MissingCriteria({ list }: { list: any[] }) {
+  if (!list || list.length === 0) {
+    return (
+      <div className="mt-3">
+        <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> Criteria</div>
+        <div className="font-mono text-[11px] text-racing-yellow">All soft criteria satisfied — perfect match</div>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-3">
+      <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> Missing / partial criteria</div>
+      <div className="flex flex-wrap gap-1">
+        {list.map((c: any, i: number) => (
+          <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
+            {formatCriterion(c)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
+  const confirmFn = useServerFn(requestMatchConfirmation);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
@@ -27,6 +63,12 @@ function MatchesPage() {
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
     onSuccess: () => { toast.success("Revealed"); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : t("matches.insufficient_tokens")),
+  });
+
+  const confirmMut = useMutation({
+    mutationFn: (id: string) => confirmFn({ data: { match_id: id } }),
+    onSuccess: () => { toast.success("Confirmation request sent"); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   return (
@@ -48,14 +90,20 @@ function MatchesPage() {
             {matches.map((m: any) => {
               const counterparty = isFreelancer ? m.team : m.freelancer;
               const cp = m.counterparty;
+              const pct = Math.round(Number(m.match_score ?? 0));
+              const perfect = m.is_perfect;
+              const requestFilled = m.request?.status === "filled";
               return (
-                <div key={m.id} className="grid gap-4 border border-border bg-card p-5 md:grid-cols-[1fr,auto] md:items-start">
+                <div key={m.id} className={`grid gap-4 border p-5 md:grid-cols-[1fr,auto] md:items-start ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                   <div className="flex items-start gap-4">
                     <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${m.revealedByMe ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
                       {m.revealedByMe ? initialsFor((isFreelancer ? cp?.team_name : counterparty?.display_name) ?? counterparty?.display_name ?? "?") : <Lock className="size-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-lg font-bold">
+                      <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
+                        {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
+                      </div>
+                      <div className="mt-1 text-lg font-bold">
                         {m.revealedByMe
                           ? (isFreelancer ? (cp?.team_name ?? counterparty?.display_name) : (counterparty?.display_name))
                           : t("matches.hidden_name")}
@@ -88,6 +136,7 @@ function MatchesPage() {
                           )}
                         </div>
                       )}
+                      <MissingCriteria list={m.missing_criteria ?? []} />
                       <div className="mt-3 border-t border-border pt-2 text-xs text-muted-foreground">{m.request?.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
                         {m.request?.start_date} → {m.request?.end_date} · {t(`role.${m.request?.role}`)} · {t(`discipline.${m.request?.discipline}`)}
@@ -95,9 +144,9 @@ function MatchesPage() {
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">Overlap: {m.overlap_days} day(s)</div>
                     </div>
                   </div>
-                  <div>
+                  <div className="flex flex-col items-stretch gap-2">
                     {m.revealedByMe ? (
-                      <span className="inline-flex items-center gap-1 border border-racing-red/40 bg-racing-red/10 px-3 py-2 font-mono text-[11px] uppercase text-racing-red">
+                      <span className="inline-flex items-center justify-center gap-1 border border-racing-red/40 bg-racing-red/10 px-3 py-2 font-mono text-[11px] uppercase text-racing-red">
                         <Eye className="size-3.5" /> {t("matches.already_revealed")}
                       </span>
                     ) : (
@@ -108,6 +157,29 @@ function MatchesPage() {
                       >
                         {t("matches.reveal_1_token")}
                       </button>
+                    )}
+                    {!isFreelancer && m.revealedByMe && !requestFilled && (
+                      <button
+                        onClick={() => { if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) confirmMut.mutate(m.id); }}
+                        disabled={confirmMut.isPending}
+                        className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
+                      >
+                        Request confirmation
+                      </button>
+                    )}
+                    {!isFreelancer && requestFilled && (
+                      <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+                        Request filled
+                      </span>
+                    )}
+                    {!isFreelancer && m.request?.id && (
+                      <Link
+                        to="/dashboard/requests/$id/matches"
+                        params={{ id: m.request.id }}
+                        className="inline-flex items-center justify-center border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      >
+                        Open request
+                      </Link>
                     )}
                   </div>
                 </div>
