@@ -42,6 +42,8 @@ function AdminFreelancers() {
     [data],
   );
 
+  const { sorted, toggle, indicator } = useSort<any>(rows);
+
   async function onEditTokens(user_id: string, current: number) {
     const v = prompt("New token balance:", String(current));
     if (v == null) return;
