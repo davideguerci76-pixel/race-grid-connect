@@ -131,6 +131,7 @@ function AdminFreelancers() {
                 <th className="px-2 py-2 text-left">Skills</th>
                 <th className="px-2 py-2 text-left">Languages</th>
                 <th className="px-2 py-2 text-left">Location</th>
+                <th className="px-2 py-2 text-left">Phone</th>
                 <th className="px-2 py-2 text-right">Rate</th>
                 <th className="px-2 py-2 text-right">Tokens</th>
                 <th className="px-2 py-2 text-left">Status</th>
