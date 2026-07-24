@@ -248,9 +248,11 @@ export const createRequest = createServerFn({ method: "POST" })
       notes: data.notes ?? null,
       season_dates: data.season_dates ?? null,
       skills: data.skills ?? [],
+      skills_hard: data.skills_hard ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
       role_hard: data.role_hard ?? true,
+      travel_required: data.travel_required ?? true,
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
