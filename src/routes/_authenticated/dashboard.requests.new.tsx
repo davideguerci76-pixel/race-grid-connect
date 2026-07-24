@@ -75,6 +75,7 @@ function NewRequestPage() {
     budget_unit: "day" as "day" | "event" | "season",
     notes: "",
   });
+  const [roleHard, setRoleHard] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
@@ -123,6 +124,7 @@ function NewRequestPage() {
           budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+          role_hard: roleHard,
           skills,
           experience_requirements: experienceReqs,
           languages: languageReqs.map((l) => ({
@@ -195,12 +197,28 @@ function NewRequestPage() {
             />
           </div>
 
-          <SelectField
-            label={t("jobs.filters.role")}
-            value={form.role}
-            onChange={(v) => setForm({ ...form, role: v })}
-            options={ROLE_OPTIONS}
-          />
+          <div>
+            <label className="label-mono">{t("jobs.filters.role")}</label>
+            <div className="mt-1 flex gap-2">
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className="flex-1 border border-border bg-background px-3 py-2"
+              >
+                {ROLE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setRoleHard(!roleHard)}
+                title={roleHard ? "Only this role will match" : "Other roles can also match (preference only)"}
+                className={`border px-3 py-2 text-[11px] font-bold uppercase ${roleHard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+              >
+                {roleHard ? "Hard" : "Soft"}
+              </button>
+            </div>
+          </div>
           <SelectField
             label={t("jobs.filters.discipline")}
             value={form.discipline}

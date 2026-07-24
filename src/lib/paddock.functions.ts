@@ -193,6 +193,7 @@ export const createRequest = createServerFn({ method: "POST" })
       .object({
         title: z.string().min(3).max(120),
         role: roleEnum,
+        role_hard: z.boolean().optional().default(true),
         discipline: disciplineEnum,
         circuit: z.string().max(120).optional().nullable(),
         location: z.string().max(120).optional().nullable(),
@@ -247,6 +248,7 @@ export const createRequest = createServerFn({ method: "POST" })
       skills: data.skills ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
+      role_hard: data.role_hard ?? true,
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
