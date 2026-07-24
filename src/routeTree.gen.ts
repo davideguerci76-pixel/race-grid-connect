@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
+import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './routes/_authenticated/dashboard.requests.$id.matches'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -156,6 +157,12 @@ const AuthenticatedDashboardRequestsNewRoute =
     path: '/requests/new',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRequestsIdMatchesRoute =
+  AuthenticatedDashboardRequestsIdMatchesRouteImport.update({
+    id: '/requests/$id/matches',
+    path: '/requests/$id/matches',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/dashboard/requests': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -228,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
   '/_authenticated/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
+  '/_authenticated/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/requests/new'
     | '/dashboard/requests/'
+    | '/dashboard/requests/$id/matches'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/requests/new'
     | '/dashboard/requests'
+    | '/dashboard/requests/$id/matches'
   id:
     | '__root__'
     | '/'
@@ -301,6 +313,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/requests/new'
     | '/_authenticated/dashboard/requests/'
+    | '/_authenticated/dashboard/requests/$id/matches'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -479,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRequestsNewRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/requests/$id/matches': {
+      id: '/_authenticated/dashboard/requests/$id/matches'
+      path: '/requests/$id/matches'
+      fullPath: '/dashboard/requests/$id/matches'
+      preLoaderRoute: typeof AuthenticatedDashboardRequestsIdMatchesRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
   }
 }
 
@@ -506,6 +526,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
   AuthenticatedDashboardRequestsIndexRoute: typeof AuthenticatedDashboardRequestsIndexRoute
+  AuthenticatedDashboardRequestsIdMatchesRoute: typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
 
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
@@ -521,6 +542,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardRequestsNewRoute,
     AuthenticatedDashboardRequestsIndexRoute:
       AuthenticatedDashboardRequestsIndexRoute,
+    AuthenticatedDashboardRequestsIdMatchesRoute:
+      AuthenticatedDashboardRequestsIdMatchesRoute,
   }
 
 const AuthenticatedDashboardRouteWithChildren =
