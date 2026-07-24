@@ -24,15 +24,19 @@ function ProfilePage() {
     queryKey: ["profile-detail", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }] = await Promise.all([
+      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }, phoneRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
         supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+        supabase.rpc("my_freelancer_phone"),
       ]);
       if (pError) throw new Error(pError.message);
       if (fpError) throw new Error(fpError.message);
       if (tpError) throw new Error(tpError.message);
-      return { ...p, freelancerProfile: fp, teamProfile: tp };
+      // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
+      const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
+      const fpWithPhone = fp ? { ...fp, phone_dial_code: phoneRow?.phone_dial_code ?? null, phone_number: phoneRow?.phone_number ?? null } : fp;
+      return { ...p, freelancerProfile: fpWithPhone, teamProfile: tp };
     },
   });
 
@@ -247,8 +251,10 @@ function FreelancerSection({ profile }: { profile: any }) {
         },
       });
     },
-    onSuccess: (saved) => {
-      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, freelancerProfile: saved } : old));
+    onSuccess: (saved: any) => {
+      // The server upsert returns non-phone columns only; merge back the values just submitted so the UI doesn't blank the phone until the next refetch.
+      const merged = saved ? { ...saved, phone_dial_code: form.phone_dial_code, phone_number: form.phone_number } : saved;
+      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, freelancerProfile: merged } : old));
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       toast.success("Freelancer profile saved");
       setEditing(false);
