@@ -155,6 +155,8 @@ export type Database = {
           headline: string | null
           languages: Json
           location: string | null
+          phone_dial_code: string | null
+          phone_number: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           skills: string[]
           travels: boolean
@@ -172,6 +174,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          phone_dial_code?: string | null
+          phone_number?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
@@ -189,6 +193,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          phone_dial_code?: string | null
+          phone_number?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
