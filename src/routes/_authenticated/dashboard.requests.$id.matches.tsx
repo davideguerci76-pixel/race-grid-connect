@@ -35,6 +35,17 @@ function RequestMatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Unlock failed"),
   });
 
+  const confirmFn = useServerFn(requestMatchConfirmation);
+  const confirmMut = useMutation({
+    mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
+    onSuccess: () => {
+      toast.success("Confirmation request sent to freelancer");
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
