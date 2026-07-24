@@ -24,15 +24,19 @@ function ProfilePage() {
     queryKey: ["profile-detail", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }] = await Promise.all([
+      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }, phoneRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
         supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+        supabase.rpc("my_freelancer_phone"),
       ]);
       if (pError) throw new Error(pError.message);
       if (fpError) throw new Error(fpError.message);
       if (tpError) throw new Error(tpError.message);
-      return { ...p, freelancerProfile: fp, teamProfile: tp };
+      // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
+      const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
+      const fpWithPhone = fp ? { ...fp, phone_dial_code: phoneRow?.phone_dial_code ?? null, phone_number: phoneRow?.phone_number ?? null } : fp;
+      return { ...p, freelancerProfile: fpWithPhone, teamProfile: tp };
     },
   });
 
