@@ -50,23 +50,120 @@ function EngagementsPage() {
 
         <div className="mt-8 grid gap-3">
           {rows.length === 0 && <div className="border border-border bg-card p-12 text-center text-sm text-muted-foreground">—</div>}
-          {rows.map((e) => {
+          {rows.map((e: any) => {
             const isFreelancer = user?.id === e.freelancer_id;
             const other = isFreelancer ? e.team : e.freelancer;
             const otherId = isFreelancer ? e.team_id : e.freelancer_id;
             const iMarked = isFreelancer ? e.freelancer_marked_complete : e.team_marked_complete;
+            const tp = e.team_profile;
+            const fp = e.freelancer_profile;
+            const req = e.request;
+            const match = e.match;
+            const pct = match ? Math.round(Number(match.match_score ?? 0)) : null;
+            const perfect = match?.is_perfect;
+            const skillsSoft: string[] = req?.skills ?? [];
+            const skillsHard: string[] = req?.skills_hard ?? [];
+            const languages: any[] = req?.languages ?? [];
+            const education: string[] = req?.education ?? [];
+            const missing: any[] = match?.missing_criteria ?? [];
             return (
-              <div key={e.id} className="border border-border bg-card p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="font-bold">{other?.display_name}</div>
-                    <div className="mt-1 font-mono text-xs text-muted-foreground">{e.start_date} → {e.end_date} · {e.currency} {e.fee ?? "—"}</div>
+              <div key={e.id} className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-3">
+                      {pct !== null && (
+                        <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
+                          {pct}% <span className="font-mono text-[10px] uppercase tracking-widest">{perfect ? "Perfect" : "Match"}</span>
+                        </div>
+                      )}
+                      <div className="font-bold">{isFreelancer ? (tp?.team_name ?? other?.display_name) : (fp?.headline ? `${other?.display_name}` : other?.display_name)}</div>
+                    </div>
+                    {isFreelancer && tp && (
+                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
+                        {tp.team_type && <span>{tp.team_type}</span>}
+                        {tp.location && <span> · {tp.location}</span>}
+                        {tp.primary_discipline && <span> · {t(`discipline.${tp.primary_discipline}`, { defaultValue: tp.primary_discipline })}</span>}
+                      </div>
+                    )}
+                    {!isFreelancer && fp && (
+                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
+                        {fp.role && <span>{t(`role.${fp.role}`, { defaultValue: fp.role })}</span>}
+                        {fp.location && <span> · {fp.location}</span>}
+                        {typeof fp.day_rate === "number" && <span> · €{fp.day_rate}/day</span>}
+                      </div>
+                    )}
                   </div>
                   <span className="border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-widest">
                     {t(`engagements.status.${e.status}`)}
                   </span>
                 </div>
-                {e.notes && <p className="mt-3 text-sm text-muted-foreground">{e.notes}</p>}
+
+                {req && (
+                  <div className="mt-3 border-t border-border pt-3">
+                    <div className="label-mono mb-1">[REQUEST]</div>
+                    <div className="text-sm font-bold">{req.title}</div>
+                    <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
+                      {t(`role.${req.role}`, { defaultValue: req.role })} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
+                      {(req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
+                    </div>
+                    {(skillsHard.length > 0 || skillsSoft.length > 0) && (
+                      <div className="mt-2">
+                        <div className="label-mono mb-1">[SKILLS]</div>
+                        <div className="flex flex-wrap gap-1">
+                          {skillsHard.map((s) => (
+                            <span key={`h-${s}`} className="border border-racing-red bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{t(`skills.${s}`, { defaultValue: s })} · hard</span>
+                          ))}
+                          {skillsSoft.filter((s) => !skillsHard.includes(s)).map((s) => (
+                            <span key={`s-${s}`} className="border border-racing-yellow bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-yellow">{t(`skills.${s}`, { defaultValue: s })}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {languages.length > 0 && (
+                      <div className="mt-2">
+                        <div className="label-mono mb-1">[LANGUAGES]</div>
+                        <div className="flex flex-wrap gap-1">
+                          {languages.map((l: any, i: number) => (
+                            <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${l.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
+                              {t(`languages.${l.code}`, { defaultValue: l.code })} ({t(`language_levels.${l.level}`, { defaultValue: l.level })}){l.hard ? " · hard" : ""}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {education.length > 0 && (
+                      <div className="mt-2">
+                        <div className="label-mono mb-1">[EDUCATION]</div>
+                        <div className="flex flex-wrap gap-1">
+                          {education.map((ed) => (
+                            <span key={ed} className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{t(`education_options.${ed}`, { defaultValue: ed })}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {req.notes && <p className="mt-2 text-xs text-muted-foreground">{req.notes}</p>}
+                  </div>
+                )}
+
+                {missing.length > 0 && (
+                  <div className="mt-3 border-t border-border pt-3">
+                    <div className="label-mono mb-1">Missing / partial criteria</div>
+                    <div className="flex flex-wrap gap-1">
+                      {missing.map((c: any, i: number) => (
+                        <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
+                          {c.kind === "role" ? `Role: ${c.label ?? ""}` : c.kind === "skill" ? `Skill: ${c.label}` : c.kind === "language" ? `Lang: ${c.code} (${c.level})` : c.kind === "education" ? "Education" : c.kind === "day_rate" ? "Day rate over budget" : c.kind === "location" ? `Location: ${c.label ?? "distant"}` : (c.kind ?? "criterion")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-3">
+                  <div className="font-mono text-xs text-muted-foreground">
+                    {e.start_date} → {e.end_date} · {e.currency} {e.fee ?? "—"}
+                  </div>
+                </div>
+                {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {e.status === "proposed" && e.proposed_by !== user?.id && (
                     <button onClick={() => confirmMut.mutate(e.id)} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110">

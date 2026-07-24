@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, requestMatchConfirmation, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
 
@@ -54,6 +54,7 @@ function MatchesPage() {
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
   const confirmFn = useServerFn(requestMatchConfirmation);
+  const acceptFn = useServerFn(confirmEngagement);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
@@ -68,6 +69,12 @@ function MatchesPage() {
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { match_id: id } }),
     onSuccess: () => { toast.success("Confirmation request sent"); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const acceptMut = useMutation({
+    mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
+    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
@@ -168,6 +175,20 @@ function MatchesPage() {
                       </button>
                     )}
                     {!isFreelancer && requestFilled && (
+                      <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+                        Request filled
+                      </span>
+                    )}
+                    {isFreelancer && m.pending_engagement_id && !requestFilled && (
+                      <button
+                        onClick={() => { if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) acceptMut.mutate(m.pending_engagement_id); }}
+                        disabled={acceptMut.isPending}
+                        className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                      >
+                        {t("engagements.confirm")}
+                      </button>
+                    )}
+                    {isFreelancer && requestFilled && (
                       <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
                         Request filled
                       </span>
