@@ -53,14 +53,21 @@ function MissingCriteria({ list }: { list: any[] }) {
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
-  const confirmFn = useServerFn(requestMatchConfirmation);
   const acceptFn = useServerFn(confirmEngagement);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
   const isFreelancer = data?.userType === "freelancer";
+
+  // Teams manage their matches per-request from the Requests dashboard.
+  useEffect(() => {
+    if (data && data.userType === "team") {
+      navigate({ to: "/dashboard/requests", replace: true });
+    }
+  }, [data, navigate]);
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
@@ -68,16 +75,11 @@ function MatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : t("matches.insufficient_tokens")),
   });
 
-  const confirmMut = useMutation({
-    mutationFn: (id: string) => confirmFn({ data: { match_id: id } }),
-    onSuccess: () => { toast.success("Confirmation request sent"); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-
   const acceptMut = useMutation({
     mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
     onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+
   });
 
   return (
