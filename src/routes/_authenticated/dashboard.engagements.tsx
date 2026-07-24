@@ -33,7 +33,11 @@ function EngagementsPage() {
   const [stars, setStars] = useState(5);
   const [comment, setComment] = useState("");
 
-  const confirmMut = useMutation({ mutationFn: (id: string) => confirmFn({ data: { id } }), onSuccess: () => { toast.success("Confirmed"); qc.invalidateQueries(); } });
+  const confirmMut = useMutation({
+    mutationFn: (id: string) => confirmFn({ data: { id } }),
+    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
+  });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success("Marked complete"); qc.invalidateQueries(); } });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; to_user_id: string }) => rateFn({ data: { ...v, stars, comment: comment || null } }),
