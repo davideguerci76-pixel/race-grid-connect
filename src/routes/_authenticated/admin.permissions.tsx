@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { adminListFreelancers, adminListTeams, adminSetAdminRole } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
+import { useSort, Th } from "@/lib/use-sort";
 
 export const Route = createFileRoute("/_authenticated/admin/permissions")({
   component: AdminPermissions,
@@ -26,6 +27,8 @@ function AdminPermissions() {
     if (!s) return all;
     return all.filter((r: any) => [r.display_name, r.email].filter(Boolean).some((v: string) => String(v).toLowerCase().includes(s)));
   }, [all, q]);
+
+  const { sorted, toggle, indicator } = useSort<any>(rows);
 
   async function onToggle(user_id: string, isAdmin: boolean, name: string) {
     if (!confirm(isAdmin ? `Revoke admin from ${name}?` : `Grant admin to ${name}?`)) return;
@@ -68,15 +71,15 @@ function AdminPermissions() {
         <table className="w-full min-w-[800px] text-xs">
           <thead className="bg-secondary text-[10px] font-bold uppercase tracking-widest">
             <tr>
-              <th className="px-2 py-2 text-left">Name</th>
-              <th className="px-2 py-2 text-left">Email</th>
-              <th className="px-2 py-2 text-left">Type</th>
-              <th className="px-2 py-2 text-left">Roles</th>
+              <Th onClick={() => toggle("display_name")} label={`Name${indicator("display_name")}`} />
+              <Th onClick={() => toggle("email")} label={`Email${indicator("email")}`} />
+              <Th onClick={() => toggle("user_type")} label={`Type${indicator("user_type")}`} />
+              <Th onClick={() => toggle("roles")} label={`Roles${indicator("roles")}`} />
               <th className="px-2 py-2 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r: any) => {
+            {sorted.map((r: any) => {
               const isAdmin = (r.roles ?? []).includes("admin");
               const isPrimary = (r.email ?? "").toLowerCase() === "davideguerci76@gmail.com";
               return (
