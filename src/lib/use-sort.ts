@@ -1,5 +1,15 @@
 import { useMemo, useState } from "react";
 
+export function Th({ label, onClick, align = "left" }: { label: string; onClick: () => void; align?: "left" | "right" }) {
+  return (
+    <th className={`px-2 py-2 text-${align}`}>
+      <button type="button" onClick={onClick} className="uppercase tracking-widest hover:text-racing-red">
+        {label}
+      </button>
+    </th>
+  );
+}
+
 export type SortDir = "asc" | "desc";
 
 export function useSort<T>(rows: T[], initialKey?: string, initialDir: SortDir = "asc") {
