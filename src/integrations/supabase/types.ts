@@ -29,6 +29,27 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_time_settings: {
+        Row: {
+          id: boolean
+          offset_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: boolean
+          offset_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: boolean
+          offset_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       availability: {
         Row: {
           created_at: string
@@ -456,8 +477,13 @@ export type Database = {
           engagement_id: string
           from_user_id: string
           id: string
+          notified_at: string | null
+          overall: number | null
           stars: number
+          sub_scores: Json
           to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
         }
         Insert: {
           comment?: string | null
@@ -465,8 +491,13 @@ export type Database = {
           engagement_id: string
           from_user_id: string
           id?: string
+          notified_at?: string | null
+          overall?: number | null
           stars: number
+          sub_scores?: Json
           to_user_id: string
+          token_bonus_awarded?: boolean
+          unlocked_at?: string | null
         }
         Update: {
           comment?: string | null
@@ -474,8 +505,13 @@ export type Database = {
           engagement_id?: string
           from_user_id?: string
           id?: string
+          notified_at?: string | null
+          overall?: number | null
           stars?: number
+          sub_scores?: Json
           to_user_id?: string
+          token_bonus_awarded?: boolean
+          unlocked_at?: string | null
         }
         Relationships: [
           {
@@ -787,6 +823,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_time_offset: { Args: { _days: number }; Returns: number }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -835,6 +872,17 @@ export type Database = {
         }
         Returns: number
       }
+      emit_rating_available_notifications: { Args: never; Returns: number }
+      get_user_rating_summary: {
+        Args: { _user_id: string }
+        Returns: {
+          average: number
+          count: number
+          punct: number
+          stress: number
+          tech: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -850,6 +898,7 @@ export type Database = {
         }[]
       }
       my_token_balance: { Args: never; Returns: number }
+      rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
@@ -928,6 +977,35 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      sim_now: { Args: never; Returns: string }
+      submit_rating_v2: {
+        Args: {
+          _comment?: string
+          _engagement_id: string
+          _overall: number
+          _sub_scores: Json
+        }
+        Returns: {
+          comment: string | null
+          created_at: string
+          engagement_id: string
+          from_user_id: string
+          id: string
+          notified_at: string | null
+          overall: number | null
+          stars: number
+          sub_scores: Json
+          to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ratings"
           isOneToOne: true
           isSetofReturn: false
         }
