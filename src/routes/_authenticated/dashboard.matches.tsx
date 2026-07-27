@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
+import { CalendarQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
