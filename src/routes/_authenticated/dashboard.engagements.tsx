@@ -28,6 +28,16 @@ function EngagementsPage() {
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
   const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const { data: myRatedIds = [] } = useQuery({
+    queryKey: ["my-rated-engagement-ids", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ratings").select("engagement_id, unlocked_at").eq("from_user_id", user!.id);
+      if (error) return [];
+      return (data ?? []) as { engagement_id: string; unlocked_at: string | null }[];
+    },
+  });
+  const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
   const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
   useEffect(() => {
