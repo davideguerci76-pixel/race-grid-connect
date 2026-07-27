@@ -56,8 +56,12 @@ function EngagementsPage() {
       const avg = (tech + punct + stress) / 3;
       return rateFn({ data: { engagement_id: v.engagement_id, overall: Math.round(avg * 10) / 10, sub_scores: { technical: tech, punctuality: punct, stress }, comment: comment || null } });
     },
-    onSuccess: () => {
-      toast.success(t("rating.submitted_bonus"));
+    onSuccess: (res: any) => {
+      if (res && res.ok === false && res.already_rated) {
+        toast.info("You have already submitted a rating for this engagement.");
+      } else {
+        toast.success(t("rating.submitted_bonus"));
+      }
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
       qc.invalidateQueries();
     },
