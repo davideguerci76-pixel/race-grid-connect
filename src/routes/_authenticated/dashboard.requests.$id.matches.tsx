@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
+import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
@@ -102,6 +103,36 @@ function RequestMatchesPage() {
                         <Phone className="size-3" /> {data.hired.phone_dial_code} {data.hired.phone_number}
                       </a>
                     ) : <div className="text-muted-foreground">No phone on file</div>}
+                  </div>
+                </div>
+
+                <div className="mt-4 border-t border-racing-yellow/30 pt-4">
+                  <div className="label-mono mb-2 text-racing-yellow">[QUICK ACTIONS]</div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div>
+                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Add match dates to calendar</div>
+                      <CalendarQuickButtons
+                        event={{
+                          title: `Match — ${data.request.title}`,
+                          startDate: data.request.start_date,
+                          endDate: data.request.end_date,
+                          location: data.request.location ?? data.request.circuit ?? null,
+                          description: `${roleLabel(data.request.role)} · ${disciplineLabel(data.request.discipline)}\nFreelancer: ${data.hired.display_name ?? ""}${data.hired.contact_email ? `\nEmail: ${data.hired.contact_email}` : ""}${data.hired.phone_number ? `\nPhone: ${data.hired.phone_dial_code ?? ""} ${data.hired.phone_number}` : ""}`,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Save freelancer contact</div>
+                      <ContactQuickButtons
+                        contact={{
+                          fullName: data.hired.display_name ?? "Freelancer",
+                          email: data.hired.contact_email ?? null,
+                          phone: data.hired.phone_number ? `${data.hired.phone_dial_code ?? ""}${data.hired.phone_number}`.replace(/\s+/g, "") : null,
+                          title: data.hired.role ? roleLabel(data.hired.role) : null,
+                          notes: `PaddockMatch — Match confirmed for "${data.request.title}"`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

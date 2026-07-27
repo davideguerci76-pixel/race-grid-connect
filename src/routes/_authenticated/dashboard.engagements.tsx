@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
+import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -211,6 +212,20 @@ function EngagementsPage() {
                   </div>
                 </div>
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
+                {(e.status === "confirmed" || e.status === "completed") && (
+                  <div className="mt-4 border-t border-border pt-3">
+                    <div className="label-mono mb-2">[ADD TO CALENDAR]</div>
+                    <CalendarQuickButtons
+                      event={{
+                        title: `Match — ${req?.title ?? other?.display_name ?? "PaddockMatch"}`,
+                        startDate: e.start_date,
+                        endDate: e.end_date,
+                        location: req?.location ?? req?.circuit ?? null,
+                        description: req ? `${req.title}${req.notes ? `\n\n${req.notes}` : ""}` : "",
+                      }}
+                    />
+                  </div>
+                )}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {e.status === "proposed" && e.proposed_by !== user?.id && (
                     <button onClick={() => confirmMut.mutate(e.id)} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110">

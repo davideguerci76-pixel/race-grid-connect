@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor } from "@/lib/paddock";
+import { CalendarQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
@@ -157,6 +158,20 @@ function MatchesPage() {
                         {m.request?.start_date} → {m.request?.end_date} · {t(`role.${m.request?.role}`)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">Overlap: {m.overlap_days} day(s)</div>
+                      {isConfirmed && m.request?.start_date && m.request?.end_date && (
+                        <div className="mt-3 border-t border-racing-yellow/30 pt-3">
+                          <div className="label-mono mb-2 text-racing-yellow">[ADD TO CALENDAR]</div>
+                          <CalendarQuickButtons
+                            event={{
+                              title: `Match — ${m.request?.title ?? "PaddockMatch"}`,
+                              startDate: m.request.start_date,
+                              endDate: m.request.end_date,
+                              location: m.request?.location ?? m.request?.circuit ?? null,
+                              description: m.request?.notes ?? "",
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-stretch gap-2">
