@@ -28,6 +28,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authenticated/admin.matching'
@@ -135,6 +136,12 @@ const AuthenticatedDashboardCalendarRoute =
     path: '/calendar',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedAdminTokensRoute =
+  AuthenticatedAdminTokensRouteImport.update({
+    id: '/tokens',
+    path: '/tokens',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -238,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/admin/matching'
     | '/admin/permissions'
     | '/admin/teams'
+    | '/admin/tokens'
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/admin/matching'
     | '/admin/permissions'
     | '/admin/teams'
+    | '/admin/tokens'
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
@@ -317,6 +329,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/matching'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/teams'
+    | '/_authenticated/admin/tokens'
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/admin/tokens': {
+      id: '/_authenticated/admin/tokens'
+      path: '/tokens'
+      fullPath: '/admin/tokens'
+      preLoaderRoute: typeof AuthenticatedAdminTokensRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/teams': {
       id: '/_authenticated/admin/teams'
       path: '/teams'
@@ -526,6 +546,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMatchingRoute: typeof AuthenticatedAdminMatchingRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
+  AuthenticatedAdminTokensRoute: typeof AuthenticatedAdminTokensRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -533,6 +554,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMatchingRoute: AuthenticatedAdminMatchingRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
+  AuthenticatedAdminTokensRoute: AuthenticatedAdminTokensRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
