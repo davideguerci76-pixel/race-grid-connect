@@ -66,12 +66,7 @@ function FreelancerProfile() {
                   {educationLabel(fp.education)}
                 </div>
               )}
-              {ratings.length > 0 && (
-                <div className="mt-2 flex items-center gap-2">
-                  <RatingStars value={Math.round(avg)} readOnly size={16} />
-                  <span className="font-mono text-xs text-muted-foreground">{avg.toFixed(1)} ({ratings.length})</span>
-                </div>
-              )}
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" /></div>
             </div>
             {fp.day_rate && (
               <div className="text-right">
