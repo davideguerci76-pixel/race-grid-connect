@@ -723,31 +723,13 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
 
 
-    // Fetch emails/phones only for unlocked candidates
-    const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
-    const emailMap = new Map<string, string | null>();
-    const phoneMap = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
-    if (unlockedIds.length) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: contacts } = await supabaseAdmin
-          .from("freelancer_contacts")
-          .select("user_id, phone_dial_code, phone_number")
-          .in("user_id", unlockedIds);
-        (contacts ?? []).forEach((c: any) => phoneMap.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number }));
-        await Promise.all(unlockedIds.map(async (uid) => {
-          const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
-          emailMap.set(uid, data?.user?.email ?? null);
-        }));
-      } catch {
-        // ignore
-      }
-    }
+    // Contacts and real names are NEVER exposed on the request-matches view.
+    // They are surfaced only inside the `hired` block below, after the freelancer
+    // has confirmed the match.
 
     const items = pageRows.map((m: any) => {
       const unlocked = unlockMap.has(m.id) || topThreeIds.has(m.id);
       const wasFree = unlockMap.get(m.id)?.free_preview ?? topThreeIds.has(m.id);
-      const prof = profMap.get(m.freelancer_id);
       const fp = fpMap.get(m.freelancer_id);
       return {
         match_id: m.id,
@@ -764,8 +746,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         },
         profile: unlocked
           ? {
-              display_name: prof?.display_name ?? "Freelancer",
-              avatar_url: prof?.avatar_url ?? null,
+              // Name and avatar hidden — revealed only after the freelancer confirms the match.
+              display_name: null,
+              avatar_url: null,
               headline: fp?.headline ?? null,
               role: fp?.role ?? null,
               disciplines: fp?.disciplines ?? [],
@@ -777,13 +760,15 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               education: fp?.education ?? null,
               experiences: fp?.experiences ?? [],
               languages: fp?.languages ?? [],
-              contact_email: emailMap.get(m.freelancer_id) ?? null,
-              phone_dial_code: phoneMap.get(m.freelancer_id)?.phone_dial_code ?? null,
-              phone_number: phoneMap.get(m.freelancer_id)?.phone_number ?? null,
+              // Contacts remain hidden until the match is confirmed.
+              contact_email: null,
+              phone_dial_code: null,
+              phone_number: null,
             }
           : null,
       };
     });
+
 
     // If request has been completed/filled, surface the confirmed freelancer's contacts
     let hired: any = null;
