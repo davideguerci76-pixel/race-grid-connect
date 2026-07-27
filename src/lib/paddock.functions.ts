@@ -897,11 +897,12 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
       .in("status", ["confirmed", "completed"])
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`);
     if (error) throw new Error(error.message);
+    const { data: nowSim } = await supabase.rpc("sim_now");
     const items = [] as any[];
     for (const e of (engs ?? []) as any[]) {
       const { data: opens } = await supabase.rpc("rating_opens_at", { _engagement_id: e.id });
       const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
-      items.push({ ...e, opens_at: opens, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
+      items.push({ ...e, opens_at: opens, sim_now: nowSim, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
     }
     return items;
   });

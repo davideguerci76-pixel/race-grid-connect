@@ -202,7 +202,7 @@ function EngagementsPage() {
 
                   {(e.status === "confirmed" || e.status === "completed") && (() => {
                     const info = ratableMap.get(e.id);
-                    const now = Date.now();
+                    const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
                     const canRate = opensAt !== null && now >= opensAt;
                     if (info?.already_rated) {
