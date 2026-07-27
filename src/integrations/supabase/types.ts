@@ -1113,6 +1113,7 @@ export type Database = {
         | "tokens_credited"
         | "rating_available"
         | "rating_unlocked"
+        | "match_taken"
       request_status: "active" | "paused" | "closed" | "completed" | "filled"
       token_reason:
         | "signup_bonus"
@@ -1354,6 +1355,7 @@ export const Constants = {
         "tokens_credited",
         "rating_available",
         "rating_unlocked",
+        "match_taken",
       ],
       request_status: ["active", "paused", "closed", "completed", "filled"],
       token_reason: [
