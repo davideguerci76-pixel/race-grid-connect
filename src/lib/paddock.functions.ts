@@ -725,6 +725,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         unlocked,
         free_preview: wasFree,
         freelancer_id: m.freelancer_id,
+        rating: {
+          average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
+          count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
+        },
         profile: unlocked
           ? {
               display_name: prof?.display_name ?? "Freelancer",
