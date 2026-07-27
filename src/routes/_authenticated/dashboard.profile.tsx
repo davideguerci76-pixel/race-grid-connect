@@ -99,6 +99,30 @@ function ProfilePage() {
     </div>
   );
 }
+function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreelancer: boolean }) {
+  const getSummary = useServerFn(getUserRatingSummary);
+  const { data } = useQuery({
+    queryKey: ["profile-rating-summary", userId],
+    queryFn: () => getSummary({ data: { user_id: userId } }),
+  });
+  if (!data || !data.count) {
+    return (
+      <div className="border border-border bg-card px-4 py-3 text-right">
+        <div className="label-mono text-[10px]">[RATING]</div>
+        <div className="mt-1 font-mono text-[11px] text-muted-foreground">No ratings yet</div>
+      </div>
+    );
+  }
+  return (
+    <div className="border border-racing-yellow/50 bg-racing-yellow/5 px-4 py-3 text-right">
+      <div className="label-mono text-[10px] text-racing-yellow">[OVERALL RATING]</div>
+      <div className="mt-1 flex items-center justify-end gap-2">
+        <RatingIcons value={data.average} count={data.count} variant={isFreelancer ? "wrench" : "headset"} size={18} />
+      </div>
+    </div>
+  );
+}
+
 
 function PersonalInfoSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
