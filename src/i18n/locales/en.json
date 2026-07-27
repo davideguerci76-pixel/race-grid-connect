@@ -187,7 +187,9 @@
     "cancel": "Cancel",
     "rate": "Leave a rating",
     "rating_locked": "Rating unlocks after both sides mark completed",
-    "rate_them": "Rate {{name}}"
+    "rate_them": "Rate {{name}}",
+    "confirmed_toast": "Confirmed — contacts unlocked",
+    "marked_complete_toast": "Marked complete"
   },
   "rating": {
     "title": "Rating",
