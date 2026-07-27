@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { initialsFor, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
 import { Lock } from "lucide-react";
 
 type Search = { req?: string };
