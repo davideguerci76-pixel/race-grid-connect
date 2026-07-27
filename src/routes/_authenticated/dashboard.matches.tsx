@@ -1,20 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
-import { initialsFor } from "@/lib/paddock";
+import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
 });
+
 
 function formatCriterion(c: any): string {
   switch (c.kind) {
