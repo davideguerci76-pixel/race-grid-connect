@@ -229,8 +229,7 @@ function EngagementsPage() {
                         <div className="mt-2">
                           <ContactQuickButtons
                             contact={{
-                              firstName: (other?.display_name ?? "Freelancer").split(" ")[0] ?? "Freelancer",
-                              lastName: (other?.display_name ?? "").split(" ").slice(1).join(" ") || undefined,
+                              fullName: other?.display_name ?? "Freelancer",
                               organization: fp?.role ? String(fp.role) : undefined,
                               title: fp?.headline ?? undefined,
                               email: e.freelancer_contact?.email ?? undefined,
@@ -238,6 +237,7 @@ function EngagementsPage() {
                               notes: req?.title ? `PaddockMatch — ${req.title}` : undefined,
                             }}
                           />
+
                         </div>
                       </div>
                     )}
