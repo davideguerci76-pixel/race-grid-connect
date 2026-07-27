@@ -112,6 +112,7 @@ function AdminTeams() {
                 <Th onClick={() => toggle("team.primary_discipline")} label={`Discipline${indicator("team.primary_discipline")}`} />
                 <Th onClick={() => toggle("team.location")} label={`Location${indicator("team.location")}`} />
                 <Th onClick={() => toggle("team.website")} label={`Website${indicator("team.website")}`} />
+                <Th onClick={() => toggle("rating_avg")} label={`Rating${indicator("rating_avg")}`} />
                 <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
                 <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
