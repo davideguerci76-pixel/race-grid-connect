@@ -155,6 +155,13 @@ function AdminFreelancers() {
                   <td className="px-2 py-2 text-muted-foreground">{r.freelancer?.location ?? "—"}</td>
                   <td className="px-2 py-2 font-mono text-muted-foreground">{r.freelancer?.phone_number ? `${r.freelancer?.phone_dial_code ?? ""} ${r.freelancer?.phone_number}`.trim() : "—"}</td>
                   <td className="px-2 py-2 text-right">{r.freelancer?.day_rate ?? "—"}</td>
+                  <td className="px-2 py-2">
+                    {r.rating_count > 0 ? (
+                      <RatingIcons variant="wrench" value={r.rating_avg} count={r.rating_count} size={14} />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="px-2 py-2 text-right font-bold">{r.token_balance}</td>
                   <td className="px-2 py-2">
                     {r.blocked_at ? (
