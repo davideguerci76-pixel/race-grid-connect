@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
+import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
