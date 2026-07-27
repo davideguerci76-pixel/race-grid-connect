@@ -434,6 +434,42 @@ export type Database = {
           },
         ]
       }
+      platform_settings: {
+        Row: {
+          category: string
+          description: string | null
+          key: string
+          label: string
+          sort_order: number
+          unit: string
+          updated_at: string
+          updated_by: string | null
+          value_num: number
+        }
+        Insert: {
+          category?: string
+          description?: string | null
+          key: string
+          label: string
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_num: number
+        }
+        Update: {
+          category?: string
+          description?: string | null
+          key?: string
+          label?: string
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_num?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -873,6 +909,10 @@ export type Database = {
         Returns: number
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
+      get_setting_num: {
+        Args: { _default: number; _key: string }
+        Returns: number
+      }
       get_user_rating_summary: {
         Args: { _user_id: string }
         Returns: {
