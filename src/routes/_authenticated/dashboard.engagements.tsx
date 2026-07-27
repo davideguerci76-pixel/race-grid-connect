@@ -219,13 +219,16 @@ function EngagementsPage() {
 
                   {(e.status === "confirmed" || e.status === "completed") && (() => {
                     const info = ratableMap.get(e.id);
+                    const mineRated = ratedMap.get(e.id);
+                    const alreadyRated = !!info?.already_rated || !!mineRated;
+                    const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
                     const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
                     const canRate = opensAt !== null && now >= opensAt;
-                    if (info?.already_rated) {
+                    if (alreadyRated) {
                       return (
                         <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                          {info.unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
+                          {unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
                         </span>
                       );
                     }
