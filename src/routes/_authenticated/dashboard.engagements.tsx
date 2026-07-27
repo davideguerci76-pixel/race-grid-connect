@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
