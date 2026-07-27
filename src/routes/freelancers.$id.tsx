@@ -26,13 +26,8 @@ function FreelancerProfile() {
     queryFn: async () => {
       const { data: fp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", id).maybeSingle();
       if (!fp) throw notFound();
-      const [{ data: availability }, { data: ratings }] = await Promise.all([
-        supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
-        supabase.from("ratings").select("stars, comment, created_at").eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
-      ]);
-      const rows = ((ratings ?? []) as unknown) as Array<{ stars: number; created_at: string; comment?: string | null }>;
-      const avg = rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
-      return { fp, availability: availability ?? [], ratings: rows, avg };
+      const { data: availability } = await supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60);
+      return { fp, availability: availability ?? [] };
     },
   });
 
@@ -52,7 +47,8 @@ function FreelancerProfile() {
   }
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
 
-  const { fp, availability, ratings, avg } = data;
+  const { fp, availability } = data;
+  const isOwner = user.id === id;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
