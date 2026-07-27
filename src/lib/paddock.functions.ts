@@ -377,31 +377,53 @@ export const getMyMatches = createServerFn({ method: "GET" })
     // Fetch pending "proposed" engagements addressed to the current user
     const matchIds = rawMatches.map((m: any) => m.id);
     const pendingByMatchId = new Map<string, string>();
+    const confirmedMatchIds = new Set<string>();
+    const takenRequestIds = new Set<string>();
     if (matchIds.length) {
       const { data: eng } = await supabase
         .from("engagements")
-        .select("id, match_id, status, proposed_by")
-        .in("match_id", matchIds)
-        .eq("status", "proposed")
-        .neq("proposed_by", userId);
-      (eng ?? []).forEach((e: any) => { if (e.match_id) pendingByMatchId.set(e.match_id, e.id); });
+        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id")
+        .in("match_id", matchIds);
+      (eng ?? []).forEach((e: any) => {
+        if (e.status === "proposed" && e.proposed_by !== userId && e.match_id) {
+          pendingByMatchId.set(e.match_id, e.id);
+        }
+        if (e.status === "confirmed" && e.match_id) confirmedMatchIds.add(e.match_id);
+      });
+      // Requests already filled by someone else (freelancer view of race-lost matches)
+      const reqIds = Array.from(new Set(rawMatches.map((m: any) => m.request?.id).filter(Boolean)));
+      if (reqIds.length && isFreelancer) {
+        const { data: filledReqs } = await supabase
+          .from("engagements")
+          .select("request_id, freelancer_id, status")
+          .in("request_id", reqIds)
+          .eq("status", "confirmed");
+        (filledReqs ?? []).forEach((r: any) => {
+          if (r.freelancer_id !== userId && r.request_id) takenRequestIds.add(r.request_id);
+        });
+      }
     }
 
     const redacted = rawMatches.map((m: any) => {
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
+      const isConfirmed = confirmedMatchIds.has(m.id);
+      // Names/contacts stay hidden until a confirmed engagement links the two parties.
+      // Token unlock only reveals technical info.
       let counterparty: any = null;
       if (revealedByMe) {
         if (isFreelancer) {
           const tp = teamProfilesById.get(m.team_id);
           counterparty = tp ? {
-            team_name: tp.team_name,
+            // team_name is intentionally hidden until confirmed
+            team_name: isConfirmed ? tp.team_name : null,
             team_type: tp.team_type,
             location: tp.location,
-            website: tp.website,
+            // website/contact_email withheld — freelancer only ever sees team name post-confirmation
+            website: null,
             bio: tp.bio,
             primary_discipline: tp.primary_discipline,
-            initials: tp.initials,
-            contact_email: emailsById.get(m.team_id) ?? null,
+            initials: isConfirmed ? tp.initials : null,
+            contact_email: null,
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
@@ -414,15 +436,26 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            contact_email: emailsById.get(m.freelancer_id) ?? null,
+            // Contacts only after confirmed match
+            contact_email: isConfirmed ? (emailsById.get(m.freelancer_id) ?? null) : null,
           } : null;
         }
-      } else {
-        if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
-        if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe, counterparty, pending_engagement_id: pendingByMatchId.get(m.id) ?? null };
+      // Always hide display_name in the joined profile rows unless the engagement is confirmed
+      if (!isConfirmed) {
+        if (m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
+        if (m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
+      }
+      return {
+        ...m,
+        revealedByMe,
+        counterparty,
+        isConfirmed,
+        matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
+        pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
+      };
     });
+
 
     return {
       matches: redacted,
@@ -675,46 +708,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
     const ids4 = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
     const matchIds4 = pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"];
-    let profs: any[] = [];
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", ids4);
-      profs = data ?? [];
-    } catch { /* ignore */ }
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
       supabase.from("freelancer_profiles").select("*").in("user_id", ids4),
       supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", matchIds4),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
-    const profMap = new Map(profs.map((r: any) => [r.id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
 
 
-    // Fetch emails/phones only for unlocked candidates
-    const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
-    const emailMap = new Map<string, string | null>();
-    const phoneMap = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
-    if (unlockedIds.length) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: contacts } = await supabaseAdmin
-          .from("freelancer_contacts")
-          .select("user_id, phone_dial_code, phone_number")
-          .in("user_id", unlockedIds);
-        (contacts ?? []).forEach((c: any) => phoneMap.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number }));
-        await Promise.all(unlockedIds.map(async (uid) => {
-          const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
-          emailMap.set(uid, data?.user?.email ?? null);
-        }));
-      } catch {
-        // ignore
-      }
-    }
+
+    // Contacts and real names are NEVER exposed on the request-matches view.
+    // They are surfaced only inside the `hired` block below, after the freelancer
+    // has confirmed the match.
 
     const items = pageRows.map((m: any) => {
       const unlocked = unlockMap.has(m.id) || topThreeIds.has(m.id);
       const wasFree = unlockMap.get(m.id)?.free_preview ?? topThreeIds.has(m.id);
-      const prof = profMap.get(m.freelancer_id);
       const fp = fpMap.get(m.freelancer_id);
       return {
         match_id: m.id,
@@ -731,8 +740,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         },
         profile: unlocked
           ? {
-              display_name: prof?.display_name ?? "Freelancer",
-              avatar_url: prof?.avatar_url ?? null,
+              // Name and avatar hidden — revealed only after the freelancer confirms the match.
+              display_name: null,
+              avatar_url: null,
               headline: fp?.headline ?? null,
               role: fp?.role ?? null,
               disciplines: fp?.disciplines ?? [],
@@ -744,13 +754,15 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               education: fp?.education ?? null,
               experiences: fp?.experiences ?? [],
               languages: fp?.languages ?? [],
-              contact_email: emailMap.get(m.freelancer_id) ?? null,
-              phone_dial_code: phoneMap.get(m.freelancer_id)?.phone_dial_code ?? null,
-              phone_number: phoneMap.get(m.freelancer_id)?.phone_number ?? null,
+              // Contacts remain hidden until the match is confirmed.
+              contact_email: null,
+              phone_dial_code: null,
+              phone_number: null,
             }
           : null,
       };
     });
+
 
     // If request has been completed/filled, surface the confirmed freelancer's contacts
     let hired: any = null;

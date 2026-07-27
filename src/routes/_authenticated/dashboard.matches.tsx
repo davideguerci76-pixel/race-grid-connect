@@ -99,24 +99,27 @@ function MatchesPage() {
         ) : (
           <div className="mt-8 grid gap-3">
             {matches.map((m: any) => {
-              const counterparty = isFreelancer ? m.team : m.freelancer;
               const cp = m.counterparty;
               const pct = Math.round(Number(m.match_score ?? 0));
               const perfect = m.is_perfect;
-              const requestFilled = m.request?.status === "filled";
+              const isConfirmed = !!m.isConfirmed;
+              const matchTaken = !!m.matchTaken;
+              const showName = isConfirmed;
               return (
                 <div key={m.id} className={`grid gap-4 border p-5 md:grid-cols-[1fr,auto] md:items-start ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                   <div className="flex items-start gap-4">
-                    <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${m.revealedByMe ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
-                      {m.revealedByMe ? initialsFor((isFreelancer ? cp?.team_name : counterparty?.display_name) ?? counterparty?.display_name ?? "?") : <Lock className="size-4" />}
+                    <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${showName ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
+                      {showName
+                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : "?"))
+                        : <Lock className="size-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
                         {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
                       </div>
                       <div className="mt-1 text-lg font-bold">
-                        {m.revealedByMe
-                          ? (isFreelancer ? (cp?.team_name ?? counterparty?.display_name) : (counterparty?.display_name))
+                        {showName
+                          ? (isFreelancer ? (cp?.team_name ?? "Team") : "Freelancer")
                           : t("matches.hidden_name")}
                       </div>
                       {m.revealedByMe && cp && (
@@ -125,12 +128,12 @@ function MatchesPage() {
                             <>
                               {cp.team_type && <div><span className="text-muted-foreground">Type:</span> <span className="font-medium">{cp.team_type}</span></div>}
                               {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
-                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
-                              {cp.website && <div><span className="text-muted-foreground">Website:</span> <a href={cp.website} target="_blank" rel="noopener" className="font-medium text-racing-red hover:underline">{cp.website}</a></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
-                              <div className="mt-2">
-                                <a href={`/teams/${m.team_id}?req=${m.request?.id ?? ""}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View team profile →</a>
-                              </div>
+                              {!isConfirmed && (
+                                <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                                  Team name is revealed only after you confirm the match.
+                                </div>
+                              )}
                             </>
                           ) : (
                             <>
@@ -138,11 +141,12 @@ function MatchesPage() {
                               {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
                               {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">Day rate:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
                               {cp.travels !== null && <div><span className="text-muted-foreground">Travels:</span> <span className="font-medium">{cp.travels ? "Yes" : "No"}</span></div>}
-                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
-                              <div className="mt-2">
-                                <a href={`/freelancers/${m.freelancer_id}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View full profile →</a>
-                              </div>
+                              {!isConfirmed && (
+                                <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                                  Name and contacts are revealed only after the freelancer confirms the match.
+                                </div>
+                              )}
                             </>
                           )}
                         </div>
@@ -163,16 +167,16 @@ function MatchesPage() {
                     ) : (
                       <button
                         onClick={() => { if (confirm(t("matches.reveal_confirm", { who: isFreelancer ? t("nav.teams") : t("nav.freelancers") }))) mut.mutate(m.id); }}
-                        disabled={mut.isPending}
+                        disabled={mut.isPending || matchTaken}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
                         {t("matches.reveal_1_token")}
                       </button>
                     )}
-                    {isFreelancer && m.pending_engagement_id && !requestFilled && (
+                    {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
                       <button
                         onClick={() => {
-                          if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) {
+                          if (confirm("Confirm this match? Your contact details will be shared with the team and the request will be closed.")) {
                             acceptMut.mutate(m.pending_engagement_id);
                           }
                         }}
@@ -182,9 +186,14 @@ function MatchesPage() {
                         {t("engagements.confirm")}
                       </button>
                     )}
-                    {isFreelancer && requestFilled && (
+                    {isFreelancer && matchTaken && (
+                      <span className="inline-flex items-center justify-center border border-border bg-secondary/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                        Match already assigned to another professional
+                      </span>
+                    )}
+                    {isFreelancer && isConfirmed && (
                       <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        Request filled
+                        Match confirmed
                       </span>
                     )}
 
@@ -198,4 +207,5 @@ function MatchesPage() {
       <SiteFooter />
     </div>
   );
+
 }

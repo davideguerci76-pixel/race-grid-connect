@@ -29,7 +29,7 @@ function RequestMatchesPage() {
   const unlockMut = useMutation({
     mutationFn: (match_id: string) => unlockFn({ data: { match_id } }),
     onSuccess: (r) => {
-      toast.success(`Candidate unlocked. Balance: ${r.balance} tokens`);
+      toast.success(`Match unlocked. Balance: ${r.balance} tokens`);
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
@@ -40,12 +40,13 @@ function RequestMatchesPage() {
   const confirmMut = useMutation({
     mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
     onSuccess: () => {
-      toast.success("Confirmation request sent to freelancer");
+      toast.success("Confirmation request sent to the freelancer");
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -66,13 +67,15 @@ function RequestMatchesPage() {
                 {roleLabel(data.request.role)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
-                <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 candidates by match score are unlocked automatically. Every other candidate costs 1 token to unlock.
+                <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 matches by score are unlocked automatically. Every other match costs 1 token to unlock its technical details. Real names and contacts appear only after the freelancer confirms the match.
               </p>
+
             </div>
 
             {data.hired && (
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
-                <div className="label-mono text-racing-yellow">[HIRED FREELANCER]</div>
+                <div className="label-mono text-racing-yellow">[CONFIRMED MATCH]</div>
+
                 <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
@@ -107,8 +110,9 @@ function RequestMatchesPage() {
 
             <div className="mt-6 flex items-center justify-between">
               <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                {data.pagination.total} candidate{data.pagination.total === 1 ? "" : "s"}
+                {data.pagination.total} match{data.pagination.total === 1 ? "" : "es"}
               </div>
+
               {data.pagination.totalPages > 1 && (
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <button
@@ -133,7 +137,7 @@ function RequestMatchesPage() {
             <div className="mt-4 grid gap-3">
               {data.items.length === 0 && (
                 <div className="border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-                  No candidates match this request yet.
+                  No matches for this request yet.
                 </div>
               )}
               {data.items.map((m) => (
@@ -144,10 +148,11 @@ function RequestMatchesPage() {
                   onUnlock={() => unlockMut.mutate(m.match_id)}
                   onConfirm={() => {
 
-                    if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) {
+                    if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
                       confirmMut.mutate(m.match_id);
                     }
                   }}
+
                   loading={unlockMut.isPending || confirmMut.isPending}
                 />
               ))}
@@ -191,7 +196,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               disabled={loading}
               className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
             >
-              <Unlock className="size-3" /> Unlock profile (1 token)
+              <Unlock className="size-3" /> Unlock details (1 token)
             </button>
           )}
           {match.unlocked && !requestFilled && (
@@ -205,7 +210,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           )}
           {requestFilled && (
             <span className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-              Request filled
+              Match already assigned
             </span>
           )}
         </div>
@@ -215,11 +220,11 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
         <div className="mt-4 grid gap-4 border-t border-border pt-4 md:grid-cols-2">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase">
-                {match.profile.display_name?.slice(0, 2) ?? "?"}
+              <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase text-muted-foreground">
+                <Lock className="size-4" />
               </div>
               <div>
-                <div className="text-lg font-bold">{match.profile.display_name}</div>
+                <div className="text-lg font-bold text-muted-foreground">Hidden freelancer</div>
                 {match.profile.role && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(match.profile.role)}</div>}
               </div>
             </div>
@@ -233,12 +238,9 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           </div>
           <div>
             <div className="label-mono mb-1">[CONTACT]</div>
-            {match.profile.contact_email && (
-              <div className="flex items-center gap-2 font-mono text-xs"><Mail className="size-3" /> {match.profile.contact_email}</div>
-            )}
-            {match.profile.phone_number && (
-              <div className="mt-1 flex items-center gap-2 font-mono text-xs"><Phone className="size-3" /> {match.profile.phone_dial_code} {match.profile.phone_number}</div>
-            )}
+            <div className="rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Name and contacts are revealed only after the freelancer confirms the match.
+            </div>
             {match.profile.disciplines?.length > 0 && (
               <>
                 <div className="label-mono mb-1 mt-3">[DISCIPLINES]</div>
@@ -260,6 +262,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               </>
             )}
           </div>
+
           <div className="md:col-span-2 border-t border-border pt-4">
             <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {match.missing_criteria.length === 0 ? "Criteria" : "Missing / partial criteria"}</div>
             {match.missing_criteria.length === 0 ? (
@@ -290,8 +293,9 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
             </div>
           )}
           <div className="mt-3 rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Full profile, contact email and phone are hidden until you unlock.
+            Technical details are hidden until you unlock (1 token). Real name and contacts appear only after the freelancer confirms the match.
           </div>
+
         </div>
       )}
 
