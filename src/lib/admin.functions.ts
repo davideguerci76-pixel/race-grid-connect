@@ -235,3 +235,49 @@ export const adminUpdateMatchingWeights = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---- Platform / token settings ----
+export const adminListSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data, error } = await context.supabase
+      .from("platform_settings")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const adminUpdateSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      updates: z.array(z.object({ key: z.string().min(1), value_num: z.number().min(0) })).min(1),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const nowIso = new Date().toISOString();
+    for (const u of data.updates) {
+      const { error } = await supabaseAdmin
+        .from("platform_settings")
+        .update({ value_num: u.value_num, updated_at: nowIso, updated_by: context.userId } as never)
+        .eq("key", u.key);
+      if (error) throw new Error(`${u.key}: ${error.message}`);
+    }
+    return { ok: true, count: data.updates.length };
+  });
+
+// Public reader (auth): any signed-in user can look up current values (e.g. UI hints)
+export const getPlatformSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("platform_settings")
+      .select("key, value_num, category, label, unit");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+
