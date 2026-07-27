@@ -700,6 +700,27 @@ export type Database = {
           },
         ]
       }
+      review_unlocks: {
+        Row: {
+          created_at: string
+          id: string
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       team_profiles: {
         Row: {
           bio: string | null
@@ -909,6 +930,16 @@ export type Database = {
         Returns: number
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
+      get_anonymous_reviews: {
+        Args: { _target: string }
+        Returns: {
+          comment: string
+          created_at: string
+          overall: number
+          stars: number
+          sub_scores: Json
+        }[]
+      }
       get_setting_num: {
         Args: { _default: number; _key: string }
         Returns: number
@@ -979,6 +1010,7 @@ export type Database = {
         }[]
       }
       reveal_request: { Args: { _request_id: string }; Returns: number }
+      reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
       set_request_status: {
         Args: {
