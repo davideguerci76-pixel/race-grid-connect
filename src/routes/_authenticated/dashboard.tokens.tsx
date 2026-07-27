@@ -6,12 +6,14 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { purchaseTokensDemo, getTokenHistory } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
 
 const PACKS = [
-  { key: "small" as const, tokens: 10, price: "€ 9" },
-  { key: "medium" as const, tokens: 50, price: "€ 39" },
-  { key: "large" as const, tokens: 200, price: "€ 129" },
+  { key: "small" as const, tokens: 10 },
+  { key: "medium" as const, tokens: 50 },
+  { key: "large" as const, tokens: 200 },
 ];
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
   component: TokensPage,
