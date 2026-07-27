@@ -293,8 +293,9 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
             </div>
           )}
           <div className="mt-3 rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Full profile, contact email and phone are hidden until you unlock.
+            Technical details are hidden until you unlock (1 token). Real name and contacts appear only after the freelancer confirms the match.
           </div>
+
         </div>
       )}
 
