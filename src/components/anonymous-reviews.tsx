@@ -1,21 +1,56 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 import { RatingIcons } from "@/components/rating-icons";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { getUserRatingSummary, getAnonymousReviews, unlockReviews } from "@/lib/paddock.functions";
 
 type Variant = "wrench" | "headset";
 
-export function ProfileRatingBadge({ userId, variant = "wrench" }: { userId: string; variant?: Variant }) {
+export function ProfileRatingBadge({
+  userId,
+  variant = "wrench",
+  isOwner = false,
+}: {
+  userId: string;
+  variant?: Variant;
+  isOwner?: boolean;
+}) {
+  const { t } = useTranslation();
   const getSummary = useServerFn(getUserRatingSummary);
+  const [open, setOpen] = useState(false);
   const { data } = useQuery({
     queryKey: ["rating-summary", userId],
     queryFn: () => getSummary({ data: { user_id: userId } }),
   });
   if (!data || !data.count) return null;
-  return <RatingIcons value={data.average} count={data.count} variant={variant} />;
+  const icons = <RatingIcons value={data.average} count={data.count} variant={variant} />;
+  if (!isOwner) return icons;
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="cursor-pointer transition hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing-yellow"
+        title={t("reviews.view_mine", { defaultValue: "View my reviews" }) as string}
+      >
+        {icons}
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-xs uppercase tracking-widest text-racing-red">
+              {t("reviews.my_reviews", { defaultValue: "Reviews received" })}
+            </DialogTitle>
+          </DialogHeader>
+          <AnonymousReviewsSection targetUserId={userId} variant={variant} isOwner />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 export function AnonymousReviewsSection({
