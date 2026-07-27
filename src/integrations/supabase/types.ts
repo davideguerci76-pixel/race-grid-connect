@@ -1033,6 +1033,8 @@ export type Database = {
         | "engagement_completed"
         | "rating_received"
         | "tokens_credited"
+        | "rating_available"
+        | "rating_unlocked"
       request_status: "active" | "paused" | "closed" | "completed" | "filled"
       token_reason:
         | "signup_bonus"
@@ -1043,6 +1045,7 @@ export type Database = {
         | "refund"
         | "request_post"
         | "team_reveal_spend"
+        | "rating_bonus"
       user_type: "freelancer" | "team"
     }
     CompositeTypes: {
@@ -1271,6 +1274,8 @@ export const Constants = {
         "engagement_completed",
         "rating_received",
         "tokens_credited",
+        "rating_available",
+        "rating_unlocked",
       ],
       request_status: ["active", "paused", "closed", "completed", "filled"],
       token_reason: [
@@ -1282,6 +1287,7 @@ export const Constants = {
         "refund",
         "request_post",
         "team_reveal_spend",
+        "rating_bonus",
       ],
       user_type: ["freelancer", "team"],
     },
