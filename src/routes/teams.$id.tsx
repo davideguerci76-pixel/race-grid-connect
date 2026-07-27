@@ -203,6 +203,9 @@ function TeamProfile() {
             </div>
           )}
         </div>
+        <div className="mt-8">
+          <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
+        </div>
       </div>
       {confirmFull && <ConfirmModal onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
       <SiteFooter />
