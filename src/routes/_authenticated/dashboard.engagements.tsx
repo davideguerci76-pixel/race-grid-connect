@@ -6,8 +6,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { RatingStars } from "@/components/rating-stars";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRating, markAllNotificationsRead } from "@/lib/paddock.functions";
+import { RatingPicker, RatingIcons } from "@/components/rating-icons";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
@@ -21,29 +21,49 @@ function EngagementsPage() {
   const getFn = useServerFn(getMyEngagements);
   const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
-  const rateFn = useServerFn(submitRating);
+  const rateFn = useServerFn(submitRatingV2);
+  const ratableFn = useServerFn(getRatableEngagements);
   const markRead = useServerFn(markAllNotificationsRead);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
+  const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
   useEffect(() => {
     markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
   }, [markRead, qc]);
+
   const [ratingFor, setRatingFor] = useState<string | null>(null);
-  const [stars, setStars] = useState(5);
+  // Sub-scores (freelance being rated by team)
+  const [tech, setTech] = useState(5);
+  const [punct, setPunct] = useState(5);
+  const [stress, setStress] = useState(5);
+  // Single overall (team being rated by freelance)
+  const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
-    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
+    onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
   });
-  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success("Marked complete"); qc.invalidateQueries(); } });
+  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const rateMut = useMutation({
-    mutationFn: (v: { engagement_id: string; to_user_id: string }) => rateFn({ data: { ...v, stars, comment: comment || null } }),
-    onSuccess: () => { toast.success(t("rating.submitted")); setRatingFor(null); setComment(""); qc.invalidateQueries(); },
+    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
+      if (v.isFreelancerReviewer) {
+        return rateFn({ data: { engagement_id: v.engagement_id, overall, sub_scores: {}, comment: comment || null } });
+      }
+      const avg = (tech + punct + stress) / 3;
+      return rateFn({ data: { engagement_id: v.engagement_id, overall: Math.round(avg * 10) / 10, sub_scores: { technical: tech, punctuality: punct, stress }, comment: comment || null } });
+    },
+    onSuccess: () => {
+      toast.success(t("rating.submitted_bonus"));
+      setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
+      qc.invalidateQueries();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
