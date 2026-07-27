@@ -109,7 +109,7 @@ function TeamProfile() {
           <div className="text-center">
             <div className="label-mono">[LOCKED]</div>
             <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Team is hidden</h1>
-            <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" /></div>
+            <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
             <p className="mt-2 text-sm text-muted-foreground">Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).</p>
             <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
               Unlock full team profile (5 tokens)
@@ -151,7 +151,7 @@ function TeamProfile() {
               {canSeeFull && tp.website && (
                 <div className="mt-2 text-xs"><a href={tp.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{tp.website}</a></div>
               )}
-              <div className="mt-2"><ProfileRatingBadge userId={id} variant="headset" /></div>
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
             </div>
           </div>
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}

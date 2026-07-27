@@ -12,6 +12,8 @@ import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPT
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { RatingIcons } from "@/components/rating-icons";
+import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -100,7 +102,9 @@ function ProfilePage() {
   );
 }
 function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreelancer: boolean }) {
+  const { t } = useTranslation();
   const getSummary = useServerFn(getUserRatingSummary);
+  const [open, setOpen] = useState(false);
   const { data } = useQuery({
     queryKey: ["profile-rating-summary", userId],
     queryFn: () => getSummary({ data: { user_id: userId } }),
@@ -114,14 +118,57 @@ function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreela
     );
   }
   return (
-    <div className="border border-racing-yellow/50 bg-racing-yellow/5 px-4 py-3 text-right">
-      <div className="label-mono text-[10px] text-racing-yellow">[OVERALL RATING]</div>
-      <div className="mt-1 flex items-center justify-end gap-2">
-        <RatingIcons value={data.average} count={data.count} variant={isFreelancer ? "wrench" : "headset"} size={18} />
-      </div>
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="border border-racing-yellow/50 bg-racing-yellow/5 px-4 py-3 text-right transition hover:bg-racing-yellow/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing-yellow"
+        title={t("reviews.view_mine", { defaultValue: "View my reviews" }) as string}
+      >
+        <div className="label-mono text-[10px] text-racing-yellow">[OVERALL RATING]</div>
+        <div className="mt-1 flex items-center justify-end gap-2">
+          <RatingIcons value={data.average} count={data.count} variant={isFreelancer ? "wrench" : "headset"} size={18} />
+        </div>
+        <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          {t("reviews.click_to_view", { defaultValue: "Click to view reviews" })}
+        </div>
+      </button>
+      <ReviewsDialog
+        open={open}
+        onOpenChange={setOpen}
+        userId={userId}
+        variant={isFreelancer ? "wrench" : "headset"}
+      />
+    </>
   );
 }
+
+function ReviewsDialog({
+  open,
+  onOpenChange,
+  userId,
+  variant,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  userId: string;
+  variant: "wrench" | "headset";
+}) {
+  const { t } = useTranslation();
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-xs uppercase tracking-widest text-racing-red">
+            {t("reviews.my_reviews", { defaultValue: "Reviews received" })}
+          </DialogTitle>
+        </DialogHeader>
+        <AnonymousReviewsSection targetUserId={userId} variant={variant} isOwner />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 
 function PersonalInfoSection({ profile }: { profile: any }) {

@@ -66,7 +66,7 @@ function FreelancerProfile() {
                   {educationLabel(fp.education)}
                 </div>
               )}
-              <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" /></div>
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" isOwner={isOwner} /></div>
             </div>
             {fp.day_rate && (
               <div className="text-right">
