@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
-import { CalendarQuickButtons } from "@/components/match-quick-actions";
+import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -214,6 +214,33 @@ function EngagementsPage() {
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
                 {(e.status === "confirmed" || e.status === "completed") && (
                   <div className="mt-4 border-t border-border pt-3">
+                    {!isFreelancer && (
+                      <div className="mb-4">
+                        <div className="label-mono mb-2 text-racing-yellow">[FREELANCER CONTACT]</div>
+                        <div className="grid gap-1 text-xs">
+                          <div><span className="text-muted-foreground">Name:</span> <span className="font-bold">{other?.display_name ?? fp?.headline ?? "Freelancer"}</span></div>
+                          {e.freelancer_contact?.email && (
+                            <div><span className="text-muted-foreground">Email:</span> <a href={`mailto:${e.freelancer_contact.email}`} className="font-mono text-racing-red hover:underline">{e.freelancer_contact.email}</a></div>
+                          )}
+                          {e.freelancer_contact?.phone_number && (
+                            <div><span className="text-muted-foreground">Phone:</span> <span className="font-mono">{e.freelancer_contact.phone_dial_code ?? ""} {e.freelancer_contact.phone_number}</span></div>
+                          )}
+                        </div>
+                        <div className="mt-2">
+                          <ContactQuickButtons
+                            contact={{
+                              fullName: other?.display_name ?? "Freelancer",
+                              organization: fp?.role ? String(fp.role) : undefined,
+                              title: fp?.headline ?? undefined,
+                              email: e.freelancer_contact?.email ?? undefined,
+                              phone: e.freelancer_contact?.phone_number ? `${e.freelancer_contact?.phone_dial_code ?? ""} ${e.freelancer_contact.phone_number}`.trim() : undefined,
+                              notes: req?.title ? `PaddockMatch — ${req.title}` : undefined,
+                            }}
+                          />
+
+                        </div>
+                      </div>
+                    )}
                     <div className="label-mono mb-2">[ADD TO CALENDAR]</div>
                     <CalendarQuickButtons
                       event={{
@@ -226,6 +253,7 @@ function EngagementsPage() {
                     />
                   </div>
                 )}
+
                 <div className="mt-4 flex flex-wrap gap-2">
                   {e.status === "proposed" && e.proposed_by !== user?.id && (
                     <button onClick={() => confirmMut.mutate(e.id)} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110">

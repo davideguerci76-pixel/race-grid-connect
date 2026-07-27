@@ -1,20 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
-import { initialsFor } from "@/lib/paddock";
+import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
 });
+
 
 function formatCriterion(c: any): string {
   switch (c.kind) {
@@ -54,21 +53,28 @@ function MissingCriteria({ list }: { list: any[] }) {
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const navigate = useNavigate();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
   const acceptFn = useServerFn(confirmEngagement);
+  const getRequests = useServerFn(getMyRequests);
+  const getEngs = useServerFn(getMyEngagements);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
   const isFreelancer = data?.userType === "freelancer";
+  const isTeam = data?.userType === "team";
 
-  // Teams manage their matches per-request from the Requests dashboard.
-  useEffect(() => {
-    if (data && data.userType === "team") {
-      navigate({ to: "/dashboard/requests", replace: true });
-    }
-  }, [data, navigate]);
+  const { data: teamRequests = [] } = useQuery({
+    queryKey: ["my-requests-summary"],
+    enabled: isTeam,
+    queryFn: () => getRequests(),
+  });
+  const { data: teamEngs = [] } = useQuery({
+    queryKey: ["engagements"],
+    enabled: isTeam,
+    queryFn: () => getEngs(),
+  });
+
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
@@ -83,6 +89,62 @@ function MatchesPage() {
 
   });
 
+  if (isTeam) {
+    const confirmedByReq = new Map<string, any>();
+    for (const e of teamEngs as any[]) {
+      if (e.status === "confirmed" || e.status === "completed") confirmedByReq.set(e.request_id ?? e.request?.id, e);
+    }
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12">
+          <div className="label-mono">[MATCHES]</div>
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">History and status of matches across all your requests.</p>
+
+          {teamRequests.length === 0 ? (
+            <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">{t("matches.empty_team")}</div>
+          ) : (
+            <div className="mt-8 grid gap-3">
+              {teamRequests.map((r: any) => {
+                const eng = confirmedByReq.get(r.id);
+                return (
+                  <Link
+                    key={r.id}
+                    to="/dashboard/requests/$id/matches"
+                    params={{ id: r.id }}
+                    className={`block border p-5 transition-colors hover:border-racing-red ${eng ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">{r.status}</span>
+                          <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
+                        </div>
+                        <div className="mt-1 text-lg font-bold">{r.title}</div>
+                        <div className="mt-1 font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}</div>
+                        {eng && (
+                          <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                            Confirmed match: {eng.freelancer?.display_name ?? "Freelancer"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <div className="font-mono text-[11px] uppercase text-muted-foreground">Matches</div>
+                        <div className="text-2xl font-black text-racing-red">{eng ? 1 : (r.matches_count ?? 0)}</div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -92,6 +154,7 @@ function MatchesPage() {
         <p className="mt-2 text-sm text-muted-foreground">
           {t("matches.counts_banner", { count: matches.length, who: isFreelancer ? t("nav.teams") : t("nav.freelancers") })}
         </p>
+
 
         {matches.length === 0 ? (
           <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">
