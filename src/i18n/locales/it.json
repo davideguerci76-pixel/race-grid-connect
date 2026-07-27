@@ -187,7 +187,9 @@
     "cancel": "Annulla",
     "rate": "Lascia una valutazione",
     "rating_locked": "La valutazione si sblocca dopo la conferma di entrambe le parti",
-    "rate_them": "Valuta {{name}}"
+    "rate_them": "Valuta {{name}}",
+    "confirmed_toast": "Confermato — contatti sbloccati",
+    "marked_complete_toast": "Segnato come completato"
   },
   "rating": {
     "title": "Valutazione",
