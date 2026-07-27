@@ -29,7 +29,7 @@ function RequestMatchesPage() {
   const unlockMut = useMutation({
     mutationFn: (match_id: string) => unlockFn({ data: { match_id } }),
     onSuccess: (r) => {
-      toast.success(`Candidate unlocked. Balance: ${r.balance} tokens`);
+      toast.success(`Match unlocked. Balance: ${r.balance} tokens`);
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
@@ -40,12 +40,13 @@ function RequestMatchesPage() {
   const confirmMut = useMutation({
     mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
     onSuccess: () => {
-      toast.success("Confirmation request sent to freelancer");
+      toast.success("Confirmation request sent to the freelancer");
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
