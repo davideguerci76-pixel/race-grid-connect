@@ -194,7 +194,17 @@
     "comment_placeholder": "Condividi la tua esperienza...",
     "submit": "Invia valutazione",
     "submitted": "Valutazione inviata",
-    "no_ratings": "Nessuna valutazione"
+    "submitted_bonus": "Valutazione inviata — +1 token in regalo!",
+    "no_ratings": "Nessuna valutazione",
+    "double_blind_hint": "Doppio cieco: la tua recensione resta sigillata finché anche l'altra parte non ti valuta, o passano 30 giorni.",
+    "opens_on": "Valutazione disponibile dal {{date}}",
+    "awaiting_other_party": "Inviata — in attesa dell'altra parte (o sblocco a 30 giorni)",
+    "visible_now": "Entrambe le valutazioni visibili",
+    "technical": "Competenza tecnica",
+    "punctuality": "Puntualità e affidabilità",
+    "stress": "Gestione dello stress",
+    "team_overall": "Esperienza complessiva col team",
+    "overall": "Complessivo"
   },
   "common": {
     "loading": "Caricamento...",
