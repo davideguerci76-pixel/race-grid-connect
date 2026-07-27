@@ -9,8 +9,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
-import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile } from "@/lib/paddock.functions";
+import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { RatingIcons } from "@/components/rating-icons";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -68,8 +69,13 @@ function ProfilePage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="label-mono">[PROFILE]</div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="label-mono">[PROFILE]</div>
+            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+          </div>
+          {user?.id && <ProfileRatingBadge userId={user.id} isFreelancer={isFreelancer} />}
+        </div>
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
           <div className="border border-border bg-card p-6">
@@ -93,6 +99,30 @@ function ProfilePage() {
     </div>
   );
 }
+function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreelancer: boolean }) {
+  const getSummary = useServerFn(getUserRatingSummary);
+  const { data } = useQuery({
+    queryKey: ["profile-rating-summary", userId],
+    queryFn: () => getSummary({ data: { user_id: userId } }),
+  });
+  if (!data || !data.count) {
+    return (
+      <div className="border border-border bg-card px-4 py-3 text-right">
+        <div className="label-mono text-[10px]">[RATING]</div>
+        <div className="mt-1 font-mono text-[11px] text-muted-foreground">No ratings yet</div>
+      </div>
+    );
+  }
+  return (
+    <div className="border border-racing-yellow/50 bg-racing-yellow/5 px-4 py-3 text-right">
+      <div className="label-mono text-[10px] text-racing-yellow">[OVERALL RATING]</div>
+      <div className="mt-1 flex items-center justify-end gap-2">
+        <RatingIcons value={data.average} count={data.count} variant={isFreelancer ? "wrench" : "headset"} size={18} />
+      </div>
+    </div>
+  );
+}
+
 
 function PersonalInfoSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
