@@ -196,7 +196,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               disabled={loading}
               className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
             >
-              <Unlock className="size-3" /> Unlock profile (1 token)
+              <Unlock className="size-3" /> Unlock details (1 token)
             </button>
           )}
           {match.unlocked && !requestFilled && (
@@ -210,7 +210,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           )}
           {requestFilled && (
             <span className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-              Request filled
+              Match already assigned
             </span>
           )}
         </div>
@@ -220,11 +220,11 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
         <div className="mt-4 grid gap-4 border-t border-border pt-4 md:grid-cols-2">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase">
-                {match.profile.display_name?.slice(0, 2) ?? "?"}
+              <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase text-muted-foreground">
+                <Lock className="size-4" />
               </div>
               <div>
-                <div className="text-lg font-bold">{match.profile.display_name}</div>
+                <div className="text-lg font-bold text-muted-foreground">Hidden freelancer</div>
                 {match.profile.role && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(match.profile.role)}</div>}
               </div>
             </div>
@@ -238,12 +238,9 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           </div>
           <div>
             <div className="label-mono mb-1">[CONTACT]</div>
-            {match.profile.contact_email && (
-              <div className="flex items-center gap-2 font-mono text-xs"><Mail className="size-3" /> {match.profile.contact_email}</div>
-            )}
-            {match.profile.phone_number && (
-              <div className="mt-1 flex items-center gap-2 font-mono text-xs"><Phone className="size-3" /> {match.profile.phone_dial_code} {match.profile.phone_number}</div>
-            )}
+            <div className="rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Name and contacts are revealed only after the freelancer confirms the match.
+            </div>
             {match.profile.disciplines?.length > 0 && (
               <>
                 <div className="label-mono mb-1 mt-3">[DISCIPLINES]</div>
@@ -265,6 +262,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               </>
             )}
           </div>
+
           <div className="md:col-span-2 border-t border-border pt-4">
             <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {match.missing_criteria.length === 0 ? "Criteria" : "Missing / partial criteria"}</div>
             {match.missing_criteria.length === 0 ? (
