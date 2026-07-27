@@ -52,6 +52,7 @@ function EngagementsPage() {
   // Single overall (team being rated by freelance)
   const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
+  const [locallySubmittedRatings, setLocallySubmittedRatings] = useState<Set<string>>(() => new Set());
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
@@ -67,9 +68,14 @@ function EngagementsPage() {
       const avg = (tech + punct + stress) / 3;
       return rateFn({ data: { engagement_id: v.engagement_id, overall: Math.round(avg * 10) / 10, sub_scores: { technical: tech, punctuality: punct, stress }, comment: comment || null } });
     },
-    onSuccess: (res: any) => {
+    onSuccess: (res: any, variables) => {
+      setLocallySubmittedRatings((prev) => {
+        const next = new Set(prev);
+        next.add(variables.engagement_id);
+        return next;
+      });
       if (res && res.ok === false && res.already_rated) {
-        toast.info("You have already submitted a rating for this engagement.");
+        toast.info(t("rating.submitted"));
       } else {
         toast.success(t("rating.submitted_bonus"));
       }
@@ -220,16 +226,16 @@ function EngagementsPage() {
                   {(e.status === "confirmed" || e.status === "completed") && (() => {
                     const info = ratableMap.get(e.id);
                     const mineRated = ratedMap.get(e.id);
-                    const alreadyRated = !!info?.already_rated || !!mineRated;
+                    const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
                     const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
                     const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
                     const canRate = opensAt !== null && now >= opensAt;
                     if (alreadyRated) {
                       return (
-                        <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                          {unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
-                        </span>
+                        <button type="button" disabled className="cursor-not-allowed border border-border bg-muted/40 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground opacity-80">
+                          {t("rating.submitted")}
+                        </button>
                       );
                     }
                     if (!canRate) {
