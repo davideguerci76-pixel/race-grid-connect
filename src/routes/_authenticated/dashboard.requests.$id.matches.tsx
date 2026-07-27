@@ -74,7 +74,8 @@ function RequestMatchesPage() {
 
             {data.hired && (
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
-                <div className="label-mono text-racing-yellow">[HIRED FREELANCER]</div>
+                <div className="label-mono text-racing-yellow">[CONFIRMED MATCH]</div>
+
                 <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
