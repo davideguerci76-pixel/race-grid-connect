@@ -137,7 +137,7 @@ function RequestMatchesPage() {
             <div className="mt-4 grid gap-3">
               {data.items.length === 0 && (
                 <div className="border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-                  No candidates match this request yet.
+                  No matches for this request yet.
                 </div>
               )}
               {data.items.map((m) => (
@@ -148,10 +148,11 @@ function RequestMatchesPage() {
                   onUnlock={() => unlockMut.mutate(m.match_id)}
                   onConfirm={() => {
 
-                    if (confirm("Send a confirmation request to this freelancer? If they accept, the job will be marked as filled and contacts will be exchanged automatically.")) {
+                    if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
                       confirmMut.mutate(m.match_id);
                     }
                   }}
+
                   loading={unlockMut.isPending || confirmMut.isPending}
                 />
               ))}
