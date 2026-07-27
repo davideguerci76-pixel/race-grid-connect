@@ -64,6 +64,7 @@ function EngagementsPage() {
       }
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
       qc.invalidateQueries();
+      qc.refetchQueries({ queryKey: ["engagements-ratable"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
