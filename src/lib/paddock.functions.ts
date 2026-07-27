@@ -637,12 +637,35 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
-      .eq("request_id", data.request_id)
-      .order("match_score", { ascending: false })
-      .order("created_at", { ascending: true });
+      .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const rows = allMatches ?? [];
+    // Fetch aggregated ratings for tiebreaker (avg from all unlocked reviews)
+    const allFreelancerIds = Array.from(new Set((allMatches ?? []).map((m: any) => m.freelancer_id)));
+    const ratingAvg = new Map<string, { avg: number; count: number }>();
+    if (allFreelancerIds.length) {
+      const { data: allRatings } = await supabase
+        .from("ratings")
+        .select("to_user_id, stars, overall, unlocked_at")
+        .in("to_user_id", allFreelancerIds)
+        .not("unlocked_at", "is", null);
+      for (const r of (allRatings ?? []) as any[]) {
+        const cur = ratingAvg.get(r.to_user_id) ?? { avg: 0, count: 0 };
+        const v = Number(r.overall ?? r.stars ?? 0);
+        const c = cur.count + 1;
+        ratingAvg.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
+      }
+    }
+
+    // Sort: match_score DESC, then rating avg DESC, then created_at ASC
+    const rows = (allMatches ?? []).slice().sort((a: any, b: any) => {
+      const ds = Number(b.match_score ?? 0) - Number(a.match_score ?? 0);
+      if (ds !== 0) return ds;
+      const ra = ratingAvg.get(a.freelancer_id)?.avg ?? 0;
+      const rb = ratingAvg.get(b.freelancer_id)?.avg ?? 0;
+      if (rb !== ra) return rb - ra;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
     const total = rows.length;
     const topThreeIds = new Set(rows.slice(0, 3).map((m: any) => m.id));
 
