@@ -151,6 +151,7 @@ function TeamProfile() {
               {canSeeFull && tp.website && (
                 <div className="mt-2 text-xs"><a href={tp.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{tp.website}</a></div>
               )}
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="headset" /></div>
             </div>
           </div>
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
