@@ -865,7 +865,7 @@ export const submitRatingV2 = createServerFn({ method: "POST" })
       _engagement_id: data.engagement_id,
       _sub_scores: data.sub_scores,
       _overall: data.overall,
-      _comment: data.comment ?? null,
+      _comment: data.comment ?? undefined,
     });
     if (error) throw new Error(error.message);
     return row;
