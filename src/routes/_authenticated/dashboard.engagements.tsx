@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -27,6 +28,16 @@ function EngagementsPage() {
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
   const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const { data: myRatedIds = [] } = useQuery({
+    queryKey: ["my-rated-engagement-ids", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ratings").select("engagement_id, unlocked_at").eq("from_user_id", user!.id);
+      if (error) return [];
+      return (data ?? []) as { engagement_id: string; unlocked_at: string | null }[];
+    },
+  });
+  const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
   const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
   useEffect(() => {
@@ -65,6 +76,7 @@ function EngagementsPage() {
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
       qc.invalidateQueries();
       qc.refetchQueries({ queryKey: ["engagements-ratable"] });
+      qc.refetchQueries({ queryKey: ["my-rated-engagement-ids"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -207,13 +219,16 @@ function EngagementsPage() {
 
                   {(e.status === "confirmed" || e.status === "completed") && (() => {
                     const info = ratableMap.get(e.id);
+                    const mineRated = ratedMap.get(e.id);
+                    const alreadyRated = !!info?.already_rated || !!mineRated;
+                    const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
                     const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
                     const canRate = opensAt !== null && now >= opensAt;
-                    if (info?.already_rated) {
+                    if (alreadyRated) {
                       return (
                         <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                          {info.unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
+                          {unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
                         </span>
                       );
                     }
