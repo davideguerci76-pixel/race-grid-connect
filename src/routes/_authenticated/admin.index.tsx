@@ -137,6 +137,7 @@ function AdminFreelancers() {
                 <Th onClick={() => toggle("freelancer.location")} label={`Location${indicator("freelancer.location")}`} />
                 <Th onClick={() => toggle("freelancer.phone_number")} label={`Phone${indicator("freelancer.phone_number")}`} />
                 <Th onClick={() => toggle("freelancer.day_rate")} label={`Rate${indicator("freelancer.day_rate")}`} align="right" />
+                <Th onClick={() => toggle("rating_avg")} label={`Rating${indicator("rating_avg")}`} />
                 <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
                 <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
