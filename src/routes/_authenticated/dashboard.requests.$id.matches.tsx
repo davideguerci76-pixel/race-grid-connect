@@ -67,8 +67,9 @@ function RequestMatchesPage() {
                 {roleLabel(data.request.role)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
-                <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 candidates by match score are unlocked automatically. Every other candidate costs 1 token to unlock.
+                <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 matches by score are unlocked automatically. Every other match costs 1 token to unlock its technical details. Real names and contacts appear only after the freelancer confirms the match.
               </p>
+
             </div>
 
             {data.hired && (
