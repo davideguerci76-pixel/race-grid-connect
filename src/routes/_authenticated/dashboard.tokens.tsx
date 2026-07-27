@@ -24,8 +24,13 @@ function TokensPage() {
   const qc = useQueryClient();
   const purchase = useServerFn(purchaseTokensDemo);
   const getHistory = useServerFn(getTokenHistory);
+  const getSettings = useServerFn(getPlatformSettings);
 
   const { data: history = [] } = useQuery({ queryKey: ["token-history"], queryFn: () => getHistory() });
+  const { data: settings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => getSettings() });
+  const priceEur = Number(
+    (settings as Array<{ key: string; value_num: number }>).find((s) => s.key === "token_price_eur")?.value_num ?? 2,
+  );
 
   const mut = useMutation({
     mutationFn: (pack: "small" | "medium" | "large") => purchase({ data: { pack } }),
@@ -44,6 +49,9 @@ function TokensPage() {
         <div className="mt-4 rounded-none border border-racing-yellow/40 bg-racing-yellow/5 p-3 font-mono text-xs text-racing-yellow">
           DEMO MODE: Stripe checkout will replace instant credit once you confirm your seller country.
         </div>
+        <div className="mt-2 font-mono text-[11px] text-muted-foreground">
+          Current token price: € {priceEur.toFixed(2)} / token
+        </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {PACKS.map((p) => (
@@ -51,13 +59,14 @@ function TokensPage() {
               <div className="label-mono">{t(`tokens.packs.${p.key}`)}</div>
               <div className="mt-3 font-mono text-4xl font-black text-racing-red">{p.tokens}</div>
               <div className="mt-1 text-xs text-muted-foreground">tokens</div>
-              <div className="mt-4 font-mono text-2xl font-bold text-racing-yellow">{p.price}</div>
+              <div className="mt-4 font-mono text-2xl font-bold text-racing-yellow">€ {(priceEur * p.tokens).toFixed(2)}</div>
               <button onClick={() => mut.mutate(p.key)} disabled={mut.isPending} className="mt-4 w-full bg-racing-red py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60">
                 {t("tokens.buy")}
               </button>
             </div>
           ))}
         </div>
+
 
         <div className="mt-12">
           <div className="label-mono mb-3">{t("tokens.history")}</div>
