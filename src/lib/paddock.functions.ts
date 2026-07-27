@@ -861,6 +861,15 @@ export const submitRatingV2 = createServerFn({ method: "POST" })
     }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    const { data: existing } = await context.supabase
+      .from("ratings")
+      .select("id")
+      .eq("engagement_id", data.engagement_id)
+      .eq("from_user_id", context.userId)
+      .maybeSingle();
+    if (existing) {
+      return { ok: false, already_rated: true } as const;
+    }
     const { data: row, error } = await context.supabase.rpc("submit_rating_v2", {
       _engagement_id: data.engagement_id,
       _sub_scores: data.sub_scores,
@@ -870,11 +879,11 @@ export const submitRatingV2 = createServerFn({ method: "POST" })
     if (error) {
       const msg = error.message ?? "";
       if (msg.includes("ratings_engagement_id_from_user_id_key") || (error as any).code === "23505") {
-        throw new Error("You have already submitted a rating for this engagement.");
+        return { ok: false, already_rated: true } as const;
       }
       throw new Error(msg);
     }
-    return row;
+    return { ok: true, row } as const;
   });
 
 export const getUserRatingSummary = createServerFn({ method: "GET" })
