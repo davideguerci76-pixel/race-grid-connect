@@ -914,6 +914,37 @@ export const getUserRatingSummary = createServerFn({ method: "GET" })
     };
   });
 
+export const unlockReviews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { target_user_id: string }) => z.object({ target_user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: bal, error } = await context.supabase.rpc("reveal_reviews", { _target: data.target_user_id });
+    if (error) throw new Error(error.message);
+    return { balance: bal as number };
+  });
+
+export const getAnonymousReviews = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { target_user_id: string }) => z.object({ target_user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const isSelf = userId === data.target_user_id;
+    let unlocked = isSelf;
+    if (!isSelf) {
+      const { data: u } = await context.supabase
+        .from("review_unlocks")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("target_user_id", data.target_user_id)
+        .maybeSingle();
+      unlocked = !!u;
+    }
+    if (!unlocked) return { unlocked: false, reviews: [] as any[] };
+    const { data: rows, error } = await context.supabase.rpc("get_anonymous_reviews", { _target: data.target_user_id });
+    if (error) throw new Error(error.message);
+    return { unlocked: true, reviews: (rows ?? []) as any[] };
+  });
+
 export const getRatableEngagements = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
