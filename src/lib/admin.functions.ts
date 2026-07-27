@@ -58,11 +58,25 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
       arr.push((r as any).role);
       roleMap.set((r as any).user_id, arr);
     }
+    const { data: allRatings } = await supabaseAdmin
+      .from("ratings")
+      .select("to_user_id, stars, overall, unlocked_at")
+      .in("to_user_id", ids)
+      .not("unlocked_at", "is", null);
+    const ratingMap = new Map<string, { avg: number; count: number }>();
+    for (const r of (allRatings ?? []) as any[]) {
+      const cur = ratingMap.get(r.to_user_id) ?? { avg: 0, count: 0 };
+      const v = Number(r.overall ?? r.stars ?? 0);
+      const c = cur.count + 1;
+      ratingMap.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
+    }
     return (profiles ?? []).map((p) => ({
       ...p,
       email: emails[p.id] ?? null,
       roles: roleMap.get(p.id) ?? [],
       freelancer: fpMap.get(p.id) ?? null,
+      rating_avg: ratingMap.get(p.id)?.avg ?? 0,
+      rating_count: ratingMap.get(p.id)?.count ?? 0,
     }));
   });
 
