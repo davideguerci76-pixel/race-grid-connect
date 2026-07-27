@@ -110,8 +110,9 @@ function RequestMatchesPage() {
 
             <div className="mt-6 flex items-center justify-between">
               <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                {data.pagination.total} candidate{data.pagination.total === 1 ? "" : "s"}
+                {data.pagination.total} match{data.pagination.total === 1 ? "" : "es"}
               </div>
+
               {data.pagination.totalPages > 1 && (
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <button
