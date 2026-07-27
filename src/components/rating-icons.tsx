@@ -65,13 +65,15 @@ export function RatingIcons({
           ))}
         </span>
         <span
-          className="pointer-events-none absolute inset-0 inline-flex gap-0.5 overflow-hidden"
+          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden"
           style={{ width: `${(v / 5) * 100}%` }}
           aria-hidden
         >
-          {[0, 1, 2, 3, 4].map((i) => (
-            <Glyph key={i} variant={variant} filled size={size} />
-          ))}
+          <span className="inline-flex gap-0.5" style={{ width: `${size * 5 + 4 * 2}px` }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Glyph key={i} variant={variant} filled size={size} />
+            ))}
+          </span>
         </span>
       </span>
       {showNumber && (
