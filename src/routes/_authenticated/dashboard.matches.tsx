@@ -53,21 +53,28 @@ function MissingCriteria({ list }: { list: any[] }) {
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const navigate = useNavigate();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
   const acceptFn = useServerFn(confirmEngagement);
+  const getRequests = useServerFn(getMyRequests);
+  const getEngs = useServerFn(getMyEngagements);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
   const isFreelancer = data?.userType === "freelancer";
+  const isTeam = data?.userType === "team";
 
-  // Teams manage their matches per-request from the Requests dashboard.
-  useEffect(() => {
-    if (data && data.userType === "team") {
-      navigate({ to: "/dashboard/requests", replace: true });
-    }
-  }, [data, navigate]);
+  const { data: teamRequests = [] } = useQuery({
+    queryKey: ["my-requests-summary"],
+    enabled: isTeam,
+    queryFn: () => getRequests(),
+  });
+  const { data: teamEngs = [] } = useQuery({
+    queryKey: ["engagements"],
+    enabled: isTeam,
+    queryFn: () => getEngs(),
+  });
+
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
