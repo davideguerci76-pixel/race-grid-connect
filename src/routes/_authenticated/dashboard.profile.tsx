@@ -69,8 +69,13 @@ function ProfilePage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="label-mono">[PROFILE]</div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="label-mono">[PROFILE]</div>
+            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+          </div>
+          {user?.id && <ProfileRatingBadge userId={user.id} isFreelancer={isFreelancer} />}
+        </div>
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
           <div className="border border-border bg-card p-6">
