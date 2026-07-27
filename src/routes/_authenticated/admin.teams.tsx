@@ -127,6 +127,13 @@ function AdminTeams() {
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.primary_discipline ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.location ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.website ?? "—"}</td>
+                  <td className="px-2 py-2">
+                    {r.rating_count > 0 ? (
+                      <RatingIcons variant="headset" value={r.rating_avg} count={r.rating_count} size={14} />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="px-2 py-2 text-right font-bold">{r.token_balance}</td>
                   <td className="px-2 py-2">
                     {r.blocked_at ? <span className="text-racing-red">Blocked</span> : <span className="text-emerald-500">Active</span>}
