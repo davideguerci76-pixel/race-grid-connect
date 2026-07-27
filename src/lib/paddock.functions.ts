@@ -377,31 +377,53 @@ export const getMyMatches = createServerFn({ method: "GET" })
     // Fetch pending "proposed" engagements addressed to the current user
     const matchIds = rawMatches.map((m: any) => m.id);
     const pendingByMatchId = new Map<string, string>();
+    const confirmedMatchIds = new Set<string>();
+    const takenRequestIds = new Set<string>();
     if (matchIds.length) {
       const { data: eng } = await supabase
         .from("engagements")
-        .select("id, match_id, status, proposed_by")
-        .in("match_id", matchIds)
-        .eq("status", "proposed")
-        .neq("proposed_by", userId);
-      (eng ?? []).forEach((e: any) => { if (e.match_id) pendingByMatchId.set(e.match_id, e.id); });
+        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id")
+        .in("match_id", matchIds);
+      (eng ?? []).forEach((e: any) => {
+        if (e.status === "proposed" && e.proposed_by !== userId && e.match_id) {
+          pendingByMatchId.set(e.match_id, e.id);
+        }
+        if (e.status === "confirmed" && e.match_id) confirmedMatchIds.add(e.match_id);
+      });
+      // Requests already filled by someone else (freelancer view of race-lost matches)
+      const reqIds = Array.from(new Set(rawMatches.map((m: any) => m.request?.id).filter(Boolean)));
+      if (reqIds.length && isFreelancer) {
+        const { data: filledReqs } = await supabase
+          .from("engagements")
+          .select("request_id, freelancer_id, status")
+          .in("request_id", reqIds)
+          .eq("status", "confirmed");
+        (filledReqs ?? []).forEach((r: any) => {
+          if (r.freelancer_id !== userId && r.request_id) takenRequestIds.add(r.request_id);
+        });
+      }
     }
 
     const redacted = rawMatches.map((m: any) => {
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
+      const isConfirmed = confirmedMatchIds.has(m.id);
+      // Names/contacts stay hidden until a confirmed engagement links the two parties.
+      // Token unlock only reveals technical info.
       let counterparty: any = null;
       if (revealedByMe) {
         if (isFreelancer) {
           const tp = teamProfilesById.get(m.team_id);
           counterparty = tp ? {
-            team_name: tp.team_name,
+            // team_name is intentionally hidden until confirmed
+            team_name: isConfirmed ? tp.team_name : null,
             team_type: tp.team_type,
             location: tp.location,
-            website: tp.website,
+            // website/contact_email withheld — freelancer only ever sees team name post-confirmation
+            website: null,
             bio: tp.bio,
             primary_discipline: tp.primary_discipline,
-            initials: tp.initials,
-            contact_email: emailsById.get(m.team_id) ?? null,
+            initials: isConfirmed ? tp.initials : null,
+            contact_email: null,
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
@@ -414,15 +436,26 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            contact_email: emailsById.get(m.freelancer_id) ?? null,
+            // Contacts only after confirmed match
+            contact_email: isConfirmed ? (emailsById.get(m.freelancer_id) ?? null) : null,
           } : null;
         }
-      } else {
-        if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
-        if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe, counterparty, pending_engagement_id: pendingByMatchId.get(m.id) ?? null };
+      // Always hide display_name in the joined profile rows unless the engagement is confirmed
+      if (!isConfirmed) {
+        if (m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
+        if (m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
+      }
+      return {
+        ...m,
+        revealedByMe,
+        counterparty,
+        isConfirmed,
+        matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
+        pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
+      };
     });
+
 
     return {
       matches: redacted,
