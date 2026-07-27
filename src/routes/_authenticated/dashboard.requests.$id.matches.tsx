@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -176,6 +177,11 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               {match.overlap_days} day{match.overlap_days === 1 ? "" : "s"} of overlap
               {match.free_preview && match.unlocked && <span className="ml-2 text-racing-yellow">· FREE PREVIEW</span>}
             </div>
+            {match.rating && match.rating.count > 0 && (
+              <div className="mt-1">
+                <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">

@@ -637,12 +637,35 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
-      .eq("request_id", data.request_id)
-      .order("match_score", { ascending: false })
-      .order("created_at", { ascending: true });
+      .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const rows = allMatches ?? [];
+    // Fetch aggregated ratings for tiebreaker (avg from all unlocked reviews)
+    const allFreelancerIds = Array.from(new Set((allMatches ?? []).map((m: any) => m.freelancer_id)));
+    const ratingAvg = new Map<string, { avg: number; count: number }>();
+    if (allFreelancerIds.length) {
+      const { data: allRatings } = await supabase
+        .from("ratings")
+        .select("to_user_id, stars, overall, unlocked_at")
+        .in("to_user_id", allFreelancerIds)
+        .not("unlocked_at", "is", null);
+      for (const r of (allRatings ?? []) as any[]) {
+        const cur = ratingAvg.get(r.to_user_id) ?? { avg: 0, count: 0 };
+        const v = Number(r.overall ?? r.stars ?? 0);
+        const c = cur.count + 1;
+        ratingAvg.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
+      }
+    }
+
+    // Sort: match_score DESC, then rating avg DESC, then created_at ASC
+    const rows = (allMatches ?? []).slice().sort((a: any, b: any) => {
+      const ds = Number(b.match_score ?? 0) - Number(a.match_score ?? 0);
+      if (ds !== 0) return ds;
+      const ra = ratingAvg.get(a.freelancer_id)?.avg ?? 0;
+      const rb = ratingAvg.get(b.freelancer_id)?.avg ?? 0;
+      if (rb !== ra) return rb - ra;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
     const total = rows.length;
     const topThreeIds = new Set(rows.slice(0, 3).map((m: any) => m.id));
 
@@ -702,6 +725,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         unlocked,
         free_preview: wasFree,
         freelancer_id: m.freelancer_id,
+        rating: {
+          average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
+          count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
+        },
         profile: unlocked
           ? {
               display_name: prof?.display_name ?? "Freelancer",
@@ -816,3 +843,94 @@ export const markAllNotificationsRead = createServerFn({ method: "POST" })
   });
 
 
+
+// ==================== RATINGS V2 (double-blind) ====================
+
+export const submitRatingV2 = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      engagement_id: z.string().uuid(),
+      overall: z.number().min(1).max(5),
+      sub_scores: z.object({
+        technical: z.number().min(1).max(5).optional(),
+        punctuality: z.number().min(1).max(5).optional(),
+        stress: z.number().min(1).max(5).optional(),
+      }).default({}),
+      comment: z.string().max(500).optional().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("submit_rating_v2", {
+      _engagement_id: data.engagement_id,
+      _sub_scores: data.sub_scores,
+      _overall: data.overall,
+      _comment: data.comment ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const getUserRatingSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { user_id: string }) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("get_user_rating_summary", { _user_id: data.user_id });
+    if (error) throw new Error(error.message);
+    const r = (Array.isArray(rows) ? rows[0] : rows) as any;
+    return {
+      count: r?.count ?? 0,
+      average: r?.average ? Number(r.average) : 0,
+      technical: r?.tech ? Number(r.tech) : null,
+      punctuality: r?.punct ? Number(r.punct) : null,
+      stress: r?.stress ? Number(r.stress) : null,
+    };
+  });
+
+export const getRatableEngagements = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: engs, error } = await supabase
+      .from("engagements")
+      .select("id, freelancer_id, team_id, start_date, end_date, status, request_id, request:requests(title, season_dates)")
+      .in("status", ["confirmed", "completed"])
+      .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`);
+    if (error) throw new Error(error.message);
+    const items = [] as any[];
+    for (const e of (engs ?? []) as any[]) {
+      const { data: opens } = await supabase.rpc("rating_opens_at", { _engagement_id: e.id });
+      const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
+      items.push({ ...e, opens_at: opens, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
+    }
+    return items;
+  });
+
+// ==================== TIME MACHINE (admin) ====================
+
+export const adminGetTimeOffset = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.from("admin_time_settings").select("offset_days, updated_at").eq("id", true).maybeSingle();
+    if (error) throw new Error(error.message);
+    return { offset_days: (data as any)?.offset_days ?? 0, updated_at: (data as any)?.updated_at ?? null };
+  });
+
+export const adminSetTimeOffsetFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { offset_days: number }) => z.object({ offset_days: z.number().int().min(-3650).max(3650) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: out, error } = await context.supabase.rpc("admin_set_time_offset", { _days: data.offset_days });
+    if (error) throw new Error(error.message);
+    // Also emit any pending notifications right away
+    await context.supabase.rpc("emit_rating_available_notifications");
+    return { offset_days: out as number };
+  });
+
+export const adminTriggerRatingNotifications = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("emit_rating_available_notifications");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });

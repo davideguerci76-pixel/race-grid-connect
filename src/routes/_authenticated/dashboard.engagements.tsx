@@ -6,8 +6,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { RatingStars } from "@/components/rating-stars";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRating, markAllNotificationsRead } from "@/lib/paddock.functions";
+import { RatingPicker, RatingIcons } from "@/components/rating-icons";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
@@ -21,29 +21,49 @@ function EngagementsPage() {
   const getFn = useServerFn(getMyEngagements);
   const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
-  const rateFn = useServerFn(submitRating);
+  const rateFn = useServerFn(submitRatingV2);
+  const ratableFn = useServerFn(getRatableEngagements);
   const markRead = useServerFn(markAllNotificationsRead);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
+  const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
   useEffect(() => {
     markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
   }, [markRead, qc]);
+
   const [ratingFor, setRatingFor] = useState<string | null>(null);
-  const [stars, setStars] = useState(5);
+  // Sub-scores (freelance being rated by team)
+  const [tech, setTech] = useState(5);
+  const [punct, setPunct] = useState(5);
+  const [stress, setStress] = useState(5);
+  // Single overall (team being rated by freelance)
+  const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
-    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
+    onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
   });
-  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success("Marked complete"); qc.invalidateQueries(); } });
+  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const rateMut = useMutation({
-    mutationFn: (v: { engagement_id: string; to_user_id: string }) => rateFn({ data: { ...v, stars, comment: comment || null } }),
-    onSuccess: () => { toast.success(t("rating.submitted")); setRatingFor(null); setComment(""); qc.invalidateQueries(); },
+    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
+      if (v.isFreelancerReviewer) {
+        return rateFn({ data: { engagement_id: v.engagement_id, overall, sub_scores: {}, comment: comment || null } });
+      }
+      const avg = (tech + punct + stress) / 3;
+      return rateFn({ data: { engagement_id: v.engagement_id, overall: Math.round(avg * 10) / 10, sub_scores: { technical: tech, punctuality: punct, stress }, comment: comment || null } });
+    },
+    onSuccess: () => {
+      toast.success(t("rating.submitted_bonus"));
+      setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
+      qc.invalidateQueries();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -180,23 +200,68 @@ function EngagementsPage() {
                     </button>
                   )}
 
-                  {e.status === "completed" && (
-                    ratingFor === e.id ? (
-                      <div className="w-full border border-border bg-background p-4">
-                        <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
-                        <RatingStars value={stars} onChange={setStars} />
-                        <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
-                        <div className="mt-3 flex gap-2">
-                          <button onClick={() => rateMut.mutate({ engagement_id: e.id, to_user_id: otherId })} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white">{t("rating.submit")}</button>
-                          <button onClick={() => setRatingFor(null)} className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest">{t("common.cancel")}</button>
+                  {(e.status === "confirmed" || e.status === "completed") && (() => {
+                    const info = ratableMap.get(e.id);
+                    const now = Date.now();
+                    const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
+                    const canRate = opensAt !== null && now >= opensAt;
+                    if (info?.already_rated) {
+                      return (
+                        <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          {info.unlocked ? t("rating.visible_now") : t("rating.awaiting_other_party")}
+                        </span>
+                      );
+                    }
+                    if (!canRate) {
+                      return (
+                        <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          {t("rating.opens_on", { date: info?.opens_at ? new Date(info.opens_at).toLocaleDateString() : "—" })}
+                        </span>
+                      );
+                    }
+                    if (ratingFor === e.id) {
+                      return (
+                        <div className="w-full border border-border bg-background p-4">
+                          <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
+                          <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                          {isFreelancer ? (
+                            <div>
+                              <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.team_overall")}</div>
+                              <RatingPicker variant="headset" value={overall} onChange={setOverall} />
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.technical")}</div>
+                                <RatingPicker variant="wrench" value={tech} onChange={setTech} />
+                              </div>
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.punctuality")}</div>
+                                <RatingPicker variant="wrench" value={punct} onChange={setPunct} />
+                              </div>
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.stress")}</div>
+                                <RatingPicker variant="wrench" value={stress} onChange={setStress} />
+                              </div>
+                              <div className="font-mono text-[11px] text-muted-foreground">
+                                {t("rating.overall")}: {((tech + punct + stress) / 3).toFixed(1)}
+                              </div>
+                            </div>
+                          )}
+                          <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
+                          <div className="mt-3 flex gap-2">
+                            <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer })} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white">{t("rating.submit")}</button>
+                            <button onClick={() => setRatingFor(null)} className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest">{t("common.cancel")}</button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
+                      );
+                    }
+                    return (
                       <button onClick={() => setRatingFor(e.id)} className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110">
-                        {t("engagements.rate")}
+                        {t("engagements.rate")} <span className="ml-1 text-[9px]">(+1 token bonus)</span>
                       </button>
-                    )
-                  )}
+                    );
+                  })()}
                 </div>
               </div>
             );
