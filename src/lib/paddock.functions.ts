@@ -547,13 +547,14 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
+      .select("*, request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as any[];
     const teamIds = Array.from(new Set(rows.map((r) => r.team_id)));
     const freelancerIds = Array.from(new Set(rows.map((r) => r.freelancer_id)));
+    const allIds = Array.from(new Set([...teamIds, ...freelancerIds]));
     const [tpsRes, fpsRes] = await Promise.all([
       teamIds.length
         ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
@@ -564,12 +565,49 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     ]);
     const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
     const fpMap = new Map(((fpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
-    return rows.map((r) => ({
-      ...r,
-      team_profile: tpMap.get(r.team_id) ?? null,
-      freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
-    }));
+
+    // RLS on `profiles` restricts to auth.uid()=id, so counterparties' display_name
+    // isn't visible via a nested join. Fetch it via admin (the .or above already
+    // scoped rows to engagements the caller is party to).
+    const nameMap = new Map<string, { display_name: string | null; avatar_url: string | null }>();
+    const contactsMap = new Map<string, { email: string | null; phone_dial_code: string | null; phone_number: string | null }>();
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      if (allIds.length) {
+        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", allIds);
+        for (const p of (ps ?? []) as any[]) nameMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url });
+      }
+      // For confirmed/completed engagements only, surface freelancer contact to team viewer
+      const confirmedFids = Array.from(new Set(rows.filter((r) => (r.status === "confirmed" || r.status === "completed") && r.team_id === userId).map((r) => r.freelancer_id)));
+      if (confirmedFids.length) {
+        const { data: cs } = await supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", confirmedFids);
+        for (const c of (cs ?? []) as any[]) contactsMap.set(c.user_id, { email: null, phone_dial_code: c.phone_dial_code, phone_number: c.phone_number });
+        for (const fid of confirmedFids) {
+          const cur = contactsMap.get(fid) ?? { email: null, phone_dial_code: null, phone_number: null };
+          try {
+            const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
+            cur.email = u?.user?.email ?? null;
+          } catch { /* ignore */ }
+          contactsMap.set(fid, cur);
+        }
+      }
+    } catch { /* ignore admin errors */ }
+
+    return rows.map((r) => {
+      const fName = nameMap.get(r.freelancer_id);
+      const tName = nameMap.get(r.team_id);
+      const contact = contactsMap.get(r.freelancer_id) ?? null;
+      return {
+        ...r,
+        freelancer: { display_name: fName?.display_name ?? null, avatar_url: fName?.avatar_url ?? null },
+        team: { display_name: tName?.display_name ?? null, avatar_url: tName?.avatar_url ?? null },
+        team_profile: tpMap.get(r.team_id) ?? null,
+        freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
+        freelancer_contact: contact,
+      };
+    });
   });
+
 
 // ---- Ratings ----
 export const submitRating = createServerFn({ method: "POST" })
