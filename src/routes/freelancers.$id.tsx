@@ -107,21 +107,7 @@ function FreelancerProfile() {
             </div>
           </div>
 
-          <div className="border border-border bg-card p-6">
-            <div className="label-mono mb-3">Ratings</div>
-            {ratings.length === 0 ? (
-              <div className="text-sm text-muted-foreground">{t("rating.no_ratings")}</div>
-            ) : (
-              <ul className="space-y-4">
-                {ratings.map((r, i) => (
-                  <li key={i} className="border-b border-border pb-3 last:border-0">
-                    <RatingStars value={r.stars} readOnly size={14} />
-                    {r.comment && <div className="mt-2 text-sm text-muted-foreground">{r.comment}</div>}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <AnonymousReviewsSection targetUserId={id} variant="wrench" isOwner={isOwner} />
         </div>
       </div>
       <SiteFooter />
