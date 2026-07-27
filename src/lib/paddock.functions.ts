@@ -867,7 +867,13 @@ export const submitRatingV2 = createServerFn({ method: "POST" })
       _overall: data.overall,
       _comment: data.comment ?? undefined,
     });
-    if (error) throw new Error(error.message);
+    if (error) {
+      const msg = error.message ?? "";
+      if (msg.includes("ratings_engagement_id_from_user_id_key") || (error as any).code === "23505") {
+        throw new Error("You have already submitted a rating for this engagement.");
+      }
+      throw new Error(msg);
+    }
     return row;
   });
 
