@@ -32,6 +32,7 @@ function AdminLayout() {
     { to: "/admin/permissions", label: "Permissions" },
     { to: "/admin/matching", label: "Matching" },
     { to: "/admin/tokens", label: "Tokens" },
+    { to: "/admin/reviews", label: "Reviews" },
   ];
 
 
