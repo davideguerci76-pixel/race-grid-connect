@@ -89,6 +89,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: z.string().max(64).optional().nullable(),
         day_rate: z.number().int().min(0).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
         // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
