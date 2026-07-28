@@ -134,6 +134,10 @@ function NewRequestPage() {
     setEducation(Array.isArray(s.education) ? s.education : []);
     setExperienceReqs(Array.isArray(s.experience_requirements) ? s.experience_requirements : []);
     setLanguageReqs(Array.isArray(s.languages) ? s.languages : []);
+    setLocationCoords({ lat: s.location_lat ?? null, lng: s.location_lng ?? null });
+    setLocRelevance((s.location_relevance as LocRelevance) ?? "not_relevant");
+    setLocAnchor((s.location_anchor as LocAnchor) ?? "this");
+    setLocRadius(s.location_radius_km == null ? "any" : String(s.location_radius_km));
     if (Array.isArray(s.season_dates)) {
       setSeasonDates(s.season_dates.map((d: string) => {
         const [y, m, day] = d.split("-").map(Number);
