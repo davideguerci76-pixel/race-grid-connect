@@ -313,11 +313,16 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
   const perfect = match.is_perfect;
   const blurred = match.blurred;
   const isPartial = match.is_partial;
-  const gapColor = match.edge_only ? "racing-yellow" : "racing-red";
-  const gapLabel = match.edge_only ? "Missing days at edges only" : "Missing days include central days";
+  const edgeOnly = match.edge_only;
+  const gapLabel = edgeOnly ? "Missing days at edges only" : "Missing days include central days";
+  const partialBorder = edgeOnly ? "border-racing-yellow/60 bg-racing-yellow/5" : "border-racing-red/60 bg-racing-red/5";
+  const gapBadge = edgeOnly
+    ? "border-racing-yellow/60 bg-racing-yellow/10 text-racing-yellow"
+    : "border-racing-red/60 bg-racing-red/10 text-racing-red";
+  const gapDot = edgeOnly ? "bg-racing-yellow" : "bg-racing-red";
 
   return (
-    <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : isPartial ? `border-${gapColor}/60 bg-${gapColor}/5` : "border-border bg-card"}`}>
+    <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : isPartial ? partialBorder : "border-border bg-card"}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {match.unlocked ? <Unlock className="size-4 text-racing-yellow" /> : <Lock className="size-4 text-muted-foreground" />}
@@ -331,8 +336,8 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
               {match.free_preview && !match.top_three && match.unlocked && <span className="ml-2 text-racing-yellow">· UNLOCKED</span>}
             </div>
             {isPartial && (
-              <div className={`mt-1 inline-flex items-center gap-2 border border-${gapColor}/60 bg-${gapColor}/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-${gapColor}`} title={gapLabel}>
-                <span className={`inline-block size-2 rounded-full bg-${gapColor}`} />
+              <div className={`mt-1 inline-flex items-center gap-2 border ${gapBadge} px-2 py-1 font-mono text-[10px] uppercase tracking-widest`} title={gapLabel}>
+                <span className={`inline-block size-2 rounded-full ${gapDot}`} />
                 <Clock className="size-3" /> {match.missing_days} missing day{match.missing_days === 1 ? "" : "s"} · {gapLabel}
               </div>
             )}
