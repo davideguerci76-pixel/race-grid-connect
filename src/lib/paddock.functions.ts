@@ -729,50 +729,58 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    // Deterministic sort matching unlock_match_for_team rank rule
-    const sorted = (allMatches ?? []).slice().sort((a: any, b: any) => {
-      const ds = Number(b.match_score ?? 0) - Number(a.match_score ?? 0);
+    // Sort by final_score DESC (penalty applied), tiebreak by created_at
+    const sortFn = (a: any, b: any) => {
+      const ds = Number(b.final_score ?? b.match_score ?? 0) - Number(a.final_score ?? a.match_score ?? 0);
       if (ds !== 0) return ds;
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    });
-    const capped = sorted.slice(0, hardCap);
-    const totalMatches = capped.length;
+    };
+    const allFull = (allMatches ?? []).filter((m: any) => !m.is_partial).slice().sort(sortFn).slice(0, hardCap);
+    const allPartial = (allMatches ?? []).filter((m: any) => m.is_partial).slice().sort(sortFn).slice(0, hardCap);
 
     const computeTierCost = (base: number, slots: number, size: number) => {
       if (slots <= 0) return 0;
       if (slots >= size) return Math.round(base);
       return Math.max(1, Math.round((base * slots) / size));
     };
-    const tier1Count = Math.min(totalMatches, 10);
-    const tier2Slots = Math.max(0, Math.min(totalMatches, 10 + tier2Size) - 10);
-    const tier3Slots = Math.max(0, Math.min(totalMatches, 10 + tier2Size + tier3Size) - (10 + tier2Size));
+    const tiersFor = (total: number, unlockedSet: Set<number>) => {
+      const t1 = Math.min(total, 10);
+      const t2Slots = Math.max(0, Math.min(total, 10 + tier2Size) - 10);
+      const t3Slots = Math.max(0, Math.min(total, 10 + tier2Size + tier3Size) - (10 + tier2Size));
+      return [
+        { tier: 1, size: 10, real_count: t1, entry_cost: 0, entry_cost_full: 0, unlocked: true, proportional: false },
+        {
+          tier: 2, size: tier2Size, real_count: t2Slots,
+          entry_cost: computeTierCost(tier2Base, t2Slots, tier2Size),
+          entry_cost_full: Math.round(tier2Base),
+          unlocked: unlockedSet.has(2),
+          proportional: t2Slots > 0 && t2Slots < tier2Size,
+        },
+        {
+          tier: 3, size: tier3Size, real_count: t3Slots,
+          entry_cost: computeTierCost(tier3Base, t3Slots, tier3Size),
+          entry_cost_full: Math.round(tier3Base),
+          unlocked: unlockedSet.has(3),
+          proportional: t3Slots > 0 && t3Slots < tier3Size,
+        },
+      ];
+    };
 
     const { data: tierUnlocks } = await supabase
       .from("request_tier_unlocks" as any)
-      .select("tier, tokens_spent")
+      .select("tier, scope, tokens_spent")
       .eq("team_id", userId)
       .eq("request_id", data.request_id);
-    const unlockedTiers = new Map((tierUnlocks ?? []).map((r: any) => [r.tier, r.tokens_spent]));
+    const unlockedFull = new Set<number>();
+    const unlockedPartial = new Set<number>();
+    for (const r of (tierUnlocks ?? []) as any[]) {
+      const scope = (r.scope ?? "full") as string;
+      (scope === "partial" ? unlockedPartial : unlockedFull).add(Number(r.tier));
+    }
+    const tiersFull = tiersFor(allFull.length, unlockedFull);
+    const tiersPartial = tiersFor(allPartial.length, unlockedPartial);
 
-    const tiers = [
-      { tier: 1, size: 10, real_count: tier1Count, entry_cost: 0, entry_cost_full: 0, unlocked: true, proportional: false },
-      {
-        tier: 2, size: tier2Size, real_count: tier2Slots,
-        entry_cost: computeTierCost(tier2Base, tier2Slots, tier2Size),
-        entry_cost_full: Math.round(tier2Base),
-        unlocked: unlockedTiers.has(2),
-        proportional: tier2Slots > 0 && tier2Slots < tier2Size,
-      },
-      {
-        tier: 3, size: tier3Size, real_count: tier3Slots,
-        entry_cost: computeTierCost(tier3Base, tier3Slots, tier3Size),
-        entry_cost_full: Math.round(tier3Base),
-        unlocked: unlockedTiers.has(3),
-        proportional: tier3Slots > 0 && tier3Slots < tier3Size,
-      },
-    ];
-
-    const allFreelancerIds = Array.from(new Set(capped.map((m: any) => m.freelancer_id)));
+    const allFreelancerIds = Array.from(new Set([...allFull, ...allPartial].map((m: any) => m.freelancer_id)));
     const ratingAvg = new Map<string, { avg: number; count: number }>();
     if (allFreelancerIds.length) {
       const { data: allRatings } = await supabase
@@ -788,8 +796,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
-    const matchIds = capped.map((m: any) => m.id);
-    const freelancerIds = capped.map((m: any) => m.freelancer_id);
+    const matchIds = [...allFull, ...allPartial].map((m: any) => m.id);
+    const freelancerIds = [...allFull, ...allPartial].map((m: any) => m.freelancer_id);
     const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
     const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
@@ -799,10 +807,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
 
-    const items = capped.map((m: any, i: number) => {
+    const buildItem = (m: any, i: number, scope: "full" | "partial", tierUnlockedSet: Set<number>) => {
       const rank = i + 1;
       const tier = rank <= 10 ? 1 : rank <= 10 + tier2Size ? 2 : 3;
-      const tierUnlocked = tier === 1 || unlockedTiers.has(tier);
+      const tierUnlocked = tier === 1 || tierUnlockedSet.has(tier);
       const topThree = rank <= 3;
       const perProfileUnlocked = unlockMap.has(m.id);
       const showTech = tierUnlocked && (topThree || perProfileUnlocked);
@@ -810,14 +818,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const fp = fpMap.get(m.freelancer_id);
       return {
         match_id: m.id,
+        scope,
         rank,
         tier,
         tier_unlocked: tierUnlocked,
         blurred,
         top_three: topThree,
-        match_score: Number(m.match_score ?? 0),
+        // UI shows pure skills affinity; ordering uses final_score internally.
+        match_score: Number(m.skills_score ?? m.match_score ?? 0),
+        skills_score: Number(m.skills_score ?? m.match_score ?? 0),
+        final_score: Number(m.final_score ?? m.match_score ?? 0),
         is_perfect: m.is_perfect,
         overlap_days: m.overlap_days,
+        missing_days: Number(m.missing_days ?? 0),
+        missing_pct: Number(m.missing_pct ?? 0),
+        is_partial: !!m.is_partial,
+        edge_only: m.edge_only !== false,
         missing_criteria: m.missing_criteria ?? [],
         unlocked: showTech,
         free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
@@ -847,7 +863,24 @@ export const getRequestMatches = createServerFn({ method: "GET" })
             }
           : null,
       };
-    });
+    };
+
+    const itemsFull = allFull.map((m: any, i: number) => buildItem(m, i, "full", unlockedFull));
+    const itemsPartial = allPartial.map((m: any, i: number) => buildItem(m, i, "partial", unlockedPartial));
+    // Legacy `items` = full pool (existing UI code path)
+    const items = itemsFull;
+
+    // FOMO / service banner data
+    const bestFullSkill = itemsFull.length ? Math.max(...itemsFull.map((i) => i.skills_score)) : 0;
+    const bestPartialSkill = itemsPartial.length ? Math.max(...itemsPartial.map((i) => i.skills_score)) : 0;
+    const partialBanner = itemsPartial.length === 0
+      ? null
+      : {
+          case: bestPartialSkill > bestFullSkill ? ("A" as const) : ("B" as const),
+          best_full_skill: Math.round(bestFullSkill),
+          best_partial_skill: Math.round(bestPartialSkill),
+          partial_count: itemsPartial.length,
+        };
 
     let hired: any = null;
     if (req.status === "completed" || req.status === "filled") {
@@ -898,13 +931,18 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     return {
       request: req,
       items,
+      items_partial: itemsPartial,
       hired,
-      tiers,
+      tiers: tiersFull,
+      tiers_partial: tiersPartial,
       per_profile_cost: perProfileCost,
-      total_matches: totalMatches,
+      total_matches: allFull.length,
+      total_partial_matches: allPartial.length,
       hard_cap: hardCap,
+      partial_banner: partialBanner,
     };
   });
+
 
 
 export const unlockMatch = createServerFn({ method: "POST" })
