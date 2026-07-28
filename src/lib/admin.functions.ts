@@ -60,8 +60,9 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
     }
     const { data: allRatings } = await supabaseAdmin
       .from("ratings")
-      .select("to_user_id, stars, overall, unlocked_at")
+      .select("to_user_id, stars, overall, unlocked_at, moderation_status")
       .in("to_user_id", ids)
+      .in("moderation_status", ["active", "approved"] as any)
       .not("unlocked_at", "is", null);
     const ratingMap = new Map<string, { avg: number; count: number }>();
     for (const r of (allRatings ?? []) as any[]) {
