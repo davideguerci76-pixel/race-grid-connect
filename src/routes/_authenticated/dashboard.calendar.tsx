@@ -32,6 +32,7 @@ function CalendarPage() {
   }, [profile, navigate]);
 
   const getAvail = useServerFn(getMyAvailability);
+  const getBlocked = useServerFn(getMyBlockedDates);
   const setAvail = useServerFn(setAvailability);
 
   const { data: myDays = [] } = useQuery({
@@ -40,14 +41,24 @@ function CalendarPage() {
     queryFn: () => getAvail(),
   });
 
-  const selectedDates = myDays.map((d: string) => new Date(d + "T00:00:00"));
+  const { data: blockedDays = [] } = useQuery({
+    queryKey: ["my-blocked-dates", user?.id],
+    enabled: !!user && profile?.user_type === "freelancer",
+    queryFn: () => getBlocked(),
+  });
+
+  const blockedSet = new Set(blockedDays);
+  const selectedDates = myDays
+    .filter((d: string) => !blockedSet.has(d))
+    .map((d: string) => new Date(d + "T00:00:00"));
+  const blockedDates = blockedDays.map((d: string) => new Date(d + "T00:00:00"));
 
   const mutation = useMutation({
     mutationFn: async (dates: Date[] | undefined) => {
-      const next = dates ?? [];
-      const currentSet = new Set(myDays);
       const fmt = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const next = (dates ?? []).filter((d) => !blockedSet.has(fmt(d)));
+      const currentSet = new Set(myDays.filter((d: string) => !blockedSet.has(d)));
       const nextSet = new Set(next.map(fmt));
       const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
@@ -75,13 +86,21 @@ function CalendarPage() {
         <div className="label-mono">[CALENDAR]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("calendar.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
-        <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.length })}</p>
+        <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.filter((d: string) => !blockedSet.has(d)).length })}</p>
+
+        <div className="mt-4 flex flex-wrap gap-4 font-mono text-[11px] uppercase tracking-widest">
+          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> Unavailable</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> Available</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> Engaged (locked)</span>
+        </div>
+
         <div className="mt-6">
           <AvailabilityCalendar
             selected={selectedDates}
+            blocked={blockedDates}
             onSelect={(d) => mutation.mutate(d)}
             min={new Date()}
-            legend="Selected (red) days = days you are available for work."
+            legend="Click a day to toggle availability. Red = confirmed match, cannot be edited."
           />
         </div>
       </div>
