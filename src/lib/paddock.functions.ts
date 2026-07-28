@@ -207,6 +207,8 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         initials,
         team_type: data.team_type || null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         primary_discipline: data.primary_discipline || null,
         bio: data.bio || null,
         website: data.website || null,
