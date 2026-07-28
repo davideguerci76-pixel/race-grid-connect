@@ -2,12 +2,11 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import { toast } from "sonner";
-import { Lock, Unlock, Mail, Phone, Star, ArrowLeft } from "lucide-react";
+import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 
@@ -17,14 +16,14 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/mat
 
 function RequestMatchesPage() {
   const { id } = useParams({ from: "/_authenticated/dashboard/requests/$id/matches" });
-  const [page, setPage] = useState(1);
   const qc = useQueryClient();
   const fetchMatches = useServerFn(getRequestMatches);
   const unlockFn = useServerFn(unlockMatch);
+  const unlockTierFn = useServerFn(unlockRequestTier);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["request-matches", id, page],
-    queryFn: () => fetchMatches({ data: { request_id: id, page } }),
+    queryKey: ["request-matches", id],
+    queryFn: () => fetchMatches({ data: { request_id: id } }),
   });
 
   const unlockMut = useMutation({
@@ -37,6 +36,16 @@ function RequestMatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Unlock failed"),
   });
 
+  const tierMut = useMutation({
+    mutationFn: (tier: number) => unlockTierFn({ data: { request_id: id, tier } }),
+    onSuccess: (r) => {
+      toast.success(`Tier ${r.tier} unlocked — ${r.tokens_spent} tokens spent. Balance: ${r.balance}`);
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["token-balance"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Tier unlock failed"),
+  });
+
   const confirmFn = useServerFn(requestMatchConfirmation);
   const confirmMut = useMutation({
     mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
@@ -47,7 +56,6 @@ function RequestMatchesPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -68,9 +76,11 @@ function RequestMatchesPage() {
                 {roleLabel(data.request.role)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
-                <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 matches by score are unlocked automatically. Every other match costs 1 token to unlock its technical details. Real names and contacts appear only after the freelancer confirms the match.
+                Matches are grouped in three tiers. <span className="font-bold text-racing-yellow">Top 3</span> are always previewable for free (technical details, no contacts). Ranks 4–10 stay blurred until you spend {data.per_profile_cost} token{data.per_profile_cost === 1 ? "" : "s"} per profile. Tiers 2 (11–20) and 3 (21–50) require a one-time entry fee — reduced proportionally when fewer matches exist. Nothing beyond rank {data.hard_cap} is ever exposed.
               </p>
-
+              <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                {data.total_matches} match{data.total_matches === 1 ? "" : "es"} total (capped at {data.hard_cap})
+              </div>
             </div>
 
             {data.hired && (
@@ -138,56 +148,90 @@ function RequestMatchesPage() {
               </div>
             )}
 
-
-            <div className="mt-6 flex items-center justify-between">
-              <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                {data.pagination.total} match{data.pagination.total === 1 ? "" : "es"}
+            {data.items.length === 0 && (
+              <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
+                No matches for this request yet.
               </div>
+            )}
 
-              {data.pagination.totalPages > 1 && (
-                <div className="flex items-center gap-2 font-mono text-xs">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    className="border border-border px-3 py-1 uppercase tracking-widest disabled:opacity-30"
-                  >
-                    Prev
-                  </button>
-                  <span>Page {page} / {data.pagination.totalPages}</span>
-                  <button
-                    disabled={page >= data.pagination.totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                    className="border border-border px-3 py-1 uppercase tracking-widest disabled:opacity-30"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </div>
+            {data.tiers.map((t) => {
+              if (t.real_count === 0) return null;
+              const tierItems = data.items.filter((i) => i.tier === t.tier);
+              const requestFilled = data.request.status === "filled" || data.request.status === "completed";
+              const isLocked = !t.unlocked;
+              return (
+                <section key={t.tier} className="mt-8">
+                  <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-2">
+                    <div>
+                      <div className="label-mono">
+                        [TIER {t.tier}] {(() => {
+                          const t2 = data.tiers.find((x) => x.tier === 2)?.size ?? 10;
+                          if (t.tier === 1) return "Top matches (1–10)";
+                          if (t.tier === 2) return `Matches 11–${10 + t.size}`;
+                          return `Matches ${11 + t2}–${10 + t2 + t.size}`;
+                        })()}
+                      </div>
+                      <div className="mt-1 text-xl font-black italic tracking-tighter">
+                        {t.tier === 1 ? "Free preview" : t.unlocked ? "Unlocked" : `Locked — ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"} to open`}
+                      </div>
+                      <div className="font-mono text-[11px] uppercase text-muted-foreground">
+                        {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier
+                      </div>
+                    </div>
+                    {isLocked && (
+                      <div className="max-w-md text-right">
+                        {t.proportional && (
+                          <div className="mb-2 flex items-start gap-2 border border-racing-yellow/50 bg-racing-yellow/10 p-2 text-left font-mono text-[11px] text-racing-yellow">
+                            <AlertTriangle className="mt-0.5 size-3 shrink-0" />
+                            <span>
+                              Only {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier (max {t.size}). Entry fee reduced proportionally from {t.entry_cost_full} to {t.entry_cost} token{t.entry_cost === 1 ? "" : "s"}.
+                            </span>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => {
+                            const msg = t.proportional
+                              ? `Unlock tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? (Reduced from ${t.entry_cost_full} — only ${t.real_count} real matches available in this tier.)`
+                              : `Unlock tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? This exposes ${t.real_count} more match card${t.real_count === 1 ? "" : "s"} (still blurred until per-profile unlock).`;
+                            if (confirm(msg)) tierMut.mutate(t.tier);
+                          }}
+                          disabled={tierMut.isPending}
+                          className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                        >
+                          <Unlock className="mr-1 inline size-3" /> Unlock tier {t.tier} ({t.entry_cost} tk)
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
-            <div className="mt-4 grid gap-3">
-              {data.items.length === 0 && (
-                <div className="border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-                  No matches for this request yet.
-                </div>
-              )}
-              {data.items.map((m) => (
-                <MatchCard
-                  key={m.match_id}
-                  match={m}
-                  requestFilled={data.request.status === "filled" || data.request.status === "completed"}
-                  onUnlock={() => unlockMut.mutate(m.match_id)}
-                  onConfirm={() => {
-
-                    if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
-                      confirmMut.mutate(m.match_id);
-                    }
-                  }}
-
-                  loading={unlockMut.isPending || confirmMut.isPending}
-                />
-              ))}
-            </div>
+                  {isLocked ? (
+                    <div className="grid gap-3">
+                      {Array.from({ length: t.real_count }).map((_, i) => (
+                        <TierPlaceholder key={i} rank={(t.tier === 2 ? 11 : 11 + (data.tiers.find((x) => x.tier === 2)?.size ?? 10)) + i} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid gap-3">
+                      {tierItems.map((m) => (
+                        <MatchCard
+                          key={m.match_id}
+                          match={m}
+                          perProfileCost={data.per_profile_cost}
+                          requestFilled={requestFilled}
+                          onUnlock={() => unlockMut.mutate(m.match_id)}
+                          onConfirm={() => {
+                            if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
+                              confirmMut.mutate(m.match_id);
+                            }
+                          }}
+                          loading={unlockMut.isPending || confirmMut.isPending}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </>
         )}
       </div>
@@ -196,9 +240,27 @@ function RequestMatchesPage() {
   );
 }
 
-function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean }) {
+function TierPlaceholder({ rank }: { rank: number }) {
+  return (
+    <div className="relative overflow-hidden border border-dashed border-border bg-card p-5">
+      <div className="pointer-events-none select-none blur-md">
+        <div className="text-3xl font-black italic tracking-tighter text-muted-foreground">??% Match</div>
+        <div className="mt-2 h-4 w-40 bg-secondary" />
+        <div className="mt-2 h-3 w-64 bg-secondary" />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex items-center gap-2 border border-border bg-background/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground backdrop-blur">
+          <EyeOff className="size-3" /> Rank #{rank} — tier locked
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProfileCost }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean; perProfileCost: number }) {
   const pct = Math.round(match.match_score);
   const perfect = match.is_perfect;
+  const blurred = match.blurred;
 
   return (
     <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
@@ -210,8 +272,9 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
             </div>
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              {match.overlap_days} day{match.overlap_days === 1 ? "" : "s"} of overlap
-              {match.free_preview && match.unlocked && <span className="ml-2 text-racing-yellow">· FREE PREVIEW</span>}
+              Rank #{match.rank} · tier {match.tier} · {match.overlap_days} day{match.overlap_days === 1 ? "" : "s"} of overlap
+              {match.top_three && <span className="ml-2 text-racing-yellow">· TOP 3 FREE</span>}
+              {match.free_preview && !match.top_three && match.unlocked && <span className="ml-2 text-racing-yellow">· UNLOCKED</span>}
             </div>
             {match.rating && match.rating.count > 0 && (
               <div className="mt-1">
@@ -221,13 +284,13 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {!match.unlocked && (
+          {blurred && (
             <button
               onClick={onUnlock}
               disabled={loading}
               className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
             >
-              <Unlock className="size-3" /> Unlock details (1 token)
+              <Unlock className="size-3" /> Unlock details ({perProfileCost} tk)
             </button>
           )}
           {match.unlocked && !requestFilled && (
@@ -324,12 +387,10 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
             </div>
           )}
           <div className="mt-3 rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Technical details are hidden until you unlock (1 token). Real name and contacts appear only after the freelancer confirms the match.
+            Technical details are hidden until you unlock ({perProfileCost} token{perProfileCost === 1 ? "" : "s"}). Real name and contacts appear only after the freelancer confirms the match.
           </div>
-
         </div>
       )}
-
     </div>
   );
 }

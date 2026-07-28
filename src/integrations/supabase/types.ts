@@ -655,6 +655,41 @@ export type Database = {
           },
         ]
       }
+      request_tier_unlocks: {
+        Row: {
+          id: string
+          request_id: string
+          team_id: string
+          tier: number
+          tokens_spent: number
+          unlocked_at: string
+        }
+        Insert: {
+          id?: string
+          request_id: string
+          team_id: string
+          tier: number
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Update: {
+          id?: string
+          request_id?: string
+          team_id?: string
+          tier?: number
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_tier_unlocks_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           budget_max: number | null
@@ -1179,6 +1214,15 @@ export type Database = {
         }
       }
       unlock_match_for_team: { Args: { _match_id: string }; Returns: number }
+      unlock_request_tier: {
+        Args: { _request_id: string; _tier: number }
+        Returns: {
+          balance: number
+          tier: number
+          tokens_spent: number
+          total_matches: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
