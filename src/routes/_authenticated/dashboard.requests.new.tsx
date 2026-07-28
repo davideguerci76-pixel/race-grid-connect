@@ -12,7 +12,20 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+
+type LocRelevance = "not_relevant" | "relevant" | "mandatory";
+type LocAnchor = "this" | "team";
+const RADIUS_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "25", label: "25 km" },
+  { value: "50", label: "50 km" },
+  { value: "100", label: "100 km" },
+  { value: "200", label: "200 km" },
+  { value: "500", label: "500 km" },
+  { value: "1000", label: "1000 km" },
+  { value: "any", label: "ANY" },
+];
 
 const search = z.object({
   from: fallback(z.string().optional(), undefined),
