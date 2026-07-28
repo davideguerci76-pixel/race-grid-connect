@@ -368,6 +368,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       education: profile?.education ?? "",
       day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
       location: profile?.location ?? "",
+      location_lat: (profile as any)?.location_lat ?? null,
+      location_lng: (profile as any)?.location_lng ?? null,
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
       experiences: Array.isArray(profile?.experiences)
