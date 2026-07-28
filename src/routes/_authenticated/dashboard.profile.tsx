@@ -349,6 +349,8 @@ function FreelancerSection({ profile }: { profile: any }) {
     education: "" as string,
     day_rate: "" as string,
     location: "",
+    location_lat: null as number | null,
+    location_lng: null as number | null,
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
