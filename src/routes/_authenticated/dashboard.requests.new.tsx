@@ -188,6 +188,11 @@ function NewRequestPage() {
             custom: l.code === "other" ? (l.custom ?? null) : null,
           })),
           ...(identical && from ? { repost_of: from } : {}),
+          location_lat: locationCoords.lat,
+          location_lng: locationCoords.lng,
+          location_relevance: locRelevance,
+          location_anchor: locAnchor,
+          location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
 
         } as never,
       }),
