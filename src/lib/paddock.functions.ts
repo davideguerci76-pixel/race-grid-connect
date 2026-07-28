@@ -591,7 +591,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
+      .select("*, request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
@@ -1202,4 +1202,81 @@ export const adminTriggerRatingNotifications = createServerFn({ method: "POST" }
     const { data, error } = await context.supabase.rpc("emit_rating_available_notifications");
     if (error) throw new Error(error.message);
     return { inserted: (data as number) ?? 0 };
+  });
+
+// ---- Cancellations & SOS Call ----
+export const cancelEngagement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      engagement_id: z.string().uuid(),
+      reason: z.string().trim().max(500).optional().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("cancel_engagement", {
+      _engagement_id: data.engagement_id,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const triggerSosCall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("trigger_sos_call", { _request_id: data.request_id });
+    if (error) throw new Error(error.message);
+    return row as { id: string; target_count: number; min_pct: number };
+  });
+
+export const acceptSosCall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ sos_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("accept_sos_call", { _sos_id: data.sos_id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const getMyOpenSosCalls = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: targets } = await supabase
+      .from("sos_call_targets")
+      .select("sos_id, skills_score, distance_km, sos:sos_calls(id, request_id, triggered_at, resolved_at, min_pct, team_id)")
+      .eq("freelancer_id", userId);
+    const open = (targets ?? []).filter((t: any) => t.sos && !t.sos.resolved_at);
+    if (open.length === 0) return [] as any[];
+    const requestIds = Array.from(new Set(open.map((o: any) => o.sos.request_id)));
+    const teamIds = Array.from(new Set(open.map((o: any) => o.sos.team_id)));
+    const [reqRes, teamRes] = await Promise.all([
+      supabase.from("requests").select("id, title, role, discipline, start_date, end_date, location, circuit").in("id", requestIds),
+      supabase.from("team_profiles").select("user_id, team_name, location").in("user_id", teamIds),
+    ]);
+    const rMap = new Map(((reqRes.data ?? []) as any[]).map((r) => [r.id, r]));
+    const tMap = new Map(((teamRes.data ?? []) as any[]).map((r) => [r.user_id, r]));
+    return open.map((o: any) => ({
+      sos_id: o.sos.id,
+      request: rMap.get(o.sos.request_id) ?? null,
+      team: tMap.get(o.sos.team_id) ?? null,
+      skills_score: Number(o.skills_score),
+      distance_km: o.distance_km == null ? null : Number(o.distance_km),
+      triggered_at: o.sos.triggered_at,
+    }));
+  });
+
+export const getTeamCancellationStats = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ team_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("engagements")
+      .select("cancelled_at, start_date")
+      .eq("team_id", data.team_id)
+      .eq("cancellation_kind", "team_late");
+    const count = (rows ?? []).length;
+    return { count };
   });

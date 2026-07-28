@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 
@@ -60,7 +60,19 @@ function RequestMatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
+  const sosFn = useServerFn(triggerSosCall);
+  const sosMut = useMutation({
+    mutationFn: () => sosFn({ data: { request_id: id } }),
+    onSuccess: (r: any) => {
+      toast.success(`SOS Call sent to ${r?.target_count ?? 0} freelancer(s) at ≥${r?.min_pct ?? 75}% affinity.`);
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "SOS Call failed"),
+  });
+
   const requestFilled = data?.request.status === "filled" || data?.request.status === "completed";
+  const isFirstDayToday = data ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
+  const sosEligible = data && !requestFilled && isFirstDayToday && data.request.duration !== "full_season";
 
   const renderPool = (
     label: string,
@@ -175,7 +187,29 @@ function RequestMatchesPage() {
               <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 {data.total_matches} full match{data.total_matches === 1 ? "" : "es"} · {data.total_partial_matches} partial (capped at {data.hard_cap})
               </div>
+              {sosEligible && (
+                <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
+                  <div className="min-w-0">
+                    <div className="label-mono text-racing-red">[SOS CALL — FIRST DAY ONLY]</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Emergency broadcast to all high-affinity freelancers available today. The first to accept fills the match automatically.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm("Trigger SOS Call for today? Every high-affinity freelancer available today will be notified. The first to accept locks the match — this is irreversible.")) {
+                        sosMut.mutate();
+                      }
+                    }}
+                    disabled={sosMut.isPending}
+                    className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                  >
+                    <Flame className="mr-1 inline size-3" /> Trigger SOS Call
+                  </button>
+                </div>
+              )}
             </div>
+
 
             {data.hired && (
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">

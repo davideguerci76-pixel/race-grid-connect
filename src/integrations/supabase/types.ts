@@ -81,6 +81,11 @@ export type Database = {
       }
       engagements: {
         Row: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
           created_at: string
           currency: string
           end_date: string
@@ -89,6 +94,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           id: string
           match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
@@ -99,6 +105,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cancellation_kind?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           end_date: string
@@ -107,6 +118,7 @@ export type Database = {
           freelancer_marked_complete?: boolean
           id?: string
           match_id?: string | null
+          no_show?: boolean
           notes?: string | null
           proposed_by: string
           request_id?: string | null
@@ -117,6 +129,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cancellation_kind?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          confirmed_at?: string | null
           created_at?: string
           currency?: string
           end_date?: string
@@ -125,6 +142,7 @@ export type Database = {
           freelancer_marked_complete?: boolean
           id?: string
           match_id?: string | null
+          no_show?: boolean
           notes?: string | null
           proposed_by?: string
           request_id?: string | null
@@ -851,6 +869,101 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_call_targets: {
+        Row: {
+          distance_km: number | null
+          freelancer_id: string
+          id: string
+          match_id: string | null
+          notified_at: string
+          skills_score: number
+          sos_id: string
+        }
+        Insert: {
+          distance_km?: number | null
+          freelancer_id: string
+          id?: string
+          match_id?: string | null
+          notified_at?: string
+          skills_score: number
+          sos_id: string
+        }
+        Update: {
+          distance_km?: number | null
+          freelancer_id?: string
+          id?: string
+          match_id?: string | null
+          notified_at?: string
+          skills_score?: number
+          sos_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_call_targets_sos_id_fkey"
+            columns: ["sos_id"]
+            isOneToOne: false
+            referencedRelation: "sos_calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_calls: {
+        Row: {
+          auto_triggered: boolean
+          id: string
+          min_pct: number
+          radius_km: number | null
+          request_id: string
+          resolved_at: string | null
+          resolved_engagement_id: string | null
+          target_count: number
+          team_id: string
+          triggered_at: string
+          triggered_by: string
+        }
+        Insert: {
+          auto_triggered?: boolean
+          id?: string
+          min_pct: number
+          radius_km?: number | null
+          request_id: string
+          resolved_at?: string | null
+          resolved_engagement_id?: string | null
+          target_count?: number
+          team_id: string
+          triggered_at?: string
+          triggered_by: string
+        }
+        Update: {
+          auto_triggered?: boolean
+          id?: string
+          min_pct?: number
+          radius_km?: number | null
+          request_id?: string
+          resolved_at?: string | null
+          resolved_engagement_id?: string | null
+          target_count?: number
+          team_id?: string
+          triggered_at?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_calls_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sos_calls_resolved_engagement_id_fkey"
+            columns: ["resolved_engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_profiles: {
         Row: {
           bio: string | null
@@ -992,6 +1105,11 @@ export type Database = {
       accept_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
           created_at: string
           currency: string
           end_date: string
@@ -1000,6 +1118,40 @@ export type Database = {
           freelancer_marked_complete: boolean
           id: string
           match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_id: string
+          team_marked_complete: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      accept_sos_call: {
+        Args: { _sos_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          id: string
+          match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
@@ -1047,6 +1199,40 @@ export type Database = {
         }
       }
       admin_set_time_offset: { Args: { _days: number }; Returns: number }
+      cancel_engagement: {
+        Args: { _engagement_id: string; _reason?: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_id: string
+          team_marked_complete: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      close_expired_requests: { Args: never; Returns: number }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -1162,6 +1348,11 @@ export type Database = {
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
           created_at: string
           currency: string
           end_date: string
@@ -1170,6 +1361,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           id: string
           match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
@@ -1275,6 +1467,35 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "ratings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      team_cancellation_stats: {
+        Args: { _team_id: string }
+        Returns: {
+          avg_days_notice: number
+          count: number
+        }[]
+      }
+      trigger_sos_call: {
+        Args: { _request_id: string }
+        Returns: {
+          auto_triggered: boolean
+          id: string
+          min_pct: number
+          radius_km: number | null
+          request_id: string
+          resolved_at: string | null
+          resolved_engagement_id: string | null
+          target_count: number
+          team_id: string
+          triggered_at: string
+          triggered_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sos_calls"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -1392,6 +1613,11 @@ export type Database = {
         | "rating_available"
         | "rating_unlocked"
         | "match_taken"
+        | "match_reopened"
+        | "sos_call"
+        | "sos_taken"
+        | "engagement_cancelled"
+        | "request_unfilled"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -1640,6 +1866,11 @@ export const Constants = {
         "rating_available",
         "rating_unlocked",
         "match_taken",
+        "match_reopened",
+        "sos_call",
+        "sos_taken",
+        "engagement_cancelled",
+        "request_unfilled",
       ],
       rating_moderation_status: [
         "active",
