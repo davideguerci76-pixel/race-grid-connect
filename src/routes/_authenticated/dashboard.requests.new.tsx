@@ -304,10 +304,83 @@ function NewRequestPage() {
             onChange={(v) => setForm({ ...form, duration: v as DurationType })}
             options={DURATIONS.map((r) => ({ value: r, label: t(`duration.${r}`) }))}
           />
-          <div>
-            <label className="label-mono">Circuit</label>
-            <input value={form.circuit} onChange={(e) => setForm({ ...form, circuit: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+          <div className="md:col-span-2 border border-border bg-background/40 p-3">
+            <label className="label-mono">Location / Circuit</label>
+            <LocationAutocomplete
+              value={form.location}
+              onChange={(v) => { setForm({ ...form, location: v, circuit: v }); }}
+              onPick={(p) => {
+                setForm({ ...form, location: p.text, circuit: p.text });
+                setLocationCoords({ lat: p.lat, lng: p.lng });
+              }}
+              placeholder="City, circuit or country"
+              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setLocRelevance(locRelevance === "not_relevant" ? "relevant" : locRelevance === "relevant" ? "mandatory" : "not_relevant");
+                }}
+                title="Click to cycle: Not relevant → Relevant → Mandatory"
+                className={`border px-3 py-2 text-[11px] font-bold uppercase tracking-widest ${
+                  locRelevance === "mandatory"
+                    ? "border-racing-red bg-racing-red text-white"
+                    : locRelevance === "relevant"
+                    ? "border-racing-yellow bg-racing-yellow text-black"
+                    : "border-border bg-black text-white"
+                }`}
+              >
+                {locRelevance === "mandatory" ? "Mandatory" : locRelevance === "relevant" ? "Relevant" : "Not relevant"}
+              </button>
+
+              {locRelevance !== "not_relevant" && (
+                <>
+                  <div className="inline-flex border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setLocAnchor("this")}
+                      className={`px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "this" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      This location
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLocAnchor("team")}
+                      className={`border-l border-border px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "team" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      Team location
+                    </button>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
+                    Max distance
+                    <select
+                      value={locRadius}
+                      onChange={(e) => setLocRadius(e.target.value)}
+                      className="border border-border bg-background px-2 py-1 text-sm"
+                    >
+                      {RADIUS_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {locRelevance === "not_relevant" && "Distance is ignored — location has no effect on the match score."}
+              {locRelevance === "relevant" && "Freelancers inside the radius get the full location score, near-radius (≤ 1.2×) get half, further out zero."}
+              {locRelevance === "mandatory" && <span className="text-racing-red font-bold">Hard filter — freelancers outside the radius are excluded from matches.</span>}
+              {" "}Distance is measured as-the-crow-flies (Haversine).
+              {locRelevance !== "not_relevant" && locAnchor === "team" && " Anchor: your team's fixed location from your profile."}
+              {locRelevance !== "not_relevant" && locAnchor === "this" && " Anchor: the location entered above."}
+            </p>
+            {locRelevance !== "not_relevant" && locAnchor === "this" && !locationCoords.lat && (
+              <p className="mt-1 text-[11px] text-racing-yellow">Pick a location from the dropdown so we can capture its coordinates.</p>
+            )}
           </div>
+
 
           {!isSeason && (
             <>
