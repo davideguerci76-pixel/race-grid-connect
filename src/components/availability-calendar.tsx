@@ -30,6 +30,7 @@ export function AvailabilityCalendar({
   const blockedSet = new Set((blocked ?? []).map((d) => ymd(d)));
   const isBlocked = (d: Date) => blockedSet.has(ymd(d));
   const isDisabled = (d: Date) => {
+    if (isBlocked(d)) return true;
     if (disabled) return disabled(d);
     if (min) return d < min;
     return false;
