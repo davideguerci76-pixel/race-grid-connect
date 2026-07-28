@@ -3,10 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
+import { Lock, Flag } from "lucide-react";
 import { RatingIcons } from "@/components/rating-icons";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getUserRatingSummary, getAnonymousReviews, unlockReviews } from "@/lib/paddock.functions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { getUserRatingSummary, getAnonymousReviews, unlockReviews, flagRating } from "@/lib/paddock.functions";
 
 type Variant = "wrench" | "headset";
 
@@ -53,6 +54,89 @@ export function ProfileRatingBadge({
   );
 }
 
+function FlagReviewButton({ ratingId, alreadyFlagged, onFlagged }: { ratingId: string; alreadyFlagged: boolean; onFlagged: () => void }) {
+  const { t } = useTranslation();
+  const flagFn = useServerFn(flagRating);
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+
+  const mut = useMutation({
+    mutationFn: () => flagFn({ data: { rating_id: ratingId, reason: reason.trim() } }),
+    onSuccess: () => {
+      toast.success(t("reviews.flag_submitted", { defaultValue: "Review reported. Our team will review it." }));
+      setOpen(false);
+      setReason("");
+      onFlagged();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+  });
+
+  if (alreadyFlagged) {
+    return (
+      <span className="inline-flex items-center gap-1 border border-racing-red/40 bg-racing-red/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-red">
+        <Flag className="size-3" />
+        {t("reviews.flag_pending", { defaultValue: "Reported" })}
+      </span>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1 border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:border-racing-red hover:text-racing-red"
+      >
+        <Flag className="size-3" />
+        {t("reviews.flag_cta", { defaultValue: "Report / Contest" })}
+      </button>
+      <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setReason(""); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-xs uppercase tracking-widest text-racing-red">
+              {t("reviews.flag_title", { defaultValue: "Contest this review" })}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {t("reviews.flag_help", {
+              defaultValue:
+                "Explain why this review looks unfair, off-topic, or abusive. Your report goes to our moderation team.",
+            })}
+          </p>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder={t("reviews.flag_placeholder", { defaultValue: "Describe the issue (min. 10 characters)…" }) as string}
+            rows={5}
+            maxLength={2000}
+            className="mt-2"
+          />
+          <div className="text-right font-mono text-[10px] text-muted-foreground">{reason.length}/2000</div>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+            >
+              {t("common.cancel", { defaultValue: "Cancel" })}
+            </button>
+            <button
+              type="button"
+              onClick={() => mut.mutate()}
+              disabled={mut.isPending || reason.trim().length < 10}
+              className="bg-racing-red px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+            >
+              {mut.isPending
+                ? t("common.loading")
+                : t("reviews.flag_submit", { defaultValue: "Submit report" })}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 export function AnonymousReviewsSection({
   targetUserId,
   variant = "wrench",
@@ -83,6 +167,8 @@ export function AnonymousReviewsSection({
   });
 
   const unlocked = !!data?.unlocked || isOwner;
+
+  const refetchReviews = () => qc.invalidateQueries({ queryKey: ["anon-reviews", targetUserId] });
 
   return (
     <div className="border border-border bg-card p-6">
@@ -120,13 +206,20 @@ export function AnonymousReviewsSection({
           {data!.reviews.map((r: any, i: number) => {
             const sub = r.sub_scores ?? {};
             const overall = r.overall != null ? Number(r.overall) : Number(r.stars ?? 0);
+            const status = r.moderation_status ?? "active";
+            const alreadyFlagged = status === "flagged" || status === "frozen";
             return (
-              <li key={i} className="border-b border-border pb-3 last:border-0">
-                <div className="flex flex-wrap items-center gap-3">
-                  <RatingIcons value={overall} variant={variant} />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {t("reviews.anonymous", { defaultValue: "Anonymous" })} · {new Date(r.created_at).toLocaleDateString()}
-                  </span>
+              <li key={r.id ?? i} className="border-b border-border pb-3 last:border-0">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <RatingIcons value={overall} variant={variant} />
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {t("reviews.anonymous", { defaultValue: "Anonymous" })} · {new Date(r.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  {r.id && (
+                    <FlagReviewButton ratingId={r.id} alreadyFlagged={alreadyFlagged} onFlagged={refetchReviews} />
+                  )}
                 </div>
                 {variant === "wrench" && (sub.technical || sub.punctuality || sub.stress) && (
                   <div className="mt-2 grid gap-1 sm:grid-cols-3">
