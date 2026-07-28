@@ -956,23 +956,30 @@ export const unlockMatch = createServerFn({ method: "POST" })
 
 export const unlockRequestTier = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { request_id: string; tier: number }) =>
-    z.object({ request_id: z.string().uuid(), tier: z.number().int().min(2).max(3) }).parse(data),
+  .validator((data: { request_id: string; tier: number; scope?: "full" | "partial" }) =>
+    z.object({
+      request_id: z.string().uuid(),
+      tier: z.number().int().min(2).max(3),
+      scope: z.enum(["full", "partial"]).default("full"),
+    }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase.rpc("unlock_request_tier" as any, {
       _request_id: data.request_id,
       _tier: data.tier,
+      _scope: data.scope ?? "full",
     } as any);
     if (error) throw new Error(error.message);
     const row = Array.isArray(rows) ? rows[0] : rows;
     return {
       tier: Number(row?.tier ?? data.tier),
+      scope: data.scope ?? "full",
       tokens_spent: Number(row?.tokens_spent ?? 0),
       balance: Number(row?.balance ?? 0),
       total_matches: Number(row?.total_matches ?? 0),
     };
   });
+
 
 // ---- Notifications ----
 export const getUnreadNotificationCount = createServerFn({ method: "GET" })
