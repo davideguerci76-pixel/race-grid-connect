@@ -685,16 +685,14 @@ export const getFreelancerRatings = createServerFn({ method: "GET" })
     return { ratings: rows ?? [], average: Math.round(avg * 10) / 10, count: rows?.length ?? 0 };
   });
 
-// ---- Team match view per request (v2 scoring + token unlocks) ----
+// ---- Team match view per request (tiered pagination v3) ----
 export const getRequestMatches = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { request_id: string; page?: number }) =>
-    z.object({ request_id: z.string().uuid(), page: z.number().int().min(1).max(200).optional() }).parse(data),
+  .validator((data: { request_id: string }) =>
+    z.object({ request_id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const page = data.page ?? 1;
-    const pageSize = 10;
 
     const { data: req, error: reqErr } = await supabase
       .from("requests")
@@ -705,14 +703,76 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (!req) throw new Error("Request not found");
     if (req.team_id !== userId) throw new Error("Not owner of this request");
 
+    const settingKeys = [
+      "cost_tier2_entry",
+      "cost_tier3_entry",
+      "cost_unlock_match_for_team",
+      "tier2_size",
+      "tier3_size",
+      "hard_cap_matches",
+    ];
+    const { data: settingsRows } = await supabase
+      .from("platform_settings")
+      .select("key, value_num")
+      .in("key", settingKeys);
+    const settings = new Map((settingsRows ?? []).map((r: any) => [r.key, Number(r.value_num)]));
+    const tier2Base = settings.get("cost_tier2_entry") ?? 5;
+    const tier3Base = settings.get("cost_tier3_entry") ?? 25;
+    const perProfileCost = settings.get("cost_unlock_match_for_team") ?? 1;
+    const tier2Size = settings.get("tier2_size") ?? 10;
+    const tier3Size = settings.get("tier3_size") ?? 30;
+    const hardCap = settings.get("hard_cap_matches") ?? 50;
+
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    // Fetch aggregated ratings for tiebreaker (avg from all unlocked reviews)
-    const allFreelancerIds = Array.from(new Set((allMatches ?? []).map((m: any) => m.freelancer_id)));
+    // Deterministic sort matching unlock_match_for_team rank rule
+    const sorted = (allMatches ?? []).slice().sort((a: any, b: any) => {
+      const ds = Number(b.match_score ?? 0) - Number(a.match_score ?? 0);
+      if (ds !== 0) return ds;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    });
+    const capped = sorted.slice(0, hardCap);
+    const totalMatches = capped.length;
+
+    const computeTierCost = (base: number, slots: number, size: number) => {
+      if (slots <= 0) return 0;
+      if (slots >= size) return Math.round(base);
+      return Math.max(1, Math.ceil((base * slots) / size));
+    };
+    const tier1Count = Math.min(totalMatches, 10);
+    const tier2Slots = Math.max(0, Math.min(totalMatches, 10 + tier2Size) - 10);
+    const tier3Slots = Math.max(0, Math.min(totalMatches, 10 + tier2Size + tier3Size) - (10 + tier2Size));
+
+    const { data: tierUnlocks } = await supabase
+      .from("request_tier_unlocks" as any)
+      .select("tier, tokens_spent")
+      .eq("team_id", userId)
+      .eq("request_id", data.request_id);
+    const unlockedTiers = new Map((tierUnlocks ?? []).map((r: any) => [r.tier, r.tokens_spent]));
+
+    const tiers = [
+      { tier: 1, size: 10, real_count: tier1Count, entry_cost: 0, entry_cost_full: 0, unlocked: true, proportional: false },
+      {
+        tier: 2, size: tier2Size, real_count: tier2Slots,
+        entry_cost: computeTierCost(tier2Base, tier2Slots, tier2Size),
+        entry_cost_full: Math.round(tier2Base),
+        unlocked: unlockedTiers.has(2),
+        proportional: tier2Slots > 0 && tier2Slots < tier2Size,
+      },
+      {
+        tier: 3, size: tier3Size, real_count: tier3Slots,
+        entry_cost: computeTierCost(tier3Base, tier3Slots, tier3Size),
+        entry_cost_full: Math.round(tier3Base),
+        unlocked: unlockedTiers.has(3),
+        proportional: tier3Slots > 0 && tier3Slots < tier3Size,
+      },
+    ];
+
+    const allFreelancerIds = Array.from(new Set(capped.map((m: any) => m.freelancer_id)));
     const ratingAvg = new Map<string, { avg: number; count: number }>();
     if (allFreelancerIds.length) {
       const { data: allRatings } = await supabase
@@ -728,57 +788,46 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
-    // Sort: match_score DESC, then rating avg DESC, then created_at ASC
-    const rows = (allMatches ?? []).slice().sort((a: any, b: any) => {
-      const ds = Number(b.match_score ?? 0) - Number(a.match_score ?? 0);
-      if (ds !== 0) return ds;
-      const ra = ratingAvg.get(a.freelancer_id)?.avg ?? 0;
-      const rb = ratingAvg.get(b.freelancer_id)?.avg ?? 0;
-      if (rb !== ra) return rb - ra;
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    });
-    const total = rows.length;
-    const topThreeIds = new Set(rows.slice(0, 3).map((m: any) => m.id));
-
-    const start = (page - 1) * pageSize;
-    const pageRows = rows.slice(start, start + pageSize);
-
-    const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
-    const ids4 = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
-    const matchIds4 = pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"];
+    const matchIds = capped.map((m: any) => m.id);
+    const freelancerIds = capped.map((m: any) => m.freelancer_id);
+    const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
+    const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select("*").in("user_id", ids4),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", matchIds4),
+      supabase.from("freelancer_profiles").select("*").in("user_id", idsSafe),
+      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
 
-
-
-    // Contacts and real names are NEVER exposed on the request-matches view.
-    // They are surfaced only inside the `hired` block below, after the freelancer
-    // has confirmed the match.
-
-    const items = pageRows.map((m: any) => {
-      const unlocked = unlockMap.has(m.id) || topThreeIds.has(m.id);
-      const wasFree = unlockMap.get(m.id)?.free_preview ?? topThreeIds.has(m.id);
+    const items = capped.map((m: any, i: number) => {
+      const rank = i + 1;
+      const tier = rank <= 10 ? 1 : rank <= 10 + tier2Size ? 2 : 3;
+      const tierUnlocked = tier === 1 || unlockedTiers.has(tier);
+      const topThree = rank <= 3;
+      const perProfileUnlocked = unlockMap.has(m.id);
+      const showTech = tierUnlocked && (topThree || perProfileUnlocked);
+      const blurred = tierUnlocked && !showTech;
       const fp = fpMap.get(m.freelancer_id);
       return {
         match_id: m.id,
+        rank,
+        tier,
+        tier_unlocked: tierUnlocked,
+        blurred,
+        top_three: topThree,
         match_score: Number(m.match_score ?? 0),
         is_perfect: m.is_perfect,
         overlap_days: m.overlap_days,
         missing_criteria: m.missing_criteria ?? [],
-        unlocked,
-        free_preview: wasFree,
+        unlocked: showTech,
+        free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
           count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
         },
-        profile: unlocked
+        profile: showTech
           ? {
-              // Name and avatar hidden — revealed only after the freelancer confirms the match.
               display_name: null,
               avatar_url: null,
               headline: fp?.headline ?? null,
@@ -792,7 +841,6 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               education: fp?.education ?? null,
               experiences: fp?.experiences ?? [],
               languages: fp?.languages ?? [],
-              // Contacts remain hidden until the match is confirmed.
               contact_email: null,
               phone_dial_code: null,
               phone_number: null,
@@ -801,8 +849,6 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       };
     });
 
-
-    // If request has been completed/filled, surface the confirmed freelancer's contacts
     let hired: any = null;
     if (req.status === "completed" || req.status === "filled") {
       const { data: eng } = await supabase
@@ -853,7 +899,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       request: req,
       items,
       hired,
-      pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
+      tiers,
+      per_profile_cost: perProfileCost,
+      total_matches: totalMatches,
+      hard_cap: hardCap,
     };
   });
 
@@ -865,6 +914,26 @@ export const unlockMatch = createServerFn({ method: "POST" })
     const { data: balance, error } = await context.supabase.rpc("unlock_match_for_team", { _match_id: data.match_id });
     if (error) throw new Error(error.message);
     return { balance: balance as number };
+  });
+
+export const unlockRequestTier = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string; tier: number }) =>
+    z.object({ request_id: z.string().uuid(), tier: z.number().int().min(2).max(3) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("unlock_request_tier" as any, {
+      _request_id: data.request_id,
+      _tier: data.tier,
+    } as any);
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return {
+      tier: Number(row?.tier ?? data.tier),
+      tokens_spent: Number(row?.tokens_spent ?? 0),
+      balance: Number(row?.balance ?? 0),
+      total_matches: Number(row?.total_matches ?? 0),
+    };
   });
 
 // ---- Notifications ----
