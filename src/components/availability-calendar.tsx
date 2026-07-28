@@ -139,6 +139,7 @@ export function AvailabilityCalendar({
         onSelect={onSelect}
         disabled={(d) => isDisabled(d)}
         modifiers={{ blocked: (d) => isBlocked(d) }}
+        modifiersClassNames={{ blocked: "rdp-blocked" }}
         weekStartsOn={1}
         showOutsideDays={false}
         numberOfMonths={2}
