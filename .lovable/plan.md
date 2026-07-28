@@ -1,62 +1,85 @@
-## Goal
+# Partial Matches — Engine, Thresholds, Banner, Token Gate
 
-Rebuild the team-side "matches for a request" view around three hard tiers (1–10, 11–20, 21–50) with per-tier entry fees, per-profile unlock fees, blurred previews, dynamic proportional pricing when a tier is not full, and a hard cap at match #50.
+## 1. Admin settings (new rows in `platform_settings`, editable in `/admin/tokens`)
 
-## Tier rules
+Category `matching` (new):
+- `partial_single_max_missing_pct` (default 30) — hard cutoff on missing-day % for single-race requests.
+- `partial_season_max_missing_pct` (default 20) — hard cutoff for full-season requests.
+- `partial_single_penalty_per_day` (default 10) — % points subtracted per missing day (single).
+- `partial_season_penalty_mode` (default 1) — fixed at "proportional %" (kept as toggle for future).
 
-- **Tier 1 (1–10)** — no entry fee.
-  - Ranks 1–3: technical preview visible (score, missing criteria, headline, skills, disciplines, location, day rate, bio, experiences, languages). Names/contacts stay hidden.
-  - Ranks 4–10: card blurred, only score + missing criteria visible. Unblur one profile = `cost_unlock_profile` tokens (per profile, standard).
-- **Tier 2 (11–20)** — locked behind a one-time entry fee `cost_tier2_entry` (default 5). Once paid, ranks 11–20 become listable in the same "blurred until per-profile unlock" state. Per-profile unblur still costs `cost_unlock_profile`.
-- **Tier 3 (21–50)** — locked behind `cost_tier3_entry` (default 25). Same per-profile unlock model. Hard cap at rank 50; anything beyond is discarded server-side.
+The existing Tokens tab already renders any setting in `platform_settings`; the new "Matching" category shows up automatically.
 
-## Proportional entry pricing
+## 2. Engine (`recompute_matches`)
 
-When the total match count `N` falls inside a tier, the entry fee for that tier is scaled by `actual_slots / tier_size`:
+- Remove `pass_dates` from hard filters. Compute:
+  - `missing_days = required_days - overlap_days` (0 for full match)
+  - `missing_pct = missing_days / required_days * 100`
+  - `is_full_season = (request.duration = 'full_season')`
+- Apply the corresponding admin threshold; drop the row when `missing_pct` exceeds it.
+- New per-match columns on `public.matches`:
+  - `missing_days int`
+  - `missing_pct numeric`
+  - `is_partial boolean` (`missing_days > 0`)
+  - `edge_only boolean` — true when every missing day sits at the very start or very end of the required window (color = yellow); false when at least one gap is in the middle (red).
+  - `skills_score numeric` — pure skill/role/discipline/etc affinity (existing `match_score` logic, unchanged from today).
+  - `final_score numeric` — `skills_score` minus the time penalty:
+    - Single: `skills_score − partial_single_penalty_per_day * missing_days`
+    - Season: `skills_score − missing_pct`
+- Ranking (`unlock_match_for_team`, tier gating, `getRequestMatches` sort) switches from `match_score` to `final_score` (tiebreak by `created_at`). This is the only sort key change.
 
-- Tier 2 size = 10. If `N < 20`, entry fee = `ceil(cost_tier2_entry * (min(N,20)-10) / 10)`, min 1 token when there is at least 1 slot.
-- Tier 3 size = 30. If `N < 50`, entry fee = `ceil(cost_tier3_entry * (min(N,50)-20) / 30)`, min 1 token.
-- If a tier has zero real slots (e.g. N ≤ 10 → tier 2/3 empty), the tier is not shown at all.
+## 3. Display rules
 
-Same formula runs on the server (charge) and on the client (preview / warning).
+- The card keeps showing **`skills_score`%** as "affinity". `final_score` is used only for ordering, so a stronger-skills / more-missing-days candidate can visually appear below a weaker-skills / fewer-missing-days one.
+- Partial cards show:
+  - `missing_days` count and a colored dot (yellow = edges only, red = middle gap) with tooltip.
+  - Same blurred/gated preview as regular tier 2/3 cards (skills visible, name/contact hidden until unlock).
 
-## Backend
+## 4. FOMO / service banner (below the "full matches" section on `/dashboard/requests/$id/matches`)
 
-New migration:
-- Add settings rows: `cost_tier2_entry` (5), `cost_tier3_entry` (25), `cost_unlock_profile` (1), `tier2_size` (10), `tier3_size` (30), `hard_cap_matches` (50).
-- New table `request_tier_unlocks (id, team_id, request_id, tier smallint check in (2,3), tokens_spent int, unlocked_at)` with unique `(team_id, request_id, tier)`. Standard grants + RLS (team can select/insert own via SECURITY DEFINER rpc).
-- New RPC `unlock_request_tier(_request_id uuid, _tier int)`:
-  - Verifies caller is `requests.team_id`.
-  - Counts real matches for the request, computes proportional cost with the formula above.
-  - Debits tokens via `credit_tokens`, inserts unlock row (idempotent — returns current balance if already unlocked).
-  - Returns `{ tier, tokens_spent, balance, total_matches }`.
-- Update `unlock_match_for_team` to reject matches beyond `hard_cap_matches`, drop the legacy "top 3 free" branch's dependence on rank ≤ 3 only (top 3 stays free through the new preview path, not through `match_unlocks`), and require the correct tier unlock for matches at ranks 11+.
+Compute:
+- `bestFullSkill` = max `skills_score` across matches with `is_partial = false`.
+- `bestPartialSkill` = max `skills_score` across `is_partial = true`.
 
-Server functions in `paddock.functions.ts`:
-- `getRequestMatches`: cap `rows` at 50, compute tiers, load `request_tier_unlocks` for the caller, gate returned data:
-  - Ranks 1–3: return tech preview.
-  - Ranks 4–10: return score + missing_criteria + `blurred: true`, no profile fields.
-  - Ranks 11–20: only returned if tier2 unlocked; otherwise return a placeholder row `{ blurred: true, tier: 2, locked_tier: true }` per slot.
-  - Ranks 21–50: same with tier 3.
-  - Add `tiers: [{ tier, size, real_count, entry_cost, unlocked }]` to the payload plus `total_matches` and existing `hired`.
-- Add `unlockRequestTier` server fn wrapping the new rpc.
-- Add `getTierPricingPreview` (optional) reusing formula — keep it inline in `getRequestMatches` payload to avoid extra round-trips.
+Banner text:
+- Case A (`bestPartialSkill > bestFullSkill`): *"Your top matches are at X%, but there are partial matches with Y% affinity (with some missing days). Want to see them?"*
+- Case B (otherwise, when partials exist): *"Looking for more options with flexible dates? Check other professionals with partial availability and evaluate their missing days."*
+- Hidden when no partials survive the threshold.
 
-## Frontend
+Clicking the banner scrolls to / expands a dedicated "Partial matches" section.
 
-`src/routes/_authenticated/dashboard.requests.$id.matches.tsx`:
-- Group `data.items` by tier (server already tags each item with `tier` and `rank`).
-- Render three sections. Each locked tier shows a call-to-action panel with the proportional entry cost, the "only X real matches in this tier" warning when applicable, and a confirm dialog before spending tokens.
-- Blurred cards use `filter blur-sm select-none pointer-events-none` on inner content, with score + missing criteria layered on top; unlock button uses the existing per-profile unlock flow (`unlockMatch`).
-- Remove the current pagination controls (replaced by tier sections); keep `hired` block unchanged.
-- Copy: warnings match the spec ("Only X real matches in this tier — entry fee reduced proportionally to Y tokens"). English only in code, existing i18n strings unchanged.
+## 5. Partial-matches token gate
 
-## Admin
+Partials get their own tiered pagination, mirroring the full-matches architecture already in place:
+- Ranks 1–3 → free technical preview.
+- Ranks 4–10 → blurred, `cost_unlock_match_for_team` per profile.
+- Ranks 11–20 → tier 2 entry, proportional to real partial count vs `tier2_size`, nearest-integer rounding, min 1 token.
+- Ranks 21–50 → tier 3 entry, same proportional rule; hard-capped at `hard_cap_matches`.
 
-`src/routes/_authenticated/admin.tokens.tsx` already renders every `platform_settings` row, so the new keys appear automatically once inserted. No code change needed.
+Implementation: extend `request_tier_unlocks.tier` to accept `12` / `13` (partial-tier 2 / 3) OR add a `scope` column (`full` | `partial`). Chosen approach: **add `scope text not null default 'full'` on `request_tier_unlocks` and `match_unlocks`** and thread it through `unlock_request_tier(_request_id, _tier, _scope)` and `unlock_match_for_team(_match_id)` (scope inferred from the match's `is_partial`). Tokens tab labels stay the same — proportional cost message auto-adapts.
 
-## Out of scope
+## 6. Files touched
 
-- No changes to freelancer-side match views (`dashboard.matches`) or engagement flow.
-- Ratings/moderation, calendar, and Google Maps flows untouched.
-- No pricing changes to existing costs — only new keys added.
+Migration:
+- Add matching settings rows.
+- Add columns on `matches` (`missing_days`, `missing_pct`, `is_partial`, `edge_only`, `skills_score`, `final_score`).
+- Add `scope` on `request_tier_unlocks` and `match_unlocks` (default `'full'`, primary/unique keys updated to include scope).
+- Rewrite `recompute_matches` to keep partials, compute penalties, edge detection, and both scores.
+- Update `unlock_match_for_team` and `unlock_request_tier` to accept/handle scope with proportional rounding (already nearest-integer).
+
+Server functions (`src/lib/paddock.functions.ts`):
+- `getRequestMatches` returns two parallel tier lists (`full`, `partial`) with proportional costs, banner payload (`bestFullSkill`, `bestPartialSkill`), and per-row `missing_days` / `edge_only` / `skills_score`.
+- `unlockRequestTier` / `unlockMatch` pass scope.
+
+UI (`src/routes/_authenticated/dashboard.requests.$id.matches.tsx`):
+- Render full-match tiers exactly as today (uses `skills_score` for the % badge, ordered by `final_score`).
+- New "Partial matches" section with the same tiered UI + yellow/red day-gap indicator.
+- FOMO banner between the two sections with dynamic Case A / Case B text.
+
+Admin (`/admin/tokens`): automatically lists the new "Matching" category — no extra UI code required.
+
+## 7. Non-goals / kept as-is
+
+- Weight sliders in `matching_weights` unchanged.
+- Wording stays "match" (no "recruitment" / "contract").
+- Names/contacts remain hidden until confirmation, per existing rules.
