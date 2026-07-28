@@ -164,7 +164,12 @@ function RequestMatchesPage() {
                   <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-2">
                     <div>
                       <div className="label-mono">
-                        [TIER {t.tier}] {t.tier === 1 ? "Top matches (1–10)" : t.tier === 2 ? `Matches ${11}–${10 + t.size}` : `Matches ${11 + t.size}–${10 + t.size + t.size /* placeholder */}`}
+                        [TIER {t.tier}] {(() => {
+                          const t2 = data.tiers.find((x) => x.tier === 2)?.size ?? 10;
+                          if (t.tier === 1) return "Top matches (1–10)";
+                          if (t.tier === 2) return `Matches 11–${10 + t.size}`;
+                          return `Matches ${11 + t2}–${10 + t2 + t.size}`;
+                        })()}
                       </div>
                       <div className="mt-1 text-xl font-black italic tracking-tighter">
                         {t.tier === 1 ? "Free preview" : t.unlocked ? "Unlocked" : `Locked — ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"} to open`}
