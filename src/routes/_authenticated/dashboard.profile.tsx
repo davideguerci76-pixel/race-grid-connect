@@ -399,6 +399,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           education: form.education || null,
           day_rate: form.day_rate ? parseInt(form.day_rate) : null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
