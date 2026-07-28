@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useRef } from "react";
 import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff } from "lucide-react";
+import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier } from "@/lib/paddock.functions";
@@ -20,6 +21,7 @@ function RequestMatchesPage() {
   const fetchMatches = useServerFn(getRequestMatches);
   const unlockFn = useServerFn(unlockMatch);
   const unlockTierFn = useServerFn(unlockRequestTier);
+  const partialRef = useRef<HTMLDivElement | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["request-matches", id],
@@ -37,9 +39,10 @@ function RequestMatchesPage() {
   });
 
   const tierMut = useMutation({
-    mutationFn: (tier: number) => unlockTierFn({ data: { request_id: id, tier } }),
+    mutationFn: (args: { tier: number; scope: "full" | "partial" }) =>
+      unlockTierFn({ data: { request_id: id, tier: args.tier, scope: args.scope } }),
     onSuccess: (r) => {
-      toast.success(`Tier ${r.tier} unlocked — ${r.tokens_spent} tokens spent. Balance: ${r.balance}`);
+      toast.success(`Tier ${r.tier} (${r.scope}) unlocked — ${r.tokens_spent} tokens spent. Balance: ${r.balance}`);
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
@@ -56,6 +59,97 @@ function RequestMatchesPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
+  const requestFilled = data?.request.status === "filled" || data?.request.status === "completed";
+
+  const renderPool = (
+    label: string,
+    scope: "full" | "partial",
+    tiers: any[],
+    items: any[],
+  ) => {
+    return (
+      <div>
+        {tiers.map((t) => {
+          if (t.real_count === 0) return null;
+          const tierItems = items.filter((i) => i.tier === t.tier);
+          const isLocked = !t.unlocked;
+          return (
+            <section key={`${scope}-${t.tier}`} className="mt-8">
+              <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-2">
+                <div>
+                  <div className="label-mono">
+                    [{label} · TIER {t.tier}] {(() => {
+                      const t2 = tiers.find((x) => x.tier === 2)?.size ?? 10;
+                      if (t.tier === 1) return "Top matches (1–10)";
+                      if (t.tier === 2) return `Matches 11–${10 + t.size}`;
+                      return `Matches ${11 + t2}–${10 + t2 + t.size}`;
+                    })()}
+                  </div>
+                  <div className="mt-1 text-xl font-black italic tracking-tighter">
+                    {t.tier === 1 ? "Free preview" : t.unlocked ? "Unlocked" : `Locked — ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"} to open`}
+                  </div>
+                  <div className="font-mono text-[11px] uppercase text-muted-foreground">
+                    {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier
+                  </div>
+                </div>
+                {isLocked && (
+                  <div className="max-w-md text-right">
+                    {t.proportional && (
+                      <div className="mb-2 flex items-start gap-2 border border-racing-yellow/50 bg-racing-yellow/10 p-2 text-left font-mono text-[11px] text-racing-yellow">
+                        <AlertTriangle className="mt-0.5 size-3 shrink-0" />
+                        <span>
+                          Only {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier (max {t.size}). Entry fee reduced proportionally from {t.entry_cost_full} to {t.entry_cost} token{t.entry_cost === 1 ? "" : "s"}.
+                        </span>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => {
+                        const msg = t.proportional
+                          ? `Unlock ${label.toLowerCase()} tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? (Reduced from ${t.entry_cost_full} — only ${t.real_count} real matches available in this tier.)`
+                          : `Unlock ${label.toLowerCase()} tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? This exposes ${t.real_count} more match card${t.real_count === 1 ? "" : "s"} (still blurred until per-profile unlock).`;
+                        if (confirm(msg)) tierMut.mutate({ tier: t.tier, scope });
+                      }}
+                      disabled={tierMut.isPending}
+                      className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                    >
+                      <Unlock className="mr-1 inline size-3" /> Unlock tier {t.tier} ({t.entry_cost} tk)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {isLocked ? (
+                <div className="grid gap-3">
+                  {Array.from({ length: t.real_count }).map((_, i) => (
+                    <TierPlaceholder key={i} rank={(t.tier === 2 ? 11 : 11 + (tiers.find((x) => x.tier === 2)?.size ?? 10)) + i} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {tierItems.map((m) => (
+                    <MatchCard
+                      key={m.match_id}
+                      match={m}
+                      perProfileCost={data!.per_profile_cost}
+                      requestFilled={!!requestFilled}
+                      onUnlock={() => unlockMut.mutate(m.match_id)}
+                      onConfirm={() => {
+                        if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
+                          confirmMut.mutate(m.match_id);
+                        }
+                      }}
+                      loading={unlockMut.isPending || confirmMut.isPending}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -79,14 +173,13 @@ function RequestMatchesPage() {
                 Matches are grouped in three tiers. <span className="font-bold text-racing-yellow">Top 3</span> are always previewable for free (technical details, no contacts). Ranks 4–10 stay blurred until you spend {data.per_profile_cost} token{data.per_profile_cost === 1 ? "" : "s"} per profile. Tiers 2 (11–20) and 3 (21–50) require a one-time entry fee — reduced proportionally when fewer matches exist. Nothing beyond rank {data.hard_cap} is ever exposed.
               </p>
               <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                {data.total_matches} match{data.total_matches === 1 ? "" : "es"} total (capped at {data.hard_cap})
+                {data.total_matches} full match{data.total_matches === 1 ? "" : "es"} · {data.total_partial_matches} partial (capped at {data.hard_cap})
               </div>
             </div>
 
             {data.hired && (
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
                 <div className="label-mono text-racing-yellow">[CONFIRMED MATCH]</div>
-
                 <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
@@ -148,90 +241,48 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {data.items.length === 0 && (
+            {data.items.length === 0 && data.items_partial.length === 0 && (
               <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
                 No matches for this request yet.
               </div>
             )}
 
-            {data.tiers.map((t) => {
-              if (t.real_count === 0) return null;
-              const tierItems = data.items.filter((i) => i.tier === t.tier);
-              const requestFilled = data.request.status === "filled" || data.request.status === "completed";
-              const isLocked = !t.unlocked;
-              return (
-                <section key={t.tier} className="mt-8">
-                  <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-2">
-                    <div>
-                      <div className="label-mono">
-                        [TIER {t.tier}] {(() => {
-                          const t2 = data.tiers.find((x) => x.tier === 2)?.size ?? 10;
-                          if (t.tier === 1) return "Top matches (1–10)";
-                          if (t.tier === 2) return `Matches 11–${10 + t.size}`;
-                          return `Matches ${11 + t2}–${10 + t2 + t.size}`;
-                        })()}
-                      </div>
-                      <div className="mt-1 text-xl font-black italic tracking-tighter">
-                        {t.tier === 1 ? "Free preview" : t.unlocked ? "Unlocked" : `Locked — ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"} to open`}
-                      </div>
-                      <div className="font-mono text-[11px] uppercase text-muted-foreground">
-                        {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier
-                      </div>
-                    </div>
-                    {isLocked && (
-                      <div className="max-w-md text-right">
-                        {t.proportional && (
-                          <div className="mb-2 flex items-start gap-2 border border-racing-yellow/50 bg-racing-yellow/10 p-2 text-left font-mono text-[11px] text-racing-yellow">
-                            <AlertTriangle className="mt-0.5 size-3 shrink-0" />
-                            <span>
-                              Only {t.real_count} real match{t.real_count === 1 ? "" : "es"} in this tier (max {t.size}). Entry fee reduced proportionally from {t.entry_cost_full} to {t.entry_cost} token{t.entry_cost === 1 ? "" : "s"}.
-                            </span>
-                          </div>
-                        )}
-                        <button
-                          onClick={() => {
-                            const msg = t.proportional
-                              ? `Unlock tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? (Reduced from ${t.entry_cost_full} — only ${t.real_count} real matches available in this tier.)`
-                              : `Unlock tier ${t.tier} for ${t.entry_cost} token${t.entry_cost === 1 ? "" : "s"}? This exposes ${t.real_count} more match card${t.real_count === 1 ? "" : "s"} (still blurred until per-profile unlock).`;
-                            if (confirm(msg)) tierMut.mutate(t.tier);
-                          }}
-                          disabled={tierMut.isPending}
-                          className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-                        >
-                          <Unlock className="mr-1 inline size-3" /> Unlock tier {t.tier} ({t.entry_cost} tk)
-                        </button>
-                      </div>
-                    )}
-                  </div>
+            {/* FULL matches */}
+            {renderPool("FULL", "full", data.tiers, data.items)}
 
-                  {isLocked ? (
-                    <div className="grid gap-3">
-                      {Array.from({ length: t.real_count }).map((_, i) => (
-                        <TierPlaceholder key={i} rank={(t.tier === 2 ? 11 : 11 + (data.tiers.find((x) => x.tier === 2)?.size ?? 10)) + i} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid gap-3">
-                      {tierItems.map((m) => (
-                        <MatchCard
-                          key={m.match_id}
-                          match={m}
-                          perProfileCost={data.per_profile_cost}
-                          requestFilled={requestFilled}
-                          onUnlock={() => unlockMut.mutate(m.match_id)}
-                          onConfirm={() => {
-                            if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
-                              confirmMut.mutate(m.match_id);
-                            }
-                          }}
-                          loading={unlockMut.isPending || confirmMut.isPending}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </section>
-              );
-            })}
+            {/* FOMO banner */}
+            {data.partial_banner && (
+              <div className="mt-8 border-2 border-racing-red bg-racing-red/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Flame className="mt-1 size-5 shrink-0 text-racing-red" />
+                  <div className="flex-1">
+                    <div className="label-mono text-racing-red">[PARTIAL MATCHES AVAILABLE]</div>
+                    <p className="mt-1 text-sm">
+                      {data.partial_banner.case === "A" ? (
+                        <>
+                          Your top matches are at <span className="font-black text-racing-yellow">{data.partial_banner.best_full_skill}%</span>, but there are partial matches with a <span className="font-black text-racing-yellow">{data.partial_banner.best_partial_skill}%</span> affinity (with some missing days). Want to see them?
+                        </>
+                      ) : (
+                        <>Looking for more options with flexible dates? Check other professionals with partial availability and evaluate their missing days.</>
+                      )}
+                    </p>
+                    <button
+                      onClick={() => partialRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="mt-3 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
+                    >
+                      View {data.partial_banner.partial_count} partial match{data.partial_banner.partial_count === 1 ? "" : "es"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PARTIAL matches */}
+            {data.items_partial.length > 0 && (
+              <div ref={partialRef}>
+                {renderPool("PARTIAL", "partial", data.tiers_partial, data.items_partial)}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -258,24 +309,33 @@ function TierPlaceholder({ rank }: { rank: number }) {
 }
 
 function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProfileCost }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean; perProfileCost: number }) {
-  const pct = Math.round(match.match_score);
+  const pct = Math.round(match.skills_score ?? match.match_score);
   const perfect = match.is_perfect;
   const blurred = match.blurred;
+  const isPartial = match.is_partial;
+  const gapColor = match.edge_only ? "racing-yellow" : "racing-red";
+  const gapLabel = match.edge_only ? "Missing days at edges only" : "Missing days include central days";
 
   return (
-    <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
+    <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : isPartial ? `border-${gapColor}/60 bg-${gapColor}/5` : "border-border bg-card"}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {match.unlocked ? <Unlock className="size-4 text-racing-yellow" /> : <Lock className="size-4 text-muted-foreground" />}
           <div>
             <div className={`text-3xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
-              {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
+              {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? "Perfect match" : "Skills affinity"}</span>
             </div>
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               Rank #{match.rank} · tier {match.tier} · {match.overlap_days} day{match.overlap_days === 1 ? "" : "s"} of overlap
               {match.top_three && <span className="ml-2 text-racing-yellow">· TOP 3 FREE</span>}
               {match.free_preview && !match.top_three && match.unlocked && <span className="ml-2 text-racing-yellow">· UNLOCKED</span>}
             </div>
+            {isPartial && (
+              <div className={`mt-1 inline-flex items-center gap-2 border border-${gapColor}/60 bg-${gapColor}/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-${gapColor}`} title={gapLabel}>
+                <span className={`inline-block size-2 rounded-full bg-${gapColor}`} />
+                <Clock className="size-3" /> {match.missing_days} missing day{match.missing_days === 1 ? "" : "s"} · {gapLabel}
+              </div>
+            )}
             {match.rating && match.rating.count > 0 && (
               <div className="mt-1">
                 <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
@@ -403,6 +463,7 @@ function formatCriterion(c: any): string {
     case "education": return "Education";
     case "day_rate": return "Day rate over budget";
     case "location": return `Location: ${c.label ?? "distant"}`;
+    case "missing_days": return `${c.days} missing day${c.days === 1 ? "" : "s"}`;
     default: return c.kind ?? "criterion";
   }
 }
