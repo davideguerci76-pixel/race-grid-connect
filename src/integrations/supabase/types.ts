@@ -200,6 +200,8 @@ export type Database = {
           headline: string | null
           languages: Json
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           skills: string[]
           travels: boolean
@@ -217,6 +219,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
@@ -234,6 +238,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
@@ -728,6 +734,11 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
@@ -757,6 +768,11 @@ export type Database = {
           is_active?: boolean
           languages?: Json
           location?: string | null
+          location_anchor?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_radius_km?: number | null
+          location_relevance?: string
           notes?: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
@@ -786,6 +802,11 @@ export type Database = {
           is_active?: boolean
           languages?: Json
           location?: string | null
+          location_anchor?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_radius_km?: number | null
+          location_relevance?: string
           notes?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
@@ -836,6 +857,8 @@ export type Database = {
           founded_year: number | null
           initials: string | null
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           primary_discipline: Database["public"]["Enums"]["discipline"] | null
           size: string | null
           team_name: string
@@ -849,6 +872,8 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name: string
@@ -862,6 +887,8 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name?: string
@@ -1038,6 +1065,11 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
@@ -1105,6 +1137,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      haversine_km: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
       }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }
@@ -1182,6 +1218,11 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
