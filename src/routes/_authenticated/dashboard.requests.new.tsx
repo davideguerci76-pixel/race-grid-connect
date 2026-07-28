@@ -105,6 +105,10 @@ function NewRequestPage() {
   const [education, setEducation] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
+  const [locationCoords, setLocationCoords] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
+  const [locRelevance, setLocRelevance] = useState<LocRelevance>("not_relevant");
+  const [locAnchor, setLocAnchor] = useState<LocAnchor>("this");
+  const [locRadius, setLocRadius] = useState<string>("100");
 
   useEffect(() => {
     if (!source) return;
