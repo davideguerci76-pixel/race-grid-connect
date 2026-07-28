@@ -109,7 +109,7 @@ export function AvailabilityCalendar({
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           {legend ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-block size-3 bg-racing-red" />
+              <span className="inline-block size-3 bg-racing-green" />
               <span>{legend}</span>
             </div>
           ) : <span />}
