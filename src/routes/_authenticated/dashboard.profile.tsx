@@ -349,6 +349,8 @@ function FreelancerSection({ profile }: { profile: any }) {
     education: "" as string,
     day_rate: "" as string,
     location: "",
+    location_lat: null as number | null,
+    location_lng: null as number | null,
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
@@ -366,6 +368,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       education: profile?.education ?? "",
       day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
       location: profile?.location ?? "",
+      location_lat: (profile as any)?.location_lat ?? null,
+      location_lng: (profile as any)?.location_lng ?? null,
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
       experiences: Array.isArray(profile?.experiences)
@@ -395,6 +399,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           education: form.education || null,
           day_rate: form.day_rate ? parseInt(form.day_rate) : null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
@@ -446,7 +452,12 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Location</label>
-            <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Milan, Italy" />
+            <LocationAutocomplete
+              value={form.location}
+              onChange={(v) => setForm({ ...form, location: v })}
+              onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+              placeholder="Milan, Italy"
+            />
           </div>
         </div>
         <div>
@@ -543,6 +554,8 @@ function TeamSection({ profile }: { profile: any }) {
     team_name: "",
     team_type: "",
     location: "",
+    location_lat: null as number | null,
+    location_lng: null as number | null,
     primary_discipline: "",
     bio: "",
     website: "",
@@ -554,6 +567,8 @@ function TeamSection({ profile }: { profile: any }) {
       team_name: profile?.team_name ?? "",
       team_type: profile?.team_type ?? "",
       location: profile?.location ?? "",
+      location_lat: (profile as any)?.location_lat ?? null,
+      location_lng: (profile as any)?.location_lng ?? null,
       primary_discipline: profile?.primary_discipline ?? "",
       bio: profile?.bio ?? "",
       website: profile?.website ?? "",
@@ -569,6 +584,8 @@ function TeamSection({ profile }: { profile: any }) {
           team_name: form.team_name,
           team_type: form.team_type || null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           primary_discipline: form.primary_discipline || null,
           bio: form.bio || null,
           website: form.website || null,
@@ -599,7 +616,11 @@ function TeamSection({ profile }: { profile: any }) {
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Location</label>
-          <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <LocationAutocomplete
+            value={form.location}
+            onChange={(v) => setForm({ ...form, location: v })}
+            onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+          />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Primary Discipline</label>

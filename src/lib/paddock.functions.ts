@@ -89,6 +89,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: z.string().max(64).optional().nullable(),
         day_rate: z.number().int().min(0).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
         // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
@@ -133,6 +135,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: data.education || null,
         day_rate: data.day_rate ?? null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         bio: data.bio || null,
         travels: data.travels,
         experiences: data.experiences ?? [],
@@ -172,6 +176,8 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         team_name: z.string().trim().min(2).max(120),
         team_type: z.string().max(120).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         primary_discipline: disciplineEnum.optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         website: z.string().max(200).optional().nullable(),
@@ -201,6 +207,8 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         initials,
         team_type: data.team_type || null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         primary_discipline: data.primary_discipline || null,
         bio: data.bio || null,
         website: data.website || null,
@@ -257,6 +265,11 @@ export const createRequest = createServerFn({ method: "POST" })
           .max(6)
           .optional(),
         repost_of: z.string().uuid().optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
+        location_relevance: z.enum(["not_relevant","relevant","mandatory"]).optional().default("not_relevant"),
+        location_anchor: z.enum(["this","team"]).optional().default("this"),
+        location_radius_km: z.number().int().min(1).max(20000).optional().nullable(),
       })
       .parse(data),
   )
@@ -283,6 +296,11 @@ export const createRequest = createServerFn({ method: "POST" })
       role_hard: data.role_hard ?? true,
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
+      location_lat: data.location_lat ?? null,
+      location_lng: data.location_lng ?? null,
+      location_relevance: data.location_relevance ?? "not_relevant",
+      location_anchor: data.location_anchor ?? "this",
+      location_radius_km: data.location_radius_km ?? null,
 
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
