@@ -741,7 +741,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const computeTierCost = (base: number, slots: number, size: number) => {
       if (slots <= 0) return 0;
       if (slots >= size) return Math.round(base);
-      return Math.max(1, Math.ceil((base * slots) / size));
+      return Math.max(1, Math.round((base * slots) / size));
     };
     const tier1Count = Math.min(totalMatches, 10);
     const tier2Slots = Math.max(0, Math.min(totalMatches, 10 + tier2Size) - 10);
