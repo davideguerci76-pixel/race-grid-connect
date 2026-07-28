@@ -34,6 +34,32 @@ export const getMyAvailability = createServerFn({ method: "GET" })
     return (data ?? []).map((r) => r.day);
   });
 
+export const getMyBlockedDates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("engagements")
+      .select("start_date, end_date, status")
+      .eq("freelancer_id", userId)
+      .in("status", ["confirmed", "completed"]);
+    if (error) throw new Error(error.message);
+    const out = new Set<string>();
+    for (const r of (data ?? []) as Array<{ start_date: string; end_date: string }>) {
+      const s = new Date(r.start_date + "T00:00:00");
+      const e = new Date(r.end_date + "T00:00:00");
+      const cur = new Date(s);
+      while (cur <= e) {
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, "0");
+        const d = String(cur.getDate()).padStart(2, "0");
+        out.add(`${y}-${m}-${d}`);
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+    return Array.from(out);
+  });
+
 // ---- Profile saving ----
 export const updateMyDisplayName = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
