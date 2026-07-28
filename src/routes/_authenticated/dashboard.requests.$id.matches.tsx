@@ -207,7 +207,7 @@ function RequestMatchesPage() {
                   {isLocked ? (
                     <div className="grid gap-3">
                       {Array.from({ length: t.real_count }).map((_, i) => (
-                        <TierPlaceholder key={i} rank={t.tier === 2 ? 11 + i : 11 + t.size + i} />
+                        <TierPlaceholder key={i} rank={(t.tier === 2 ? 11 : 11 + (data.tiers.find((x) => x.tier === 2)?.size ?? 10)) + i} />
                       ))}
                     </div>
                   ) : (
