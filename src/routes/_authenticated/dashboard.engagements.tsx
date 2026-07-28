@@ -45,6 +45,45 @@ function EngagementsPage() {
     markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
   }, [markRead, qc]);
 
+  // Realtime: first-come-first-served. When another freelancer accepts a competing proposal,
+  // the DB flips this user's proposed engagement to 'cancelled' and inserts a 'match_taken'
+  // notification. Refetch live so the Confirm button disappears instantly, and surface a
+  // clear "waitlist" toast. Confirmed engagements block calendar days; waitlisted ones do not.
+  useEffect(() => {
+    if (!user?.id) return;
+    const ch = supabase
+      .channel(`engagements-live-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "engagements", filter: `freelancer_id=eq.${user.id}` },
+        (payload: any) => {
+          const oldRow = payload.old ?? {};
+          const newRow = payload.new ?? {};
+          qc.invalidateQueries({ queryKey: ["engagements"] });
+          qc.invalidateQueries({ queryKey: ["matches"] });
+          if (oldRow.status === "proposed" && newRow.status === "cancelled" && !newRow.cancelled_by) {
+            toast.info("Another freelancer accepted first — you're on the waitlist. Your calendar stays open in case the match reopens.");
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload: any) => {
+          const kind = payload.new?.kind;
+          qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+          if (kind === "match_taken" || kind === "match_reopened" || kind === "sos_call" || kind === "engagement_proposed") {
+            qc.invalidateQueries({ queryKey: ["engagements"] });
+            qc.invalidateQueries({ queryKey: ["matches"] });
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user?.id, qc]);
+
   const [ratingFor, setRatingFor] = useState<string | null>(null);
   // Sub-scores (freelance being rated by team)
   const [tech, setTech] = useState(5);
