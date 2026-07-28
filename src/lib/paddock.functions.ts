@@ -983,6 +983,20 @@ export const getAnonymousReviews = createServerFn({ method: "GET" })
     return { unlocked: true, reviews: (rows ?? []) as any[] };
   });
 
+export const flagRating = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { rating_id: string; reason: string }) =>
+    z.object({ rating_id: z.string().uuid(), reason: z.string().trim().min(10).max(2000) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("flag_rating" as any, {
+      _rating_id: data.rating_id,
+      _reason: data.reason,
+    } as any);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const getRatableEngagements = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

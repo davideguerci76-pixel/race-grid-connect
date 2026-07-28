@@ -30,6 +30,7 @@ import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
+import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authenticated/admin.matching'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
@@ -147,6 +148,12 @@ const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminReviewsRoute =
+  AuthenticatedAdminReviewsRouteImport.update({
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminPermissionsRoute =
   AuthenticatedAdminPermissionsRouteImport.update({
     id: '/permissions',
@@ -192,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/teams/': typeof TeamsIndexRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -217,6 +225,7 @@ export interface FileRoutesByTo {
   '/teams': typeof TeamsIndexRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -246,6 +255,7 @@ export interface FileRoutesById {
   '/teams/': typeof TeamsIndexRoute
   '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/teams/'
     | '/admin/matching'
     | '/admin/permissions'
+    | '/admin/reviews'
     | '/admin/teams'
     | '/admin/tokens'
     | '/dashboard/calendar'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/admin/matching'
     | '/admin/permissions'
+    | '/admin/reviews'
     | '/admin/teams'
     | '/admin/tokens'
     | '/dashboard/calendar'
@@ -328,6 +340,7 @@ export interface FileRouteTypes {
     | '/teams/'
     | '/_authenticated/admin/matching'
     | '/_authenticated/admin/permissions'
+    | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/teams'
     | '/_authenticated/admin/tokens'
     | '/_authenticated/dashboard/calendar'
@@ -504,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTeamsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/reviews': {
+      id: '/_authenticated/admin/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AuthenticatedAdminReviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/permissions': {
       id: '/_authenticated/admin/permissions'
       path: '/permissions'
@@ -545,6 +565,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMatchingRoute: typeof AuthenticatedAdminMatchingRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
+  AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminTokensRoute: typeof AuthenticatedAdminTokensRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -553,6 +574,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMatchingRoute: AuthenticatedAdminMatchingRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
+  AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminTokensRoute: AuthenticatedAdminTokensRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

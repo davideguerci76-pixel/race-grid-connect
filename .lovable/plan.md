@@ -1,52 +1,64 @@
-## Goal
-Add an **Education** category to freelancer profiles (single-select, multi-language) and add **"Others"** to the Disciplines / Championships list.
+## Overview
+Add end-to-end review contestation: users flag suspicious ratings from the anonymous review list; admins see a dedicated moderation panel with filters and per-rating actions (freeze, delete, approve). Frozen/deleted ratings must be excluded from average and count everywhere.
 
-## Scope
+## 1. Database migration
 
-### 1. New taxonomy: Education levels
-Add to `src/lib/paddock.ts`:
-- `EDUCATION_OPTIONS: Option[]` covering (from lowest to highest):
-  - `middle_school` — Middle School / Secondary
-  - `high_school` — High School Diploma
-  - `vocational_motorsport` — Vocational Motorsport School (e.g. ACI Sport, Skip Barber, National Motorsport Academy short courses)
-  - `technical_diploma` — Technical / Mechanical Diploma (ITS, Perito Meccanico, etc.)
-  - `bachelor_equivalent` — Bachelor Equivalent (self-declared experience equal to a bachelor's)
-  - `bachelor` — Bachelor's Degree
-  - `master` — Master's Degree
-  - `master_motorsport` — Master's Degree in Motorsport Engineering (Cranfield, Oxford Brookes, Bologna, UPM, etc.)
-  - `phd` — PhD / Doctorate
-  - `other` — Other
-- `educationLabel()` helper mirroring `roleLabel` / `skillLabel`.
+New enum + columns on `public.ratings`:
+- `rating_moderation_status` enum: `active`, `flagged`, `frozen`, `deleted`, `approved`
+- Add `moderation_status rating_moderation_status not null default 'active'`
+- Add `flag_reason text`, `flagged_by uuid`, `flagged_at timestamptz`, `moderated_by uuid`, `moderated_at timestamptz`, `auto_suspicious boolean not null default false`
 
-### 2. Add "Others" to Disciplines
-Append `{ value: "other", label: "Other / Not listed" }` to `DISCIPLINE_OPTIONS`.
+New table `public.rating_flags` (allow multiple reports per rating, audit trail):
+- `id`, `rating_id → ratings`, `reported_by uuid`, `reason text not null`, `created_at`
+- RLS: reporter can insert own; reporter can select own; admins select/delete all
+- GRANT insert/select to authenticated; all to service_role
 
-### 3. Database
-Migration:
-- `ALTER TABLE public.freelancer_profiles ADD COLUMN education text NULL;`
-- No enum (kept as free text with app-side whitelist, same pattern as roles/skills which are already loose strings). No RLS change needed — inherits existing policies.
-- Regenerated types will expose the new column afterwards.
+RPCs (SECURITY DEFINER):
+- `flag_rating(_rating_id uuid, _reason text) returns void` — validates reason length (10–2000), inserts flag, sets `moderation_status='flagged'`, `flag_reason`, `flagged_by=auth.uid()`, `flagged_at=now()` (only if currently `active`); creates admin notification (or skipped — notifications enum is user-scoped, we'll skip). Any authenticated user may flag.
+- `admin_set_rating_moderation(_rating_id uuid, _action text) returns ratings` — admin only via `has_role`; `_action` in `freeze|delete|approve`. Sets status accordingly, `moderated_by/at`. `delete` performs hard `DELETE`.
 
-### 4. UI wiring
-- **`src/routes/_authenticated/dashboard.profile.tsx`** (freelancer form): add an Education `<select>` after Skills, bound to the new column. Save via existing `updateFreelancerProfile` server function.
-- **`src/lib/paddock.functions.ts`**: extend the freelancer update payload validator + update statement to include `education`.
-- **`src/routes/freelancers.$id.tsx`**: show Education line in the header block (e.g. "Bachelor's Degree" below role/location).
-- **`src/routes/freelancers.index.tsx`**: no filter for now (keep scope tight — can add later if needed).
+Update aggregation to exclude non-active-visible ratings:
+- Modify `get_user_rating_summary` and `get_anonymous_reviews` to filter `moderation_status IN ('active','approved')` (i.e. exclude `flagged`, `frozen`, `deleted`).
+- Also update admin list aggregators via server-fn (adminListFreelancers/Teams already query ratings directly — add same filter).
 
-### 5. i18n
-Add the new strings to all 5 locales (`en`, `it`, `es`, `fr`, `de`) under:
-- `education.label` — section title ("Education", "Titolo di studio", "Formación", "Formation", "Ausbildung")
-- `education.placeholder` — "Select your education"
-- `education.options.*` — one key per education value above
-- `discipline.other` — "Other / Not listed" translation
+## 2. Server functions (`src/lib/paddock.functions.ts`)
 
-The taxonomy file keeps English labels as fallback; the profile/detail views will prefer the translated key `education.options.<value>` when available (same pattern isn't currently used for roles/disciplines, so to stay consistent we'll render via the English label from `EDUCATION_OPTIONS` for now, and only translate the section title + placeholder). Confirm before I widen translation to all option labels.
+- `flagRating({ rating_id, reason })` — auth, calls RPC.
+- Extend `getAnonymousReviews` to return each row's `id` (already returned via `*` in RPC? currently `get_anonymous_reviews` returns stars/overall/sub/comment/created_at). Update DB function to also return `id` + `moderation_status` so UI can hide/label already-flagged rows and know rating id for reporting.
+
+Admin:
+- `adminListRatings({ filter: 'all'|'flagged'|'frozen'|'auto_suspicious' })` — admin only via service role; joins engagement, from/to profiles (display_name, user_type), includes `flag_reason`, `flagged_at`, `moderation_status`, `auto_suspicious`.
+- `adminModerateRating({ rating_id, action })` — calls RPC.
+- Auto-suspicious flag: compute simply — a rating is auto-suspicious when its `overall` (or stars) is ≤ 2 AND the recipient's average across other active ratings is ≥ 4. Compute this on the fly in `adminListRatings` (mark `auto_suspicious: true` in the returned row).
+
+## 3. UI
+
+### Anonymous reviews (user-facing) — `src/components/anonymous-reviews.tsx`
+- For every review row (not owner-mode blocked), add a small "Flag / Contest" button (Flag icon).
+- Opens a shadcn `Dialog` with a required `<Textarea>` (min 10 chars) + submit.
+- On submit: call `flagRating`, toast success, refetch. If row already has `moderation_status='flagged'`, show a small muted badge "Reported" and disable button.
+- Owner-mode dialog: same behavior — the owner can also contest reviews received.
+
+### Admin panel — new route `src/routes/_authenticated/admin.reviews.tsx`
+- Add "Reviews" tab in `admin.tsx` tab list.
+- Filter chips: All / Flagged / Frozen / Auto-suspicious.
+- Table columns: date, engagement (title/id link), from → to (display names + user_type), overall + sub-scores (compact `RatingIcons`), comment excerpt, status badge, flag reason (if any), actions.
+- Actions per row: **Freeze**, **Delete** (confirm), **Approve** — call `adminModerateRating`.
+- Status badges: `active` (dim), `flagged` (red), `frozen` (yellow), `approved` (green). `deleted` rows are removed (hard delete) so won't appear.
+
+## 4. i18n
+Add strings under `reviews.flag_*` and `admin.reviews.*` in all 5 locale files (English + fallbacks; user can localize later).
+
+## 5. Files touched / created
+- Migration (new)
+- `src/lib/paddock.functions.ts` — add `flagRating`, tweak `getAnonymousReviews` DB call/shape
+- `src/lib/admin.functions.ts` — add `adminListRatings`, `adminModerateRating`
+- `src/components/anonymous-reviews.tsx` — flag button + dialog
+- `src/routes/_authenticated/admin.reviews.tsx` (new)
+- `src/routes/_authenticated/admin.tsx` — new tab entry
+- 5 locale JSONs — new keys
 
 ## Out of scope
-- Matching logic changes (Education won't influence match score).
-- Team profile / requests (education is a freelancer attribute only).
-- Filtering freelancers by education on the directory.
-
-## Technical notes
-- No new enum type → future additions don't require a migration.
-- Legacy rows get `education = NULL`; UI shows "—".
+- Moderator-only role (uses existing `admin` only).
+- Editing rating contents. Only status transitions + hard delete.
+- Notification to reviewer when their rating is moderated (can be added later; notif enum lacks kind).

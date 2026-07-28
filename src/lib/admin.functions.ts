@@ -60,8 +60,9 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
     }
     const { data: allRatings } = await supabaseAdmin
       .from("ratings")
-      .select("to_user_id, stars, overall, unlocked_at")
+      .select("to_user_id, stars, overall, unlocked_at, moderation_status")
       .in("to_user_id", ids)
+      .in("moderation_status", ["active", "approved"] as any)
       .not("unlocked_at", "is", null);
     const ratingMap = new Map<string, { avg: number; count: number }>();
     for (const r of (allRatings ?? []) as any[]) {
@@ -110,8 +111,9 @@ export const adminListTeams = createServerFn({ method: "GET" })
     }
     const { data: teamRatings } = await supabaseAdmin
       .from("ratings")
-      .select("to_user_id, stars, overall, unlocked_at")
+      .select("to_user_id, stars, overall, unlocked_at, moderation_status")
       .in("to_user_id", ids)
+      .in("moderation_status", ["active", "approved"] as any)
       .not("unlocked_at", "is", null);
     const ratingMap = new Map<string, { avg: number; count: number }>();
     for (const r of (teamRatings ?? []) as any[]) {
@@ -281,3 +283,104 @@ export const getPlatformSettings = createServerFn({ method: "GET" })
   });
 
 
+
+// ==================== RATING MODERATION ====================
+
+export const adminListRatings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({ filter: z.enum(["all", "flagged", "frozen", "auto_suspicious"]).default("all") })
+      .parse(data ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("ratings")
+      .select(
+        "id, engagement_id, from_user_id, to_user_id, stars, overall, comment, sub_scores, created_at, unlocked_at, moderation_status, flag_reason, flagged_by, flagged_at, moderated_by, moderated_at",
+      )
+      .order("created_at", { ascending: false })
+      .limit(500);
+
+    if (data.filter === "flagged") q = q.eq("moderation_status", "flagged");
+    else if (data.filter === "frozen") q = q.eq("moderation_status", "frozen");
+
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const userIds = Array.from(
+      new Set(((rows ?? []) as any[]).flatMap((r) => [r.from_user_id, r.to_user_id])),
+    );
+    const engIds = Array.from(new Set(((rows ?? []) as any[]).map((r) => r.engagement_id).filter(Boolean)));
+
+    const [{ data: profs }, { data: engs }] = await Promise.all([
+      userIds.length
+        ? supabaseAdmin.from("profiles").select("id, display_name, user_type").in("id", userIds)
+        : Promise.resolve({ data: [] as any[] }),
+      engIds.length
+        ? supabaseAdmin
+            .from("engagements")
+            .select("id, request_id, request:requests(title)")
+            .in("id", engIds)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const profMap = new Map(((profs as any[]) ?? []).map((p) => [p.id, p]));
+    const engMap = new Map(((engs as any[]) ?? []).map((e) => [e.id, e]));
+
+    // Compute auto-suspicious: rating overall <= 2 AND recipient's average across other visible ratings >= 4
+    const recipients = Array.from(new Set(((rows ?? []) as any[]).map((r) => r.to_user_id)));
+    const avgMap = new Map<string, { sum: number; count: number }>();
+    if (recipients.length) {
+      const { data: agg } = await supabaseAdmin
+        .from("ratings")
+        .select("to_user_id, stars, overall, moderation_status")
+        .in("to_user_id", recipients)
+        .in("moderation_status", ["active", "approved"] as any);
+      for (const r of ((agg as any[]) ?? [])) {
+        const v = Number(r.overall ?? r.stars ?? 0);
+        const cur = avgMap.get(r.to_user_id) ?? { sum: 0, count: 0 };
+        cur.sum += v;
+        cur.count += 1;
+        avgMap.set(r.to_user_id, cur);
+      }
+    }
+
+    const enriched = ((rows ?? []) as any[]).map((r) => {
+      const other = avgMap.get(r.to_user_id) ?? { sum: 0, count: 0 };
+      const otherSum = other.sum - Number(r.overall ?? r.stars ?? 0);
+      const otherCount = Math.max(0, other.count - (r.moderation_status === "active" || r.moderation_status === "approved" ? 1 : 0));
+      const otherAvg = otherCount > 0 ? otherSum / otherCount : null;
+      const value = Number(r.overall ?? r.stars ?? 0);
+      const autoSus = value <= 2 && otherAvg !== null && otherAvg >= 4 && otherCount >= 2;
+      return {
+        ...r,
+        auto_suspicious: autoSus,
+        from_profile: profMap.get(r.from_user_id) ?? null,
+        to_profile: profMap.get(r.to_user_id) ?? null,
+        engagement: engMap.get(r.engagement_id) ?? null,
+      };
+    });
+
+    if (data.filter === "auto_suspicious") return enriched.filter((r) => r.auto_suspicious);
+    return enriched;
+  });
+
+export const adminModerateRating = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({ rating_id: z.string().uuid(), action: z.enum(["freeze", "delete", "approve"]) })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { error } = await context.supabase.rpc("admin_set_rating_moderation" as any, {
+      _rating_id: data.rating_id,
+      _action: data.action,
+    } as any);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

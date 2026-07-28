@@ -506,13 +506,52 @@ export type Database = {
         }
         Relationships: []
       }
+      rating_flags: {
+        Row: {
+          created_at: string
+          id: string
+          rating_id: string
+          reason: string
+          reported_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating_id: string
+          reason: string
+          reported_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating_id?: string
+          reason?: string
+          reported_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rating_flags_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ratings: {
         Row: {
+          auto_suspicious: boolean
           comment: string | null
           created_at: string
           engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
           from_user_id: string
           id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
           notified_at: string | null
           overall: number | null
           stars: number
@@ -522,11 +561,18 @@ export type Database = {
           unlocked_at: string | null
         }
         Insert: {
+          auto_suspicious?: boolean
           comment?: string | null
           created_at?: string
           engagement_id: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           from_user_id: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
           notified_at?: string | null
           overall?: number | null
           stars: number
@@ -536,11 +582,18 @@ export type Database = {
           unlocked_at?: string | null
         }
         Update: {
+          auto_suspicious?: boolean
           comment?: string | null
           created_at?: string
           engagement_id?: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           from_user_id?: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
           notified_at?: string | null
           overall?: number | null
           stars?: number
@@ -880,6 +933,36 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_rating_moderation: {
+        Args: { _action: string; _rating_id: string }
+        Returns: {
+          auto_suspicious: boolean
+          comment: string | null
+          created_at: string
+          engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
+          from_user_id: string
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at: string | null
+          overall: number | null
+          stars: number
+          sub_scores: Json
+          to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ratings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_time_offset: { Args: { _days: number }; Returns: number }
       create_request: {
         Args: { _payload: Json }
@@ -930,11 +1013,17 @@ export type Database = {
         Returns: number
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
+      flag_rating: {
+        Args: { _rating_id: string; _reason: string }
+        Returns: undefined
+      }
       get_anonymous_reviews: {
         Args: { _target: string }
         Returns: {
           comment: string
           created_at: string
+          id: string
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
           overall: number
           stars: number
           sub_scores: Json
@@ -1062,11 +1151,18 @@ export type Database = {
           _sub_scores: Json
         }
         Returns: {
+          auto_suspicious: boolean
           comment: string | null
           created_at: string
           engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
           from_user_id: string
           id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
           notified_at: string | null
           overall: number | null
           stars: number
@@ -1186,6 +1282,12 @@ export type Database = {
         | "rating_available"
         | "rating_unlocked"
         | "match_taken"
+      rating_moderation_status:
+        | "active"
+        | "flagged"
+        | "frozen"
+        | "deleted"
+        | "approved"
       request_status: "active" | "paused" | "closed" | "completed" | "filled"
       token_reason:
         | "signup_bonus"
@@ -1428,6 +1530,13 @@ export const Constants = {
         "rating_available",
         "rating_unlocked",
         "match_taken",
+      ],
+      rating_moderation_status: [
+        "active",
+        "flagged",
+        "frozen",
+        "deleted",
+        "approved",
       ],
       request_status: ["active", "paused", "closed", "completed", "filled"],
       token_reason: [
