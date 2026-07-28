@@ -265,6 +265,11 @@ export const createRequest = createServerFn({ method: "POST" })
           .max(6)
           .optional(),
         repost_of: z.string().uuid().optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
+        location_relevance: z.enum(["not_relevant","relevant","mandatory"]).optional().default("not_relevant"),
+        location_anchor: z.enum(["this","team"]).optional().default("this"),
+        location_radius_km: z.number().int().min(1).max(20000).optional().nullable(),
       })
       .parse(data),
   )
