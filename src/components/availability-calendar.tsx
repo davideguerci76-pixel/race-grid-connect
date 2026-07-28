@@ -16,6 +16,7 @@ export function AvailabilityCalendar({
   legend,
   showBulkActions = true,
   bulkMonths = 6,
+  blocked,
 }: {
   selected: Date[];
   onSelect: (dates: Date[] | undefined) => void;
@@ -24,7 +25,10 @@ export function AvailabilityCalendar({
   legend?: string;
   showBulkActions?: boolean;
   bulkMonths?: number;
+  blocked?: Date[];
 }) {
+  const blockedSet = new Set((blocked ?? []).map((d) => ymd(d)));
+  const isBlocked = (d: Date) => blockedSet.has(ymd(d));
   const isDisabled = (d: Date) => {
     if (disabled) return disabled(d);
     if (min) return d < min;
