@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -61,6 +61,19 @@ function EngagementsPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
   });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  const cancelFn = useServerFn(cancelEngagement);
+  const cancelMut = useMutation({
+    mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
+    onSuccess: (row: any) => {
+      const kind = row?.cancellation_kind;
+      if (kind === "grace") toast.success("Cancelled within grace window — no penalty. The request is reopened.");
+      else if (kind === "team_late") toast.warning("Late cancellation recorded on your team profile.");
+      else if (kind === "freelancer_late") toast.warning("Late cancellation — those days stay blocked on your calendar.");
+      else toast.success("Cancelled");
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
+  });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
       if (v.isFreelancerReviewer) {
@@ -265,6 +278,36 @@ function EngagementsPage() {
                       {t("engagements.mark_complete")}
                     </button>
                   )}
+                  {e.status === "confirmed" && (() => {
+                    const confirmedAt = e.confirmed_at ? new Date(e.confirmed_at).getTime() : null;
+                    const graceEnd = confirmedAt ? confirmedAt + 24 * 3600 * 1000 : null;
+                    const firstDay = new Date(e.start_date + "T00:00:00").getTime();
+                    const now = Date.now();
+                    const inGrace = graceEnd !== null && now < graceEnd && now < firstDay;
+                    const label = inGrace
+                      ? `Cancel (grace: ${Math.max(0, Math.round((graceEnd! - now) / 3600000))}h left)`
+                      : isFreelancer
+                      ? "Cancel (late — days stay blocked)"
+                      : "Cancel (late — logged on profile)";
+                    const warn = inGrace
+                      ? "Cancel this confirmed match? You are within the 24h grace window: no penalty and the request reopens for other candidates."
+                      : isFreelancer
+                      ? "You are past the grace window. The engaged days remain blocked on your calendar and the request will be reopened for other candidates. Continue?"
+                      : "You are past the grace window. This cancellation will be recorded on your public team profile and the request will be archived. Continue?";
+                    return (
+                      <button
+                        onClick={() => {
+                          if (!confirm(warn)) return;
+                          const reason = window.prompt("Reason (optional):", "") ?? "";
+                          cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
+                        }}
+                        className={`px-4 py-2 text-[11px] font-bold uppercase tracking-widest ${inGrace ? "border border-border hover:bg-secondary" : "border border-racing-red text-racing-red hover:bg-racing-red/10"}`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })()}
+
 
                   {(e.status === "confirmed" || e.status === "completed") && (() => {
                     const info = ratableMap.get(e.id);

@@ -33,17 +33,20 @@ function TeamProfile() {
     queryKey: ["team-detail", id, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }] = await Promise.all([
+      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }] = await Promise.all([
         supabase.from("team_profiles").select("*").eq("user_id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
         supabase.from("team_reveals").select("team_id").eq("user_id", user!.id).eq("team_id", id).maybeSingle(),
         supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id),
+        supabase.rpc("team_cancellation_stats", { _team_id: id }),
       ]);
+      const stats = Array.isArray(cancelStats) ? (cancelStats[0] as any) : (cancelStats as any);
       return {
         tp,
         requests: requests ?? [],
         fullUnlocked: !!fullReveal,
         revealedRequestIds: new Set((reqReveals ?? []).map((r) => r.request_id)),
+        cancelStats: stats ?? { count: 0, avg_days_notice: null },
       };
     },
   });
@@ -155,6 +158,14 @@ function TeamProfile() {
             </div>
           </div>
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
+          {data.cancelStats && Number(data.cancelStats.count ?? 0) > 0 && (
+            <div className="mt-4 flex items-start gap-2 border border-racing-red/40 bg-racing-red/10 p-3 font-mono text-[11px] text-racing-red">
+              <span className="font-black">⚠ CANCELLATION HISTORY</span>
+              <span>
+                {data.cancelStats.count} late cancellation{Number(data.cancelStats.count) === 1 ? "" : "s"} recorded on confirmed matches.
+              </span>
+            </div>
+          )}
         </div>
 
         {!canSeeFull && (
