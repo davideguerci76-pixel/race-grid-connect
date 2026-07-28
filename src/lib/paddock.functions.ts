@@ -296,6 +296,11 @@ export const createRequest = createServerFn({ method: "POST" })
       role_hard: data.role_hard ?? true,
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
+      location_lat: data.location_lat ?? null,
+      location_lng: data.location_lng ?? null,
+      location_relevance: data.location_relevance ?? "not_relevant",
+      location_anchor: data.location_anchor ?? "this",
+      location_radius_km: data.location_radius_km ?? null,
 
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
