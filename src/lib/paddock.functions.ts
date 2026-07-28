@@ -135,6 +135,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: data.education || null,
         day_rate: data.day_rate ?? null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         bio: data.bio || null,
         travels: data.travels,
         experiences: data.experiences ?? [],
