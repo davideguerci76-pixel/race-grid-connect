@@ -605,7 +605,11 @@ function TeamSection({ profile }: { profile: any }) {
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Location</label>
-          <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <LocationAutocomplete
+            value={form.location}
+            onChange={(v) => setForm({ ...form, location: v })}
+            onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+          />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Primary Discipline</label>
