@@ -299,44 +299,62 @@ export type Database = {
       matches: {
         Row: {
           created_at: string
+          edge_only: boolean
+          final_score: number
           freelancer_id: string
           id: string
+          is_partial: boolean
           is_perfect: boolean
           match_score: number
           missing_criteria: Json
+          missing_days: number
+          missing_pct: number
           overlap_days: number
           request_id: string
           revealed_by_freelancer: boolean
           revealed_by_team: boolean
           score: number
+          skills_score: number
           team_id: string
         }
         Insert: {
           created_at?: string
+          edge_only?: boolean
+          final_score?: number
           freelancer_id: string
           id?: string
+          is_partial?: boolean
           is_perfect?: boolean
           match_score?: number
           missing_criteria?: Json
+          missing_days?: number
+          missing_pct?: number
           overlap_days?: number
           request_id: string
           revealed_by_freelancer?: boolean
           revealed_by_team?: boolean
           score?: number
+          skills_score?: number
           team_id: string
         }
         Update: {
           created_at?: string
+          edge_only?: boolean
+          final_score?: number
           freelancer_id?: string
           id?: string
+          is_partial?: boolean
           is_perfect?: boolean
           match_score?: number
           missing_criteria?: Json
+          missing_days?: number
+          missing_pct?: number
           overlap_days?: number
           request_id?: string
           revealed_by_freelancer?: boolean
           revealed_by_team?: boolean
           score?: number
+          skills_score?: number
           team_id?: string
         }
         Relationships: [
@@ -659,6 +677,7 @@ export type Database = {
         Row: {
           id: string
           request_id: string
+          scope: string
           team_id: string
           tier: number
           tokens_spent: number
@@ -667,6 +686,7 @@ export type Database = {
         Insert: {
           id?: string
           request_id: string
+          scope?: string
           team_id: string
           tier: number
           tokens_spent?: number
@@ -675,6 +695,7 @@ export type Database = {
         Update: {
           id?: string
           request_id?: string
+          scope?: string
           team_id?: string
           tier?: number
           tokens_spent?: number
@@ -1085,6 +1106,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      match_edge_only: {
+        Args: { _freelancer: string; _required: string[] }
+        Returns: boolean
+      }
       my_freelancer_phone: {
         Args: never
         Returns: {
@@ -1215,7 +1240,7 @@ export type Database = {
       }
       unlock_match_for_team: { Args: { _match_id: string }; Returns: number }
       unlock_request_tier: {
-        Args: { _request_id: string; _tier: number }
+        Args: { _request_id: string; _scope?: string; _tier: number }
         Returns: {
           balance: number
           tier: number
