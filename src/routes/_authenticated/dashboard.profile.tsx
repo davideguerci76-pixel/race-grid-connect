@@ -573,6 +573,8 @@ function TeamSection({ profile }: { profile: any }) {
           team_name: form.team_name,
           team_type: form.team_type || null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           primary_discipline: form.primary_discipline || null,
           bio: form.bio || null,
           website: form.website || null,
