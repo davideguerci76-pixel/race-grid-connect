@@ -158,6 +158,14 @@ function TeamProfile() {
             </div>
           </div>
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
+          {data.cancelStats && Number(data.cancelStats.count ?? 0) > 0 && (
+            <div className="mt-4 flex items-start gap-2 border border-racing-red/40 bg-racing-red/10 p-3 font-mono text-[11px] text-racing-red">
+              <span className="font-black">⚠ CANCELLATION HISTORY</span>
+              <span>
+                {data.cancelStats.count} late cancellation{Number(data.cancelStats.count) === 1 ? "" : "s"} recorded on confirmed matches.
+              </span>
+            </div>
+          )}
         </div>
 
         {!canSeeFull && (
