@@ -143,27 +143,6 @@ function TimeMachine() {
         >
           <Zap className="size-3" /> Emit calendar-stale notifications now
         </button>
-        <button
-          onClick={() => contactCheckMut.mutate()}
-          disabled={contactCheckMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
-        >
-          <Zap className="size-3" /> Emit contact checks (day 3)
-        </button>
-        <button
-          onClick={() => teamRemindMut.mutate()}
-          disabled={teamRemindMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-        >
-          <Zap className="size-3" /> Emit team ghosting reminders (day 5 & 8)
-        </button>
-        <button
-          onClick={() => releaseGhostedMut.mutate()}
-          disabled={releaseGhostedMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-red bg-racing-red/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:brightness-110"
-        >
-          <Zap className="size-3" /> Release ghosted engagements (day 10)
-        </button>
       </div>
     </div>
   );
