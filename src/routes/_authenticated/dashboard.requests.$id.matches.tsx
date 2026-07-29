@@ -286,7 +286,36 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {data.items.length === 0 && data.items_partial.length === 0 && (
+            {/* Trivio: zero total matches, still active, no refund yet */}
+            {data.total_matches === 0 && !requestFilled && !(data.request as any).partial_refund_taken && (
+              <ZeroMatchTrivio
+                quote={(data as any).refund_quote}
+                hasPartials={data.total_partial_matches > 0}
+                onWait={() => toast.info("Search stays active. You'll be notified as soon as a full match appears.")}
+                onRefund={() => {
+                  const q = (data as any).refund_quote;
+                  if (confirm(`Close this request and take a refund of ${q.refund_full} token(s) (${q.refund_pct}% of ${q.spent})? The request will be archived as unfilled.`)) {
+                    refundMut.mutate("full");
+                  }
+                }}
+                onPartial={() => {
+                  const q = (data as any).refund_quote;
+                  if (confirm(`Unlock partial matches now and take a HALVED refund of ${q.refund_partial} token(s)? You keep browsing partial candidates; if a full match later confirms, no additional refund is granted.`)) {
+                    refundMut.mutate("partial");
+                  }
+                }}
+                loading={refundMut.isPending}
+              />
+            )}
+
+            {(data.request as any).partial_refund_taken && (data.request as any).refund_kind === "partial" && (
+              <div className="mt-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4 text-xs text-racing-yellow">
+                <span className="font-mono uppercase tracking-widest">[PARTIAL REFUND COLLECTED]</span>{" "}
+                <span className="ml-2">{(data.request as any).refund_tokens} token(s) credited ({(data.request as any).refund_pct}%). Partial matches are now open below.</span>
+              </div>
+            )}
+
+            {data.items.length === 0 && data.items_partial.length === 0 && !((data.total_matches === 0) && !requestFilled) && (
               <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
                 No matches for this request yet.
               </div>
