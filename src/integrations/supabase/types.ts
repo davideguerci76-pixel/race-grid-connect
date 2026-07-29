@@ -210,6 +210,7 @@ export type Database = {
       freelancer_profiles: {
         Row: {
           bio: string | null
+          calendar_last_updated_at: string
           currency: string
           day_rate: number | null
           disciplines: Database["public"]["Enums"]["discipline"][]
@@ -229,6 +230,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
@@ -248,6 +250,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
@@ -407,6 +410,7 @@ export type Database = {
       }
       matching_weights: {
         Row: {
+          calendar_freshness_weight: number
           day_rate_weight: number
           disciplines_weight: number
           education_weight: number
@@ -418,6 +422,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calendar_freshness_weight?: number
           day_rate_weight?: number
           disciplines_weight?: number
           education_weight?: number
@@ -429,6 +434,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calendar_freshness_weight?: number
           day_rate_weight?: number
           disciplines_weight?: number
           education_weight?: number
@@ -1245,6 +1251,7 @@ export type Database = {
         }
       }
       close_expired_requests: { Args: never; Returns: number }
+      confirm_calendar: { Args: never; Returns: string }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -1302,6 +1309,7 @@ export type Database = {
         }
         Returns: number
       }
+      emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }
       flag_rating: {
         Args: { _rating_id: string; _reason: string }
@@ -1647,6 +1655,7 @@ export type Database = {
         | "sos_taken"
         | "engagement_cancelled"
         | "request_unfilled"
+        | "calendar_stale"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -1900,6 +1909,7 @@ export const Constants = {
         "sos_taken",
         "engagement_cancelled",
         "request_unfilled",
+        "calendar_stale",
       ],
       rating_moderation_status: [
         "active",
