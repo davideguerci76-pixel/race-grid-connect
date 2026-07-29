@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale, adminEmitContactChecks, adminEmitTeamGhostingReminders, adminReleaseGhostedEngagements } from "@/lib/paddock.functions";
+import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 
