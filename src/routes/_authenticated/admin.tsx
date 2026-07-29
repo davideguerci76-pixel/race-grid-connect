@@ -33,6 +33,7 @@ function AdminLayout() {
     { to: "/admin/matching", label: "Matching" },
     { to: "/admin/tokens", label: "Tokens" },
     { to: "/admin/reviews", label: "Reviews" },
+    { to: "/admin/wiki", label: "Platform Wiki" },
   ];
 
 

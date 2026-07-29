@@ -28,6 +28,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedAdminWikiRouteImport } from './routes/_authenticated/admin.wiki'
 import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
@@ -137,6 +138,11 @@ const AuthenticatedDashboardCalendarRoute =
     path: '/calendar',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedAdminWikiRoute = AuthenticatedAdminWikiRouteImport.update({
+  id: '/wiki',
+  path: '/wiki',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminTokensRoute =
   AuthenticatedAdminTokensRouteImport.update({
     id: '/tokens',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
+  '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
+  '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
+  '/_authenticated/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/teams'
     | '/admin/tokens'
+    | '/admin/wiki'
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/teams'
     | '/admin/tokens'
+    | '/admin/wiki'
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/teams'
     | '/_authenticated/admin/tokens'
+    | '/_authenticated/admin/wiki'
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
@@ -503,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/admin/wiki': {
+      id: '/_authenticated/admin/wiki'
+      path: '/wiki'
+      fullPath: '/admin/wiki'
+      preLoaderRoute: typeof AuthenticatedAdminWikiRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/tokens': {
       id: '/_authenticated/admin/tokens'
       path: '/tokens'
@@ -568,6 +587,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminTokensRoute: typeof AuthenticatedAdminTokensRoute
+  AuthenticatedAdminWikiRoute: typeof AuthenticatedAdminWikiRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -577,6 +597,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminTokensRoute: AuthenticatedAdminTokensRoute,
+  AuthenticatedAdminWikiRoute: AuthenticatedAdminWikiRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
