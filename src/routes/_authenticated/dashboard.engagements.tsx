@@ -480,7 +480,8 @@ function EngagementsPage() {
                     const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
                     const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
-                    const canRate = opensAt !== null && now >= opensAt;
+                    const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
+                    const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;
                     if (alreadyRated) {
                       return (
                         <button type="button" disabled className="cursor-not-allowed border border-border bg-muted/40 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground opacity-80">
