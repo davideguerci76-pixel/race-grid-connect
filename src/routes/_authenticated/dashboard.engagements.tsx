@@ -347,6 +347,50 @@ function EngagementsPage() {
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
                 {(e.status === "confirmed" || e.status === "completed") && (
                   <div className="mt-4 border-t border-border pt-3">
+                    {/* Anti-ghosting contact check */}
+                    {e.status === "confirmed" && isFreelancer && e.contact_check_sent_at && e.freelancer_contacted == null && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[HAS THE TEAM REACHED OUT?]</div>
+                        <p className="mt-1 text-xs">Contacts were shared. Did the team already get in touch with you about this match?</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            disabled={answerContactMut.isPending}
+                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: true })}
+                            className="bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                          >
+                            Yes, they contacted me
+                          </button>
+                          <button
+                            disabled={answerContactMut.isPending}
+                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
+                            className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                          >
+                            Not yet
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && e.freelancer_contacted === true && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[CONFIRM YOU'VE CONTACTED THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">The freelancer confirmed you reached out. Confirm here to close the follow-up loop and stop reminder notifications.</p>
+                        <button
+                          disabled={teamConfirmMut.isPending}
+                          onClick={() => teamConfirmMut.mutate(e.id)}
+                          className="mt-2 bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                        >
+                          I contacted the freelancer
+                        </button>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && e.team_reminder2_sent_at && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-red bg-racing-red/10 p-3">
+                        <div className="label-mono text-racing-red">[URGENT — CONTACT THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">
+                          You still haven't confirmed contact with the freelancer. If you don't confirm soon, the engagement will be auto-released, the freelancer's calendar will reopen, and the incident will be recorded on your team profile.
+                        </p>
+                      </div>
+                    )}
                     {!isFreelancer && (
                       <div className="mb-4">
                         <div className="label-mono mb-2 text-racing-yellow">[FREELANCER CONTACT]</div>
