@@ -473,7 +473,7 @@ function EngagementsPage() {
                   })()}
 
 
-                  {(e.status === "confirmed" || e.status === "completed") && (() => {
+                  {(e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
                     const info = ratableMap.get(e.id);
                     const mineRated = ratedMap.get(e.id);
                     const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
