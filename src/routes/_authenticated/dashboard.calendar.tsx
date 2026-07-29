@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { setAvailability, getMyAvailability, getMyBlockedDates } from "@/lib/paddock.functions";
+import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
