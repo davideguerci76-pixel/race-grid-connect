@@ -70,6 +70,17 @@ function RequestMatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "SOS Call failed"),
   });
 
+  const refundFn = useServerFn(refundAndCloseRequest);
+  const refundMut = useMutation({
+    mutationFn: (mode: "full" | "partial") => refundFn({ data: { request_id: id, mode } }),
+    onSuccess: (r: any) => {
+      toast.success(`Refund credited: ${r?.refund_tokens ?? 0} tokens (${r?.refund_pct ?? 0}%).`);
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["token-balance"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Refund failed"),
+  });
+
   const requestFilled = data?.request.status === "filled" || data?.request.status === "completed";
   const isFirstDayToday = data ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
   const sosEligible = data && !requestFilled && isFirstDayToday && data.request.duration !== "full_season";
