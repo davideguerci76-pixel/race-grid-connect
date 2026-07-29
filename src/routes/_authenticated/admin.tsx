@@ -76,6 +76,7 @@ function TimeMachine() {
   const getFn = useServerFn(adminGetTimeOffset);
   const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
+  const triggerCalFn = useServerFn(adminTriggerCalendarStale);
   const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
   const [days, setDays] = useState(0);
   useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
@@ -91,6 +92,11 @@ function TimeMachine() {
   const triggerMut = useMutation({
     mutationFn: () => triggerFn(),
     onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} rating notifications`),
+  });
+  const triggerCalMut = useMutation({
+    mutationFn: () => triggerCalFn(),
+    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} calendar-stale notifications`),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   return (
