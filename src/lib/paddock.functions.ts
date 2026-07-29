@@ -1375,3 +1375,65 @@ export const getTeamCancellationStats = createServerFn({ method: "GET" })
     const count = (rows ?? []).length;
     return { count };
   });
+
+// ---- Anti-Ghosting workflow ----
+export const freelancerAnswerContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({ engagement_id: z.string().uuid(), contacted: z.boolean() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("freelancer_answer_contact", {
+      _engagement_id: data.engagement_id,
+      _contacted: data.contacted,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const teamConfirmContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ engagement_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("team_confirm_contact", {
+      _engagement_id: data.engagement_id,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+async function assertAdmin(supabase: any, userId: string) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Admin only");
+}
+
+export const adminEmitContactChecks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("emit_contact_checks");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+export const adminEmitTeamGhostingReminders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("emit_team_ghosting_reminders");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+export const adminReleaseGhostedEngagements = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("release_ghosted_engagements");
+    if (error) throw new Error(error.message);
+    return { released: (data as number) ?? 0 };
+  });
