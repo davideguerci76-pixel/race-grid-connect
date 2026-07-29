@@ -1,84 +1,76 @@
-# Query Lifecycle, De-confirmations, Negative CV & SOS Call
+# Zero-Match Refund Policy, Hard Skill Penalty, and the Strategic Trivio
 
-Scope is large and cross-cutting (DB + engine + UI + notifications). Presenting a plan before touching code.
+## 1. Admin settings (Tokens tab)
 
-## 1. Query lifecycle & auto-close
+Add two rows in `platform_settings` (category = `refunds`, new section in the admin panel):
 
-- Add scheduled server helper `close_expired_requests()` (SQL function + cron via `pg_net` → `/api/public/cron/close-requests`):
-  - For every `active`/`paused` request where `sim_now() > first_required_day + 1`:
-    - If a `confirmed` engagement exists → status stays `filled` (already handled today, no change).
-    - Else → set `status = 'completed'`, `is_active = false`. Reuses existing `completed` enum value; UI relabels as **"Completed · Unfilled"** when `status='completed'` AND no confirmed engagement.
-- Requests remain in the archive (already the case). Team dashboard list already shows all statuses — add the "Unfilled" pill next to `completed` when there's no confirmed engagement.
+- `refund_min_pct` — minimum guaranteed refund. Default `20`, range 0–50 (%).
+- `refund_hard_penalty_pct` — refund drop per active hard filter. Default `10` (%).
 
-## 2. Cancel-within-24h (no penalty)
+Formula (server-authoritative):
+```
+hard_count = (role_hard?1:0)
+           + (travel_required?1:0)
+           + count(skills_hard)
+           + count(experience_requirements where hard=true)
+           + count(languages where hard=true)
+           + (location_relevance = 'mandatory' ? 1 : 0)
+           + (education has entries ? 1 : 0)   // treated as hard when specified
+refund_pct = max(refund_min_pct, 100 - hard_count * refund_hard_penalty_pct)
+```
 
-- New RPC `cancel_engagement(_engagement_id uuid, _reason text)`:
-  - Auth: caller must be freelancer or team on the engagement.
-  - If `sim_now() - confirmed_at < 24h` **AND** `sim_now() < first_required_day` → **grace cancel**:
-    - `engagements.status = 'cancelled'`, `cancellation_kind = 'grace'`.
-    - Reopen the request: `requests.status='active'`, `is_active=true`.
-    - Notify all freelancers with a still-pending `proposed` engagement on the same request + the top matched freelancers who never got proposed (kind `match_reopened`).
-    - If nobody accepts before the auto-close deadline, standard lifecycle closes it as `completed · unfilled`.
-- New engagement columns: `confirmed_at timestamptz`, `cancelled_at timestamptz`, `cancelled_by uuid`, `cancellation_kind text` (`grace` | `team_late` | `freelancer_late` | `no_show`), `cancellation_reason text`.
+Applies to tokens spent to post the request (`cost_request_single` / `cost_request_full_season`, from the actual `token_transactions` entries with `reason='request_post'` and `ref_id=request_id`).
 
-## 3. Late team cancellation (negative CV)
+## 2. Trivio panel on the matches page
 
-- Same `cancel_engagement` RPC when caller = team AND `sim_now() >= first_required_day` (or > 24h after confirm):
-  - `cancellation_kind = 'team_late'`.
-  - Free the freelancer's calendar: nothing to delete — `getMyBlockedDates` already derives from active engagements, so cancelled ones stop blocking automatically.
-  - Request goes to `completed` (unfilled). No reopen.
-- Public team profile shows aggregate CV line derived from `engagements` where `cancellation_kind='team_late'`:
-  - `count(*)` and `avg(first_required_day - cancelled_at::date)` days of notice.
-  - Added to `teams/$id` public route and team-preview card in match views.
+Trigger: `request.status='active'`, `total_matches = 0`, no confirmed engagement. Rendered above the empty-state on `dashboard.requests.$id.matches.tsx`.
 
-## 4. Late freelancer cancellation (slot protection)
+Three options:
 
-- Same RPC when caller = freelancer AND late:
-  - `cancellation_kind = 'freelancer_late'`.
-  - Request reopens like case 2 (notify reserves), auto-close still applies.
-  - **Slot protection**: `getMyBlockedDates` extended to also include date ranges of engagements with `cancellation_kind in ('freelancer_late','no_show')` — so red/locked days remain on the freelancer's calendar for that window. UI legend gets a third entry: "Locked (cancelled late)".
+**A. Keep searching (wait).** No-op. Request stays active. When `recompute_matches` later produces a full match, the existing `new_matches` notification fires — no code change beyond a notification kind already present. No refund.
 
-## 5. SOS Call
+**B. Take refund & close.** Calls RPC `refund_and_close_request(_request_id, _mode='full')`:
+- Verifies zero full matches and no confirmed engagement.
+- Reads spent tokens for that request, computes refund with formula above.
+- Credits tokens via `credit_tokens(reason='refund')`.
+- Sets `requests.status='completed'`, `is_active=false`, `refund_pct`, `refund_tokens`, `refund_kind='full'`.
 
-- New setting `sos_min_match_pct` (default 75) in `platform_settings` under existing `matching` category → automatically appears in Admin Tokens tab.
-- New RPC `trigger_sos_call(_request_id)`:
-  - Team-only.
-  - Only allowed when `sim_now()::date = first_required_day` AND request is single-race (`duration <> 'full_season'`) AND request is currently unfilled OR was un-filled today via a same-day freelancer cancel.
-  - Finds freelancers whose `matches.skills_score >= sos_min_match_pct` for this request, honouring the request's existing location relevance/anchor/radius filter (mandatory-style geo check, always applied for SOS regardless of the request's original relevance setting).
-  - Inserts `sos_calls` row + notifications (`sos_call`) to each eligible freelancer.
-  - Auto-trigger path: when `cancel_engagement` fires with same-day freelancer cancel on a single-race request, call the same helper server-side.
-- New RPC `accept_sos_call(_sos_id)`:
-  - First freelancer to accept → creates a `confirmed` engagement (skips propose step), cancels the SOS, notifies team + all other eligible freelancers (`sos_taken`).
-- New table `sos_calls (id, request_id, team_id, triggered_at, triggered_by, resolved_at, resolved_by_engagement)` + `sos_call_targets` for audit.
-- UI: SOS button on `dashboard.requests.$id.matches`, visible only when the eligibility window is open. Confirm modal with the exact copy from the spec. Freelancer notification center + top-of-dashboard banner shows active SOS invites with "Accept now" CTA.
-- Immediate negative review path for no-show: on same-day freelancer cancel, unlock a "Rate no-show" action for the team in `dashboard.engagements` that submits a 1-star rating bypassing the double-blind wait (server-side flag `no_show=true` on `submit_rating_v2`).
+**C. Unlock partials (half refund now).** Calls `refund_and_close_request(_request_id, _mode='partial')`:
+- Requires `total_partial_matches > 0`.
+- Credits `round(refund_full / 2)` (min 1 if refund_full > 0).
+- Marks `requests.partial_refund_taken=true`, `refund_kind='partial'`, keeps request `active` so team can browse partial tiers.
+- On subsequent confirmation of a FULL match for this request → no further refund. Already covered by not calling refund again.
+- On confirmation of a PARTIAL match → no further refund.
+- If request later auto-closes as unfilled → no additional refund (partial was already collected).
 
-## 6. Files touched
+New columns on `requests`: `refund_pct numeric`, `refund_tokens int`, `refund_kind text` (`full`|`partial`|null), `partial_refund_taken bool default false`.
 
-**Migrations (single migration):**
-- Add columns to `engagements` (`confirmed_at`, `cancelled_at`, `cancelled_by`, `cancellation_kind`, `cancellation_reason`).
-- Add `sos_min_match_pct` setting row.
-- Create `sos_calls` + `sos_call_targets` tables with GRANTs, RLS, policies.
-- Add enum values to `notif_kind`: `match_reopened`, `sos_call`, `sos_taken`, `engagement_cancelled`.
-- New/updated RPCs: `cancel_engagement`, `trigger_sos_call`, `accept_sos_call`, `close_expired_requests`, `team_cancellation_stats(team_id)`, extend `accept_match_confirmation` to stamp `confirmed_at`, extend `submit_rating_v2` for `no_show`.
-- Set up cron: `pg_cron` job every 15 min calling `close_expired_requests()`.
+## 3. Server function + UI
 
-**Server functions (`src/lib/paddock.functions.ts`):**
-- `cancelEngagement`, `triggerSosCall`, `acceptSosCall`, `getActiveSosForMe`, `getTeamCancellationStats`.
-- Extend `getMyBlockedDates` to include locked cancelled ranges (with a `locked` flag per date).
-- Extend `getMyEngagements` to expose `confirmed_at`, cancellation state, and "can grace-cancel" / "can late-cancel" flags.
+`src/lib/paddock.functions.ts`:
+- `getRefundQuote(request_id)` — returns `{spent, hard_count, refund_pct, refund_full, refund_partial, has_partials}` (server-only helper computing hard_count from the DB row).
+- `refundAndCloseRequest({request_id, mode})` — wraps the RPC.
 
-**UI:**
-- `dashboard.engagements.tsx`: Cancel button with dynamic copy (grace vs late warning), no-show rate action.
-- `dashboard.requests.$id.matches.tsx`: SOS button + confirm modal, "Reopened" banner when applicable.
-- `dashboard.requests.index.tsx`: "Unfilled" pill for `completed` without confirmed engagement.
-- `dashboard.calendar.tsx` + `availability-calendar.tsx`: extra legend entry, distinguish "engaged" red vs "locked-late" red (same red, different tooltip).
-- `teams/$id.tsx`: negative CV line under team header.
-- Notification center: render the four new notif kinds with proper CTAs.
-- i18n keys added to all 5 locale files.
+`getRequestMatches` extends its return with `refund_quote` and `refund_state` so the page renders the trivio without a second round-trip.
 
-## 7. Non-goals
+`dashboard.requests.$id.matches.tsx`:
+- Above empty state, when `total_matches === 0 && !partial_refund_taken`, render a 3-column trivio panel. Show computed refund %, tokens, and hard-filter breakdown.
+- When `partial_refund_taken`, show a small banner "Partial refund collected — X tokens" and hide the trivio.
 
-- No refunds/token adjustments on cancellations (spec says "zero penali" only for the grace window; no monetary flow specified for late cancels beyond CV).
-- SOS not available for `full_season` requests (explicit in spec).
-- No changes to matching weights or partial-match logic.
+## 4. i18n
+
+Add keys under `requests.zeroMatch.*` in all 5 locale files (wait/refund/partial titles + descriptions + toast strings).
+
+## 5. Files touched
+
+- **Migration**: two new settings rows, four new columns on `requests`, new RPC `refund_and_close_request(uuid, text)`.
+- `src/lib/paddock.functions.ts` — add `getRefundQuote`, `refundAndCloseRequest`; extend `getRequestMatches`.
+- `src/routes/_authenticated/dashboard.requests.$id.matches.tsx` — trivio panel + wiring.
+- `src/routes/_authenticated/admin.tokens.tsx` — add `refunds` category header (auto-appears since categories loop already generic; only need to register in `CATEGORIES` list).
+- `src/i18n/locales/*.json` — new strings.
+
+## Non-goals
+
+- No changes to matching engine, weights, or partial-match penalty.
+- No monetary refund; token-only.
+- Full-season requests behave identically; the formula uses whatever tokens were actually spent on the post.
