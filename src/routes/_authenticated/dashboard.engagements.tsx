@@ -8,7 +8,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement, getMyNotifications } from "@/lib/paddock.functions";
+import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,9 +27,11 @@ function EngagementsPage() {
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
   const markRead = useServerFn(markAllNotificationsRead);
+  const notifsFn = useServerFn(getMyNotifications);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
   const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const { data: notifications = [] } = useQuery({ queryKey: ["my-notifications", user?.id], enabled: !!user?.id, queryFn: () => notifsFn() });
   const { data: myRatedIds = [] } = useQuery({
     queryKey: ["my-rated-engagement-ids", user?.id],
     enabled: !!user?.id,
@@ -147,6 +150,39 @@ function EngagementsPage() {
       <div className="container-page py-12">
         <div className="label-mono">[ENGAGEMENTS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("engagements.title")}</h1>
+
+        {notifications.length > 0 && (
+          <div className="mt-6 border border-border bg-card">
+            <div className="border-b border-border px-4 py-2 label-mono">[NOTIFICATIONS]</div>
+            <ul className="divide-y divide-border">
+              {(notifications as any[]).slice(0, 15).map((n) => {
+                const unread = !n.read_at;
+                const isStale = n.kind === "calendar_stale";
+                return (
+                  <li key={n.id} className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "bg-racing-red/5" : ""}`}>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {unread && <span className="inline-block h-2 w-2 rounded-full bg-racing-red" />}
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{n.kind}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</span>
+                      </div>
+                      <div className="mt-1 text-sm">
+                        {isStale
+                          ? "Your availability calendar hasn't been updated in a while. Keep it fresh to rank higher in team searches."
+                          : (n.payload?.message ?? n.kind)}
+                      </div>
+                    </div>
+                    {isStale && (
+                      <Link to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
+                        Update calendar
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-3">
           {rows.length === 0 && <div className="border border-border bg-card p-12 text-center text-sm text-muted-foreground">—</div>}

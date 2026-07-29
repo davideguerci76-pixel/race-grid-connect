@@ -1112,6 +1112,19 @@ export const getUnreadNotificationCount = createServerFn({ method: "GET" })
     return { count: count ?? 0 };
   });
 
+export const getMyNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("notifications")
+      .select("id, kind, payload, created_at, read_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
