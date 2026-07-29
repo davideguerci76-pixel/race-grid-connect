@@ -98,21 +98,6 @@ function TimeMachine() {
     onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} calendar-stale notifications`),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
-  const contactCheckMut = useMutation({
-    mutationFn: () => contactCheckFn(),
-    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} contact-check notifications`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-  const teamRemindMut = useMutation({
-    mutationFn: () => teamRemindFn(),
-    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} team ghosting reminders`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-  const releaseGhostedMut = useMutation({
-    mutationFn: () => releaseGhostedFn(),
-    onSuccess: (r: any) => toast.success(`Released ${r.released} ghosted engagements`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
 
   return (
     <div className="mb-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4">
