@@ -1,76 +1,58 @@
-# Zero-Match Refund Policy, Hard Skill Penalty, and the Strategic Trivio
+# Anti-Ghosting Team → Freelance
 
-## 1. Admin settings (Tokens tab)
+## Timing (configurabile in Admin → Tokens/Settings, tutti in giorni `sim_now()`)
+- `ghosting_freelance_check_days` = **3** — dopo tanti giorni dalla conferma match, chiedo al freelance "il team ti ha contattato?"
+- `ghosting_team_reminder1_days` = **5** — se il freelance ha risposto NO, primo sollecito collaborativo al team
+- `ghosting_team_reminder2_days` = **8** — secondo sollecito al team ("il match verrà liberato se non confermato")
+- `ghosting_deadline_days` = **10** — se ancora nulla, rilascio automatico + rating unilaterale abilitato per il freelance
 
-Add two rows in `platform_settings` (category = `refunds`, new section in the admin panel):
+Se il freelance risponde YES o il team clicca "Confermo il contatto" in qualsiasi momento → sequenza chiusa, nessun altro sollecito.
 
-- `refund_min_pct` — minimum guaranteed refund. Default `20`, range 0–50 (%).
-- `refund_hard_penalty_pct` — refund drop per active hard filter. Default `10` (%).
+## 1. Schema (`engagements` + nuove enum notif)
+Colonne aggiunte a `engagements`:
+- `freelancer_contacted` boolean, `freelancer_contacted_at` timestamptz
+- `team_confirmed_contact` boolean, `team_confirmed_contact_at` timestamptz
+- `contact_check_sent_at`, `team_reminder1_sent_at`, `team_reminder2_sent_at`, `ghosting_released_at` timestamptz
+- `cancellation_kind` accetta il nuovo valore `team_ghosting`
 
-Formula (server-authoritative):
-```
-hard_count = (role_hard?1:0)
-           + (travel_required?1:0)
-           + count(skills_hard)
-           + count(experience_requirements where hard=true)
-           + count(languages where hard=true)
-           + (location_relevance = 'mandatory' ? 1 : 0)
-           + (education has entries ? 1 : 0)   // treated as hard when specified
-refund_pct = max(refund_min_pct, 100 - hard_count * refund_hard_penalty_pct)
-```
+Nuovi `notif_kind`:
+- `contact_check` (→ freelance, con SI/NO)
+- `team_contact_reminder_1`, `team_contact_reminder_2` (→ team, con CTA "Ho contattato il freelance")
+- `ghosting_released` (→ freelance, con CTA "Lascia una recensione al team")
+- `team_ghosted` (→ team, notifica di rilascio e blocco reputazionale)
 
-Applies to tokens spent to post the request (`cost_request_single` / `cost_request_full_season`, from the actual `token_transactions` entries with `reason='request_post'` and `ref_id=request_id`).
+## 2. Funzioni DB (SECURITY DEFINER, usano `sim_now()`)
+- `freelancer_answer_contact(_engagement_id, _contacted boolean)` — freelance risponde SI/NO. Se SI → chiude la sequenza. Se NO → nessun cambio di stato, semplicemente registrato.
+- `team_confirm_contact(_engagement_id)` — team dichiara di aver contattato → sequenza chiusa (`team_confirmed_contact=true`).
+- `emit_contact_checks()` — inserisce `contact_check` per engagements `confirmed` con `confirmed_at ≤ sim_now() - N gg` e nessun contact_check già inviato.
+- `emit_team_ghosting_reminders()` — invia reminder 1 / reminder 2 secondo soglie, solo se `freelancer_contacted = false` e `team_confirmed_contact` è NULL.
+- `release_ghosted_engagements()` — alla deadline, se ancora ghosting: `status='cancelled'`, `cancellation_kind='team_ghosting'`, `cancelled_by=team_id`, `ghosting_released_at=now()`, notifica `ghosting_released` al freelance + `team_ghosted` al team. Le date tornano verdi perché il calendario blocca solo status `confirmed` o cancellazioni "late" (regola già esistente): `team_ghosting` non è nella lista bloccante.
+- `submit_rating_v2` esteso: consente rating anche se `status='cancelled' AND cancellation_kind='team_ghosting'`, purché sia il freelance a scrivere e verso il team. La regola double-blind non si applica al rating unilaterale (esce subito visibile, `unlocked_at=now()`).
 
-## 2. Trivio panel on the matches page
+Grants coerenti con lo standard esistente: revoke da `anon`/`PUBLIC`, execute a `authenticated` per le due RPC "azione utente"; nessun grant pubblico per le funzioni cron `emit_*` / `release_*` (le chiama solo l'admin via Time Machine o pg_cron).
 
-Trigger: `request.status='active'`, `total_matches = 0`, no confirmed engagement. Rendered above the empty-state on `dashboard.requests.$id.matches.tsx`.
+## 3. UI Freelance — `dashboard.engagements.tsx`
+- Card di ogni engagement `confirmed`: nuovo pulsante permanente **"The team contacted me"** (verde, in cima).
+- Inbox notifications: quando arriva `contact_check`, la card mostra domanda + due bottoni **Yes** / **No, not yet**.
+- Card di engagement `cancelled` con `cancellation_kind='team_ghosting'`: banner rosso "The team ghosted you" + CTA **"Leave a unilateral rating"** → apre il modal rating esistente pre-compilato verso il team.
 
-Three options:
+## 4. UI Team — `dashboard.engagements.tsx`
+- Card di engagement `confirmed` non ancora confermato: pulsante **"I contacted the freelancer"**.
+- Notifiche `team_contact_reminder_1` / `_2` renderizzate con testo dedicato e stessa CTA.
+- Notifica `team_ghosted` renderizzata come warning "Match released — leave open the calendar so it doesn't happen again".
 
-**A. Keep searching (wait).** No-op. Request stays active. When `recompute_matches` later produces a full match, the existing `new_matches` notification fires — no code change beyond a notification kind already present. No refund.
+## 5. Admin Time Machine (`admin.tsx`)
+Tre nuovi bottoni oltre a quelli esistenti:
+- Emit contact checks now
+- Emit team ghosting reminders now
+- Release ghosted engagements now
 
-**B. Take refund & close.** Calls RPC `refund_and_close_request(_request_id, _mode='full')`:
-- Verifies zero full matches and no confirmed engagement.
-- Reads spent tokens for that request, computes refund with formula above.
-- Credits tokens via `credit_tokens(reason='refund')`.
-- Sets `requests.status='completed'`, `is_active=false`, `refund_pct`, `refund_tokens`, `refund_kind='full'`.
+Ognuno chiama la rispettiva RPC via nuova serverFn in `paddock.functions.ts` (`adminEmitContactChecks`, `adminEmitTeamReminders`, `adminReleaseGhosted`) protette da `requireSupabaseAuth` + check `has_role('admin')`.
 
-**C. Unlock partials (half refund now).** Calls `refund_and_close_request(_request_id, _mode='partial')`:
-- Requires `total_partial_matches > 0`.
-- Credits `round(refund_full / 2)` (min 1 if refund_full > 0).
-- Marks `requests.partial_refund_taken=true`, `refund_kind='partial'`, keeps request `active` so team can browse partial tiers.
-- On subsequent confirmation of a FULL match for this request → no further refund. Already covered by not calling refund again.
-- On confirmation of a PARTIAL match → no further refund.
-- If request later auto-closes as unfilled → no additional refund (partial was already collected).
+## 6. Platform Wiki (`admin.wiki.tsx`)
+Nuova sezione **Anti-Ghosting** che riassume timeline (3 → 5 → 8 → 10 giorni), attori, esito e impatto reputazionale.
 
-New columns on `requests`: `refund_pct numeric`, `refund_tokens int`, `refund_kind text` (`full`|`partial`|null), `partial_refund_taken bool default false`.
-
-## 3. Server function + UI
-
-`src/lib/paddock.functions.ts`:
-- `getRefundQuote(request_id)` — returns `{spent, hard_count, refund_pct, refund_full, refund_partial, has_partials}` (server-only helper computing hard_count from the DB row).
-- `refundAndCloseRequest({request_id, mode})` — wraps the RPC.
-
-`getRequestMatches` extends its return with `refund_quote` and `refund_state` so the page renders the trivio without a second round-trip.
-
-`dashboard.requests.$id.matches.tsx`:
-- Above empty state, when `total_matches === 0 && !partial_refund_taken`, render a 3-column trivio panel. Show computed refund %, tokens, and hard-filter breakdown.
-- When `partial_refund_taken`, show a small banner "Partial refund collected — X tokens" and hide the trivio.
-
-## 4. i18n
-
-Add keys under `requests.zeroMatch.*` in all 5 locale files (wait/refund/partial titles + descriptions + toast strings).
-
-## 5. Files touched
-
-- **Migration**: two new settings rows, four new columns on `requests`, new RPC `refund_and_close_request(uuid, text)`.
-- `src/lib/paddock.functions.ts` — add `getRefundQuote`, `refundAndCloseRequest`; extend `getRequestMatches`.
-- `src/routes/_authenticated/dashboard.requests.$id.matches.tsx` — trivio panel + wiring.
-- `src/routes/_authenticated/admin.tokens.tsx` — add `refunds` category header (auto-appears since categories loop already generic; only need to register in `CATEGORIES` list).
-- `src/i18n/locales/*.json` — new strings.
-
-## Non-goals
-
-- No changes to matching engine, weights, or partial-match penalty.
-- No monetary refund; token-only.
-- Full-season requests behave identically; the formula uses whatever tokens were actually spent on the post.
+## Note tecniche
+- Uso `sim_now()` ovunque per compatibilità Time Machine.
+- Il calendario del freelance già rappresenta "engaged" solo se `status='confirmed'` o cancellazioni penalty; `team_ghosting` non blocca ⇒ ritorno automatico a verde senza ulteriore lavoro sull'UI calendario.
+- I costi/timing sono in `platform_settings` per essere modificati live dall'admin senza migration.

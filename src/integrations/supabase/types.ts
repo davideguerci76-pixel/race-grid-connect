@@ -86,12 +86,16 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
           no_show: boolean
@@ -100,8 +104,12 @@ export type Database = {
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         Insert: {
@@ -110,12 +118,16 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           confirmed_at?: string | null
+          contact_check_sent_at?: string | null
           created_at?: string
           currency?: string
           end_date: string
           fee?: number | null
+          freelancer_contacted?: boolean | null
+          freelancer_contacted_at?: string | null
           freelancer_id: string
           freelancer_marked_complete?: boolean
+          ghosting_released_at?: string | null
           id?: string
           match_id?: string | null
           no_show?: boolean
@@ -124,8 +136,12 @@ export type Database = {
           request_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact?: boolean | null
+          team_confirmed_contact_at?: string | null
           team_id: string
           team_marked_complete?: boolean
+          team_reminder1_sent_at?: string | null
+          team_reminder2_sent_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -134,12 +150,16 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           confirmed_at?: string | null
+          contact_check_sent_at?: string | null
           created_at?: string
           currency?: string
           end_date?: string
           fee?: number | null
+          freelancer_contacted?: boolean | null
+          freelancer_contacted_at?: string | null
           freelancer_id?: string
           freelancer_marked_complete?: boolean
+          ghosting_released_at?: string | null
           id?: string
           match_id?: string | null
           no_show?: boolean
@@ -148,8 +168,12 @@ export type Database = {
           request_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact?: boolean | null
+          team_confirmed_contact_at?: string | null
           team_id?: string
           team_marked_complete?: boolean
+          team_reminder1_sent_at?: string | null
+          team_reminder2_sent_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1128,12 +1152,16 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
           no_show: boolean
@@ -1142,8 +1170,12 @@ export type Database = {
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1161,12 +1193,16 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
           no_show: boolean
@@ -1175,8 +1211,12 @@ export type Database = {
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1225,12 +1265,16 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
           no_show: boolean
@@ -1239,8 +1283,12 @@ export type Database = {
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1310,10 +1358,53 @@ export type Database = {
         Returns: number
       }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
+      emit_contact_checks: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }
+      emit_team_ghosting_reminders: { Args: never; Returns: number }
       flag_rating: {
         Args: { _rating_id: string; _reason: string }
         Returns: undefined
+      }
+      freelancer_answer_contact: {
+        Args: { _contacted: boolean; _engagement_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_anonymous_reviews: {
         Args: { _target: string }
@@ -1378,6 +1469,7 @@ export type Database = {
           refund_tokens: number
         }[]
       }
+      release_ghosted_engagements: { Args: never; Returns: number }
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {
@@ -1386,12 +1478,16 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
           no_show: boolean
@@ -1400,8 +1496,12 @@ export type Database = {
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1514,6 +1614,47 @@ export type Database = {
           avg_days_notice: number
           count: number
         }[]
+      }
+      team_confirm_contact: {
+        Args: { _engagement_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       trigger_sos_call: {
         Args: { _request_id: string }
@@ -1656,6 +1797,11 @@ export type Database = {
         | "engagement_cancelled"
         | "request_unfilled"
         | "calendar_stale"
+        | "contact_check"
+        | "team_contact_reminder_1"
+        | "team_contact_reminder_2"
+        | "ghosting_released"
+        | "team_ghosted"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -1910,6 +2056,11 @@ export const Constants = {
         "engagement_cancelled",
         "request_unfilled",
         "calendar_stale",
+        "contact_check",
+        "team_contact_reminder_1",
+        "team_contact_reminder_2",
+        "ghosting_released",
+        "team_ghosted",
       ],
       rating_moderation_status: [
         "active",

@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement, getMyNotifications } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement, getMyNotifications, freelancerAnswerContact, teamConfirmContact } from "@/lib/paddock.functions";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,6 +117,22 @@ function EngagementsPage() {
       qc.invalidateQueries();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
+  });
+
+  const answerContactFn = useServerFn(freelancerAnswerContact);
+  const answerContactMut = useMutation({
+    mutationFn: (v: { engagement_id: string; contacted: boolean }) => answerContactFn({ data: v }),
+    onSuccess: (_r, v) => {
+      toast.success(v.contacted ? "Thanks — logged that the team reached out." : "Logged. We'll remind the team.");
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const teamConfirmFn = useServerFn(teamConfirmContact);
+  const teamConfirmMut = useMutation({
+    mutationFn: (id: string) => teamConfirmFn({ data: { engagement_id: id } }),
+    onSuccess: () => { toast.success("Contact confirmed."); qc.invalidateQueries({ queryKey: ["engagements"] }); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
@@ -254,6 +270,15 @@ function EngagementsPage() {
                   </span>
                 </div>
 
+                {e.cancellation_kind === "team_ghosting" && (
+                  <div className="mt-3 border border-racing-red bg-racing-red/10 p-3">
+                    <div className="label-mono text-racing-red">[TEAM DID NOT FOLLOW UP]</div>
+                    <p className="mt-1 text-xs">
+                      The team never confirmed contact after the match. The engagement was auto-released and your calendar days reopened. You can still leave a rating for the team below.
+                    </p>
+                  </div>
+                )}
+
                 {req && (
                   <div className="mt-3 border-t border-border pt-3">
                     <div className="label-mono mb-1">[REQUEST]</div>
@@ -322,6 +347,50 @@ function EngagementsPage() {
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
                 {(e.status === "confirmed" || e.status === "completed") && (
                   <div className="mt-4 border-t border-border pt-3">
+                    {/* Anti-ghosting contact check */}
+                    {e.status === "confirmed" && isFreelancer && e.contact_check_sent_at && e.freelancer_contacted == null && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[HAS THE TEAM REACHED OUT?]</div>
+                        <p className="mt-1 text-xs">Contacts were shared. Did the team already get in touch with you about this match?</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            disabled={answerContactMut.isPending}
+                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: true })}
+                            className="bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                          >
+                            Yes, they contacted me
+                          </button>
+                          <button
+                            disabled={answerContactMut.isPending}
+                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
+                            className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                          >
+                            Not yet
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && e.freelancer_contacted === true && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[CONFIRM YOU'VE CONTACTED THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">The freelancer confirmed you reached out. Confirm here to close the follow-up loop and stop reminder notifications.</p>
+                        <button
+                          disabled={teamConfirmMut.isPending}
+                          onClick={() => teamConfirmMut.mutate(e.id)}
+                          className="mt-2 bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                        >
+                          I contacted the freelancer
+                        </button>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && e.team_reminder2_sent_at && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-red bg-racing-red/10 p-3">
+                        <div className="label-mono text-racing-red">[URGENT — CONTACT THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">
+                          You still haven't confirmed contact with the freelancer. If you don't confirm soon, the engagement will be auto-released, the freelancer's calendar will reopen, and the incident will be recorded on your team profile.
+                        </p>
+                      </div>
+                    )}
                     {!isFreelancer && (
                       <div className="mb-4">
                         <div className="label-mono mb-2 text-racing-yellow">[FREELANCER CONTACT]</div>
@@ -404,14 +473,15 @@ function EngagementsPage() {
                   })()}
 
 
-                  {(e.status === "confirmed" || e.status === "completed") && (() => {
+                  {(e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
                     const info = ratableMap.get(e.id);
                     const mineRated = ratedMap.get(e.id);
                     const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
                     const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
                     const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
-                    const canRate = opensAt !== null && now >= opensAt;
+                    const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
+                    const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;
                     if (alreadyRated) {
                       return (
                         <button type="button" disabled className="cursor-not-allowed border border-border bg-muted/40 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground opacity-80">
