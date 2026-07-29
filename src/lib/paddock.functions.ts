@@ -26,6 +26,26 @@ export const setAvailability = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const confirmMyCalendar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("confirm_calendar" as any);
+    if (error) throw new Error(error.message);
+    return { calendar_last_updated_at: data as unknown as string };
+  });
+
+export const getMyCalendarFreshness = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("freelancer_profiles")
+      .select("calendar_last_updated_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return { calendar_last_updated_at: (data as any)?.calendar_last_updated_at ?? null };
+  });
+
 export const getMyAvailability = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
