@@ -136,6 +136,13 @@ function TimeMachine() {
         >
           <Zap className="size-3" /> Emit rating notifications now
         </button>
+        <button
+          onClick={() => triggerCalMut.mutate()}
+          disabled={triggerCalMut.isPending}
+          className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+        >
+          <Zap className="size-3" /> Emit calendar-stale notifications now
+        </button>
       </div>
     </div>
   );
