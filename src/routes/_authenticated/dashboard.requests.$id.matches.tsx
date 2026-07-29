@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest } from "@/lib/paddock.functions";
 import { roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 
@@ -68,6 +68,17 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "SOS Call failed"),
+  });
+
+  const refundFn = useServerFn(refundAndCloseRequest);
+  const refundMut = useMutation({
+    mutationFn: (mode: "full" | "partial") => refundFn({ data: { request_id: id, mode } }),
+    onSuccess: (r: any) => {
+      toast.success(`Refund credited: ${r?.refund_tokens ?? 0} tokens (${r?.refund_pct ?? 0}%).`);
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["token-balance"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Refund failed"),
   });
 
   const requestFilled = data?.request.status === "filled" || data?.request.status === "completed";
@@ -275,7 +286,36 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {data.items.length === 0 && data.items_partial.length === 0 && (
+            {/* Trivio: zero total matches, still active, no refund yet */}
+            {data.total_matches === 0 && !requestFilled && !(data.request as any).partial_refund_taken && (
+              <ZeroMatchTrivio
+                quote={(data as any).refund_quote}
+                hasPartials={data.total_partial_matches > 0}
+                onWait={() => toast.info("Search stays active. You'll be notified as soon as a full match appears.")}
+                onRefund={() => {
+                  const q = (data as any).refund_quote;
+                  if (confirm(`Close this request and take a refund of ${q.refund_full} token(s) (${q.refund_pct}% of ${q.spent})? The request will be archived as unfilled.`)) {
+                    refundMut.mutate("full");
+                  }
+                }}
+                onPartial={() => {
+                  const q = (data as any).refund_quote;
+                  if (confirm(`Unlock partial matches now and take a HALVED refund of ${q.refund_partial} token(s)? You keep browsing partial candidates; if a full match later confirms, no additional refund is granted.`)) {
+                    refundMut.mutate("partial");
+                  }
+                }}
+                loading={refundMut.isPending}
+              />
+            )}
+
+            {(data.request as any).partial_refund_taken && (data.request as any).refund_kind === "partial" && (
+              <div className="mt-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4 text-xs text-racing-yellow">
+                <span className="font-mono uppercase tracking-widest">[PARTIAL REFUND COLLECTED]</span>{" "}
+                <span className="ml-2">{(data.request as any).refund_tokens} token(s) credited ({(data.request as any).refund_pct}%). Partial matches are now open below.</span>
+              </div>
+            )}
+
+            {data.items.length === 0 && data.items_partial.length === 0 && !((data.total_matches === 0) && !requestFilled) && (
               <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
                 No matches for this request yet.
               </div>
@@ -505,4 +545,74 @@ function formatCriterion(c: any): string {
     case "missing_days": return `${c.days} missing day${c.days === 1 ? "" : "s"}`;
     default: return c.kind ?? "criterion";
   }
+}
+
+function ZeroMatchTrivio({
+  quote,
+  hasPartials,
+  onWait,
+  onRefund,
+  onPartial,
+  loading,
+}: {
+  quote: { spent: number; hard_count: number; min_pct: number; drop_pct: number; refund_pct: number; refund_full: number; refund_partial: number };
+  hasPartials: boolean;
+  onWait: () => void;
+  onRefund: () => void;
+  onPartial: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="mt-6 border-2 border-racing-red bg-racing-red/5 p-5">
+      <div className="label-mono text-racing-red">[ZERO MATCHES — CHOOSE YOUR MOVE]</div>
+      <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Nothing matches your criteria — yet</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Refund quote: <span className="font-bold text-racing-yellow">{quote.refund_pct}%</span> of {quote.spent} token{quote.spent === 1 ? "" : "s"} spent
+        {" "}= <span className="font-bold text-racing-yellow">{quote.refund_full}</span> token{quote.refund_full === 1 ? "" : "s"}.
+        {" "}Based on {quote.hard_count} hard filter{quote.hard_count === 1 ? "" : "s"} (floor {quote.min_pct}%, −{quote.drop_pct}% per hard filter).
+      </p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="flex flex-col border border-border bg-card p-4">
+          <div className="label-mono">[OPTION 1]</div>
+          <div className="text-lg font-black uppercase italic">Keep searching</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            Leave the request live. As soon as a freelancer becomes 100% available, you're notified and the standard first-come-first-served flow resumes. No refund — the search is still alive.
+          </p>
+          <button onClick={onWait} className="mt-3 border border-racing-yellow px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10">
+            Keep waiting
+          </button>
+        </div>
+        <div className="flex flex-col border border-border bg-card p-4">
+          <div className="label-mono">[OPTION 2]</div>
+          <div className="text-lg font-black uppercase italic">Refund & close</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            Accept the {quote.refund_full}-token refund and archive this request as completed — unfilled. Final: no further changes.
+          </p>
+          <button
+            onClick={onRefund}
+            disabled={loading || quote.refund_full === 0}
+            className="mt-3 bg-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
+          >
+            Take {quote.refund_full} tk & close
+          </button>
+        </div>
+        <div className={`flex flex-col border p-4 ${hasPartials ? "border-border bg-card" : "border-border/40 bg-secondary/40 opacity-60"}`}>
+          <div className="label-mono">[OPTION 3]</div>
+          <div className="text-lg font-black uppercase italic">Unlock partials</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            {hasPartials
+              ? `See freelancers available only for part of the dates now. Refund is halved to ${quote.refund_partial} token${quote.refund_partial === 1 ? "" : "s"}. Request stays open — if a full match later confirms, no extra refund.`
+              : "No partial candidates exist for this request yet."}
+          </p>
+          <button
+            onClick={onPartial}
+            disabled={loading || !hasPartials || quote.refund_partial === 0}
+            className="mt-3 border border-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+          >
+            Take {quote.refund_partial} tk & unlock
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

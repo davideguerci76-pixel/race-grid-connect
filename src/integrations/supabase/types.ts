@@ -758,6 +758,10 @@ export type Database = {
           location_radius_km: number | null
           location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null
@@ -792,6 +796,10 @@ export type Database = {
           location_radius_km?: number | null
           location_relevance?: string
           notes?: string | null
+          partial_refund_taken?: boolean
+          refund_kind?: string | null
+          refund_pct?: number | null
+          refund_tokens?: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
           season_dates?: string[] | null
@@ -826,6 +834,10 @@ export type Database = {
           location_radius_km?: number | null
           location_relevance?: string
           notes?: string | null
+          partial_refund_taken?: boolean
+          refund_kind?: string | null
+          refund_pct?: number | null
+          refund_tokens?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
           season_dates?: string[] | null
@@ -1257,6 +1269,10 @@ export type Database = {
           location_radius_km: number | null
           location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null
@@ -1345,6 +1361,15 @@ export type Database = {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
       }
+      refund_and_close_request: {
+        Args: { _mode: string; _request_id: string }
+        Returns: {
+          balance: number
+          kind: string
+          refund_pct: number
+          refund_tokens: number
+        }[]
+      }
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {
@@ -1416,6 +1441,10 @@ export type Database = {
           location_radius_km: number | null
           location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null

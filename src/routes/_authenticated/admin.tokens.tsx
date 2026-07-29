@@ -24,6 +24,7 @@ const CATEGORIES: { id: string; title: string; blurb: string }[] = [
   { id: "economics", title: "Token economics", blurb: "Retail value of a single token. All pack pricing on the buy page derives from this." },
   { id: "costs", title: "Operational costs (tokens spent)", blurb: "Amount of tokens deducted for each user action. Reads apply platform-wide on the next call." },
   { id: "rewards", title: "Rewards & incentives (tokens credited)", blurb: "Tokens credited automatically to users for the listed actions." },
+  { id: "refunds", title: "Zero-match refunds", blurb: "Refund policy when a Job Request returns 0 total matches. Percentages compute automatically from the number of hard filters on the request." },
 ];
 
 function AdminTokensPage() {
