@@ -27,9 +27,11 @@ function EngagementsPage() {
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
   const markRead = useServerFn(markAllNotificationsRead);
+  const notifsFn = useServerFn(getMyNotifications);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
   const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const { data: notifications = [] } = useQuery({ queryKey: ["my-notifications", user?.id], enabled: !!user?.id, queryFn: () => notifsFn() });
   const { data: myRatedIds = [] } = useQuery({
     queryKey: ["my-rated-engagement-ids", user?.id],
     enabled: !!user?.id,
