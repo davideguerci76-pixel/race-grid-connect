@@ -118,6 +118,22 @@ function EngagementsPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
   });
+
+  const answerContactFn = useServerFn(freelancerAnswerContact);
+  const answerContactMut = useMutation({
+    mutationFn: (v: { engagement_id: string; contacted: boolean }) => answerContactFn({ data: v }),
+    onSuccess: (_r, v) => {
+      toast.success(v.contacted ? "Thanks — logged that the team reached out." : "Logged. We'll remind the team.");
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const teamConfirmFn = useServerFn(teamConfirmContact);
+  const teamConfirmMut = useMutation({
+    mutationFn: (id: string) => teamConfirmFn({ data: { engagement_id: id } }),
+    onSuccess: () => { toast.success("Contact confirmed."); qc.invalidateQueries({ queryKey: ["engagements"] }); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
       if (v.isFreelancerReviewer) {
