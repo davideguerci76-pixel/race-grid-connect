@@ -155,8 +155,26 @@ function EngagementsPage() {
 
         {notifications.length > 0 && (
           <div className="mt-6 border border-border bg-card">
-            <div className="border-b border-border px-4 py-2 label-mono">[NOTIFICATIONS]</div>
+            <div className="flex items-center justify-between border-b border-border px-4 py-2">
+              <span className="label-mono">[NOTIFICATIONS]{unreadCount > 0 ? ` · ${unreadCount} UNREAD` : ""}</span>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => {
+                    markRead()
+                      .then(() => {
+                        qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+                        qc.invalidateQueries({ queryKey: ["my-notifications"] });
+                      })
+                      .catch(() => {});
+                  }}
+                  className="border border-border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
             <ul className="divide-y divide-border">
+
               {(notifications as any[]).slice(0, 15).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
