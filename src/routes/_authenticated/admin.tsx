@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications } from "@/lib/paddock.functions";
+import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 
@@ -76,6 +76,7 @@ function TimeMachine() {
   const getFn = useServerFn(adminGetTimeOffset);
   const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
+  const triggerCalFn = useServerFn(adminTriggerCalendarStale);
   const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
   const [days, setDays] = useState(0);
   useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
@@ -91,6 +92,11 @@ function TimeMachine() {
   const triggerMut = useMutation({
     mutationFn: () => triggerFn(),
     onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} rating notifications`),
+  });
+  const triggerCalMut = useMutation({
+    mutationFn: () => triggerCalFn(),
+    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} calendar-stale notifications`),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
   return (
@@ -129,6 +135,13 @@ function TimeMachine() {
           className="ml-auto inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
         >
           <Zap className="size-3" /> Emit rating notifications now
+        </button>
+        <button
+          onClick={() => triggerCalMut.mutate()}
+          disabled={triggerCalMut.isPending}
+          className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+        >
+          <Zap className="size-3" /> Emit calendar-stale notifications now
         </button>
       </div>
     </div>
