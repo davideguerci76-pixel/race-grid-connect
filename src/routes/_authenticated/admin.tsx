@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale, adminEmitContactChecks, adminEmitTeamGhostingReminders, adminReleaseGhostedEngagements } from "@/lib/paddock.functions";
+import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 
@@ -77,9 +77,6 @@ function TimeMachine() {
   const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
   const triggerCalFn = useServerFn(adminTriggerCalendarStale);
-  const contactCheckFn = useServerFn(adminEmitContactChecks);
-  const teamRemindFn = useServerFn(adminEmitTeamGhostingReminders);
-  const releaseGhostedFn = useServerFn(adminReleaseGhostedEngagements);
   const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
   const [days, setDays] = useState(0);
   useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
@@ -99,21 +96,6 @@ function TimeMachine() {
   const triggerCalMut = useMutation({
     mutationFn: () => triggerCalFn(),
     onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} calendar-stale notifications`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-  const contactCheckMut = useMutation({
-    mutationFn: () => contactCheckFn(),
-    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} contact-check notifications`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-  const teamRemindMut = useMutation({
-    mutationFn: () => teamRemindFn(),
-    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} team ghosting reminders`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
-  });
-  const releaseGhostedMut = useMutation({
-    mutationFn: () => releaseGhostedFn(),
-    onSuccess: (r: any) => toast.success(`Released ${r.released} ghosted engagements`),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
@@ -160,27 +142,6 @@ function TimeMachine() {
           className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
         >
           <Zap className="size-3" /> Emit calendar-stale notifications now
-        </button>
-        <button
-          onClick={() => contactCheckMut.mutate()}
-          disabled={contactCheckMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
-        >
-          <Zap className="size-3" /> Emit contact checks (day 3)
-        </button>
-        <button
-          onClick={() => teamRemindMut.mutate()}
-          disabled={teamRemindMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-        >
-          <Zap className="size-3" /> Emit team ghosting reminders (day 5 & 8)
-        </button>
-        <button
-          onClick={() => releaseGhostedMut.mutate()}
-          disabled={releaseGhostedMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-red bg-racing-red/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:brightness-110"
-        >
-          <Zap className="size-3" /> Release ghosted engagements (day 10)
         </button>
       </div>
     </div>

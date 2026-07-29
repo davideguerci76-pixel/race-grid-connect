@@ -347,33 +347,42 @@ function EngagementsPage() {
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
                 {(e.status === "confirmed" || e.status === "completed") && (
                   <div className="mt-4 border-t border-border pt-3">
-                    {/* Anti-ghosting contact check */}
-                    {e.status === "confirmed" && isFreelancer && e.contact_check_sent_at && e.freelancer_contacted == null && (
+                    {/* Anti-ghosting contact check — freelancer always has the button available
+                        for a confirmed engagement until they confirm the team reached out. */}
+                    {e.status === "confirmed" && isFreelancer && e.freelancer_contacted !== true && (
                       <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
                         <div className="label-mono text-racing-yellow">[HAS THE TEAM REACHED OUT?]</div>
-                        <p className="mt-1 text-xs">Contacts were shared. Did the team already get in touch with you about this match?</p>
+                        <p className="mt-1 text-xs">
+                          {e.contact_check_sent_at
+                            ? "It's been a few days since the match — did the team already contact you?"
+                            : "As soon as the team gets in touch, click below. If they don't, we'll automatically remind them and — if they keep ghosting — release the match so your calendar reopens."}
+                        </p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           <button
                             disabled={answerContactMut.isPending}
                             onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: true })}
                             className="bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
                           >
-                            Yes, they contacted me
+                            The team contacted me
                           </button>
-                          <button
-                            disabled={answerContactMut.isPending}
-                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
-                            className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
-                          >
-                            Not yet
-                          </button>
+                          {e.contact_check_sent_at && (
+                            <button
+                              disabled={answerContactMut.isPending}
+                              onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
+                              className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                            >
+                              Not yet
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
-                    {e.status === "confirmed" && !isFreelancer && e.freelancer_contacted === true && !e.team_confirmed_contact && (
+                    {e.status === "confirmed" && !isFreelancer && !e.team_confirmed_contact && (
                       <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
                         <div className="label-mono text-racing-yellow">[CONFIRM YOU'VE CONTACTED THE FREELANCER]</div>
-                        <p className="mt-1 text-xs">The freelancer confirmed you reached out. Confirm here to close the follow-up loop and stop reminder notifications.</p>
+                        <p className="mt-1 text-xs">
+                          Confirm here as soon as you reach out to the freelancer. If you don't, automatic reminders will be sent and — after the deadline — the match will be released and logged on your team profile.
+                        </p>
                         <button
                           disabled={teamConfirmMut.isPending}
                           onClick={() => teamConfirmMut.mutate(e.id)}
