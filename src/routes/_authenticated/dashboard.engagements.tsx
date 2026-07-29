@@ -270,6 +270,15 @@ function EngagementsPage() {
                   </span>
                 </div>
 
+                {e.cancellation_kind === "team_ghosting" && (
+                  <div className="mt-3 border border-racing-red bg-racing-red/10 p-3">
+                    <div className="label-mono text-racing-red">[TEAM DID NOT FOLLOW UP]</div>
+                    <p className="mt-1 text-xs">
+                      The team never confirmed contact after the match. The engagement was auto-released and your calendar days reopened. You can still leave a rating for the team below.
+                    </p>
+                  </div>
+                )}
+
                 {req && (
                   <div className="mt-3 border-t border-border pt-3">
                     <div className="label-mono mb-1">[REQUEST]</div>
