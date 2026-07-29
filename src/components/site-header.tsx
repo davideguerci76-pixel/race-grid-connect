@@ -40,12 +40,37 @@ export function SiteHeader() {
   });
 
   const getUnread = useServerFn(getUnreadNotificationCount);
+  const qc = useQueryClient();
   const { data: unread } = useQuery({
     queryKey: ["unread-notifications", user?.id],
     enabled: !!user,
     queryFn: async () => (await getUnread()).count,
-    refetchInterval: 30000,
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
   });
+
+  // Realtime: bump the badge the instant a notification is inserted for this user,
+  // even when the freelancer is not on the engagements page.
+  useEffect(() => {
+    if (!user?.id) return;
+    const ch = supabase
+      .channel(`notif-badge-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => qc.invalidateQueries({ queryKey: ["unread-notifications", user.id] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => qc.invalidateQueries({ queryKey: ["unread-notifications", user.id] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user?.id, qc]);
+
 
 
   async function handleSignOut() {
