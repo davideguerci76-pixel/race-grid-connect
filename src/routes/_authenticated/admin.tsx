@@ -77,6 +77,9 @@ function TimeMachine() {
   const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
   const triggerCalFn = useServerFn(adminTriggerCalendarStale);
+  const contactCheckFn = useServerFn(adminEmitContactChecks);
+  const teamRemindFn = useServerFn(adminEmitTeamGhostingReminders);
+  const releaseGhostedFn = useServerFn(adminReleaseGhostedEngagements);
   const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
   const [days, setDays] = useState(0);
   useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
@@ -96,6 +99,21 @@ function TimeMachine() {
   const triggerCalMut = useMutation({
     mutationFn: () => triggerCalFn(),
     onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} calendar-stale notifications`),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const contactCheckMut = useMutation({
+    mutationFn: () => contactCheckFn(),
+    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} contact-check notifications`),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const teamRemindMut = useMutation({
+    mutationFn: () => teamRemindFn(),
+    onSuccess: (r: any) => toast.success(`Emitted ${r.inserted} team ghosting reminders`),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const releaseGhostedMut = useMutation({
+    mutationFn: () => releaseGhostedFn(),
+    onSuccess: (r: any) => toast.success(`Released ${r.released} ghosted engagements`),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
