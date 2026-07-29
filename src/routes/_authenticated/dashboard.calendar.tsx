@@ -34,6 +34,8 @@ function CalendarPage() {
   const getAvail = useServerFn(getMyAvailability);
   const getBlocked = useServerFn(getMyBlockedDates);
   const setAvail = useServerFn(setAvailability);
+  const getFresh = useServerFn(getMyCalendarFreshness);
+  const confirmCal = useServerFn(confirmMyCalendar);
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -46,6 +48,25 @@ function CalendarPage() {
     enabled: !!user && profile?.user_type === "freelancer",
     queryFn: () => getBlocked(),
   });
+
+  const { data: freshness } = useQuery({
+    queryKey: ["my-calendar-freshness", user?.id],
+    enabled: !!user && profile?.user_type === "freelancer",
+    queryFn: () => getFresh(),
+  });
+
+  const confirmMut = useMutation({
+    mutationFn: () => confirmCal(),
+    onSuccess: () => {
+      toast.success(t("calendar.confirm_success", { defaultValue: "Availability confirmed. You keep top visibility in matches." }));
+      qc.invalidateQueries({ queryKey: ["my-calendar-freshness"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const lastUpdated = freshness?.calendar_last_updated_at ? new Date(freshness.calendar_last_updated_at) : null;
+  const daysSince = lastUpdated ? Math.floor((Date.now() - lastUpdated.getTime()) / 86400000) : null;
+  const freshTone = daysSince == null ? "text-muted-foreground" : daysSince < 30 ? "text-[#16a34a]" : daysSince < 90 ? "text-racing-yellow" : "text-racing-red";
 
   const blockedSet = new Set(blockedDays);
   const selectedDates = myDays
