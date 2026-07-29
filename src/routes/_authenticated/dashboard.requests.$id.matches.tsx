@@ -546,3 +546,73 @@ function formatCriterion(c: any): string {
     default: return c.kind ?? "criterion";
   }
 }
+
+function ZeroMatchTrivio({
+  quote,
+  hasPartials,
+  onWait,
+  onRefund,
+  onPartial,
+  loading,
+}: {
+  quote: { spent: number; hard_count: number; min_pct: number; drop_pct: number; refund_pct: number; refund_full: number; refund_partial: number };
+  hasPartials: boolean;
+  onWait: () => void;
+  onRefund: () => void;
+  onPartial: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="mt-6 border-2 border-racing-red bg-racing-red/5 p-5">
+      <div className="label-mono text-racing-red">[ZERO MATCHES — CHOOSE YOUR MOVE]</div>
+      <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Nothing matches your criteria — yet</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Refund quote: <span className="font-bold text-racing-yellow">{quote.refund_pct}%</span> of {quote.spent} token{quote.spent === 1 ? "" : "s"} spent
+        {" "}= <span className="font-bold text-racing-yellow">{quote.refund_full}</span> token{quote.refund_full === 1 ? "" : "s"}.
+        {" "}Based on {quote.hard_count} hard filter{quote.hard_count === 1 ? "" : "s"} (floor {quote.min_pct}%, −{quote.drop_pct}% per hard filter).
+      </p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="flex flex-col border border-border bg-card p-4">
+          <div className="label-mono">[OPTION 1]</div>
+          <div className="text-lg font-black uppercase italic">Keep searching</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            Leave the request live. As soon as a freelancer becomes 100% available, you're notified and the standard first-come-first-served flow resumes. No refund — the search is still alive.
+          </p>
+          <button onClick={onWait} className="mt-3 border border-racing-yellow px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10">
+            Keep waiting
+          </button>
+        </div>
+        <div className="flex flex-col border border-border bg-card p-4">
+          <div className="label-mono">[OPTION 2]</div>
+          <div className="text-lg font-black uppercase italic">Refund & close</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            Accept the {quote.refund_full}-token refund and archive this request as completed — unfilled. Final: no further changes.
+          </p>
+          <button
+            onClick={onRefund}
+            disabled={loading || quote.refund_full === 0}
+            className="mt-3 bg-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
+          >
+            Take {quote.refund_full} tk & close
+          </button>
+        </div>
+        <div className={`flex flex-col border p-4 ${hasPartials ? "border-border bg-card" : "border-border/40 bg-secondary/40 opacity-60"}`}>
+          <div className="label-mono">[OPTION 3]</div>
+          <div className="text-lg font-black uppercase italic">Unlock partials</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">
+            {hasPartials
+              ? `See freelancers available only for part of the dates now. Refund is halved to ${quote.refund_partial} token${quote.refund_partial === 1 ? "" : "s"}. Request stays open — if a full match later confirms, no extra refund.`
+              : "No partial candidates exist for this request yet."}
+          </p>
+          <button
+            onClick={onPartial}
+            disabled={loading || !hasPartials || quote.refund_partial === 0}
+            className="mt-3 border border-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
+          >
+            Take {quote.refund_partial} tk & unlock
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
