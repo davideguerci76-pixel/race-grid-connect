@@ -109,7 +109,36 @@ function CalendarPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
         <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.filter((d: string) => !blockedSet.has(d)).length })}</p>
 
-        <div className="mt-4 flex flex-wrap gap-4 font-mono text-[11px] uppercase tracking-widest">
+        <div className="mt-6 flex flex-wrap items-center gap-4 border border-border bg-card p-4">
+          <div className="flex-1 min-w-[220px]">
+            <div className="label-mono">[CALENDAR FRESHNESS]</div>
+            <div className={`mt-1 font-mono text-xs ${freshTone}`}>
+              {lastUpdated
+                ? t("calendar.last_confirmed", {
+                    defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}",
+                    days: daysSince,
+                    date: lastUpdated.toLocaleDateString(),
+                  })
+                : t("calendar.never_confirmed", { defaultValue: "Never confirmed yet" })}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {t("calendar.freshness_benefit", {
+                defaultValue: "Confirm regularly to keep top visibility in team matches.",
+              })}
+            </p>
+          </div>
+          <button
+            onClick={() => confirmMut.mutate()}
+            disabled={confirmMut.isPending}
+            className="bg-racing-yellow px-4 py-3 text-xs font-black uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-40"
+          >
+            {confirmMut.isPending
+              ? t("common.loading")
+              : t("calendar.confirm_button", { defaultValue: "I confirm my availability" })}
+          </button>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-4 font-mono text-[11px] uppercase tracking-widest">
           <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> Unavailable</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> Available</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> Engaged (locked)</span>
