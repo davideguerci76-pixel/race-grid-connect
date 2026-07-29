@@ -77,9 +77,6 @@ function TimeMachine() {
   const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
   const triggerCalFn = useServerFn(adminTriggerCalendarStale);
-  const contactCheckFn = useServerFn(adminEmitContactChecks);
-  const teamRemindFn = useServerFn(adminEmitTeamGhostingReminders);
-  const releaseGhostedFn = useServerFn(adminReleaseGhostedEngagements);
   const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
   const [days, setDays] = useState(0);
   useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
