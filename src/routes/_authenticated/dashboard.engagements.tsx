@@ -44,9 +44,11 @@ function EngagementsPage() {
   const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
   const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
-  useEffect(() => {
-    markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
-  }, [markRead, qc]);
+  // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
+  // would silently reset before the user has a chance to see it. Users click the
+  // "Mark all as read" button below when they've reviewed the list.
+  const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
+
 
   // Realtime: first-come-first-served. When another freelancer accepts a competing proposal,
   // the DB flips this user's proposed engagement to 'cancelled' and inserts a 'match_taken'
