@@ -44,9 +44,11 @@ function EngagementsPage() {
   const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
   const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
-  useEffect(() => {
-    markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
-  }, [markRead, qc]);
+  // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
+  // would silently reset before the user has a chance to see it. Users click the
+  // "Mark all as read" button below when they've reviewed the list.
+  const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
+
 
   // Realtime: first-come-first-served. When another freelancer accepts a competing proposal,
   // the DB flips this user's proposed engagement to 'cancelled' and inserts a 'match_taken'
@@ -153,8 +155,26 @@ function EngagementsPage() {
 
         {notifications.length > 0 && (
           <div className="mt-6 border border-border bg-card">
-            <div className="border-b border-border px-4 py-2 label-mono">[NOTIFICATIONS]</div>
+            <div className="flex items-center justify-between border-b border-border px-4 py-2">
+              <span className="label-mono">[NOTIFICATIONS]{unreadCount > 0 ? ` · ${unreadCount} UNREAD` : ""}</span>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => {
+                    markRead()
+                      .then(() => {
+                        qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+                        qc.invalidateQueries({ queryKey: ["my-notifications"] });
+                      })
+                      .catch(() => {});
+                  }}
+                  className="border border-border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
             <ul className="divide-y divide-border">
+
               {(notifications as any[]).slice(0, 15).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
