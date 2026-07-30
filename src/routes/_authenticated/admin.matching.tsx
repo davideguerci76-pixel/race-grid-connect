@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/admin/matching")({
 });
 
 const FIELDS: { key: string; label: string; hint: string }[] = [
-  { key: "role_weight", label: "Role", hint: "Exact role match" },
+  { key: "role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
   { key: "skills_weight", label: "Skills", hint: "Requested skills possessed" },
   { key: "disciplines_weight", label: "Disciplines & Experience", hint: "Championship / discipline overlap" },
   { key: "day_rate_weight", label: "Day rate (EUR)", hint: "Rate vs budget" },
@@ -57,7 +57,7 @@ function AdminMatchingPage() {
     <div>
       <h2 className="mb-2 text-xl font-bold">Matching weights</h2>
       <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
-        Percentages that determine the match score. Hard filters (role hard, skills hard, dates, travel, hard languages, hard experience) still exclude non-matching candidates regardless of these weights. Weights must sum to <span className="font-bold">100</span>.
+        Percentages that determine the match score. Hard filters (macro-role, hard sub-role, skills hard, dates, travel, hard languages, hard experience) still exclude non-matching candidates regardless of these weights. Weights must sum to <span className="font-bold">100</span>.
       </p>
 
       <div className="max-w-2xl grid gap-3">

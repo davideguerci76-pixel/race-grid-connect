@@ -29,16 +29,16 @@ function AdminFreelancers() {
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
     return (data ?? []).filter((r: any) => {
-      if (role && r.freelancer?.role !== role) return false;
+      if (role && r.freelancer?.role_group !== role) return false;
       if (!s) return true;
-      return [r.display_name, r.email, r.freelancer?.role, r.freelancer?.location, ...(r.freelancer?.skills ?? [])]
+      return [r.display_name, r.email, r.freelancer?.role_group, r.freelancer?.location, ...(r.freelancer?.skills ?? [])]
         .filter(Boolean)
         .some((v: string) => String(v).toLowerCase().includes(s));
     });
   }, [data, q, role]);
 
   const roles = useMemo(
-    () => Array.from(new Set((data ?? []).map((r: any) => r.freelancer?.role).filter(Boolean))).sort(),
+    () => Array.from(new Set((data ?? []).map((r: any) => r.freelancer?.role_group).filter(Boolean))).sort(),
     [data],
   );
 
@@ -100,7 +100,7 @@ function AdminFreelancers() {
             exportToExcel("freelancers", "Freelancers", rows.map((r: any) => ({
               Name: r.display_name,
               Email: r.email ?? "",
-              Role: r.freelancer?.role ?? "",
+              Role: r.freelancer?.role_group ?? "",
               Disciplines: (r.freelancer?.disciplines ?? []).join(", "),
               Skills: (r.freelancer?.skills ?? []).join(", "),
               Languages: (r.freelancer?.languages ?? []).map((l: any) => `${l.code === "other" ? (l.custom || "Other") : l.code}(${l.level})`).join(", "),
@@ -129,7 +129,7 @@ function AdminFreelancers() {
               <tr>
                 <Th onClick={() => toggle("display_name")} label={`Name${indicator("display_name")}`} />
                 <Th onClick={() => toggle("email")} label={`Email${indicator("email")}`} />
-                <Th onClick={() => toggle("freelancer.role")} label={`Role${indicator("freelancer.role")}`} />
+                <Th onClick={() => toggle("freelancer.role_group")} label={`Macro-role${indicator("freelancer.role_group")}`} />
                 <Th onClick={() => toggle("freelancer.disciplines")} label={`Disciplines${indicator("freelancer.disciplines")}`} />
                 <Th onClick={() => toggle("freelancer.skills")} label={`Skills${indicator("freelancer.skills")}`} />
                 <Th onClick={() => toggle("freelancer.languages")} label={`Languages${indicator("freelancer.languages")}`} />
@@ -146,7 +146,7 @@ function AdminFreelancers() {
                 <tr key={r.id} className="border-t border-border/60 hover:bg-secondary/40">
                   <td className="px-2 py-2">{r.display_name}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.email}</td>
-                  <td className="px-2 py-2">{r.freelancer?.role ?? "—"}</td>
+                  <td className="px-2 py-2">{r.freelancer?.role_group ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.disciplines ?? []).join(", ")}</td>
                   <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.skills ?? []).slice(0, 5).join(", ")}{(r.freelancer?.skills ?? []).length > 5 ? "…" : ""}</td>
                   <td className="px-2 py-2 text-muted-foreground">{(r.freelancer?.languages ?? []).map((l: any) => `${l.code === "other" ? (l.custom || "Other") : l.code}(${l.level?.[0] ?? "?"})`).join(", ")}</td>
