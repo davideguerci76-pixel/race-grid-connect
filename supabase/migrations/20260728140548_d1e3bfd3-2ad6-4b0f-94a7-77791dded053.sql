@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.team_cancellation_stats(uuid) FROM anon, PUBLIC;
