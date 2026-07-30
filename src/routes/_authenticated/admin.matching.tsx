@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/admin/matching")({
 });
 
 const FIELDS: { key: string; label: string; hint: string }[] = [
-  { key: "role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
+  { key: "sub_role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
   { key: "skills_weight", label: "Skills", hint: "Requested skills possessed" },
   { key: "disciplines_weight", label: "Disciplines & Experience", hint: "Championship / discipline overlap" },
   { key: "day_rate_weight", label: "Day rate (EUR)", hint: "Rate vs budget" },
@@ -27,19 +27,25 @@ function AdminMatchingPage() {
 
   const { data } = useQuery({ queryKey: ["matching-weights"], queryFn: () => load() });
   const [values, setValues] = useState<Record<string, number>>({});
+  // Seniority multipliers, edited as factors (0..1), stored as percentages
+  const [factorX, setFactorX] = useState(0.5);
+  const [factorY, setFactorY] = useState(0.25);
 
   useEffect(() => {
     if (data) {
+      const d = data as any;
       setValues({
-        role_weight: Number(data.role_weight),
-        skills_weight: Number(data.skills_weight),
-        disciplines_weight: Number(data.disciplines_weight),
-        day_rate_weight: Number(data.day_rate_weight),
-        languages_weight: Number(data.languages_weight),
-        education_weight: Number(data.education_weight),
-        location_weight: Number(data.location_weight),
-        calendar_freshness_weight: Number((data as any).calendar_freshness_weight ?? 0),
+        sub_role_weight: Number(d.sub_role_weight ?? d.role_weight ?? 0),
+        skills_weight: Number(d.skills_weight),
+        disciplines_weight: Number(d.disciplines_weight),
+        day_rate_weight: Number(d.day_rate_weight),
+        languages_weight: Number(d.languages_weight),
+        education_weight: Number(d.education_weight),
+        location_weight: Number(d.location_weight),
+        calendar_freshness_weight: Number(d.calendar_freshness_weight ?? 0),
       });
+      setFactorX(Number(d.level_one_below_pct ?? 50) / 100);
+      setFactorY(Number(d.level_two_below_pct ?? 25) / 100);
     }
   }, [data]);
 
@@ -47,7 +53,14 @@ function AdminMatchingPage() {
   const validSum = Math.abs(total - 100) < 0.01;
 
   const mut = useMutation({
-    mutationFn: () => save({ data: values as any }),
+    mutationFn: () =>
+      save({
+        data: {
+          ...values,
+          level_one_below_pct: Math.max(0, Math.min(100, factorX * 100)),
+          level_two_below_pct: Math.max(0, Math.min(100, factorY * 100)),
+        } as any,
+      }),
     onSuccess: () => {
       toast.success("Weights saved and matches recomputed");
       qc.invalidateQueries({ queryKey: ["matching-weights"] });
@@ -64,24 +77,61 @@ function AdminMatchingPage() {
 
       <div className="max-w-2xl grid gap-3">
         {FIELDS.map((f) => (
-          <label key={f.key} className="flex items-center justify-between gap-4 border border-border bg-card p-3">
-            <div>
-              <div className="font-bold">{f.label}</div>
-              <div className="font-mono text-[11px] uppercase text-muted-foreground">{f.hint}</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                step="0.5"
-                min={0}
-                max={100}
-                value={values[f.key] ?? 0}
-                onChange={(e) => setValues((v) => ({ ...v, [f.key]: parseFloat(e.target.value) || 0 }))}
-                className="w-24 border border-border bg-background px-3 py-2 text-right font-mono text-sm"
-              />
-              <span className="font-mono text-xs">%</span>
-            </div>
-          </label>
+          <div key={f.key}>
+            <label className="flex items-center justify-between gap-4 border border-border bg-card p-3">
+              <div>
+                <div className="font-bold">{f.label}</div>
+                <div className="font-mono text-[11px] uppercase text-muted-foreground">{f.hint}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="0.5"
+                  min={0}
+                  max={100}
+                  value={values[f.key] ?? 0}
+                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: parseFloat(e.target.value) || 0 }))}
+                  className="w-24 border border-border bg-background px-3 py-2 text-right font-mono text-sm"
+                />
+                <span className="font-mono text-xs">%</span>
+              </div>
+            </label>
+
+            {f.key === "sub_role_weight" && (
+              <div className="ml-4 border-l-2 border-racing-red/40 pl-4 pt-3 grid gap-3">
+                <p className="font-mono text-[11px] uppercase text-muted-foreground">
+                  Seniority multipliers — same level or over-qualified = full weight
+                </p>
+                {[
+                  { label: "Factor X — 1 level below", hint: "e.g. Intermediate required, Junior profile", value: factorX, set: setFactorX },
+                  { label: "Factor Y — 2 levels below", hint: "e.g. Senior required, Junior profile", value: factorY, set: setFactorY },
+                ].map((m) => (
+                  <label key={m.label} className="flex items-center justify-between gap-4 border border-border bg-card p-3">
+                    <div>
+                      <div className="font-bold">{m.label}</div>
+                      <div className="font-mono text-[11px] uppercase text-muted-foreground">{m.hint}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        step="0.05"
+                        min={0}
+                        max={1}
+                        value={m.value}
+                        onChange={(e) => m.set(Math.max(0, Math.min(1, parseFloat(e.target.value) || 0)))}
+                        className="w-24 border border-border bg-background px-3 py-2 text-right font-mono text-sm"
+                      />
+                      <span className="font-mono text-xs">×</span>
+                    </div>
+                  </label>
+                ))}
+                <div className="font-mono text-[11px] text-muted-foreground">
+                  Effective: {(((values.sub_role_weight ?? 0) * factorX)).toFixed(2)}% (1 below) ·{" "}
+                  {(((values.sub_role_weight ?? 0) * factorY)).toFixed(2)}% (2 below)
+                </div>
+              </div>
+            )}
+          </div>
         ))}
 
         <div className={`flex items-center justify-between border p-3 font-mono text-sm ${validSum ? "border-racing-yellow bg-racing-yellow/10 text-racing-yellow" : "border-racing-red bg-racing-red/10 text-racing-red"}`}>
