@@ -110,6 +110,7 @@ function NewRequestPage() {
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
   const [locationCoords, setLocationCoords] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
+  const [locationDetails, setLocationDetails] = useState<{ city: string | null; region: string | null; country: string | null; placeId: string | null }>({ city: null, region: null, country: null, placeId: null });
   const [locRelevance, setLocRelevance] = useState<LocRelevance>("not_relevant");
   const [locAnchor, setLocAnchor] = useState<LocAnchor>("this");
   const [locRadius, setLocRadius] = useState<string>("100");
@@ -141,6 +142,7 @@ function NewRequestPage() {
     setExperienceReqs(Array.isArray(s.experience_requirements) ? s.experience_requirements : []);
     setLanguageReqs(Array.isArray(s.languages) ? s.languages : []);
     setLocationCoords({ lat: s.location_lat ?? null, lng: s.location_lng ?? null });
+    setLocationDetails({ city: s.location_city ?? null, region: s.location_region ?? null, country: s.location_country ?? null, placeId: s.location_place_id ?? null });
     setLocRelevance((s.location_relevance as LocRelevance) ?? "not_relevant");
     setLocAnchor((s.location_anchor as LocAnchor) ?? "this");
     setLocRadius(s.location_radius_km == null ? "any" : String(s.location_radius_km));
@@ -198,6 +200,10 @@ function NewRequestPage() {
           ...(identical && from ? { repost_of: from } : {}),
           location_lat: locationCoords.lat,
           location_lng: locationCoords.lng,
+          location_city: locationDetails.city,
+          location_region: locationDetails.region,
+          location_country: locationDetails.country,
+          location_place_id: locationDetails.placeId,
           location_relevance: locRelevance,
           location_anchor: locAnchor,
           location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
@@ -340,10 +346,15 @@ function NewRequestPage() {
             <label className="label-mono">Location / Circuit</label>
             <LocationAutocomplete
               value={form.location}
-              onChange={(v) => { setForm({ ...form, location: v, circuit: v }); }}
+              onChange={(v) => {
+                setForm({ ...form, location: v, circuit: v });
+                setLocationCoords({ lat: null, lng: null });
+                setLocationDetails({ city: null, region: null, country: null, placeId: null });
+              }}
               onPick={(p) => {
                 setForm({ ...form, location: p.text, circuit: p.text });
                 setLocationCoords({ lat: p.lat, lng: p.lng });
+                setLocationDetails({ city: p.city, region: p.region, country: p.country, placeId: p.placeId });
               }}
               placeholder="City, circuit or country"
               className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
