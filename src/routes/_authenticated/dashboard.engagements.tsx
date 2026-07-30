@@ -9,7 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement, getMyNotifications, freelancerAnswerContact, teamConfirmContact } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact } from "@/lib/paddock.functions";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,12 +27,9 @@ function EngagementsPage() {
   const completeFn = useServerFn(markEngagementComplete);
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
-  const markRead = useServerFn(markAllNotificationsRead);
-  const notifsFn = useServerFn(getMyNotifications);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
   const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
-  const { data: notifications = [] } = useQuery({ queryKey: ["my-notifications", user?.id], enabled: !!user?.id, queryFn: () => notifsFn() });
   const { data: myRatedIds = [] } = useQuery({
     queryKey: ["my-rated-engagement-ids", user?.id],
     enabled: !!user?.id,
@@ -48,7 +45,6 @@ function EngagementsPage() {
   // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
   // would silently reset before the user has a chance to see it. Users click the
   // "Mark all as read" button below when they've reviewed the list.
-  const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
 
 
   // Realtime: first-come-first-served. When another freelancer accepts a competing proposal,
