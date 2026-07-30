@@ -1,14 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-
+import { useState } from "react";
 import { Menu, X, Bell } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
 import { getUnreadNotificationCount } from "@/lib/paddock.functions";
 
@@ -40,37 +39,12 @@ export function SiteHeader() {
   });
 
   const getUnread = useServerFn(getUnreadNotificationCount);
-  const qc = useQueryClient();
   const { data: unread } = useQuery({
     queryKey: ["unread-notifications", user?.id],
     enabled: !!user,
     queryFn: async () => (await getUnread()).count,
-    refetchInterval: 15000,
-    refetchOnWindowFocus: true,
+    refetchInterval: 30000,
   });
-
-  // Realtime: bump the badge the instant a notification is inserted for this user,
-  // even when the freelancer is not on the engagements page.
-  useEffect(() => {
-    if (!user?.id) return;
-    const ch = supabase
-      .channel(`notif-badge-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        () => qc.invalidateQueries({ queryKey: ["unread-notifications", user.id] }),
-      )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        () => qc.invalidateQueries({ queryKey: ["unread-notifications", user.id] }),
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
-  }, [user?.id, qc]);
-
 
 
   async function handleSignOut() {

@@ -49,18 +49,14 @@ async function loadPlaces(): Promise<any> {
   return await w.google.maps.importLibrary("places");
 }
 
-export type LocationPick = { text: string; lat: number | null; lng: number | null };
-
 export function LocationAutocomplete({
   value,
   onChange,
-  onPick,
   placeholder = "City, Country",
   className,
 }: {
   value: string;
   onChange: (v: string) => void;
-  onPick?: (p: LocationPick) => void;
   placeholder?: string;
   className?: string;
 }) {
@@ -121,25 +117,11 @@ export function LocationAutocomplete({
     }, 200);
   };
 
-  const pick = async (s: { text: string; placeId: string }) => {
+  const pick = (s: { text: string; placeId: string }) => {
     setInput(s.text);
     onChange(s.text);
     setOpen(false);
     const places = placesRef.current;
-    let lat: number | null = null;
-    let lng: number | null = null;
-    if (places && onPick) {
-      try {
-        const place = new places.Place({ id: s.placeId });
-        await place.fetchFields({ fields: ["location"] });
-        const loc = (place as any).location;
-        if (loc) {
-          lat = typeof loc.lat === "function" ? loc.lat() : loc.lat;
-          lng = typeof loc.lng === "function" ? loc.lng() : loc.lng;
-        }
-      } catch { /* ignore */ }
-    }
-    onPick?.({ text: s.text, lat, lng });
     if (places) sessionRef.current = new places.AutocompleteSessionToken();
   };
 

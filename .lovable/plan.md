@@ -1,58 +1,52 @@
-# Anti-Ghosting Team → Freelance
+## Goal
+Add an **Education** category to freelancer profiles (single-select, multi-language) and add **"Others"** to the Disciplines / Championships list.
 
-## Timing (configurabile in Admin → Tokens/Settings, tutti in giorni `sim_now()`)
-- `ghosting_freelance_check_days` = **3** — dopo tanti giorni dalla conferma match, chiedo al freelance "il team ti ha contattato?"
-- `ghosting_team_reminder1_days` = **5** — se il freelance ha risposto NO, primo sollecito collaborativo al team
-- `ghosting_team_reminder2_days` = **8** — secondo sollecito al team ("il match verrà liberato se non confermato")
-- `ghosting_deadline_days` = **10** — se ancora nulla, rilascio automatico + rating unilaterale abilitato per il freelance
+## Scope
 
-Se il freelance risponde YES o il team clicca "Confermo il contatto" in qualsiasi momento → sequenza chiusa, nessun altro sollecito.
+### 1. New taxonomy: Education levels
+Add to `src/lib/paddock.ts`:
+- `EDUCATION_OPTIONS: Option[]` covering (from lowest to highest):
+  - `middle_school` — Middle School / Secondary
+  - `high_school` — High School Diploma
+  - `vocational_motorsport` — Vocational Motorsport School (e.g. ACI Sport, Skip Barber, National Motorsport Academy short courses)
+  - `technical_diploma` — Technical / Mechanical Diploma (ITS, Perito Meccanico, etc.)
+  - `bachelor_equivalent` — Bachelor Equivalent (self-declared experience equal to a bachelor's)
+  - `bachelor` — Bachelor's Degree
+  - `master` — Master's Degree
+  - `master_motorsport` — Master's Degree in Motorsport Engineering (Cranfield, Oxford Brookes, Bologna, UPM, etc.)
+  - `phd` — PhD / Doctorate
+  - `other` — Other
+- `educationLabel()` helper mirroring `roleLabel` / `skillLabel`.
 
-## 1. Schema (`engagements` + nuove enum notif)
-Colonne aggiunte a `engagements`:
-- `freelancer_contacted` boolean, `freelancer_contacted_at` timestamptz
-- `team_confirmed_contact` boolean, `team_confirmed_contact_at` timestamptz
-- `contact_check_sent_at`, `team_reminder1_sent_at`, `team_reminder2_sent_at`, `ghosting_released_at` timestamptz
-- `cancellation_kind` accetta il nuovo valore `team_ghosting`
+### 2. Add "Others" to Disciplines
+Append `{ value: "other", label: "Other / Not listed" }` to `DISCIPLINE_OPTIONS`.
 
-Nuovi `notif_kind`:
-- `contact_check` (→ freelance, con SI/NO)
-- `team_contact_reminder_1`, `team_contact_reminder_2` (→ team, con CTA "Ho contattato il freelance")
-- `ghosting_released` (→ freelance, con CTA "Lascia una recensione al team")
-- `team_ghosted` (→ team, notifica di rilascio e blocco reputazionale)
+### 3. Database
+Migration:
+- `ALTER TABLE public.freelancer_profiles ADD COLUMN education text NULL;`
+- No enum (kept as free text with app-side whitelist, same pattern as roles/skills which are already loose strings). No RLS change needed — inherits existing policies.
+- Regenerated types will expose the new column afterwards.
 
-## 2. Funzioni DB (SECURITY DEFINER, usano `sim_now()`)
-- `freelancer_answer_contact(_engagement_id, _contacted boolean)` — freelance risponde SI/NO. Se SI → chiude la sequenza. Se NO → nessun cambio di stato, semplicemente registrato.
-- `team_confirm_contact(_engagement_id)` — team dichiara di aver contattato → sequenza chiusa (`team_confirmed_contact=true`).
-- `emit_contact_checks()` — inserisce `contact_check` per engagements `confirmed` con `confirmed_at ≤ sim_now() - N gg` e nessun contact_check già inviato.
-- `emit_team_ghosting_reminders()` — invia reminder 1 / reminder 2 secondo soglie, solo se `freelancer_contacted = false` e `team_confirmed_contact` è NULL.
-- `release_ghosted_engagements()` — alla deadline, se ancora ghosting: `status='cancelled'`, `cancellation_kind='team_ghosting'`, `cancelled_by=team_id`, `ghosting_released_at=now()`, notifica `ghosting_released` al freelance + `team_ghosted` al team. Le date tornano verdi perché il calendario blocca solo status `confirmed` o cancellazioni "late" (regola già esistente): `team_ghosting` non è nella lista bloccante.
-- `submit_rating_v2` esteso: consente rating anche se `status='cancelled' AND cancellation_kind='team_ghosting'`, purché sia il freelance a scrivere e verso il team. La regola double-blind non si applica al rating unilaterale (esce subito visibile, `unlocked_at=now()`).
+### 4. UI wiring
+- **`src/routes/_authenticated/dashboard.profile.tsx`** (freelancer form): add an Education `<select>` after Skills, bound to the new column. Save via existing `updateFreelancerProfile` server function.
+- **`src/lib/paddock.functions.ts`**: extend the freelancer update payload validator + update statement to include `education`.
+- **`src/routes/freelancers.$id.tsx`**: show Education line in the header block (e.g. "Bachelor's Degree" below role/location).
+- **`src/routes/freelancers.index.tsx`**: no filter for now (keep scope tight — can add later if needed).
 
-Grants coerenti con lo standard esistente: revoke da `anon`/`PUBLIC`, execute a `authenticated` per le due RPC "azione utente"; nessun grant pubblico per le funzioni cron `emit_*` / `release_*` (le chiama solo l'admin via Time Machine o pg_cron).
+### 5. i18n
+Add the new strings to all 5 locales (`en`, `it`, `es`, `fr`, `de`) under:
+- `education.label` — section title ("Education", "Titolo di studio", "Formación", "Formation", "Ausbildung")
+- `education.placeholder` — "Select your education"
+- `education.options.*` — one key per education value above
+- `discipline.other` — "Other / Not listed" translation
 
-## 3. UI Freelance — `dashboard.engagements.tsx`
-- Card di ogni engagement `confirmed`: nuovo pulsante permanente **"The team contacted me"** (verde, in cima).
-- Inbox notifications: quando arriva `contact_check`, la card mostra domanda + due bottoni **Yes** / **No, not yet**.
-- Card di engagement `cancelled` con `cancellation_kind='team_ghosting'`: banner rosso "The team ghosted you" + CTA **"Leave a unilateral rating"** → apre il modal rating esistente pre-compilato verso il team.
+The taxonomy file keeps English labels as fallback; the profile/detail views will prefer the translated key `education.options.<value>` when available (same pattern isn't currently used for roles/disciplines, so to stay consistent we'll render via the English label from `EDUCATION_OPTIONS` for now, and only translate the section title + placeholder). Confirm before I widen translation to all option labels.
 
-## 4. UI Team — `dashboard.engagements.tsx`
-- Card di engagement `confirmed` non ancora confermato: pulsante **"I contacted the freelancer"**.
-- Notifiche `team_contact_reminder_1` / `_2` renderizzate con testo dedicato e stessa CTA.
-- Notifica `team_ghosted` renderizzata come warning "Match released — leave open the calendar so it doesn't happen again".
+## Out of scope
+- Matching logic changes (Education won't influence match score).
+- Team profile / requests (education is a freelancer attribute only).
+- Filtering freelancers by education on the directory.
 
-## 5. Admin Time Machine (`admin.tsx`)
-Tre nuovi bottoni oltre a quelli esistenti:
-- Emit contact checks now
-- Emit team ghosting reminders now
-- Release ghosted engagements now
-
-Ognuno chiama la rispettiva RPC via nuova serverFn in `paddock.functions.ts` (`adminEmitContactChecks`, `adminEmitTeamReminders`, `adminReleaseGhosted`) protette da `requireSupabaseAuth` + check `has_role('admin')`.
-
-## 6. Platform Wiki (`admin.wiki.tsx`)
-Nuova sezione **Anti-Ghosting** che riassume timeline (3 → 5 → 8 → 10 giorni), attori, esito e impatto reputazionale.
-
-## Note tecniche
-- Uso `sim_now()` ovunque per compatibilità Time Machine.
-- Il calendario del freelance già rappresenta "engaged" solo se `status='confirmed'` o cancellazioni penalty; `team_ghosting` non blocca ⇒ ritorno automatico a verde senza ulteriore lavoro sull'UI calendario.
-- I costi/timing sono in `platform_settings` per essere modificati live dall'admin senza migration.
+## Technical notes
+- No new enum type → future additions don't require a migration.
+- Legacy rows get `education = NULL`; UI shows "—".

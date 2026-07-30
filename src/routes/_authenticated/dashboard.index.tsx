@@ -1,15 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { toast } from "sonner";
-import { Calendar, Coins, Star, Users, User, Briefcase, Flame } from "lucide-react";
+import { Calendar, Coins, Star, Users, User, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -90,21 +87,6 @@ function DashboardHome() {
   });
 
 
-  const isFreelancer = profile?.user_type === "freelancer";
-  const listSos = useServerFn(getMyOpenSosCalls);
-  const acceptSos = useServerFn(acceptSosCall);
-  const { data: sosCalls = [] } = useQuery({
-    queryKey: ["open-sos", user?.id],
-    enabled: !!user && isFreelancer,
-    queryFn: () => listSos(),
-    refetchInterval: 30_000,
-  });
-  const sosMut = useMutation({
-    mutationFn: (sos_id: string) => acceptSos({ data: { sos_id } }),
-    onSuccess: () => { toast.success("Match locked in. Contacts unlocked."); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "SOS accept failed"),
-  });
-
   const isTeam = profile?.user_type === "team";
 
   return (
@@ -122,32 +104,6 @@ function DashboardHome() {
             </div>
             <span className="font-mono text-xs text-racing-red">{t("dashboard.new_matches_pill", { count: matchesCount })} →</span>
           </Link>
-        )}
-
-        {isFreelancer && (sosCalls as any[]).length > 0 && (
-          <div className="mt-6 space-y-2">
-            {(sosCalls as any[]).map((s) => (
-              <div key={s.sos_id} className="flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-racing-red">
-                    <Flame className="size-4" /> [SOS CALL — {Math.round(s.skills_score)}% affinity]
-                  </div>
-                  <div className="mt-1 text-lg font-bold">{s.request?.title ?? "Emergency job"}</div>
-                  <div className="font-mono text-[11px] uppercase text-muted-foreground">
-                    {s.team?.team_name ?? "Team"} · {s.request?.start_date}
-                    {s.distance_km != null ? ` · ${Math.round(s.distance_km)} km` : ""}
-                  </div>
-                </div>
-                <button
-                  onClick={() => { if (confirm("Accept this SOS Call? First to accept wins — this locks the match immediately.")) sosMut.mutate(s.sos_id); }}
-                  disabled={sosMut.isPending}
-                  className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-                >
-                  Accept SOS
-                </button>
-              </div>
-            ))}
-          </div>
         )}
 
         <div className="mt-8 grid gap-4 md:grid-cols-5">

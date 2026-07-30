@@ -1,19 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, confirmEngagement } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
-import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
-import { CalendarQuickButtons } from "@/components/match-quick-actions";
+import { initialsFor } from "@/lib/paddock";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
 });
-
 
 function formatCriterion(c: any): string {
   switch (c.kind) {
@@ -53,28 +53,21 @@ function MissingCriteria({ list }: { list: any[] }) {
 function MatchesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
   const acceptFn = useServerFn(confirmEngagement);
-  const getRequests = useServerFn(getMyRequests);
-  const getEngs = useServerFn(getMyEngagements);
 
   const { data } = useQuery({ queryKey: ["matches"], queryFn: () => getMatches() });
   const matches = data?.matches ?? [];
   const isFreelancer = data?.userType === "freelancer";
-  const isTeam = data?.userType === "team";
 
-  const { data: teamRequests = [] } = useQuery({
-    queryKey: ["my-requests-summary"],
-    enabled: isTeam,
-    queryFn: () => getRequests(),
-  });
-  const { data: teamEngs = [] } = useQuery({
-    queryKey: ["engagements"],
-    enabled: isTeam,
-    queryFn: () => getEngs(),
-  });
-
+  // Teams manage their matches per-request from the Requests dashboard.
+  useEffect(() => {
+    if (data && data.userType === "team") {
+      navigate({ to: "/dashboard/requests", replace: true });
+    }
+  }, [data, navigate]);
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
@@ -89,62 +82,6 @@ function MatchesPage() {
 
   });
 
-  if (isTeam) {
-    const confirmedByReq = new Map<string, any>();
-    for (const e of teamEngs as any[]) {
-      if (e.status === "confirmed" || e.status === "completed") confirmedByReq.set(e.request_id ?? e.request?.id, e);
-    }
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <SiteHeader />
-        <div className="container-page py-12">
-          <div className="label-mono">[MATCHES]</div>
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">History and status of matches across all your requests.</p>
-
-          {teamRequests.length === 0 ? (
-            <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">{t("matches.empty_team")}</div>
-          ) : (
-            <div className="mt-8 grid gap-3">
-              {teamRequests.map((r: any) => {
-                const eng = confirmedByReq.get(r.id);
-                return (
-                  <Link
-                    key={r.id}
-                    to="/dashboard/requests/$id/matches"
-                    params={{ id: r.id }}
-                    className={`block border p-5 transition-colors hover:border-racing-red ${eng ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">{r.status}</span>
-                          <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
-                        </div>
-                        <div className="mt-1 text-lg font-bold">{r.title}</div>
-                        <div className="mt-1 font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}</div>
-                        {eng && (
-                          <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                            Confirmed match: {eng.freelancer?.display_name ?? "Freelancer"}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <div className="font-mono text-[11px] uppercase text-muted-foreground">Matches</div>
-                        <div className="text-2xl font-black text-racing-red">{eng ? 1 : (r.matches_count ?? 0)}</div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-        <SiteFooter />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -155,7 +92,6 @@ function MatchesPage() {
           {t("matches.counts_banner", { count: matches.length, who: isFreelancer ? t("nav.teams") : t("nav.freelancers") })}
         </p>
 
-
         {matches.length === 0 ? (
           <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">
             {isFreelancer ? t("matches.empty") : t("matches.empty_team")}
@@ -163,27 +99,24 @@ function MatchesPage() {
         ) : (
           <div className="mt-8 grid gap-3">
             {matches.map((m: any) => {
+              const counterparty = isFreelancer ? m.team : m.freelancer;
               const cp = m.counterparty;
               const pct = Math.round(Number(m.match_score ?? 0));
               const perfect = m.is_perfect;
-              const isConfirmed = !!m.isConfirmed;
-              const matchTaken = !!m.matchTaken;
-              const showName = isConfirmed;
+              const requestFilled = m.request?.status === "filled";
               return (
                 <div key={m.id} className={`grid gap-4 border p-5 md:grid-cols-[1fr,auto] md:items-start ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                   <div className="flex items-start gap-4">
-                    <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${showName ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
-                      {showName
-                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : "?"))
-                        : <Lock className="size-4" />}
+                    <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${m.revealedByMe ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
+                      {m.revealedByMe ? initialsFor((isFreelancer ? cp?.team_name : counterparty?.display_name) ?? counterparty?.display_name ?? "?") : <Lock className="size-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
                         {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
                       </div>
                       <div className="mt-1 text-lg font-bold">
-                        {showName
-                          ? (isFreelancer ? (cp?.team_name ?? "Team") : "Freelancer")
+                        {m.revealedByMe
+                          ? (isFreelancer ? (cp?.team_name ?? counterparty?.display_name) : (counterparty?.display_name))
                           : t("matches.hidden_name")}
                       </div>
                       {m.revealedByMe && cp && (
@@ -192,12 +125,12 @@ function MatchesPage() {
                             <>
                               {cp.team_type && <div><span className="text-muted-foreground">Type:</span> <span className="font-medium">{cp.team_type}</span></div>}
                               {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
+                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
+                              {cp.website && <div><span className="text-muted-foreground">Website:</span> <a href={cp.website} target="_blank" rel="noopener" className="font-medium text-racing-red hover:underline">{cp.website}</a></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
-                              {!isConfirmed && (
-                                <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                                  Team name is revealed only after you confirm the match.
-                                </div>
-                              )}
+                              <div className="mt-2">
+                                <a href={`/teams/${m.team_id}?req=${m.request?.id ?? ""}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View team profile →</a>
+                              </div>
                             </>
                           ) : (
                             <>
@@ -205,12 +138,11 @@ function MatchesPage() {
                               {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
                               {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">Day rate:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
                               {cp.travels !== null && <div><span className="text-muted-foreground">Travels:</span> <span className="font-medium">{cp.travels ? "Yes" : "No"}</span></div>}
+                              {cp.contact_email && <div><span className="text-muted-foreground">Contact:</span> <a href={`mailto:${cp.contact_email}`} className="font-medium text-racing-red hover:underline">{cp.contact_email}</a></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
-                              {!isConfirmed && (
-                                <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                                  Name and contacts are revealed only after the freelancer confirms the match.
-                                </div>
-                              )}
+                              <div className="mt-2">
+                                <a href={`/freelancers/${m.freelancer_id}`} className="inline-block border border-racing-red px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10">View full profile →</a>
+                              </div>
                             </>
                           )}
                         </div>
@@ -221,20 +153,6 @@ function MatchesPage() {
                         {m.request?.start_date} → {m.request?.end_date} · {t(`role.${m.request?.role}`)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">Overlap: {m.overlap_days} day(s)</div>
-                      {isConfirmed && m.request?.start_date && m.request?.end_date && (
-                        <div className="mt-3 border-t border-racing-yellow/30 pt-3">
-                          <div className="label-mono mb-2 text-racing-yellow">[ADD TO CALENDAR]</div>
-                          <CalendarQuickButtons
-                            event={{
-                              title: `Match — ${m.request?.title ?? "PaddockMatch"}`,
-                              startDate: m.request.start_date,
-                              endDate: m.request.end_date,
-                              location: m.request?.location ?? m.request?.circuit ?? null,
-                              description: m.request?.notes ?? "",
-                            }}
-                          />
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-stretch gap-2">
@@ -245,16 +163,16 @@ function MatchesPage() {
                     ) : (
                       <button
                         onClick={() => { if (confirm(t("matches.reveal_confirm", { who: isFreelancer ? t("nav.teams") : t("nav.freelancers") }))) mut.mutate(m.id); }}
-                        disabled={mut.isPending || matchTaken}
+                        disabled={mut.isPending}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
                         {t("matches.reveal_1_token")}
                       </button>
                     )}
-                    {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
+                    {isFreelancer && m.pending_engagement_id && !requestFilled && (
                       <button
                         onClick={() => {
-                          if (confirm("Confirm this match? Your contact details will be shared with the team and the request will be closed.")) {
+                          if (confirm("Confirm this engagement? Your contact details will be shared with the team and the job will be marked as filled.")) {
                             acceptMut.mutate(m.pending_engagement_id);
                           }
                         }}
@@ -264,14 +182,9 @@ function MatchesPage() {
                         {t("engagements.confirm")}
                       </button>
                     )}
-                    {isFreelancer && matchTaken && (
-                      <span className="inline-flex items-center justify-center border border-border bg-secondary/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        Match already assigned to another professional
-                      </span>
-                    )}
-                    {isFreelancer && isConfirmed && (
+                    {isFreelancer && requestFilled && (
                       <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        Match confirmed
+                        Request filled
                       </span>
                     )}
 
@@ -285,5 +198,4 @@ function MatchesPage() {
       <SiteFooter />
     </div>
   );
-
 }

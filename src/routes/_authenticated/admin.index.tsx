@@ -11,7 +11,6 @@ import {
 } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
-import { RatingIcons } from "@/components/rating-icons";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminFreelancers,
@@ -137,7 +136,6 @@ function AdminFreelancers() {
                 <Th onClick={() => toggle("freelancer.location")} label={`Location${indicator("freelancer.location")}`} />
                 <Th onClick={() => toggle("freelancer.phone_number")} label={`Phone${indicator("freelancer.phone_number")}`} />
                 <Th onClick={() => toggle("freelancer.day_rate")} label={`Rate${indicator("freelancer.day_rate")}`} align="right" />
-                <Th onClick={() => toggle("rating_avg")} label={`Rating${indicator("rating_avg")}`} />
                 <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
                 <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
@@ -155,13 +153,6 @@ function AdminFreelancers() {
                   <td className="px-2 py-2 text-muted-foreground">{r.freelancer?.location ?? "—"}</td>
                   <td className="px-2 py-2 font-mono text-muted-foreground">{r.freelancer?.phone_number ? `${r.freelancer?.phone_dial_code ?? ""} ${r.freelancer?.phone_number}`.trim() : "—"}</td>
                   <td className="px-2 py-2 text-right">{r.freelancer?.day_rate ?? "—"}</td>
-                  <td className="px-2 py-2">
-                    {r.rating_count > 0 ? (
-                      <RatingIcons variant="wrench" value={r.rating_avg} count={r.rating_count} size={14} />
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
                   <td className="px-2 py-2 text-right font-bold">{r.token_balance}</td>
                   <td className="px-2 py-2">
                     {r.blocked_at ? (

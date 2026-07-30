@@ -16,7 +16,6 @@ export function AvailabilityCalendar({
   legend,
   showBulkActions = true,
   bulkMonths = 6,
-  blocked,
 }: {
   selected: Date[];
   onSelect: (dates: Date[] | undefined) => void;
@@ -25,12 +24,8 @@ export function AvailabilityCalendar({
   legend?: string;
   showBulkActions?: boolean;
   bulkMonths?: number;
-  blocked?: Date[];
 }) {
-  const blockedSet = new Set((blocked ?? []).map((d) => ymd(d)));
-  const isBlocked = (d: Date) => blockedSet.has(ymd(d));
   const isDisabled = (d: Date) => {
-    if (isBlocked(d)) return true;
     if (disabled) return disabled(d);
     if (min) return d < min;
     return false;
@@ -109,7 +104,7 @@ export function AvailabilityCalendar({
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           {legend ? (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-block size-3 bg-racing-green" />
+              <span className="inline-block size-3 bg-racing-red" />
               <span>{legend}</span>
             </div>
           ) : <span />}
@@ -137,9 +132,7 @@ export function AvailabilityCalendar({
         mode="multiple"
         selected={selected}
         onSelect={onSelect}
-        disabled={(d) => isDisabled(d)}
-        modifiers={{ blocked: (d) => isBlocked(d) }}
-        modifiersClassNames={{ blocked: "rdp-blocked" }}
+        disabled={disabled ?? (min ? { before: min } : undefined)}
         weekStartsOn={1}
         showOutsideDays={false}
         numberOfMonths={2}
@@ -147,9 +140,9 @@ export function AvailabilityCalendar({
       />
       <style>{`
         .paddock-calendar .rdp-root {
-          --rdp-accent-color: #16a34a;
-          --rdp-accent-background-color: color-mix(in oklab, #16a34a 20%, transparent);
-          --rdp-selected-border: 2px solid #16a34a;
+          --rdp-accent-color: var(--racing-red);
+          --rdp-accent-background-color: color-mix(in oklab, var(--racing-red) 20%, transparent);
+          --rdp-selected-border: 2px solid var(--racing-red);
           --rdp-day_button-border-radius: 0;
           --rdp-day_button-height: 40px;
           --rdp-day_button-width: 40px;
@@ -167,28 +160,11 @@ export function AvailabilityCalendar({
           color: var(--muted-foreground);
         }
         .paddock-calendar .rdp-caption_label { color: var(--foreground); }
-        .paddock-calendar .rdp-day_button {
-          border-radius: 0;
-          font-family: var(--font-mono);
-          font-size: 13px;
-          background: #0a0a0a;
-          color: #e5e5e5;
-        }
+        .paddock-calendar .rdp-day_button { border-radius: 0; font-family: var(--font-mono); font-size: 13px; }
         .paddock-calendar .rdp-day_button:hover { background: var(--secondary); }
         .paddock-calendar .rdp-selected .rdp-day_button {
-          background: #16a34a !important;
+          background: var(--racing-red);
           color: white;
-        }
-        .paddock-calendar .rdp-blocked .rdp-day_button {
-          background: var(--racing-red) !important;
-          color: white !important;
-          cursor: not-allowed;
-          opacity: 1 !important;
-        }
-        .paddock-calendar .rdp-disabled:not(.rdp-blocked) .rdp-day_button {
-          background: transparent;
-          color: var(--muted-foreground);
-          opacity: 0.4;
         }
         .paddock-calendar .rdp-today .rdp-day_button {
           outline: 1px solid var(--racing-yellow);
