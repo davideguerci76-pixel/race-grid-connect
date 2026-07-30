@@ -5,9 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+<<<<<<< /tmp/mg/ours
 import { RatingStars } from "@/components/rating-stars";
 import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
+=======
+import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
+import { disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
+>>>>>>> /tmp/mg/theirs
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -27,13 +32,8 @@ function FreelancerProfile() {
     queryFn: async () => {
       const { data: fp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", id).maybeSingle();
       if (!fp) throw notFound();
-      const [{ data: availability }, { data: ratings }] = await Promise.all([
-        supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60),
-        supabase.from("ratings").select("stars, comment, created_at").eq("to_user_id", id).order("created_at", { ascending: false }).limit(20),
-      ]);
-      const rows = ((ratings ?? []) as unknown) as Array<{ stars: number; created_at: string; comment?: string | null }>;
-      const avg = rows.length ? rows.reduce((a, r) => a + r.stars, 0) / rows.length : 0;
-      return { fp, availability: availability ?? [], ratings: rows, avg };
+      const { data: availability } = await supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60);
+      return { fp, availability: availability ?? [] };
     },
   });
 
@@ -53,7 +53,8 @@ function FreelancerProfile() {
   }
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
 
-  const { fp, availability, ratings, avg } = data;
+  const { fp, availability } = data;
+  const isOwner = user.id === id;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -71,12 +72,19 @@ function FreelancerProfile() {
                   {educationLabel(fp.education)}
                 </div>
               )}
-              {ratings.length > 0 && (
-                <div className="mt-2 flex items-center gap-2">
-                  <RatingStars value={Math.round(avg)} readOnly size={16} />
-                  <span className="font-mono text-xs text-muted-foreground">{avg.toFixed(1)} ({ratings.length})</span>
-                </div>
-              )}
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" isOwner={isOwner} /></div>
+              {(() => {
+                const ts = (fp as any).calendar_last_updated_at;
+                if (!ts) return null;
+                const d = new Date(ts);
+                const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+                const tone = days < 30 ? "text-[#16a34a]" : days < 90 ? "text-racing-yellow" : "text-racing-red";
+                return (
+                  <div className={`mt-2 font-mono text-[11px] uppercase tracking-widest ${tone}`}>
+                    Calendar confirmed {days}d ago · {d.toLocaleDateString()}
+                  </div>
+                );
+              })()}
             </div>
             {fp.day_rate && (
               <div className="text-right">
@@ -117,21 +125,7 @@ function FreelancerProfile() {
             </div>
           </div>
 
-          <div className="border border-border bg-card p-6">
-            <div className="label-mono mb-3">Ratings</div>
-            {ratings.length === 0 ? (
-              <div className="text-sm text-muted-foreground">{t("rating.no_ratings")}</div>
-            ) : (
-              <ul className="space-y-4">
-                {ratings.map((r, i) => (
-                  <li key={i} className="border-b border-border pb-3 last:border-0">
-                    <RatingStars value={r.stars} readOnly size={14} />
-                    {r.comment && <div className="mt-2 text-sm text-muted-foreground">{r.comment}</div>}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <AnonymousReviewsSection targetUserId={id} variant="wrench" isOwner={isOwner} />
         </div>
       </div>
       <SiteFooter />

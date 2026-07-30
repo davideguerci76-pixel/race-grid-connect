@@ -12,8 +12,25 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
+<<<<<<< /tmp/mg/ours
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+=======
+import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+>>>>>>> /tmp/mg/theirs
+
+type LocRelevance = "not_relevant" | "relevant" | "mandatory";
+type LocAnchor = "this" | "team";
+const RADIUS_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "25", label: "25 km" },
+  { value: "50", label: "50 km" },
+  { value: "100", label: "100 km" },
+  { value: "200", label: "200 km" },
+  { value: "500", label: "500 km" },
+  { value: "1000", label: "1000 km" },
+  { value: "any", label: "ANY" },
+];
 
 const search = z.object({
   from: fallback(z.string().optional(), undefined),
@@ -96,6 +113,10 @@ function NewRequestPage() {
   const [education, setEducation] = useState<string[]>([]);
   const [experienceReqs, setExperienceReqs] = useState<RequestExperienceRequirement[]>([]);
   const [languageReqs, setLanguageReqs] = useState<RequestLanguageRequirement[]>([]);
+  const [locationCoords, setLocationCoords] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
+  const [locRelevance, setLocRelevance] = useState<LocRelevance>("not_relevant");
+  const [locAnchor, setLocAnchor] = useState<LocAnchor>("this");
+  const [locRadius, setLocRadius] = useState<string>("100");
 
   useEffect(() => {
     if (!source) return;
@@ -123,6 +144,10 @@ function NewRequestPage() {
     setEducation(Array.isArray(s.education) ? s.education : []);
     setExperienceReqs(Array.isArray(s.experience_requirements) ? s.experience_requirements : []);
     setLanguageReqs(Array.isArray(s.languages) ? s.languages : []);
+    setLocationCoords({ lat: s.location_lat ?? null, lng: s.location_lng ?? null });
+    setLocRelevance((s.location_relevance as LocRelevance) ?? "not_relevant");
+    setLocAnchor((s.location_anchor as LocAnchor) ?? "this");
+    setLocRadius(s.location_radius_km == null ? "any" : String(s.location_radius_km));
     if (Array.isArray(s.season_dates)) {
       setSeasonDates(s.season_dates.map((d: string) => {
         const [y, m, day] = d.split("-").map(Number);
@@ -175,6 +200,11 @@ function NewRequestPage() {
             custom: l.code === "other" ? (l.custom ?? null) : null,
           })),
           ...(identical && from ? { repost_of: from } : {}),
+          location_lat: locationCoords.lat,
+          location_lng: locationCoords.lng,
+          location_relevance: locRelevance,
+          location_anchor: locAnchor,
+          location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
 
         } as never,
       }),
@@ -297,6 +327,99 @@ function NewRequestPage() {
               </button>
             </div>
           </div>
+<<<<<<< /tmp/mg/ours
+=======
+          <SelectField
+            label={t("jobs.filters.discipline")}
+            value={form.discipline}
+            onChange={(v) => setForm({ ...form, discipline: v })}
+            options={DISCIPLINE_OPTIONS}
+          />
+
+          <SelectField
+            label={t("jobs.filters.duration")}
+            value={form.duration}
+            onChange={(v) => setForm({ ...form, duration: v as DurationType })}
+            options={DURATIONS.map((r) => ({ value: r, label: t(`duration.${r}`) }))}
+          />
+          <div className="md:col-span-2 border border-border bg-background/40 p-3">
+            <label className="label-mono">Location / Circuit</label>
+            <LocationAutocomplete
+              value={form.location}
+              onChange={(v) => { setForm({ ...form, location: v, circuit: v }); }}
+              onPick={(p) => {
+                setForm({ ...form, location: p.text, circuit: p.text });
+                setLocationCoords({ lat: p.lat, lng: p.lng });
+              }}
+              placeholder="City, circuit or country"
+              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setLocRelevance(locRelevance === "not_relevant" ? "relevant" : locRelevance === "relevant" ? "mandatory" : "not_relevant");
+                }}
+                title="Click to cycle: Not relevant → Relevant → Mandatory"
+                className={`border px-3 py-2 text-[11px] font-bold uppercase tracking-widest ${
+                  locRelevance === "mandatory"
+                    ? "border-racing-red bg-racing-red text-white"
+                    : locRelevance === "relevant"
+                    ? "border-racing-yellow bg-racing-yellow text-black"
+                    : "border-border bg-black text-white"
+                }`}
+              >
+                {locRelevance === "mandatory" ? "Mandatory" : locRelevance === "relevant" ? "Relevant" : "Not relevant"}
+              </button>
+
+              {locRelevance !== "not_relevant" && (
+                <>
+                  <div className="inline-flex border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setLocAnchor("this")}
+                      className={`px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "this" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      This location
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLocAnchor("team")}
+                      className={`border-l border-border px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "team" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      Team location
+                    </button>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
+                    Max distance
+                    <select
+                      value={locRadius}
+                      onChange={(e) => setLocRadius(e.target.value)}
+                      className="border border-border bg-background px-2 py-1 text-sm"
+                    >
+                      {RADIUS_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {locRelevance === "not_relevant" && "Distance is ignored — location has no effect on the match score."}
+              {locRelevance === "relevant" && "Freelancers inside the radius get the full location score, near-radius (≤ 1.2×) get half, further out zero."}
+              {locRelevance === "mandatory" && <span className="text-racing-red font-bold">Hard filter — freelancers outside the radius are excluded from matches.</span>}
+              {" "}Distance is measured as-the-crow-flies (Haversine).
+              {locRelevance !== "not_relevant" && locAnchor === "team" && " Anchor: your team's fixed location from your profile."}
+              {locRelevance !== "not_relevant" && locAnchor === "this" && " Anchor: the location entered above."}
+            </p>
+            {locRelevance !== "not_relevant" && locAnchor === "this" && !locationCoords.lat && (
+              <p className="mt-1 text-[11px] text-racing-yellow">Pick a location from the dropdown so we can capture its coordinates.</p>
+            )}
+          </div>
+>>>>>>> /tmp/mg/theirs
+
 
           {!isSeason && (
             <>

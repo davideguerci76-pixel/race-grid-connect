@@ -7,9 +7,12 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { RatingStars } from "@/components/rating-stars";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRating, markAllNotificationsRead } from "@/lib/paddock.functions";
+import { RatingPicker, RatingIcons } from "@/components/rating-icons";
+import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, markAllNotificationsRead, cancelEngagement, getMyNotifications, freelancerAnswerContact, teamConfirmContact } from "@/lib/paddock.functions";
+import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -22,29 +25,143 @@ function EngagementsPage() {
   const getFn = useServerFn(getMyEngagements);
   const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
-  const rateFn = useServerFn(submitRating);
+  const rateFn = useServerFn(submitRatingV2);
+  const ratableFn = useServerFn(getRatableEngagements);
   const markRead = useServerFn(markAllNotificationsRead);
+  const notifsFn = useServerFn(getMyNotifications);
 
   const { data: rows = [] } = useQuery({ queryKey: ["engagements"], queryFn: () => getFn() });
+  const { data: ratable = [] } = useQuery({ queryKey: ["engagements-ratable"], queryFn: () => ratableFn() });
+  const { data: notifications = [] } = useQuery({ queryKey: ["my-notifications", user?.id], enabled: !!user?.id, queryFn: () => notifsFn() });
+  const { data: myRatedIds = [] } = useQuery({
+    queryKey: ["my-rated-engagement-ids", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("ratings").select("engagement_id, unlocked_at").eq("from_user_id", user!.id);
+      if (error) return [];
+      return (data ?? []) as { engagement_id: string; unlocked_at: string | null }[];
+    },
+  });
+  const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
+  const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
+  // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
+  // would silently reset before the user has a chance to see it. Users click the
+  // "Mark all as read" button below when they've reviewed the list.
+  const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
+
+
+  // Realtime: first-come-first-served. When another freelancer accepts a competing proposal,
+  // the DB flips this user's proposed engagement to 'cancelled' and inserts a 'match_taken'
+  // notification. Refetch live so the Confirm button disappears instantly, and surface a
+  // clear "waitlist" toast. Confirmed engagements block calendar days; waitlisted ones do not.
   useEffect(() => {
-    markRead().then(() => qc.invalidateQueries({ queryKey: ["unread-notifications"] })).catch(() => {});
-  }, [markRead, qc]);
+    if (!user?.id) return;
+    const ch = supabase
+      .channel(`engagements-live-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "engagements", filter: `freelancer_id=eq.${user.id}` },
+        (payload: any) => {
+          const oldRow = payload.old ?? {};
+          const newRow = payload.new ?? {};
+          qc.invalidateQueries({ queryKey: ["engagements"] });
+          qc.invalidateQueries({ queryKey: ["matches"] });
+          if (oldRow.status === "proposed" && newRow.status === "cancelled" && !newRow.cancelled_by) {
+            toast.info("Another freelancer accepted first — you're on the waitlist. Your calendar stays open in case the match reopens.");
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload: any) => {
+          const kind = payload.new?.kind;
+          qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+          if (kind === "match_taken" || kind === "match_reopened" || kind === "sos_call" || kind === "engagement_proposed") {
+            qc.invalidateQueries({ queryKey: ["engagements"] });
+            qc.invalidateQueries({ queryKey: ["matches"] });
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [user?.id, qc]);
+
   const [ratingFor, setRatingFor] = useState<string | null>(null);
-  const [stars, setStars] = useState(5);
+  // Sub-scores (freelance being rated by team)
+  const [tech, setTech] = useState(5);
+  const [punct, setPunct] = useState(5);
+  const [stress, setStress] = useState(5);
+  // Single overall (team being rated by freelance)
+  const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
+  const [locallySubmittedRatings, setLocallySubmittedRatings] = useState<Set<string>>(() => new Set());
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
-    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
+    onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
   });
-  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success("Marked complete"); qc.invalidateQueries(); } });
-  const rateMut = useMutation({
-    mutationFn: (v: { engagement_id: string; to_user_id: string }) => rateFn({ data: { ...v, stars, comment: comment || null } }),
-    onSuccess: () => { toast.success(t("rating.submitted")); setRatingFor(null); setComment(""); qc.invalidateQueries(); },
+  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  const cancelFn = useServerFn(cancelEngagement);
+  const cancelMut = useMutation({
+    mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
+    onSuccess: (row: any) => {
+      const kind = row?.cancellation_kind;
+      if (kind === "grace") toast.success("Cancelled within grace window — no penalty. The request is reopened.");
+      else if (kind === "team_late") toast.warning("Late cancellation recorded on your team profile.");
+      else if (kind === "freelancer_late") toast.warning("Late cancellation — those days stay blocked on your calendar.");
+      else toast.success("Cancelled");
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
+  });
+
+  const answerContactFn = useServerFn(freelancerAnswerContact);
+  const answerContactMut = useMutation({
+    mutationFn: (v: { engagement_id: string; contacted: boolean }) => answerContactFn({ data: v }),
+    onSuccess: (_r, v) => {
+      toast.success(v.contacted ? "Thanks — logged that the team reached out." : "Logged. We'll remind the team.");
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+  const teamConfirmFn = useServerFn(teamConfirmContact);
+  const teamConfirmMut = useMutation({
+    mutationFn: (id: string) => teamConfirmFn({ data: { engagement_id: id } }),
+    onSuccess: () => { toast.success("Contact confirmed."); qc.invalidateQueries({ queryKey: ["engagements"] }); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const rateMut = useMutation({
+    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
+      if (v.isFreelancerReviewer) {
+        return rateFn({ data: { engagement_id: v.engagement_id, overall, sub_scores: {}, comment: comment || null } });
+      }
+      const avg = (tech + punct + stress) / 3;
+      return rateFn({ data: { engagement_id: v.engagement_id, overall: Math.round(avg * 10) / 10, sub_scores: { technical: tech, punctuality: punct, stress }, comment: comment || null } });
+    },
+    onSuccess: (res: any, variables) => {
+      setLocallySubmittedRatings((prev) => {
+        const next = new Set(prev);
+        next.add(variables.engagement_id);
+        return next;
+      });
+      if (res && res.ok === false && res.already_rated) {
+        toast.info(t("rating.submitted"));
+      } else {
+        toast.success(t("rating.submitted_bonus"));
+      }
+      setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
+      qc.invalidateQueries();
+      qc.refetchQueries({ queryKey: ["engagements-ratable"] });
+      qc.refetchQueries({ queryKey: ["my-rated-engagement-ids"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -52,6 +169,57 @@ function EngagementsPage() {
       <div className="container-page py-12">
         <div className="label-mono">[ENGAGEMENTS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("engagements.title")}</h1>
+
+        {notifications.length > 0 && (
+          <div className="mt-6 border border-border bg-card">
+            <div className="flex items-center justify-between border-b border-border px-4 py-2">
+              <span className="label-mono">[NOTIFICATIONS]{unreadCount > 0 ? ` · ${unreadCount} UNREAD` : ""}</span>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => {
+                    markRead()
+                      .then(() => {
+                        qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+                        qc.invalidateQueries({ queryKey: ["my-notifications"] });
+                      })
+                      .catch(() => {});
+                  }}
+                  className="border border-border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
+            <ul className="divide-y divide-border">
+
+              {(notifications as any[]).slice(0, 15).map((n) => {
+                const unread = !n.read_at;
+                const isStale = n.kind === "calendar_stale";
+                return (
+                  <li key={n.id} className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "bg-racing-red/5" : ""}`}>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {unread && <span className="inline-block h-2 w-2 rounded-full bg-racing-red" />}
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{n.kind}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</span>
+                      </div>
+                      <div className="mt-1 text-sm">
+                        {isStale
+                          ? "Your availability calendar hasn't been updated in a while. Keep it fresh to rank higher in team searches."
+                          : (n.payload?.message ?? n.kind)}
+                      </div>
+                    </div>
+                    {isStale && (
+                      <Link to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
+                        Update calendar
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-3">
           {rows.length === 0 && <div className="border border-border bg-card p-12 text-center text-sm text-muted-foreground">—</div>}
@@ -102,6 +270,15 @@ function EngagementsPage() {
                     {t(`engagements.status.${e.status}`)}
                   </span>
                 </div>
+
+                {e.cancellation_kind === "team_ghosting" && (
+                  <div className="mt-3 border border-racing-red bg-racing-red/10 p-3">
+                    <div className="label-mono text-racing-red">[TEAM DID NOT FOLLOW UP]</div>
+                    <p className="mt-1 text-xs">
+                      The team never confirmed contact after the match. The engagement was auto-released and your calendar days reopened. You can still leave a rating for the team below.
+                    </p>
+                  </div>
+                )}
 
                 {req && (
                   <div className="mt-3 border-t border-border pt-3">
@@ -169,6 +346,101 @@ function EngagementsPage() {
                   </div>
                 </div>
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
+                {(e.status === "confirmed" || e.status === "completed") && (
+                  <div className="mt-4 border-t border-border pt-3">
+                    {/* Anti-ghosting contact check — freelancer always has the button available
+                        for a confirmed engagement until they confirm the team reached out. */}
+                    {e.status === "confirmed" && isFreelancer && e.freelancer_contacted !== true && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[HAS THE TEAM REACHED OUT?]</div>
+                        <p className="mt-1 text-xs">
+                          {e.contact_check_sent_at
+                            ? "It's been a few days since the match — did the team already contact you?"
+                            : "As soon as the team gets in touch, click below. If they don't, we'll automatically remind them and — if they keep ghosting — release the match so your calendar reopens."}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            disabled={answerContactMut.isPending}
+                            onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: true })}
+                            className="bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                          >
+                            The team contacted me
+                          </button>
+                          {e.contact_check_sent_at && (
+                            <button
+                              disabled={answerContactMut.isPending}
+                              onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
+                              className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                            >
+                              Not yet
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
+                        <div className="label-mono text-racing-yellow">[CONFIRM YOU'VE CONTACTED THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">
+                          Confirm here as soon as you reach out to the freelancer. If you don't, automatic reminders will be sent and — after the deadline — the match will be released and logged on your team profile.
+                        </p>
+                        <button
+                          disabled={teamConfirmMut.isPending}
+                          onClick={() => teamConfirmMut.mutate(e.id)}
+                          className="mt-2 bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+                        >
+                          I contacted the freelancer
+                        </button>
+                      </div>
+                    )}
+                    {e.status === "confirmed" && !isFreelancer && e.team_reminder2_sent_at && !e.team_confirmed_contact && (
+                      <div className="mb-4 border border-racing-red bg-racing-red/10 p-3">
+                        <div className="label-mono text-racing-red">[URGENT — CONTACT THE FREELANCER]</div>
+                        <p className="mt-1 text-xs">
+                          You still haven't confirmed contact with the freelancer. If you don't confirm soon, the engagement will be auto-released, the freelancer's calendar will reopen, and the incident will be recorded on your team profile.
+                        </p>
+                      </div>
+                    )}
+                    {!isFreelancer && (
+                      <div className="mb-4">
+                        <div className="label-mono mb-2 text-racing-yellow">[FREELANCER CONTACT]</div>
+                        <div className="grid gap-1 text-xs">
+                          <div><span className="text-muted-foreground">Name:</span> <span className="font-bold">{other?.display_name ?? fp?.headline ?? "Freelancer"}</span></div>
+                          {e.freelancer_contact?.email && (
+                            <div><span className="text-muted-foreground">Email:</span> <a href={`mailto:${e.freelancer_contact.email}`} className="font-mono text-racing-red hover:underline">{e.freelancer_contact.email}</a></div>
+                          )}
+                          {e.freelancer_contact?.phone_number && (
+                            <div><span className="text-muted-foreground">Phone:</span> <span className="font-mono">{e.freelancer_contact.phone_dial_code ?? ""} {e.freelancer_contact.phone_number}</span></div>
+                          )}
+                        </div>
+                        <div className="mt-2">
+                          <ContactQuickButtons
+                            contact={{
+                              fullName: other?.display_name ?? "Freelancer",
+                              organization: fp?.role ? String(fp.role) : undefined,
+                              title: fp?.headline ?? undefined,
+                              email: e.freelancer_contact?.email ?? undefined,
+                              phone: e.freelancer_contact?.phone_number ? `${e.freelancer_contact?.phone_dial_code ?? ""} ${e.freelancer_contact.phone_number}`.trim() : undefined,
+                              notes: req?.title ? `PaddockMatch — ${req.title}` : undefined,
+                            }}
+                          />
+
+                        </div>
+                      </div>
+                    )}
+                    <div className="label-mono mb-2">[ADD TO CALENDAR]</div>
+                    <CalendarQuickButtons
+                      event={{
+                        title: `Match — ${req?.title ?? other?.display_name ?? "PaddockMatch"}`,
+                        startDate: e.start_date,
+                        endDate: e.end_date,
+                        location: req?.location ?? req?.circuit ?? null,
+                        description: req ? `${req.title}${req.notes ? `\n\n${req.notes}` : ""}` : "",
+                      }}
+                    />
+                  </div>
+                )}
+
                 <div className="mt-4 flex flex-wrap gap-2">
                   {e.status === "proposed" && e.proposed_by !== user?.id && (
                     <button onClick={() => confirmMut.mutate(e.id)} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110">
@@ -180,24 +452,103 @@ function EngagementsPage() {
                       {t("engagements.mark_complete")}
                     </button>
                   )}
-
-                  {e.status === "completed" && (
-                    ratingFor === e.id ? (
-                      <div className="w-full border border-border bg-background p-4">
-                        <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
-                        <RatingStars value={stars} onChange={setStars} />
-                        <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
-                        <div className="mt-3 flex gap-2">
-                          <button onClick={() => rateMut.mutate({ engagement_id: e.id, to_user_id: otherId })} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white">{t("rating.submit")}</button>
-                          <button onClick={() => setRatingFor(null)} className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest">{t("common.cancel")}</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button onClick={() => setRatingFor(e.id)} className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110">
-                        {t("engagements.rate")}
+                  {e.status === "confirmed" && (() => {
+                    const confirmedAt = e.confirmed_at ? new Date(e.confirmed_at).getTime() : null;
+                    const graceEnd = confirmedAt ? confirmedAt + 24 * 3600 * 1000 : null;
+                    const firstDay = new Date(e.start_date + "T00:00:00").getTime();
+                    const now = Date.now();
+                    const inGrace = graceEnd !== null && now < graceEnd && now < firstDay;
+                    const label = inGrace
+                      ? `Cancel (grace: ${Math.max(0, Math.round((graceEnd! - now) / 3600000))}h left)`
+                      : isFreelancer
+                      ? "Cancel (late — days stay blocked)"
+                      : "Cancel (late — logged on profile)";
+                    const warn = inGrace
+                      ? "Cancel this confirmed match? You are within the 24h grace window: no penalty and the request reopens for other candidates."
+                      : isFreelancer
+                      ? "You are past the grace window. The engaged days remain blocked on your calendar and the request will be reopened for other candidates. Continue?"
+                      : "You are past the grace window. This cancellation will be recorded on your public team profile and the request will be archived. Continue?";
+                    return (
+                      <button
+                        onClick={() => {
+                          if (!confirm(warn)) return;
+                          const reason = window.prompt("Reason (optional):", "") ?? "";
+                          cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
+                        }}
+                        className={`px-4 py-2 text-[11px] font-bold uppercase tracking-widest ${inGrace ? "border border-border hover:bg-secondary" : "border border-racing-red text-racing-red hover:bg-racing-red/10"}`}
+                      >
+                        {label}
                       </button>
-                    )
-                  )}
+                    );
+                  })()}
+
+
+                  {(e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
+                    const info = ratableMap.get(e.id);
+                    const mineRated = ratedMap.get(e.id);
+                    const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
+                    const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
+                    const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
+                    const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
+                    const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
+                    const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;
+                    if (alreadyRated) {
+                      return (
+                        <button type="button" disabled className="cursor-not-allowed border border-border bg-muted/40 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground opacity-80">
+                          {t("rating.submitted")}
+                        </button>
+                      );
+                    }
+                    if (!canRate) {
+                      return (
+                        <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          {t("rating.opens_on", { date: info?.opens_at ? new Date(info.opens_at).toLocaleDateString() : "—" })}
+                        </span>
+                      );
+                    }
+                    if (ratingFor === e.id) {
+                      return (
+                        <div className="w-full border border-border bg-background p-4">
+                          <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
+                          <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                          {isFreelancer ? (
+                            <div>
+                              <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.team_overall")}</div>
+                              <RatingPicker variant="headset" value={overall} onChange={setOverall} />
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.technical")}</div>
+                                <RatingPicker variant="wrench" value={tech} onChange={setTech} />
+                              </div>
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.punctuality")}</div>
+                                <RatingPicker variant="wrench" value={punct} onChange={setPunct} />
+                              </div>
+                              <div>
+                                <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.stress")}</div>
+                                <RatingPicker variant="wrench" value={stress} onChange={setStress} />
+                              </div>
+                              <div className="font-mono text-[11px] text-muted-foreground">
+                                {t("rating.overall")}: {((tech + punct + stress) / 3).toFixed(1)}
+                              </div>
+                            </div>
+                          )}
+                          <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
+                          <div className="mt-3 flex gap-2">
+                            <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer })} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white">{t("rating.submit")}</button>
+                            <button onClick={() => setRatingFor(null)} className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest">{t("common.cancel")}</button>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <button onClick={() => setRatingFor(e.id)} className="bg-racing-yellow px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-carbon hover:brightness-110">
+                        {t("engagements.rate")} <span className="ml-1 text-[9px]">(+1 token bonus)</span>
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             );

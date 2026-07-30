@@ -17,6 +17,7 @@ const FIELDS: { key: string; label: string; hint: string }[] = [
   { key: "languages_weight", label: "Languages", hint: "Level >= required" },
   { key: "education_weight", label: "Education", hint: "Study / motorsport academy" },
   { key: "location_weight", label: "Location", hint: "Geographic proximity" },
+  { key: "calendar_freshness_weight", label: "Calendar freshness", hint: "Recent calendar confirmation (< 30 / 90 / 180 days)" },
 ];
 
 function AdminMatchingPage() {
@@ -37,6 +38,7 @@ function AdminMatchingPage() {
         languages_weight: Number(data.languages_weight),
         education_weight: Number(data.education_weight),
         location_weight: Number(data.location_weight),
+        calendar_freshness_weight: Number((data as any).calendar_freshness_weight ?? 0),
       });
     }
   }, [data]);

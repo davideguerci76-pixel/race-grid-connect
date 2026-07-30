@@ -8,10 +8,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+<<<<<<< /tmp/mg/ours
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile } from "@/lib/paddock.functions";
+=======
+import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
+import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
+>>>>>>> /tmp/mg/theirs
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { RatingIcons } from "@/components/rating-icons";
+import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -69,8 +77,13 @@ function ProfilePage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="label-mono">[PROFILE]</div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="label-mono">[PROFILE]</div>
+            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+          </div>
+          {user?.id && <ProfileRatingBadge userId={user.id} isFreelancer={isFreelancer} />}
+        </div>
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
           <div className="border border-border bg-card p-6">
@@ -94,6 +107,75 @@ function ProfilePage() {
     </div>
   );
 }
+function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreelancer: boolean }) {
+  const { t } = useTranslation();
+  const getSummary = useServerFn(getUserRatingSummary);
+  const [open, setOpen] = useState(false);
+  const { data } = useQuery({
+    queryKey: ["profile-rating-summary", userId],
+    queryFn: () => getSummary({ data: { user_id: userId } }),
+  });
+  if (!data || !data.count) {
+    return (
+      <div className="border border-border bg-card px-4 py-3 text-right">
+        <div className="label-mono text-[10px]">[RATING]</div>
+        <div className="mt-1 font-mono text-[11px] text-muted-foreground">No ratings yet</div>
+      </div>
+    );
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="border border-racing-yellow/50 bg-racing-yellow/5 px-4 py-3 text-right transition hover:bg-racing-yellow/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-racing-yellow"
+        title={t("reviews.view_mine", { defaultValue: "View my reviews" }) as string}
+      >
+        <div className="label-mono text-[10px] text-racing-yellow">[OVERALL RATING]</div>
+        <div className="mt-1 flex items-center justify-end gap-2">
+          <RatingIcons value={data.average} count={data.count} variant={isFreelancer ? "wrench" : "headset"} size={18} />
+        </div>
+        <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          {t("reviews.click_to_view", { defaultValue: "Click to view reviews" })}
+        </div>
+      </button>
+      <ReviewsDialog
+        open={open}
+        onOpenChange={setOpen}
+        userId={userId}
+        variant={isFreelancer ? "wrench" : "headset"}
+      />
+    </>
+  );
+}
+
+function ReviewsDialog({
+  open,
+  onOpenChange,
+  userId,
+  variant,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  userId: string;
+  variant: "wrench" | "headset";
+}) {
+  const { t } = useTranslation();
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-xs uppercase tracking-widest text-racing-red">
+            {t("reviews.my_reviews", { defaultValue: "Reviews received" })}
+          </DialogTitle>
+        </DialogHeader>
+        <AnonymousReviewsSection targetUserId={userId} variant={variant} isOwner />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
 
 function PersonalInfoSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
@@ -275,6 +357,8 @@ function FreelancerSection({ profile }: { profile: any }) {
     education: "" as string,
     day_rate: "" as string,
     location: "",
+    location_lat: null as number | null,
+    location_lng: null as number | null,
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
@@ -293,6 +377,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       education: profile?.education ?? "",
       day_rate: profile?.day_rate != null ? String(profile.day_rate) : "",
       location: profile?.location ?? "",
+      location_lat: (profile as any)?.location_lat ?? null,
+      location_lng: (profile as any)?.location_lng ?? null,
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
       experiences: Array.isArray(profile?.experiences)
@@ -323,6 +409,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           education: form.education || null,
           day_rate: form.day_rate ? parseInt(form.day_rate) : null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
@@ -406,7 +494,12 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Location</label>
-            <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Milan, Italy" />
+            <LocationAutocomplete
+              value={form.location}
+              onChange={(v) => setForm({ ...form, location: v })}
+              onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+              placeholder="Milan, Italy"
+            />
           </div>
         </div>
         <div>
@@ -513,6 +606,8 @@ function TeamSection({ profile }: { profile: any }) {
     team_name: "",
     team_type: "",
     location: "",
+    location_lat: null as number | null,
+    location_lng: null as number | null,
     primary_discipline: "",
     bio: "",
     website: "",
@@ -524,6 +619,8 @@ function TeamSection({ profile }: { profile: any }) {
       team_name: profile?.team_name ?? "",
       team_type: profile?.team_type ?? "",
       location: profile?.location ?? "",
+      location_lat: (profile as any)?.location_lat ?? null,
+      location_lng: (profile as any)?.location_lng ?? null,
       primary_discipline: profile?.primary_discipline ?? "",
       bio: profile?.bio ?? "",
       website: profile?.website ?? "",
@@ -539,6 +636,8 @@ function TeamSection({ profile }: { profile: any }) {
           team_name: form.team_name,
           team_type: form.team_type || null,
           location: form.location || null,
+          location_lat: form.location_lat ?? null,
+          location_lng: form.location_lng ?? null,
           primary_discipline: form.primary_discipline || null,
           bio: form.bio || null,
           website: form.website || null,
@@ -569,7 +668,11 @@ function TeamSection({ profile }: { profile: any }) {
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Location</label>
-          <LocationAutocomplete value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+          <LocationAutocomplete
+            value={form.location}
+            onChange={(v) => setForm({ ...form, location: v })}
+            onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+          />
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Primary Discipline</label>

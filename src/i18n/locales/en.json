@@ -187,14 +187,26 @@
     "cancel": "Cancel",
     "rate": "Leave a rating",
     "rating_locked": "Rating unlocks after both sides mark completed",
-    "rate_them": "Rate {{name}}"
+    "rate_them": "Rate {{name}}",
+    "confirmed_toast": "Confirmed — contacts unlocked",
+    "marked_complete_toast": "Marked complete"
   },
   "rating": {
     "title": "Rating",
     "comment_placeholder": "Share your experience...",
     "submit": "Submit rating",
     "submitted": "Rating submitted",
-    "no_ratings": "No ratings yet"
+    "submitted_bonus": "Rating submitted — +1 token bonus awarded!",
+    "no_ratings": "No ratings yet",
+    "double_blind_hint": "Double-blind: your review stays sealed until the other party rates you, or 30 days pass.",
+    "opens_on": "Rating opens on {{date}}",
+    "awaiting_other_party": "Submitted — waiting for the other party (or 30-day unlock)",
+    "visible_now": "Both ratings visible",
+    "technical": "Technical skill",
+    "punctuality": "Punctuality & reliability",
+    "stress": "Stress management",
+    "team_overall": "Overall team experience",
+    "overall": "Overall"
   },
   "common": {
     "loading": "Loading...",
