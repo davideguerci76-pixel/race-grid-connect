@@ -49,7 +49,15 @@ async function loadPlaces(): Promise<any> {
   return await w.google.maps.importLibrary("places");
 }
 
-export type LocationPick = { text: string; lat: number | null; lng: number | null };
+export type LocationPick = {
+  text: string;
+  lat: number | null;
+  lng: number | null;
+  city: string | null;
+  region: string | null;
+  country: string | null;
+  placeId: string;
+};
 
 export function LocationAutocomplete({
   value,
@@ -57,17 +65,21 @@ export function LocationAutocomplete({
   onPick,
   placeholder = "City, Country",
   className,
+  includeAllPlaces = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   onPick?: (p: LocationPick) => void;
   placeholder?: string;
   className?: string;
+  /** Job Requests may target a named circuit; profiles remain limited to geographic areas. */
+  includeAllPlaces?: boolean;
 }) {
   const [input, setInput] = useState(value);
   const [suggestions, setSuggestions] = useState<Array<{ text: string; placeId: string }>>([]);
   const [open, setOpen] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const placesRef = useRef<any>(null);
   const sessionRef = useRef<any>(null);
   const debRef = useRef<number | null>(null);
@@ -83,8 +95,12 @@ export function LocationAutocomplete({
         placesRef.current = places;
         sessionRef.current = new places.AutocompleteSessionToken();
         setReady(true);
+        setLoadFailed(false);
       })
-      .catch(() => setReady(false));
+      .catch(() => {
+        setReady(false);
+        setLoadFailed(true);
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -102,11 +118,14 @@ export function LocationAutocomplete({
       if (!ready || text.trim().length < 2) { setSuggestions([]); return; }
       try {
         const places = placesRef.current;
-        const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        const request: Record<string, unknown> = {
           input: text,
           sessionToken: sessionRef.current,
-          includedPrimaryTypes: ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"],
-        });
+        };
+        if (!includeAllPlaces) {
+          request.includedPrimaryTypes = ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"];
+        }
+        const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
         const mapped = (s ?? [])
           .filter((x: any) => x.placePrediction)
           .map((x: any) => ({
@@ -128,18 +147,37 @@ export function LocationAutocomplete({
     const places = placesRef.current;
     let lat: number | null = null;
     let lng: number | null = null;
+    let emitted = false;
     if (places && onPick) {
       try {
         const place = new places.Place({ id: s.placeId });
-        await place.fetchFields({ fields: ["location"] });
+        await place.fetchFields({ fields: ["id", "formattedAddress", "location", "addressComponents"] });
         const loc = (place as any).location;
         if (loc) {
           lat = typeof loc.lat === "function" ? loc.lat() : loc.lat;
           lng = typeof loc.lng === "function" ? loc.lng() : loc.lng;
         }
+        const components = Array.isArray((place as any).addressComponents) ? (place as any).addressComponents : [];
+        const component = (...types: string[]) => {
+          const found = components.find((item: any) => types.some((type) => item.types?.includes(type)));
+          return found?.longText ?? found?.shortText ?? null;
+        };
+        const text = (place as any).formattedAddress || s.text;
+        onPick({
+          text,
+          lat,
+          lng,
+          city: component("locality", "postal_town", "administrative_area_level_3"),
+          region: component("administrative_area_level_1", "administrative_area_level_2"),
+          country: component("country"),
+          placeId: (place as any).id || s.placeId,
+        });
+        emitted = true;
       } catch { /* ignore */ }
     }
-    onPick?.({ text: s.text, lat, lng });
+    if (!emitted) {
+      onPick?.({ text: s.text, lat, lng, city: null, region: null, country: null, placeId: s.placeId });
+    }
     if (places) sessionRef.current = new places.AutocompleteSessionToken();
   };
 
@@ -152,7 +190,15 @@ export function LocationAutocomplete({
         placeholder={placeholder}
         className={className ?? "mt-1 w-full border border-border bg-background px-3 py-2 text-sm"}
         autoComplete="off"
+        aria-autocomplete="list"
+        aria-expanded={open}
+        aria-label={placeholder}
       />
+      {loadFailed && (
+        <p className="mt-1 font-mono text-[10px] uppercase text-racing-red" role="alert">
+          Google Maps autocomplete is unavailable. Reload before saving a location.
+        </p>
+      )}
       {open && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 max-h-64 w-full overflow-auto border border-border bg-card shadow-lg">
           {suggestions.map((s) => (
@@ -165,6 +211,9 @@ export function LocationAutocomplete({
               {s.text}
             </button>
           ))}
+          <div className="border-t border-border px-3 py-1.5 text-right font-mono text-[9px] uppercase text-muted-foreground">
+            Powered by Google
+          </div>
         </div>
       )}
     </div>

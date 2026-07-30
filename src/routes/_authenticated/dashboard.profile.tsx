@@ -354,6 +354,10 @@ function FreelancerSection({ profile }: { profile: any }) {
     location: "",
     location_lat: null as number | null,
     location_lng: null as number | null,
+    location_city: null as string | null,
+    location_region: null as string | null,
+    location_country: null as string | null,
+    location_place_id: null as string | null,
     bio: "",
     travels: true,
     experiences: [] as FreelancerExperience[],
@@ -374,6 +378,10 @@ function FreelancerSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       location_lat: (profile as any)?.location_lat ?? null,
       location_lng: (profile as any)?.location_lng ?? null,
+      location_city: (profile as any)?.location_city ?? null,
+      location_region: (profile as any)?.location_region ?? null,
+      location_country: (profile as any)?.location_country ?? null,
+      location_place_id: (profile as any)?.location_place_id ?? null,
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
       experiences: Array.isArray(profile?.experiences)
@@ -406,6 +414,10 @@ function FreelancerSection({ profile }: { profile: any }) {
           location: form.location || null,
           location_lat: form.location_lat ?? null,
           location_lng: form.location_lng ?? null,
+          location_city: form.location_city,
+          location_region: form.location_region,
+          location_country: form.location_country,
+          location_place_id: form.location_place_id,
           bio: form.bio || null,
           travels: form.travels,
           experiences: form.experiences,
@@ -491,8 +503,8 @@ function FreelancerSection({ profile }: { profile: any }) {
             <label className="text-xs text-muted-foreground">Location</label>
             <LocationAutocomplete
               value={form.location}
-              onChange={(v) => setForm({ ...form, location: v })}
-              onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+              onChange={(v) => setForm({ ...form, location: v, location_lat: null, location_lng: null, location_city: null, location_region: null, location_country: null, location_place_id: null })}
+              onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng, location_city: p.city, location_region: p.region, location_country: p.country, location_place_id: p.placeId })}
               placeholder="Milan, Italy"
             />
           </div>
@@ -603,6 +615,10 @@ function TeamSection({ profile }: { profile: any }) {
     location: "",
     location_lat: null as number | null,
     location_lng: null as number | null,
+    location_city: null as string | null,
+    location_region: null as string | null,
+    location_country: null as string | null,
+    location_place_id: null as string | null,
     primary_discipline: "",
     bio: "",
     website: "",
@@ -616,6 +632,10 @@ function TeamSection({ profile }: { profile: any }) {
       location: profile?.location ?? "",
       location_lat: (profile as any)?.location_lat ?? null,
       location_lng: (profile as any)?.location_lng ?? null,
+      location_city: (profile as any)?.location_city ?? null,
+      location_region: (profile as any)?.location_region ?? null,
+      location_country: (profile as any)?.location_country ?? null,
+      location_place_id: (profile as any)?.location_place_id ?? null,
       primary_discipline: profile?.primary_discipline ?? "",
       bio: profile?.bio ?? "",
       website: profile?.website ?? "",
@@ -633,6 +653,10 @@ function TeamSection({ profile }: { profile: any }) {
           location: form.location || null,
           location_lat: form.location_lat ?? null,
           location_lng: form.location_lng ?? null,
+          location_city: form.location_city,
+          location_region: form.location_region,
+          location_country: form.location_country,
+          location_place_id: form.location_place_id,
           primary_discipline: form.primary_discipline || null,
           bio: form.bio || null,
           website: form.website || null,
@@ -665,8 +689,8 @@ function TeamSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">Location</label>
           <LocationAutocomplete
             value={form.location}
-            onChange={(v) => setForm({ ...form, location: v })}
-            onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng })}
+            onChange={(v) => setForm({ ...form, location: v, location_lat: null, location_lng: null, location_city: null, location_region: null, location_country: null, location_place_id: null })}
+            onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng, location_city: p.city, location_region: p.region, location_country: p.country, location_place_id: p.placeId })}
           />
         </div>
         <div>
