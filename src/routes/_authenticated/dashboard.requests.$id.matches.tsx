@@ -7,15 +7,10 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-<<<<<<< /tmp/mg/ours
-import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
-=======
-import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest } from "@/lib/paddock.functions";
-import { roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
->>>>>>> /tmp/mg/theirs
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
@@ -463,13 +458,8 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
                 <Lock className="size-4" />
               </div>
               <div>
-<<<<<<< /tmp/mg/ours
-                <div className="text-lg font-bold">{match.profile.display_name}</div>
-                {match.profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(match.profile.role_group)}{parseSubRoles(match.profile.sub_roles).length ? ` · ${parseSubRoles(match.profile.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
-=======
                 <div className="text-lg font-bold text-muted-foreground">Hidden freelancer</div>
-                {match.profile.role && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(match.profile.role)}</div>}
->>>>>>> /tmp/mg/theirs
+                {match.profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(match.profile.role_group)}{parseSubRoles(match.profile.sub_roles).length ? ` · ${parseSubRoles(match.profile.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
               </div>
             </div>
             {match.profile.headline && <p className="mt-3 text-sm">{match.profile.headline}</p>}

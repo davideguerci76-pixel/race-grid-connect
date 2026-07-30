@@ -626,11 +626,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-<<<<<<< /tmp/mg/ours
-      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
-=======
-      .select("*, request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
->>>>>>> /tmp/mg/theirs
+      .select("*, request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);

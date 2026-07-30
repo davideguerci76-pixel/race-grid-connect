@@ -6,13 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-<<<<<<< /tmp/mg/ours
 import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
-=======
-import { initialsFor, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
->>>>>>> /tmp/mg/theirs
 import { Lock } from "lucide-react";
 
 type Search = { req?: string };

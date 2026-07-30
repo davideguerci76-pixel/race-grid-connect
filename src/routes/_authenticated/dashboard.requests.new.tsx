@@ -12,13 +12,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-<<<<<<< /tmp/mg/ours
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
-=======
-import { LocationAutocomplete } from "@/components/location-autocomplete";
-import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
->>>>>>> /tmp/mg/theirs
 
 type LocRelevance = "not_relevant" | "relevant" | "mandatory";
 type LocAnchor = "this" | "team";
@@ -327,8 +323,6 @@ function NewRequestPage() {
               </button>
             </div>
           </div>
-<<<<<<< /tmp/mg/ours
-=======
           <SelectField
             label={t("jobs.filters.discipline")}
             value={form.discipline}
@@ -418,7 +412,6 @@ function NewRequestPage() {
               <p className="mt-1 text-[11px] text-racing-yellow">Pick a location from the dropdown so we can capture its coordinates.</p>
             )}
           </div>
->>>>>>> /tmp/mg/theirs
 
 
           {!isSeason && (
