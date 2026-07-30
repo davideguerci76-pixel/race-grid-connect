@@ -119,7 +119,7 @@ export function SiteHeader() {
             <>
               <TokenBadge balance={profile?.token_balance ?? 0} />
               <Link
-                to="/dashboard/engagements"
+                to="/dashboard/notifications"
                 aria-label="Notifications"
                 className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
               >
@@ -155,7 +155,7 @@ export function SiteHeader() {
           {user && <TokenBadge balance={profile?.token_balance ?? 0} />}
           {user && (
             <Link
-              to="/dashboard/engagements"
+              to="/dashboard/notifications"
               aria-label="Notifications"
               className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
             >

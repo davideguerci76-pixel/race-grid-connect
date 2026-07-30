@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
@@ -120,6 +121,12 @@ const AuthenticatedDashboardProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardNotificationsRoute =
+  AuthenticatedDashboardNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardMatchesRoute =
   AuthenticatedDashboardMatchesRouteImport.update({
     id: '/matches',
@@ -212,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -239,6 +247,7 @@ export interface FileRoutesByTo {
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -270,6 +279,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
+  '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
+    | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/tokens'
     | '/admin/'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/dashboard/calendar'
     | '/dashboard/engagements'
     | '/dashboard/matches'
+    | '/dashboard/notifications'
     | '/dashboard/profile'
     | '/dashboard/tokens'
     | '/admin'
@@ -358,6 +370,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
+    | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/tokens'
     | '/_authenticated/admin/'
@@ -494,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/notifications': {
+      id: '/_authenticated/dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications'
+      preLoaderRoute: typeof AuthenticatedDashboardNotificationsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/matches': {
       id: '/_authenticated/dashboard/matches'
       path: '/matches'
@@ -608,6 +628,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
+  AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -622,6 +643,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardEngagementsRoute:
       AuthenticatedDashboardEngagementsRoute,
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
+    AuthenticatedDashboardNotificationsRoute:
+      AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
@@ -666,13 +689,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
