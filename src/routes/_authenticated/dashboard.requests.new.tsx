@@ -116,7 +116,7 @@ function NewRequestPage() {
       budget_unit: (s.budget_unit as "day" | "event" | "season") ?? "day",
       notes: s.notes ?? "",
     });
-    setRoleHard(s.role_hard ?? true);
+    setSubRoleHard(s.sub_role_hard ?? false);
     setTravelRequired(s.travel_required ?? true);
     setSkills(Array.isArray(s.skills) ? s.skills : []);
     setSkillsHard(Array.isArray(s.skills_hard) ? s.skills_hard : []);
