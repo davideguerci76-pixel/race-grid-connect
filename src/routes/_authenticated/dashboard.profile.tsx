@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, roleLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
@@ -264,8 +265,10 @@ function FreelancerSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
   const [editing, setEditing] = useState(false);
+  const [showAllSkills, setShowAllSkills] = useState(false);
   const [form, setForm] = useState({
-    role: "other" as string,
+    role_group: "" as string,
+    sub_roles: [] as FreelancerSubRole[],
     headline: "",
     disciplines: [] as string[],
     skills: [] as string[],
@@ -282,7 +285,8 @@ function FreelancerSection({ profile }: { profile: any }) {
   useEffect(() => {
     if (editing) return;
     setForm({
-      role: profile?.role ?? "other",
+      role_group: profile?.role_group ?? "",
+      sub_roles: parseSubRoles(profile?.sub_roles),
       headline: profile?.headline ?? "",
       disciplines: profile?.disciplines ?? [],
       skills: profile?.skills ?? [],
@@ -311,7 +315,8 @@ function FreelancerSection({ profile }: { profile: any }) {
       if (!user?.id) throw new Error("Not authenticated");
       return saveFreelancerProfile({
         data: {
-          role: form.role,
+          role_group: form.role_group,
+          sub_roles: form.sub_roles,
           headline: form.headline || null,
           disciplines: form.disciplines,
           skills: form.skills,
@@ -344,17 +349,49 @@ function FreelancerSection({ profile }: { profile: any }) {
     return (
       <div className="mt-4 space-y-4">
         <div>
-          <label className="text-xs text-muted-foreground">Role</label>
-          <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
-            {ROLE_OPTIONS.map((r) => (<option key={r.value} value={r.value}>{r.label}</option>))}
+          <label className="text-xs text-muted-foreground">Macro-role</label>
+          <select
+            value={form.role_group}
+            onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_roles: [], skills: [] })}
+            className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Select a macro-role…</option>
+            {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
           </select>
         </div>
+        <SubRolesEditor
+          group={form.role_group}
+          value={form.sub_roles}
+          onChange={(v) => setForm({ ...form, sub_roles: v })}
+        />
         <div>
           <label className="text-xs text-muted-foreground">Headline</label>
           <input value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="e.g. F1 Mechanic – 10 yrs" />
         </div>
         <MultiCheckboxBox label="Disciplines / Championships" options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
-        <MultiCheckboxBox label="Skills" options={SKILL_OPTIONS.map((o) => ({ value: o.value, label: skillLabel(o.value) }))} value={form.skills} onChange={(v) => setForm({ ...form, skills: v })} />
+        <div>
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              {showAllSkills || !form.role_group ? "All skills" : "Skills for your macro-role"}
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowAllSkills((v) => !v)}
+              className="font-mono text-[10px] uppercase tracking-widest text-racing-red hover:underline"
+            >
+              {showAllSkills ? "Show macro-role skills" : "Show all skills"}
+            </button>
+          </div>
+          <MultiCheckboxBox
+            label="Skills"
+            options={(showAllSkills || !form.role_group
+              ? SKILL_OPTIONS.map((o) => o.value)
+              : skillsForGroup(form.role_group)
+            ).map((v) => ({ value: v, label: skillLabel(v) }))}
+            value={form.skills}
+            onChange={(v) => setForm({ ...form, skills: v })}
+          />
+        </div>
         <div>
           <label className="text-xs text-muted-foreground">{t("education.label")}</label>
           <select value={form.education} onChange={(e) => setForm({ ...form, education: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
@@ -398,7 +435,17 @@ function FreelancerSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <Row label="Role" value={roleLabel(profile?.role)} />
+      <Row label="Macro-role" value={roleGroupLabel(profile?.role_group)} />
+      <div>
+        <div className="text-xs text-muted-foreground">Sub-roles</div>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {parseSubRoles(profile?.sub_roles).length ? parseSubRoles(profile?.sub_roles).map((sr) => (
+            <span key={sr.sub_role} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-yellow">
+              {subRoleLabel(sr.sub_role)} · {levelLabel(sr.level)}
+            </span>
+          )) : <span className="text-sm">—</span>}
+        </div>
+      </div>
       <Row label="Headline" value={profile?.headline ?? "—"} />
       <div>
         <div className="text-xs text-muted-foreground">Disciplines</div>
@@ -775,6 +822,46 @@ function LanguagesEditor({
       >
         {value.length === 0 ? "+ Add language" : "+ Add another language"}
       </button>
+    </div>
+  );
+}
+
+
+function SubRolesEditor({ group, value, onChange }: { group: string; value: FreelancerSubRole[]; onChange: (v: FreelancerSubRole[]) => void }) {
+  const options = subRolesForGroup(group);
+  if (!group) {
+    return <div className="border border-border bg-card p-3 text-xs text-muted-foreground">Select a macro-role first to pick your sub-roles.</div>;
+  }
+  const toggle = (sub: string) => {
+    const exists = value.find((v) => v.sub_role === sub);
+    onChange(exists ? value.filter((v) => v.sub_role !== sub) : [...value, { sub_role: sub, level: "intermediate" as SubRoleLevel }]);
+  };
+  const setLevel = (sub: string, level: SubRoleLevel) => onChange(value.map((v) => (v.sub_role === sub ? { ...v, level } : v)));
+  return (
+    <div>
+      <label className="text-xs text-muted-foreground">Sub-roles &amp; level</label>
+      <div className="mt-1 max-h-72 space-y-1 overflow-auto border border-border bg-card p-2">
+        {options.map((o) => {
+          const sel = value.find((v) => v.sub_role === o.value);
+          return (
+            <div key={o.value} className="flex items-center justify-between gap-2 px-1 py-1">
+              <label className="flex flex-1 items-center gap-2 text-sm">
+                <input type="checkbox" checked={!!sel} onChange={() => toggle(o.value)} className="accent-racing-red" />
+                <span>{o.label}</span>
+              </label>
+              {sel && (
+                <select
+                  value={sel.level}
+                  onChange={(e) => setLevel(o.value, e.target.value as SubRoleLevel)}
+                  className="border border-border bg-background px-2 py-1 font-mono text-[11px] uppercase"
+                >
+                  {SUB_ROLE_LEVELS.map((l) => (<option key={l} value={l}>{levelLabel(l)}</option>))}
+                </select>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
