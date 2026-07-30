@@ -357,6 +357,7 @@ function NewRequestPage() {
                 setLocationDetails({ city: p.city, region: p.region, country: p.country, placeId: p.placeId });
               }}
               placeholder="City, circuit or country"
+              includeAllPlaces
               className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
             />
             <div className="mt-3 flex flex-wrap items-center gap-2">

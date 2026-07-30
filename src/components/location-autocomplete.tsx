@@ -65,12 +65,15 @@ export function LocationAutocomplete({
   onPick,
   placeholder = "City, Country",
   className,
+  includeAllPlaces = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   onPick?: (p: LocationPick) => void;
   placeholder?: string;
   className?: string;
+  /** Job Requests may target a named circuit; profiles remain limited to geographic areas. */
+  includeAllPlaces?: boolean;
 }) {
   const [input, setInput] = useState(value);
   const [suggestions, setSuggestions] = useState<Array<{ text: string; placeId: string }>>([]);
@@ -115,11 +118,14 @@ export function LocationAutocomplete({
       if (!ready || text.trim().length < 2) { setSuggestions([]); return; }
       try {
         const places = placesRef.current;
-        const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        const request: Record<string, unknown> = {
           input: text,
           sessionToken: sessionRef.current,
-          includedPrimaryTypes: ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"],
-        });
+        };
+        if (!includeAllPlaces) {
+          request.includedPrimaryTypes = ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"];
+        }
+        const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
         const mapped = (s ?? [])
           .filter((x: any) => x.placePrediction)
           .map((x: any) => ({
