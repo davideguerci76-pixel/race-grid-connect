@@ -12,7 +12,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
-import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, ROLE_OPTIONS, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
+import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 
 const search = z.object({
   from: fallback(z.string().optional(), undefined),
@@ -72,7 +73,9 @@ function NewRequestPage() {
 
   const [form, setForm] = useState({
     title: "",
-    role: "race_mechanics" as string,
+    role_group: "engineering" as string,
+    sub_role: "" as string,
+    sub_role_min_level: "junior" as "junior" | "intermediate" | "senior",
     discipline: "formula_1" as string,
     duration: "race_weekend" as DurationType,
     circuit: "",
@@ -84,7 +87,8 @@ function NewRequestPage() {
     budget_unit: "day" as "day" | "event" | "season",
     notes: "",
   });
-  const [roleHard, setRoleHard] = useState(true);
+  const [subRoleHard, setSubRoleHard] = useState(false);
+  const [showAllSkills, setShowAllSkills] = useState(false);
   const [travelRequired, setTravelRequired] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -98,7 +102,9 @@ function NewRequestPage() {
     const s: any = source;
     setForm({
       title: s.title,
-      role: s.role as string,
+      role_group: (s.role_group as string) ?? "engineering",
+      sub_role: (s.sub_role as string) ?? "",
+      sub_role_min_level: (s.sub_role_min_level as "junior" | "intermediate" | "senior") ?? "junior",
       discipline: s.discipline as string,
       duration: s.duration as DurationType,
       circuit: s.circuit ?? "",
@@ -142,7 +148,10 @@ function NewRequestPage() {
       create({
         data: {
           title: form.title,
-          role: form.role,
+          role_group: form.role_group,
+          sub_role: form.sub_role || null,
+          sub_role_min_level: form.sub_role_min_level,
+          sub_role_hard: subRoleHard,
           discipline: form.discipline,
           duration: form.duration,
           circuit: form.circuit || null,
@@ -154,7 +163,6 @@ function NewRequestPage() {
           budget_unit: isSeason ? "season" : form.budget_unit,
           notes: form.notes || null,
           ...(isSeason ? { season_dates: seasonDatesIso } : {}),
-          role_hard: roleHard,
           travel_required: travelRequired,
           skills,
           skills_hard: skillsHard,
@@ -244,43 +252,50 @@ function NewRequestPage() {
           </div>
 
           <div>
-            <label className="label-mono">{t("jobs.filters.role")}</label>
+            <label className="label-mono">Macro-role</label>
+            <select
+              value={form.role_group}
+              onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_role: "" })}
+              className="mt-1 w-full border border-border bg-background px-3 py-2"
+            >
+              {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
+            </select>
+            <p className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
+              Hard filter — only {roleGroupLabel(form.role_group)} professionals will match.
+            </p>
+          </div>
+
+          <div>
+            <label className="label-mono">Sub-role &amp; minimum level</label>
             <div className="mt-1 flex gap-2">
               <select
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                value={form.sub_role}
+                onChange={(e) => setForm({ ...form, sub_role: e.target.value })}
                 className="flex-1 border border-border bg-background px-3 py-2"
               >
-                {ROLE_OPTIONS.map((o) => (
+                <option value="">Any sub-role</option>
+                {subRolesForGroup(form.role_group).map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
+              <select
+                value={form.sub_role_min_level}
+                onChange={(e) => setForm({ ...form, sub_role_min_level: e.target.value as "junior" | "intermediate" | "senior" })}
+                disabled={!form.sub_role}
+                className="border border-border bg-background px-3 py-2 disabled:opacity-40"
+              >
+                {SUB_ROLE_LEVELS.map((l) => (<option key={l} value={l}>{levelLabel(l)}</option>))}
+              </select>
               <button
                 type="button"
-                onClick={() => setRoleHard(!roleHard)}
-                title={roleHard ? "Only this role will match" : "Other roles can also match (preference only)"}
-                className={`border px-3 py-2 text-[11px] font-bold uppercase ${roleHard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
+                disabled={!form.sub_role}
+                onClick={() => setSubRoleHard(!subRoleHard)}
+                title={subRoleHard ? "Only this sub-role will match" : "Weighted preference only"}
+                className={`border px-3 py-2 text-[11px] font-bold uppercase disabled:opacity-40 ${subRoleHard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
               >
-                {roleHard ? "Hard" : "Soft"}
+                {subRoleHard ? "Hard" : "Soft"}
               </button>
             </div>
-          </div>
-          <SelectField
-            label={t("jobs.filters.discipline")}
-            value={form.discipline}
-            onChange={(v) => setForm({ ...form, discipline: v })}
-            options={DISCIPLINE_OPTIONS}
-          />
-
-          <SelectField
-            label={t("jobs.filters.duration")}
-            value={form.duration}
-            onChange={(v) => setForm({ ...form, duration: v as DurationType })}
-            options={DURATIONS.map((r) => ({ value: r, label: t(`duration.${r}`) }))}
-          />
-          <div>
-            <label className="label-mono">Circuit</label>
-            <input value={form.circuit} onChange={(e) => setForm({ ...form, circuit: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
 
           {!isSeason && (
@@ -347,10 +362,18 @@ function NewRequestPage() {
               Required skills <span className="text-racing-red">({skills.length + skillsHard.length})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => setShowAllSkills((v) => !v)}
+                className="float-right font-mono text-[10px] uppercase tracking-widest text-racing-red hover:underline"
+              >
+                {showAllSkills ? "Show macro-role skills" : "Show all skills"}
+              </button>
               Click a skill once for <span className="font-bold text-yellow-500">SOFT</span> (preference), twice for <span className="font-bold text-racing-red">HARD</span> (freelancer must have it), a third time to deselect.
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {SKILL_OPTIONS.map((o) => {
+              {(showAllSkills ? SKILL_OPTIONS.map((o) => o.value) : skillsForGroup(form.role_group)).map((sv) => {
+                const o = { value: sv };
                 const isSoft = skills.includes(o.value);
                 const isHard = skillsHard.includes(o.value);
                 const cycle = () => {
