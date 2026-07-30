@@ -266,7 +266,7 @@ function RequestMatchesPage() {
                           startDate: data.request.start_date,
                           endDate: data.request.end_date,
                           location: data.request.location ?? data.request.circuit ?? null,
-                          description: `${roleLabel(data.request.role)} · ${disciplineLabel(data.request.discipline)}\nFreelancer: ${data.hired.display_name ?? ""}${data.hired.contact_email ? `\nEmail: ${data.hired.contact_email}` : ""}${data.hired.phone_number ? `\nPhone: ${data.hired.phone_dial_code ?? ""} ${data.hired.phone_number}` : ""}`,
+                          description: `${roleGroupLabel(data.request.role_group)}${data.request.sub_role ? ` · ${subRoleLabel(data.request.sub_role)}` : ""} · ${disciplineLabel(data.request.discipline)}\nFreelancer: ${data.hired.display_name ?? ""}${data.hired.contact_email ? `\nEmail: ${data.hired.contact_email}` : ""}${data.hired.phone_number ? `\nPhone: ${data.hired.phone_dial_code ?? ""} ${data.hired.phone_number}` : ""}`,
                         }}
                       />
                     </div>
@@ -277,7 +277,7 @@ function RequestMatchesPage() {
                           fullName: data.hired.display_name ?? "Freelancer",
                           email: data.hired.contact_email ?? null,
                           phone: data.hired.phone_number ? `${data.hired.phone_dial_code ?? ""}${data.hired.phone_number}`.replace(/\s+/g, "") : null,
-                          title: data.hired.role ? roleLabel(data.hired.role) : null,
+                          title: data.hired.role_group ? roleGroupLabel(data.hired.role_group) : null,
                           notes: `PaddockMatch — Match confirmed for "${data.request.title}"`,
                         }}
                       />
