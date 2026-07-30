@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
@@ -150,7 +151,7 @@ function MatchesPage() {
                       <MissingCriteria list={m.missing_criteria ?? []} />
                       <div className="mt-3 border-t border-border pt-2 text-xs text-muted-foreground">{m.request?.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
-                        {m.request?.start_date} → {m.request?.end_date} · {t(`role.${m.request?.role}`)} · {t(`discipline.${m.request?.discipline}`)}
+                        {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">Overlap: {m.overlap_days} day(s)</div>
                     </div>

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
@@ -91,7 +92,7 @@ function EngagementsPage() {
                     )}
                     {!isFreelancer && fp && (
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {fp.role && <span>{t(`role.${fp.role}`, { defaultValue: fp.role })}</span>}
+                        {fp.role_group && <span>{roleGroupLabel(fp.role_group)}</span>}
                         {fp.location && <span> · {fp.location}</span>}
                         {typeof fp.day_rate === "number" && <span> · €{fp.day_rate}/day</span>}
                       </div>
@@ -107,7 +108,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-1">[REQUEST]</div>
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                      {t(`role.${req.role}`, { defaultValue: req.role })} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
+                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
                       {(req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
                     {(skillsHard.length > 0 || skillsSoft.length > 0) && (

@@ -6,7 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingStars } from "@/components/rating-stars";
-import { disciplineLabel, educationLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
+import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -61,9 +62,9 @@ function FreelancerProfile() {
         <div className="border border-border bg-card p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-black uppercase italic tracking-tighter">{fp.headline || roleLabel(fp.role)}</h1>
+              <h1 className="text-3xl font-black uppercase italic tracking-tighter">{fp.headline || roleGroupLabel(fp.role_group)}</h1>
               <div className="mt-1 text-sm text-muted-foreground">
-                {roleLabel(fp.role)} · {fp.location ?? "—"}
+                {roleGroupLabel(fp.role_group)}{parseSubRoles(fp.sub_roles).length ? ` · ${parseSubRoles(fp.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""} · {fp.location ?? "—"}
               </div>
               {fp.education && (
                 <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
