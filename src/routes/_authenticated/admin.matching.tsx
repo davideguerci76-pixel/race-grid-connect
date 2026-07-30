@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/admin/matching")({
 });
 
 const FIELDS: { key: string; label: string; hint: string }[] = [
-  { key: "role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
+  { key: "sub_role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
   { key: "skills_weight", label: "Skills", hint: "Requested skills possessed" },
   { key: "disciplines_weight", label: "Disciplines & Experience", hint: "Championship / discipline overlap" },
   { key: "day_rate_weight", label: "Day rate (EUR)", hint: "Rate vs budget" },
@@ -27,19 +27,25 @@ function AdminMatchingPage() {
 
   const { data } = useQuery({ queryKey: ["matching-weights"], queryFn: () => load() });
   const [values, setValues] = useState<Record<string, number>>({});
+  // Seniority multipliers, edited as factors (0..1), stored as percentages
+  const [factorX, setFactorX] = useState(0.5);
+  const [factorY, setFactorY] = useState(0.25);
 
   useEffect(() => {
     if (data) {
+      const d = data as any;
       setValues({
-        role_weight: Number(data.role_weight),
-        skills_weight: Number(data.skills_weight),
-        disciplines_weight: Number(data.disciplines_weight),
-        day_rate_weight: Number(data.day_rate_weight),
-        languages_weight: Number(data.languages_weight),
-        education_weight: Number(data.education_weight),
-        location_weight: Number(data.location_weight),
-        calendar_freshness_weight: Number((data as any).calendar_freshness_weight ?? 0),
+        sub_role_weight: Number(d.sub_role_weight ?? d.role_weight ?? 0),
+        skills_weight: Number(d.skills_weight),
+        disciplines_weight: Number(d.disciplines_weight),
+        day_rate_weight: Number(d.day_rate_weight),
+        languages_weight: Number(d.languages_weight),
+        education_weight: Number(d.education_weight),
+        location_weight: Number(d.location_weight),
+        calendar_freshness_weight: Number(d.calendar_freshness_weight ?? 0),
       });
+      setFactorX(Number(d.level_one_below_pct ?? 50) / 100);
+      setFactorY(Number(d.level_two_below_pct ?? 25) / 100);
     }
   }, [data]);
 
@@ -47,7 +53,14 @@ function AdminMatchingPage() {
   const validSum = Math.abs(total - 100) < 0.01;
 
   const mut = useMutation({
-    mutationFn: () => save({ data: values as any }),
+    mutationFn: () =>
+      save({
+        data: {
+          ...values,
+          level_one_below_pct: Math.max(0, Math.min(100, factorX * 100)),
+          level_two_below_pct: Math.max(0, Math.min(100, factorY * 100)),
+        } as any,
+      }),
     onSuccess: () => {
       toast.success("Weights saved and matches recomputed");
       qc.invalidateQueries({ queryKey: ["matching-weights"] });
