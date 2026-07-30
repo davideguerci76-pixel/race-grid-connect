@@ -243,8 +243,12 @@ export type Database = {
           headline: string | null
           languages: Json
           location: string | null
+          location_city: string | null
+          location_country: string | null
           location_lat: number | null
           location_lng: number | null
+          location_place_id: string | null
+          location_region: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
           skills: string[]
@@ -265,8 +269,12 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
+          location_region?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           skills?: string[]
@@ -287,8 +295,12 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
+          location_region?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           skills?: string[]
@@ -801,9 +813,13 @@ export type Database = {
           languages: Json
           location: string | null
           location_anchor: string
+          location_city: string | null
+          location_country: string | null
           location_lat: number | null
           location_lng: number | null
+          location_place_id: string | null
           location_radius_km: number | null
+          location_region: string | null
           location_relevance: string
           notes: string | null
           partial_refund_taken: boolean
@@ -843,9 +859,13 @@ export type Database = {
           languages?: Json
           location?: string | null
           location_anchor?: string
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
           location_radius_km?: number | null
+          location_region?: string | null
           location_relevance?: string
           notes?: string | null
           partial_refund_taken?: boolean
@@ -885,9 +905,13 @@ export type Database = {
           languages?: Json
           location?: string | null
           location_anchor?: string
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
           location_radius_km?: number | null
+          location_region?: string | null
           location_relevance?: string
           notes?: string | null
           partial_refund_taken?: boolean
@@ -1042,8 +1066,12 @@ export type Database = {
           founded_year: number | null
           initials: string | null
           location: string | null
+          location_city: string | null
+          location_country: string | null
           location_lat: number | null
           location_lng: number | null
+          location_place_id: string | null
+          location_region: string | null
           primary_discipline: Database["public"]["Enums"]["discipline"] | null
           size: string | null
           team_name: string
@@ -1057,8 +1085,12 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
+          location_region?: string | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name: string
@@ -1072,8 +1104,12 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_city?: string | null
+          location_country?: string | null
           location_lat?: number | null
           location_lng?: number | null
+          location_place_id?: string | null
+          location_region?: string | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name?: string
@@ -1349,9 +1385,13 @@ export type Database = {
           languages: Json
           location: string | null
           location_anchor: string
+          location_city: string | null
+          location_country: string | null
           location_lat: number | null
           location_lng: number | null
+          location_place_id: string | null
           location_radius_km: number | null
+          location_region: string | null
           location_relevance: string
           notes: string | null
           partial_refund_taken: boolean
@@ -1580,9 +1620,13 @@ export type Database = {
           languages: Json
           location: string | null
           location_anchor: string
+          location_city: string | null
+          location_country: string | null
           location_lat: number | null
           location_lng: number | null
+          location_place_id: string | null
           location_radius_km: number | null
+          location_region: string | null
           location_relevance: string
           notes: string | null
           partial_refund_taken: boolean
