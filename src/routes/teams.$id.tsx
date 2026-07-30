@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { initialsFor, disciplineLabel, roleLabel, skillLabel } from "@/lib/paddock";
+import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Lock } from "lucide-react";
 
 type Search = { req?: string };
@@ -173,7 +174,7 @@ function TeamProfile() {
                 <div key={r.id} className="border border-border bg-card p-4">
                   <div className="mb-2 flex flex-wrap gap-2">
                     <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(r.discipline)}</span>
-                    <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{roleLabel(r.role)}</span>
+                    <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group)}</span>
                   </div>
                   <div className="font-bold">{r.title}</div>
                   <div className="font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}{r.circuit ? ` · ${r.circuit}` : ""}</div>

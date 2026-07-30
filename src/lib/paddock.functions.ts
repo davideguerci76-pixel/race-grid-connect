@@ -56,7 +56,16 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z
       .object({
-        role: roleEnum,
+        role_group: z.string().min(1).max(64),
+        sub_roles: z
+          .array(
+            z.object({
+              sub_role: z.string().min(1).max(64),
+              level: z.enum(["junior", "intermediate", "senior"]),
+            }),
+          )
+          .max(40)
+          .optional(),
         headline: z.string().max(140).optional().nullable(),
         disciplines: z.array(disciplineEnum).max(80),
         skills: z.array(z.string().max(64)).max(80).optional(),
@@ -100,7 +109,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     const { data: row, error } = await context.supabase.from("freelancer_profiles").upsert(
       {
         user_id: context.userId,
-        role: data.role,
+        role_group: data.role_group,
+        sub_roles: data.sub_roles ?? [],
         headline: data.headline || null,
         disciplines: data.disciplines,
         skills: data.skills ?? [],
@@ -192,8 +202,10 @@ export const createRequest = createServerFn({ method: "POST" })
     z
       .object({
         title: z.string().min(3).max(120),
-        role: roleEnum,
-        role_hard: z.boolean().optional().default(true),
+        role_group: z.string().min(1).max(64),
+        sub_role: z.string().max(64).optional().nullable(),
+        sub_role_min_level: z.enum(["junior", "intermediate", "senior"]).optional().default("junior"),
+        sub_role_hard: z.boolean().optional().default(false),
         discipline: disciplineEnum,
         circuit: z.string().max(120).optional().nullable(),
         location: z.string().max(120).optional().nullable(),
@@ -237,7 +249,10 @@ export const createRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const payload: Record<string, unknown> = {
       title: data.title,
-      role: data.role,
+      role_group: data.role_group,
+      sub_role: data.sub_role || null,
+      sub_role_min_level: data.sub_role_min_level ?? "junior",
+      sub_role_hard: data.sub_role_hard ?? false,
       discipline: data.discipline,
       duration: data.duration,
       circuit: data.circuit ?? null,
@@ -254,7 +269,6 @@ export const createRequest = createServerFn({ method: "POST" })
       education: data.education ?? [],
       experience_requirements: data.experience_requirements ?? [],
       languages: data.languages ?? [],
-      role_hard: data.role_hard ?? true,
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
 
@@ -407,7 +421,8 @@ export const getMyMatches = createServerFn({ method: "GET" })
           const fp = freelancerProfilesById.get(m.freelancer_id);
           counterparty = fp ? {
             headline: fp.headline,
-            role: fp.role,
+            role_group: fp.role_group,
+            sub_roles: fp.sub_roles,
             disciplines: fp.disciplines,
             skills: fp.skills,
             location: fp.location,
@@ -514,7 +529,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
+      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
@@ -526,7 +541,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
         ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
         : Promise.resolve({ data: [] as any[] } as any),
       freelancerIds.length
-        ? supabase.from("freelancer_profiles").select("user_id, headline, role, location, day_rate, disciplines, skills, bio, travels").in("user_id", freelancerIds)
+        ? supabase.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, day_rate, disciplines, skills, bio, travels").in("user_id", freelancerIds)
         : Promise.resolve({ data: [] as any[] } as any),
     ]);
     const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
@@ -707,7 +722,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               display_name: prof?.display_name ?? "Freelancer",
               avatar_url: prof?.avatar_url ?? null,
               headline: fp?.headline ?? null,
-              role: fp?.role ?? null,
+              role_group: fp?.role_group ?? null,
+              sub_roles: fp?.sub_roles ?? [],
               disciplines: fp?.disciplines ?? [],
               skills: fp?.skills ?? [],
               location: fp?.location ?? null,
@@ -759,7 +775,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           display_name: hProf?.display_name ?? "Freelancer",
           avatar_url: hProf?.avatar_url ?? null,
           headline: (hFp as any)?.headline ?? null,
-          role: (hFp as any)?.role ?? null,
+          role_group: (hFp as any)?.role_group ?? null,
+          sub_roles: (hFp as any)?.sub_roles ?? [],
           location: (hFp as any)?.location ?? null,
           day_rate: (hFp as any)?.day_rate ?? null,
           bio: (hFp as any)?.bio ?? null,

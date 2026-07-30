@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { DISCIPLINES, DURATIONS, ROLES, type Discipline, type DurationType, type FreelancerRole } from "@/lib/paddock";
+import { DISCIPLINES, DURATIONS, type Discipline, type DurationType } from "@/lib/paddock";
+import { ROLE_GROUPS, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/jobs")({
   component: JobsPage,
@@ -18,7 +19,7 @@ function JobsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
-  const [role, setRole] = useState<FreelancerRole | "all">("all");
+  const [role, setRole] = useState<string>("all");
   const [disc, setDisc] = useState<Discipline | "all">("all");
   const [dur, setDur] = useState<DurationType | "all">("all");
   const [confirmRequestId, setConfirmRequestId] = useState<string | null>(null);
@@ -80,7 +81,7 @@ function JobsPage() {
   });
 
   const filtered = requests.filter((r) => {
-    if (role !== "all" && r.role !== role) return false;
+    if (role !== "all" && (r as any).role_group !== role) return false;
     if (disc !== "all" && r.discipline !== disc) return false;
     if (dur !== "all" && r.duration !== dur) return false;
     if (q && !`${r.title} ${r.circuit ?? ""} ${r.location ?? ""}`.toLowerCase().includes(q.toLowerCase())) return false;
@@ -126,7 +127,7 @@ function JobsPage() {
             placeholder={t("jobs.filters.search_placeholder")}
             className="border border-border bg-card px-3 py-2 focus:border-racing-red focus:outline-none"
           />
-          <FilterSelect value={role} onChange={(v) => setRole(v as FreelancerRole | "all")} label={t("jobs.filters.role")} options={ROLES} translate={(v) => t(`role.${v}`)} />
+          <FilterSelect value={role} onChange={(v) => setRole(v)} label={t("jobs.filters.role")} options={ROLE_GROUPS.map((g) => g.value)} translate={(v) => roleGroupLabel(v)} />
           <FilterSelect value={disc} onChange={(v) => setDisc(v as Discipline | "all")} label={t("jobs.filters.discipline")} options={DISCIPLINES} translate={(v) => t(`discipline.${v}`)} />
           <FilterSelect value={dur} onChange={(v) => setDur(v as DurationType | "all")} label={t("jobs.filters.duration")} options={DURATIONS} translate={(v) => t(`duration.${v}`)} />
         </div>
@@ -142,7 +143,7 @@ function JobsPage() {
                 <div>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <span className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red">{t(`discipline.${r.discipline}`)}</span>
-                    <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t(`role.${r.role}`)}</span>
+                    <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{(r as any).sub_role ? subRoleLabel((r as any).sub_role) : roleGroupLabel((r as any).role_group)}</span>
                     <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t(`duration.${r.duration}`)}</span>
                   </div>
                   <div className="text-lg font-bold">{r.title}</div>

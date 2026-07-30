@@ -9,7 +9,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
-import { roleLabel, disciplineLabel } from "@/lib/paddock";
+import { disciplineLabel } from "@/lib/paddock";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -87,7 +88,7 @@ function RequestsPage() {
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
                     <span className="font-mono text-[11px] uppercase text-muted-foreground">
-                      {roleLabel(r.role)} · {disciplineLabel(r.discipline)}
+                      {(r as any).sub_role ? subRoleLabel((r as any).sub_role) : roleGroupLabel((r as any).role_group)} · {disciplineLabel(r.discipline)}
                     </span>
                   </div>
                   <h2 className="mt-1 text-xl font-bold">{r.title}</h2>

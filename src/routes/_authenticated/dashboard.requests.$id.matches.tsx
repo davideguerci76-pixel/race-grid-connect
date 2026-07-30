@@ -7,7 +7,8 @@ import { Lock, Unlock, Mail, Phone, Star, ArrowLeft } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation } from "@/lib/paddock.functions";
-import { roleLabel, disciplineLabel } from "@/lib/paddock";
+import { disciplineLabel } from "@/lib/paddock";
+import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
@@ -62,7 +63,7 @@ function RequestMatchesPage() {
               <div className="label-mono">[REQUEST]</div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{data.request.title}</h1>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
-                {roleLabel(data.request.role)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
+                {data.request.sub_role ? `${subRoleLabel(data.request.sub_role)} (${levelLabel(data.request.sub_role_min_level ?? "junior")}+)` : roleGroupLabel(data.request.role_group)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
                 <span className="font-bold text-racing-yellow">Free preview:</span> the top 3 candidates by match score are unlocked automatically. Every other candidate costs 1 token to unlock.
@@ -81,7 +82,7 @@ function RequestMatchesPage() {
                       <div className="text-2xl font-black italic tracking-tighter">{data.hired.display_name}</div>
                       {data.hired.headline && <div className="text-sm text-muted-foreground">{data.hired.headline}</div>}
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {data.hired.role && <>{roleLabel(data.hired.role)}</>}
+                        {data.hired.role_group && <>{roleGroupLabel(data.hired.role_group)}</>}
                         {data.hired.location && <> · 📍 {data.hired.location}</>}
                       </div>
                     </div>
@@ -214,7 +215,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled }: { mat
               </div>
               <div>
                 <div className="text-lg font-bold">{match.profile.display_name}</div>
-                {match.profile.role && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(match.profile.role)}</div>}
+                {match.profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(match.profile.role_group)}{parseSubRoles(match.profile.sub_roles).length ? ` · ${parseSubRoles(match.profile.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
               </div>
             </div>
             {match.profile.headline && <p className="mt-3 text-sm">{match.profile.headline}</p>}

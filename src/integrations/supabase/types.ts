@@ -245,8 +245,10 @@ export type Database = {
           location: string | null
           location_lat: number | null
           location_lng: number | null
-          role: Database["public"]["Enums"]["freelancer_role"]
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
           skills: string[]
+          sub_roles: Json
           travels: boolean
           updated_at: string
           user_id: string
@@ -265,8 +267,10 @@ export type Database = {
           location?: string | null
           location_lat?: number | null
           location_lng?: number | null
-          role?: Database["public"]["Enums"]["freelancer_role"]
+          role?: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group?: string | null
           skills?: string[]
+          sub_roles?: Json
           travels?: boolean
           updated_at?: string
           user_id: string
@@ -285,8 +289,10 @@ export type Database = {
           location?: string | null
           location_lat?: number | null
           location_lng?: number | null
-          role?: Database["public"]["Enums"]["freelancer_role"]
+          role?: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group?: string | null
           skills?: string[]
+          sub_roles?: Json
           travels?: boolean
           updated_at?: string
           user_id?: string
@@ -440,9 +446,13 @@ export type Database = {
           education_weight: number
           id: boolean
           languages_weight: number
+          level_exact_pct: number
+          level_one_below_pct: number
+          level_two_below_pct: number
           location_weight: number
           role_weight: number
           skills_weight: number
+          sub_role_weight: number
           updated_at: string
         }
         Insert: {
@@ -452,9 +462,13 @@ export type Database = {
           education_weight?: number
           id?: boolean
           languages_weight?: number
+          level_exact_pct?: number
+          level_one_below_pct?: number
+          level_two_below_pct?: number
           location_weight?: number
           role_weight?: number
           skills_weight?: number
+          sub_role_weight?: number
           updated_at?: string
         }
         Update: {
@@ -464,9 +478,13 @@ export type Database = {
           education_weight?: number
           id?: boolean
           languages_weight?: number
+          level_exact_pct?: number
+          level_one_below_pct?: number
+          level_two_below_pct?: number
           location_weight?: number
           role_weight?: number
           skills_weight?: number
+          sub_role_weight?: number
           updated_at?: string
         }
         Relationships: []
@@ -792,13 +810,17 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
-          role: Database["public"]["Enums"]["freelancer_role"]
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
           team_id: string
           title: string
           travel_required: boolean
@@ -830,13 +852,17 @@ export type Database = {
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
-          role: Database["public"]["Enums"]["freelancer_role"]
+          role?: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group?: string | null
           role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
           skills_hard?: string[]
           start_date: string
           status?: Database["public"]["Enums"]["request_status"]
+          sub_role?: string | null
+          sub_role_hard?: boolean
+          sub_role_min_level?: string
           team_id: string
           title: string
           travel_required?: boolean
@@ -868,13 +894,17 @@ export type Database = {
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
-          role?: Database["public"]["Enums"]["freelancer_role"]
+          role?: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group?: string | null
           role_hard?: boolean
           season_dates?: string[] | null
           skills?: string[]
           skills_hard?: string[]
           start_date?: string
           status?: Database["public"]["Enums"]["request_status"]
+          sub_role?: string | null
+          sub_role_hard?: boolean
+          sub_role_min_level?: string
           team_id?: string
           title?: string
           travel_required?: boolean
@@ -1328,13 +1358,17 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
-          role: Database["public"]["Enums"]["freelancer_role"]
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
           team_id: string
           title: string
           travel_required: boolean
@@ -1443,6 +1477,8 @@ export type Database = {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
+      legacy_role_group: { Args: { _role: string }; Returns: string }
+      legacy_sub_role: { Args: { _role: string }; Returns: string }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }
         Returns: boolean
@@ -1553,13 +1589,17 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
-          role: Database["public"]["Enums"]["freelancer_role"]
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
           role_hard: boolean
           season_dates: string[] | null
           skills: string[]
           skills_hard: string[]
           start_date: string
           status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
           team_id: string
           title: string
           travel_required: boolean

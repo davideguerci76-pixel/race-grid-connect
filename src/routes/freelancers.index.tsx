@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { roleGroupLabel } from "@/lib/roles";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
@@ -17,12 +18,12 @@ function FreelancersIndex() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("freelancer_profiles")
-        .select("user_id, role, disciplines, day_rate, currency, location, headline, travels, skills")
+        .select("user_id, role_group, sub_roles, disciplines, day_rate, currency, location, headline, travels, skills")
         .limit(48);
       if (error) throw error;
       return (data ?? []).map((r) => ({
         id: r.user_id,
-        display_name: r.headline || r.role,
+        display_name: r.headline || roleGroupLabel(r.role_group),
         freelancer_profiles: r,
       }));
     },
@@ -47,7 +48,7 @@ function FreelancersIndex() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-bold">{f.display_name}</div>
-                    <div className="text-xs text-muted-foreground">{p ? t(`role.${p.role}`) : ""}</div>
+                    <div className="text-xs text-muted-foreground">{p ? roleGroupLabel(p.role_group) : ""}</div>
                   </div>
                 </div>
                 {p?.headline && <div className="mt-3 line-clamp-2 text-sm text-muted-foreground">{p.headline}</div>}
