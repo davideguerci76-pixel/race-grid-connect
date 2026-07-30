@@ -141,6 +141,7 @@ export function LocationAutocomplete({
     const places = placesRef.current;
     let lat: number | null = null;
     let lng: number | null = null;
+    let emitted = false;
     if (places && onPick) {
       try {
         const place = new places.Place({ id: s.placeId });
@@ -165,9 +166,10 @@ export function LocationAutocomplete({
           country: component("country"),
           placeId: (place as any).id || s.placeId,
         });
+        emitted = true;
       } catch { /* ignore */ }
     }
-    if (!places || !onPick) {
+    if (!emitted) {
       onPick?.({ text: s.text, lat, lng, city: null, region: null, country: null, placeId: s.placeId });
     }
     if (places) sessionRef.current = new places.AutocompleteSessionToken();
@@ -203,6 +205,9 @@ export function LocationAutocomplete({
               {s.text}
             </button>
           ))}
+          <div className="border-t border-border px-3 py-1.5 text-right font-mono text-[9px] uppercase text-muted-foreground">
+            Powered by Google
+          </div>
         </div>
       )}
     </div>
