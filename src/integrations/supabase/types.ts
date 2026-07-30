@@ -29,6 +29,27 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_time_settings: {
+        Row: {
+          id: boolean
+          offset_days: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: boolean
+          offset_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: boolean
+          offset_days?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       availability: {
         Row: {
           created_at: string
@@ -60,57 +81,99 @@ export type Database = {
       }
       engagements: {
         Row: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         Insert: {
+          cancellation_kind?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          confirmed_at?: string | null
+          contact_check_sent_at?: string | null
           created_at?: string
           currency?: string
           end_date: string
           fee?: number | null
+          freelancer_contacted?: boolean | null
+          freelancer_contacted_at?: string | null
           freelancer_id: string
           freelancer_marked_complete?: boolean
+          ghosting_released_at?: string | null
           id?: string
           match_id?: string | null
+          no_show?: boolean
           notes?: string | null
           proposed_by: string
           request_id?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact?: boolean | null
+          team_confirmed_contact_at?: string | null
           team_id: string
           team_marked_complete?: boolean
+          team_reminder1_sent_at?: string | null
+          team_reminder2_sent_at?: string | null
           updated_at?: string
         }
         Update: {
+          cancellation_kind?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          confirmed_at?: string | null
+          contact_check_sent_at?: string | null
           created_at?: string
           currency?: string
           end_date?: string
           fee?: number | null
+          freelancer_contacted?: boolean | null
+          freelancer_contacted_at?: string | null
           freelancer_id?: string
           freelancer_marked_complete?: boolean
+          ghosting_released_at?: string | null
           id?: string
           match_id?: string | null
+          no_show?: boolean
           notes?: string | null
           proposed_by?: string
           request_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact?: boolean | null
+          team_confirmed_contact_at?: string | null
           team_id?: string
           team_marked_complete?: boolean
+          team_reminder1_sent_at?: string | null
+          team_reminder2_sent_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -171,6 +234,7 @@ export type Database = {
       freelancer_profiles: {
         Row: {
           bio: string | null
+          calendar_last_updated_at: string
           currency: string
           day_rate: number | null
           disciplines: Database["public"]["Enums"]["discipline"][]
@@ -179,6 +243,8 @@ export type Database = {
           headline: string | null
           languages: Json
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           skills: string[]
           travels: boolean
@@ -188,6 +254,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
@@ -196,6 +263,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
@@ -205,6 +274,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
           disciplines?: Database["public"]["Enums"]["discipline"][]
@@ -213,6 +283,8 @@ export type Database = {
           headline?: string | null
           languages?: Json
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           skills?: string[]
           travels?: boolean
@@ -278,44 +350,62 @@ export type Database = {
       matches: {
         Row: {
           created_at: string
+          edge_only: boolean
+          final_score: number
           freelancer_id: string
           id: string
+          is_partial: boolean
           is_perfect: boolean
           match_score: number
           missing_criteria: Json
+          missing_days: number
+          missing_pct: number
           overlap_days: number
           request_id: string
           revealed_by_freelancer: boolean
           revealed_by_team: boolean
           score: number
+          skills_score: number
           team_id: string
         }
         Insert: {
           created_at?: string
+          edge_only?: boolean
+          final_score?: number
           freelancer_id: string
           id?: string
+          is_partial?: boolean
           is_perfect?: boolean
           match_score?: number
           missing_criteria?: Json
+          missing_days?: number
+          missing_pct?: number
           overlap_days?: number
           request_id: string
           revealed_by_freelancer?: boolean
           revealed_by_team?: boolean
           score?: number
+          skills_score?: number
           team_id: string
         }
         Update: {
           created_at?: string
+          edge_only?: boolean
+          final_score?: number
           freelancer_id?: string
           id?: string
+          is_partial?: boolean
           is_perfect?: boolean
           match_score?: number
           missing_criteria?: Json
+          missing_days?: number
+          missing_pct?: number
           overlap_days?: number
           request_id?: string
           revealed_by_freelancer?: boolean
           revealed_by_team?: boolean
           score?: number
+          skills_score?: number
           team_id?: string
         }
         Relationships: [
@@ -344,6 +434,7 @@ export type Database = {
       }
       matching_weights: {
         Row: {
+          calendar_freshness_weight: number
           day_rate_weight: number
           disciplines_weight: number
           education_weight: number
@@ -355,6 +446,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calendar_freshness_weight?: number
           day_rate_weight?: number
           disciplines_weight?: number
           education_weight?: number
@@ -366,6 +458,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calendar_freshness_weight?: number
           day_rate_weight?: number
           disciplines_weight?: number
           education_weight?: number
@@ -413,6 +506,42 @@ export type Database = {
           },
         ]
       }
+      platform_settings: {
+        Row: {
+          category: string
+          description: string | null
+          key: string
+          label: string
+          sort_order: number
+          unit: string
+          updated_at: string
+          updated_by: string | null
+          value_num: number
+        }
+        Insert: {
+          category?: string
+          description?: string | null
+          key: string
+          label: string
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_num: number
+        }
+        Update: {
+          category?: string
+          description?: string | null
+          key?: string
+          label?: string
+          sort_order?: number
+          unit?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_num?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -449,33 +578,101 @@ export type Database = {
         }
         Relationships: []
       }
+      rating_flags: {
+        Row: {
+          created_at: string
+          id: string
+          rating_id: string
+          reason: string
+          reported_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating_id: string
+          reason: string
+          reported_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating_id?: string
+          reason?: string
+          reported_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rating_flags_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ratings: {
         Row: {
+          auto_suspicious: boolean
           comment: string | null
           created_at: string
           engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
           from_user_id: string
           id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at: string | null
+          overall: number | null
           stars: number
+          sub_scores: Json
           to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
         }
         Insert: {
+          auto_suspicious?: boolean
           comment?: string | null
           created_at?: string
           engagement_id: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           from_user_id: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at?: string | null
+          overall?: number | null
           stars: number
+          sub_scores?: Json
           to_user_id: string
+          token_bonus_awarded?: boolean
+          unlocked_at?: string | null
         }
         Update: {
+          auto_suspicious?: boolean
           comment?: string | null
           created_at?: string
           engagement_id?: string
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           from_user_id?: string
           id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at?: string | null
+          overall?: number | null
           stars?: number
+          sub_scores?: Json
           to_user_id?: string
+          token_bonus_awarded?: boolean
+          unlocked_at?: string | null
         }
         Relationships: [
           {
@@ -530,6 +727,44 @@ export type Database = {
           },
         ]
       }
+      request_tier_unlocks: {
+        Row: {
+          id: string
+          request_id: string
+          scope: string
+          team_id: string
+          tier: number
+          tokens_spent: number
+          unlocked_at: string
+        }
+        Insert: {
+          id?: string
+          request_id: string
+          scope?: string
+          team_id: string
+          tier: number
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Update: {
+          id?: string
+          request_id?: string
+          scope?: string
+          team_id?: string
+          tier?: number
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_tier_unlocks_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           budget_max: number | null
@@ -547,7 +782,16 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null
@@ -576,7 +820,16 @@ export type Database = {
           is_active?: boolean
           languages?: Json
           location?: string | null
+          location_anchor?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_radius_km?: number | null
+          location_relevance?: string
           notes?: string | null
+          partial_refund_taken?: boolean
+          refund_kind?: string | null
+          refund_pct?: number | null
+          refund_tokens?: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
           season_dates?: string[] | null
@@ -605,7 +858,16 @@ export type Database = {
           is_active?: boolean
           languages?: Json
           location?: string | null
+          location_anchor?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          location_radius_km?: number | null
+          location_relevance?: string
           notes?: string | null
+          partial_refund_taken?: boolean
+          refund_kind?: string | null
+          refund_pct?: number | null
+          refund_tokens?: number | null
           role?: Database["public"]["Enums"]["freelancer_role"]
           role_hard?: boolean
           season_dates?: string[] | null
@@ -628,12 +890,130 @@ export type Database = {
           },
         ]
       }
+      review_unlocks: {
+        Row: {
+          created_at: string
+          id: string
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sos_call_targets: {
+        Row: {
+          distance_km: number | null
+          freelancer_id: string
+          id: string
+          match_id: string | null
+          notified_at: string
+          skills_score: number
+          sos_id: string
+        }
+        Insert: {
+          distance_km?: number | null
+          freelancer_id: string
+          id?: string
+          match_id?: string | null
+          notified_at?: string
+          skills_score: number
+          sos_id: string
+        }
+        Update: {
+          distance_km?: number | null
+          freelancer_id?: string
+          id?: string
+          match_id?: string | null
+          notified_at?: string
+          skills_score?: number
+          sos_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_call_targets_sos_id_fkey"
+            columns: ["sos_id"]
+            isOneToOne: false
+            referencedRelation: "sos_calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_calls: {
+        Row: {
+          auto_triggered: boolean
+          id: string
+          min_pct: number
+          radius_km: number | null
+          request_id: string
+          resolved_at: string | null
+          resolved_engagement_id: string | null
+          target_count: number
+          team_id: string
+          triggered_at: string
+          triggered_by: string
+        }
+        Insert: {
+          auto_triggered?: boolean
+          id?: string
+          min_pct: number
+          radius_km?: number | null
+          request_id: string
+          resolved_at?: string | null
+          resolved_engagement_id?: string | null
+          target_count?: number
+          team_id: string
+          triggered_at?: string
+          triggered_by: string
+        }
+        Update: {
+          auto_triggered?: boolean
+          id?: string
+          min_pct?: number
+          radius_km?: number | null
+          request_id?: string
+          resolved_at?: string | null
+          resolved_engagement_id?: string | null
+          target_count?: number
+          team_id?: string
+          triggered_at?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_calls_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sos_calls_resolved_engagement_id_fkey"
+            columns: ["resolved_engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_profiles: {
         Row: {
           bio: string | null
           founded_year: number | null
           initials: string | null
           location: string | null
+          location_lat: number | null
+          location_lng: number | null
           primary_discipline: Database["public"]["Enums"]["discipline"] | null
           size: string | null
           team_name: string
@@ -647,6 +1027,8 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name: string
@@ -660,6 +1042,8 @@ export type Database = {
           founded_year?: number | null
           initials?: string | null
           location?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
           primary_discipline?: Database["public"]["Enums"]["discipline"] | null
           size?: string | null
           team_name?: string
@@ -763,21 +1147,35 @@ export type Database = {
       accept_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -787,6 +1185,121 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      accept_sos_call: {
+        Args: { _sos_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_rating_moderation: {
+        Args: { _action: string; _rating_id: string }
+        Returns: {
+          auto_suspicious: boolean
+          comment: string | null
+          created_at: string
+          engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
+          from_user_id: string
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at: string | null
+          overall: number | null
+          stars: number
+          sub_scores: Json
+          to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ratings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_time_offset: { Args: { _days: number }; Returns: number }
+      cancel_engagement: {
+        Args: { _engagement_id: string; _reason?: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      close_expired_requests: { Args: never; Returns: number }
+      confirm_calendar: { Args: never; Returns: string }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -805,7 +1318,16 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null
@@ -835,11 +1357,94 @@ export type Database = {
         }
         Returns: number
       }
+      emit_calendar_stale_notifications: { Args: never; Returns: number }
+      emit_contact_checks: { Args: never; Returns: number }
+      emit_rating_available_notifications: { Args: never; Returns: number }
+      emit_team_ghosting_reminders: { Args: never; Returns: number }
+      flag_rating: {
+        Args: { _rating_id: string; _reason: string }
+        Returns: undefined
+      }
+      freelancer_answer_contact: {
+        Args: { _contacted: boolean; _engagement_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_anonymous_reviews: {
+        Args: { _target: string }
+        Returns: {
+          comment: string
+          created_at: string
+          id: string
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
+          overall: number
+          stars: number
+          sub_scores: Json
+        }[]
+      }
+      get_setting_num: {
+        Args: { _default: number; _key: string }
+        Returns: number
+      }
+      get_user_rating_summary: {
+        Args: { _user_id: string }
+        Returns: {
+          average: number
+          count: number
+          punct: number
+          stress: number
+          tech: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      haversine_km: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
+      }
+      match_edge_only: {
+        Args: { _freelancer: string; _required: string[] }
         Returns: boolean
       }
       my_freelancer_phone: {
@@ -850,28 +1455,53 @@ export type Database = {
         }[]
       }
       my_token_balance: { Args: never; Returns: number }
+      rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
       }
+      refund_and_close_request: {
+        Args: { _mode: string; _request_id: string }
+        Returns: {
+          balance: number
+          kind: string
+          refund_pct: number
+          refund_tokens: number
+        }[]
+      }
+      release_ghosted_engagements: { Args: never; Returns: number }
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
           created_at: string
           currency: string
           end_date: string
           fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
           freelancer_id: string
           freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
           id: string
           match_id: string | null
+          no_show: boolean
           notes: string | null
           proposed_by: string
           request_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
           team_id: string
           team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -890,6 +1520,7 @@ export type Database = {
         }[]
       }
       reveal_request: { Args: { _request_id: string }; Returns: number }
+      reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
       set_request_status: {
         Args: {
@@ -912,7 +1543,16 @@ export type Database = {
           is_active: boolean
           languages: Json
           location: string | null
+          location_anchor: string
+          location_lat: number | null
+          location_lng: number | null
+          location_radius_km: number | null
+          location_relevance: string
           notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
           role: Database["public"]["Enums"]["freelancer_role"]
           role_hard: boolean
           season_dates: string[] | null
@@ -932,7 +1572,122 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sim_now: { Args: never; Returns: string }
+      submit_rating_v2: {
+        Args: {
+          _comment?: string
+          _engagement_id: string
+          _overall: number
+          _sub_scores: Json
+        }
+        Returns: {
+          auto_suspicious: boolean
+          comment: string | null
+          created_at: string
+          engagement_id: string
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
+          from_user_id: string
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
+          notified_at: string | null
+          overall: number | null
+          stars: number
+          sub_scores: Json
+          to_user_id: string
+          token_bonus_awarded: boolean
+          unlocked_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ratings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      team_cancellation_stats: {
+        Args: { _team_id: string }
+        Returns: {
+          avg_days_notice: number
+          count: number
+        }[]
+      }
+      team_confirm_contact: {
+        Args: { _engagement_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          created_at: string
+          currency: string
+          end_date: string
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      trigger_sos_call: {
+        Args: { _request_id: string }
+        Returns: {
+          auto_triggered: boolean
+          id: string
+          min_pct: number
+          radius_km: number | null
+          request_id: string
+          resolved_at: string | null
+          resolved_engagement_id: string | null
+          target_count: number
+          team_id: string
+          triggered_at: string
+          triggered_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sos_calls"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       unlock_match_for_team: { Args: { _match_id: string }; Returns: number }
+      unlock_request_tier: {
+        Args: { _request_id: string; _scope?: string; _tier: number }
+        Returns: {
+          balance: number
+          tier: number
+          tokens_spent: number
+          total_matches: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -1033,6 +1788,26 @@ export type Database = {
         | "engagement_completed"
         | "rating_received"
         | "tokens_credited"
+        | "rating_available"
+        | "rating_unlocked"
+        | "match_taken"
+        | "match_reopened"
+        | "sos_call"
+        | "sos_taken"
+        | "engagement_cancelled"
+        | "request_unfilled"
+        | "calendar_stale"
+        | "contact_check"
+        | "team_contact_reminder_1"
+        | "team_contact_reminder_2"
+        | "ghosting_released"
+        | "team_ghosted"
+      rating_moderation_status:
+        | "active"
+        | "flagged"
+        | "frozen"
+        | "deleted"
+        | "approved"
       request_status: "active" | "paused" | "closed" | "completed" | "filled"
       token_reason:
         | "signup_bonus"
@@ -1043,6 +1818,7 @@ export type Database = {
         | "refund"
         | "request_post"
         | "team_reveal_spend"
+        | "rating_bonus"
       user_type: "freelancer" | "team"
     }
     CompositeTypes: {
@@ -1271,6 +2047,27 @@ export const Constants = {
         "engagement_completed",
         "rating_received",
         "tokens_credited",
+        "rating_available",
+        "rating_unlocked",
+        "match_taken",
+        "match_reopened",
+        "sos_call",
+        "sos_taken",
+        "engagement_cancelled",
+        "request_unfilled",
+        "calendar_stale",
+        "contact_check",
+        "team_contact_reminder_1",
+        "team_contact_reminder_2",
+        "ghosting_released",
+        "team_ghosted",
+      ],
+      rating_moderation_status: [
+        "active",
+        "flagged",
+        "frozen",
+        "deleted",
+        "approved",
       ],
       request_status: ["active", "paused", "closed", "completed", "filled"],
       token_reason: [
@@ -1282,6 +2079,7 @@ export const Constants = {
         "refund",
         "request_post",
         "team_reveal_spend",
+        "rating_bonus",
       ],
       user_type: ["freelancer", "team"],
     },
