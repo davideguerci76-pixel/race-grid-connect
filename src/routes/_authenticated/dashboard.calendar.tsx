@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { setAvailability, getMyAvailability } from "@/lib/paddock.functions";
+import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -32,7 +32,10 @@ function CalendarPage() {
   }, [profile, navigate]);
 
   const getAvail = useServerFn(getMyAvailability);
+  const getBlocked = useServerFn(getMyBlockedDates);
   const setAvail = useServerFn(setAvailability);
+  const getFresh = useServerFn(getMyCalendarFreshness);
+  const confirmCal = useServerFn(confirmMyCalendar);
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -40,14 +43,43 @@ function CalendarPage() {
     queryFn: () => getAvail(),
   });
 
-  const selectedDates = myDays.map((d: string) => new Date(d + "T00:00:00"));
+  const { data: blockedDays = [] } = useQuery({
+    queryKey: ["my-blocked-dates", user?.id],
+    enabled: !!user && profile?.user_type === "freelancer",
+    queryFn: () => getBlocked(),
+  });
+
+  const { data: freshness } = useQuery({
+    queryKey: ["my-calendar-freshness", user?.id],
+    enabled: !!user && profile?.user_type === "freelancer",
+    queryFn: () => getFresh(),
+  });
+
+  const confirmMut = useMutation({
+    mutationFn: () => confirmCal(),
+    onSuccess: () => {
+      toast.success(t("calendar.confirm_success", { defaultValue: "Availability confirmed. You keep top visibility in matches." }));
+      qc.invalidateQueries({ queryKey: ["my-calendar-freshness"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const lastUpdated = freshness?.calendar_last_updated_at ? new Date(freshness.calendar_last_updated_at) : null;
+  const daysSince = lastUpdated ? Math.floor((Date.now() - lastUpdated.getTime()) / 86400000) : null;
+  const freshTone = daysSince == null ? "text-muted-foreground" : daysSince < 30 ? "text-[#16a34a]" : daysSince < 90 ? "text-racing-yellow" : "text-racing-red";
+
+  const blockedSet = new Set(blockedDays);
+  const selectedDates = myDays
+    .filter((d: string) => !blockedSet.has(d))
+    .map((d: string) => new Date(d + "T00:00:00"));
+  const blockedDates = blockedDays.map((d: string) => new Date(d + "T00:00:00"));
 
   const mutation = useMutation({
     mutationFn: async (dates: Date[] | undefined) => {
-      const next = dates ?? [];
-      const currentSet = new Set(myDays);
       const fmt = (d: Date) =>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const next = (dates ?? []).filter((d) => !blockedSet.has(fmt(d)));
+      const currentSet = new Set(myDays.filter((d: string) => !blockedSet.has(d)));
       const nextSet = new Set(next.map(fmt));
       const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
@@ -75,13 +107,50 @@ function CalendarPage() {
         <div className="label-mono">[CALENDAR]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("calendar.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
-        <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.length })}</p>
+        <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.filter((d: string) => !blockedSet.has(d)).length })}</p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-4 border border-border bg-card p-4">
+          <div className="flex-1 min-w-[220px]">
+            <div className="label-mono">[CALENDAR FRESHNESS]</div>
+            <div className={`mt-1 font-mono text-xs ${freshTone}`}>
+              {lastUpdated
+                ? t("calendar.last_confirmed", {
+                    defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}",
+                    days: daysSince,
+                    date: lastUpdated.toLocaleDateString(),
+                  })
+                : t("calendar.never_confirmed", { defaultValue: "Never confirmed yet" })}
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {t("calendar.freshness_benefit", {
+                defaultValue: "Confirm regularly to keep top visibility in team matches.",
+              })}
+            </p>
+          </div>
+          <button
+            onClick={() => confirmMut.mutate()}
+            disabled={confirmMut.isPending}
+            className="bg-racing-yellow px-4 py-3 text-xs font-black uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-40"
+          >
+            {confirmMut.isPending
+              ? t("common.loading")
+              : t("calendar.confirm_button", { defaultValue: "I confirm my availability" })}
+          </button>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-4 font-mono text-[11px] uppercase tracking-widest">
+          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> Unavailable</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> Available</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> Engaged (locked)</span>
+        </div>
+
         <div className="mt-6">
           <AvailabilityCalendar
             selected={selectedDates}
+            blocked={blockedDates}
             onSelect={(d) => mutation.mutate(d)}
             min={new Date()}
-            legend="Selected (red) days = days you are available for work."
+            legend="Click a day to toggle availability. Red = confirmed match, cannot be edited."
           />
         </div>
       </div>

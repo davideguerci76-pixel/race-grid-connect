@@ -26,12 +26,58 @@ export const setAvailability = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const confirmMyCalendar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("confirm_calendar" as any);
+    if (error) throw new Error(error.message);
+    return { calendar_last_updated_at: data as unknown as string };
+  });
+
+export const getMyCalendarFreshness = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("freelancer_profiles")
+      .select("calendar_last_updated_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return { calendar_last_updated_at: (data as any)?.calendar_last_updated_at ?? null };
+  });
+
 export const getMyAvailability = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.from("availability").select("day").eq("freelancer_id", context.userId);
     if (error) throw new Error(error.message);
     return (data ?? []).map((r) => r.day);
+  });
+
+export const getMyBlockedDates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("engagements")
+      .select("start_date, end_date, status")
+      .eq("freelancer_id", userId)
+      .in("status", ["confirmed", "completed"]);
+    if (error) throw new Error(error.message);
+    const out = new Set<string>();
+    for (const r of (data ?? []) as Array<{ start_date: string; end_date: string }>) {
+      const s = new Date(r.start_date + "T00:00:00");
+      const e = new Date(r.end_date + "T00:00:00");
+      const cur = new Date(s);
+      while (cur <= e) {
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, "0");
+        const d = String(cur.getDate()).padStart(2, "0");
+        out.add(`${y}-${m}-${d}`);
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+    return Array.from(out);
   });
 
 // ---- Profile saving ----
@@ -72,6 +118,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: z.string().max(64).optional().nullable(),
         day_rate: z.number().int().min(0).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
         // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
@@ -117,6 +165,8 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         education: data.education || null,
         day_rate: data.day_rate ?? null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         bio: data.bio || null,
         travels: data.travels,
         experiences: data.experiences ?? [],
@@ -156,6 +206,8 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         team_name: z.string().trim().min(2).max(120),
         team_type: z.string().max(120).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         primary_discipline: disciplineEnum.optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         website: z.string().max(200).optional().nullable(),
@@ -185,6 +237,8 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         initials,
         team_type: data.team_type || null,
         location: data.location || null,
+        location_lat: data.location_lat ?? null,
+        location_lng: data.location_lng ?? null,
         primary_discipline: data.primary_discipline || null,
         bio: data.bio || null,
         website: data.website || null,
@@ -243,6 +297,11 @@ export const createRequest = createServerFn({ method: "POST" })
           .max(6)
           .optional(),
         repost_of: z.string().uuid().optional().nullable(),
+        location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
+        location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
+        location_relevance: z.enum(["not_relevant","relevant","mandatory"]).optional().default("not_relevant"),
+        location_anchor: z.enum(["this","team"]).optional().default("this"),
+        location_radius_km: z.number().int().min(1).max(20000).optional().nullable(),
       })
       .parse(data),
   )
@@ -271,6 +330,11 @@ export const createRequest = createServerFn({ method: "POST" })
       languages: data.languages ?? [],
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
+      location_lat: data.location_lat ?? null,
+      location_lng: data.location_lng ?? null,
+      location_relevance: data.location_relevance ?? "not_relevant",
+      location_anchor: data.location_anchor ?? "this",
+      location_radius_km: data.location_radius_km ?? null,
 
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
@@ -391,31 +455,53 @@ export const getMyMatches = createServerFn({ method: "GET" })
     // Fetch pending "proposed" engagements addressed to the current user
     const matchIds = rawMatches.map((m: any) => m.id);
     const pendingByMatchId = new Map<string, string>();
+    const confirmedMatchIds = new Set<string>();
+    const takenRequestIds = new Set<string>();
     if (matchIds.length) {
       const { data: eng } = await supabase
         .from("engagements")
-        .select("id, match_id, status, proposed_by")
-        .in("match_id", matchIds)
-        .eq("status", "proposed")
-        .neq("proposed_by", userId);
-      (eng ?? []).forEach((e: any) => { if (e.match_id) pendingByMatchId.set(e.match_id, e.id); });
+        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id")
+        .in("match_id", matchIds);
+      (eng ?? []).forEach((e: any) => {
+        if (e.status === "proposed" && e.proposed_by !== userId && e.match_id) {
+          pendingByMatchId.set(e.match_id, e.id);
+        }
+        if (e.status === "confirmed" && e.match_id) confirmedMatchIds.add(e.match_id);
+      });
+      // Requests already filled by someone else (freelancer view of race-lost matches)
+      const reqIds = Array.from(new Set(rawMatches.map((m: any) => m.request?.id).filter(Boolean)));
+      if (reqIds.length && isFreelancer) {
+        const { data: filledReqs } = await supabase
+          .from("engagements")
+          .select("request_id, freelancer_id, status")
+          .in("request_id", reqIds)
+          .eq("status", "confirmed");
+        (filledReqs ?? []).forEach((r: any) => {
+          if (r.freelancer_id !== userId && r.request_id) takenRequestIds.add(r.request_id);
+        });
+      }
     }
 
     const redacted = rawMatches.map((m: any) => {
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
+      const isConfirmed = confirmedMatchIds.has(m.id);
+      // Names/contacts stay hidden until a confirmed engagement links the two parties.
+      // Token unlock only reveals technical info.
       let counterparty: any = null;
       if (revealedByMe) {
         if (isFreelancer) {
           const tp = teamProfilesById.get(m.team_id);
           counterparty = tp ? {
-            team_name: tp.team_name,
+            // team_name is intentionally hidden until confirmed
+            team_name: isConfirmed ? tp.team_name : null,
             team_type: tp.team_type,
             location: tp.location,
-            website: tp.website,
+            // website/contact_email withheld — freelancer only ever sees team name post-confirmation
+            website: null,
             bio: tp.bio,
             primary_discipline: tp.primary_discipline,
-            initials: tp.initials,
-            contact_email: emailsById.get(m.team_id) ?? null,
+            initials: isConfirmed ? tp.initials : null,
+            contact_email: null,
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
@@ -429,15 +515,26 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            contact_email: emailsById.get(m.freelancer_id) ?? null,
+            // Contacts only after confirmed match
+            contact_email: isConfirmed ? (emailsById.get(m.freelancer_id) ?? null) : null,
           } : null;
         }
-      } else {
-        if (isFreelancer && m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
-        if (!isFreelancer && m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
       }
-      return { ...m, revealedByMe, counterparty, pending_engagement_id: pendingByMatchId.get(m.id) ?? null };
+      // Always hide display_name in the joined profile rows unless the engagement is confirmed
+      if (!isConfirmed) {
+        if (m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
+        if (m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
+      }
+      return {
+        ...m,
+        revealedByMe,
+        counterparty,
+        isConfirmed,
+        matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
+        pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
+      };
     });
+
 
     return {
       matches: redacted,
@@ -529,13 +626,14 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, freelancer:profiles!engagements_freelancer_id_fkey(display_name), team:profiles!engagements_team_id_fkey(display_name), request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
+      .select("*, request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as any[];
     const teamIds = Array.from(new Set(rows.map((r) => r.team_id)));
     const freelancerIds = Array.from(new Set(rows.map((r) => r.freelancer_id)));
+    const allIds = Array.from(new Set([...teamIds, ...freelancerIds]));
     const [tpsRes, fpsRes] = await Promise.all([
       teamIds.length
         ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
@@ -546,12 +644,49 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     ]);
     const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
     const fpMap = new Map(((fpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
-    return rows.map((r) => ({
-      ...r,
-      team_profile: tpMap.get(r.team_id) ?? null,
-      freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
-    }));
+
+    // RLS on `profiles` restricts to auth.uid()=id, so counterparties' display_name
+    // isn't visible via a nested join. Fetch it via admin (the .or above already
+    // scoped rows to engagements the caller is party to).
+    const nameMap = new Map<string, { display_name: string | null; avatar_url: string | null }>();
+    const contactsMap = new Map<string, { email: string | null; phone_dial_code: string | null; phone_number: string | null }>();
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      if (allIds.length) {
+        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", allIds);
+        for (const p of (ps ?? []) as any[]) nameMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url });
+      }
+      // For confirmed/completed engagements only, surface freelancer contact to team viewer
+      const confirmedFids = Array.from(new Set(rows.filter((r) => (r.status === "confirmed" || r.status === "completed") && r.team_id === userId).map((r) => r.freelancer_id)));
+      if (confirmedFids.length) {
+        const { data: cs } = await supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", confirmedFids);
+        for (const c of (cs ?? []) as any[]) contactsMap.set(c.user_id, { email: null, phone_dial_code: c.phone_dial_code, phone_number: c.phone_number });
+        for (const fid of confirmedFids) {
+          const cur = contactsMap.get(fid) ?? { email: null, phone_dial_code: null, phone_number: null };
+          try {
+            const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
+            cur.email = u?.user?.email ?? null;
+          } catch { /* ignore */ }
+          contactsMap.set(fid, cur);
+        }
+      }
+    } catch { /* ignore admin errors */ }
+
+    return rows.map((r) => {
+      const fName = nameMap.get(r.freelancer_id);
+      const tName = nameMap.get(r.team_id);
+      const contact = contactsMap.get(r.freelancer_id) ?? null;
+      return {
+        ...r,
+        freelancer: { display_name: fName?.display_name ?? null, avatar_url: fName?.avatar_url ?? null },
+        team: { display_name: tName?.display_name ?? null, avatar_url: tName?.avatar_url ?? null },
+        team_profile: tpMap.get(r.team_id) ?? null,
+        freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
+        freelancer_contact: contact,
+      };
+    });
   });
+
 
 // ---- Ratings ----
 export const submitRating = createServerFn({ method: "POST" })
@@ -629,16 +764,14 @@ export const getFreelancerRatings = createServerFn({ method: "GET" })
     return { ratings: rows ?? [], average: Math.round(avg * 10) / 10, count: rows?.length ?? 0 };
   });
 
-// ---- Team match view per request (v2 scoring + token unlocks) ----
+// ---- Team match view per request (tiered pagination v3) ----
 export const getRequestMatches = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { request_id: string; page?: number }) =>
-    z.object({ request_id: z.string().uuid(), page: z.number().int().min(1).max(200).optional() }).parse(data),
+  .validator((data: { request_id: string }) =>
+    z.object({ request_id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const page = data.page ?? 1;
-    const pageSize = 10;
 
     const { data: req, error: reqErr } = await supabase
       .from("requests")
@@ -649,78 +782,149 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (!req) throw new Error("Request not found");
     if (req.team_id !== userId) throw new Error("Not owner of this request");
 
+    const settingKeys = [
+      "cost_tier2_entry",
+      "cost_tier3_entry",
+      "cost_unlock_match_for_team",
+      "tier2_size",
+      "tier3_size",
+      "hard_cap_matches",
+    ];
+    const { data: settingsRows } = await supabase
+      .from("platform_settings")
+      .select("key, value_num")
+      .in("key", settingKeys);
+    const settings = new Map((settingsRows ?? []).map((r: any) => [r.key, Number(r.value_num)]));
+    const tier2Base = settings.get("cost_tier2_entry") ?? 5;
+    const tier3Base = settings.get("cost_tier3_entry") ?? 25;
+    const perProfileCost = settings.get("cost_unlock_match_for_team") ?? 1;
+    const tier2Size = settings.get("tier2_size") ?? 10;
+    const tier3Size = settings.get("tier3_size") ?? 30;
+    const hardCap = settings.get("hard_cap_matches") ?? 50;
+
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
-      .eq("request_id", data.request_id)
-      .order("match_score", { ascending: false })
-      .order("created_at", { ascending: true });
+      .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const rows = allMatches ?? [];
-    const total = rows.length;
-    const topThreeIds = new Set(rows.slice(0, 3).map((m: any) => m.id));
+    // Sort by final_score DESC (penalty applied), tiebreak by created_at
+    const sortFn = (a: any, b: any) => {
+      const ds = Number(b.final_score ?? b.match_score ?? 0) - Number(a.final_score ?? a.match_score ?? 0);
+      if (ds !== 0) return ds;
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    };
+    const allFull = (allMatches ?? []).filter((m: any) => !m.is_partial).slice().sort(sortFn).slice(0, hardCap);
+    const allPartial = (allMatches ?? []).filter((m: any) => m.is_partial).slice().sort(sortFn).slice(0, hardCap);
 
-    const start = (page - 1) * pageSize;
-    const pageRows = rows.slice(start, start + pageSize);
+    const computeTierCost = (base: number, slots: number, size: number) => {
+      if (slots <= 0) return 0;
+      if (slots >= size) return Math.round(base);
+      return Math.max(1, Math.round((base * slots) / size));
+    };
+    const tiersFor = (total: number, unlockedSet: Set<number>) => {
+      const t1 = Math.min(total, 10);
+      const t2Slots = Math.max(0, Math.min(total, 10 + tier2Size) - 10);
+      const t3Slots = Math.max(0, Math.min(total, 10 + tier2Size + tier3Size) - (10 + tier2Size));
+      return [
+        { tier: 1, size: 10, real_count: t1, entry_cost: 0, entry_cost_full: 0, unlocked: true, proportional: false },
+        {
+          tier: 2, size: tier2Size, real_count: t2Slots,
+          entry_cost: computeTierCost(tier2Base, t2Slots, tier2Size),
+          entry_cost_full: Math.round(tier2Base),
+          unlocked: unlockedSet.has(2),
+          proportional: t2Slots > 0 && t2Slots < tier2Size,
+        },
+        {
+          tier: 3, size: tier3Size, real_count: t3Slots,
+          entry_cost: computeTierCost(tier3Base, t3Slots, tier3Size),
+          entry_cost_full: Math.round(tier3Base),
+          unlocked: unlockedSet.has(3),
+          proportional: t3Slots > 0 && t3Slots < tier3Size,
+        },
+      ];
+    };
 
-    const freelancerIds = pageRows.map((m: any) => m.freelancer_id);
-    const ids4 = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
-    const matchIds4 = pageRows.map((m: any) => m.id).length ? pageRows.map((m: any) => m.id) : ["00000000-0000-0000-0000-000000000000"];
-    let profs: any[] = [];
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", ids4);
-      profs = data ?? [];
-    } catch { /* ignore */ }
-    const [{ data: fps }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select("*").in("user_id", ids4),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", matchIds4),
-    ]);
-    const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
-    const profMap = new Map(profs.map((r: any) => [r.id, r]));
-    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    const { data: tierUnlocks } = await supabase
+      .from("request_tier_unlocks" as any)
+      .select("tier, scope, tokens_spent")
+      .eq("team_id", userId)
+      .eq("request_id", data.request_id);
+    const unlockedFull = new Set<number>();
+    const unlockedPartial = new Set<number>();
+    for (const r of (tierUnlocks ?? []) as any[]) {
+      const scope = (r.scope ?? "full") as string;
+      (scope === "partial" ? unlockedPartial : unlockedFull).add(Number(r.tier));
+    }
+    const tiersFull = tiersFor(allFull.length, unlockedFull);
+    const tiersPartial = tiersFor(allPartial.length, unlockedPartial);
 
-
-    // Fetch emails/phones only for unlocked candidates
-    const unlockedIds = pageRows.filter((m: any) => unlockMap.has(m.id)).map((m: any) => m.freelancer_id);
-    const emailMap = new Map<string, string | null>();
-    const phoneMap = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
-    if (unlockedIds.length) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: contacts } = await supabaseAdmin
-          .from("freelancer_contacts")
-          .select("user_id, phone_dial_code, phone_number")
-          .in("user_id", unlockedIds);
-        (contacts ?? []).forEach((c: any) => phoneMap.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number }));
-        await Promise.all(unlockedIds.map(async (uid) => {
-          const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
-          emailMap.set(uid, data?.user?.email ?? null);
-        }));
-      } catch {
-        // ignore
+    const allFreelancerIds = Array.from(new Set([...allFull, ...allPartial].map((m: any) => m.freelancer_id)));
+    const ratingAvg = new Map<string, { avg: number; count: number }>();
+    if (allFreelancerIds.length) {
+      const { data: allRatings } = await supabase
+        .from("ratings")
+        .select("to_user_id, stars, overall, unlocked_at")
+        .in("to_user_id", allFreelancerIds)
+        .not("unlocked_at", "is", null);
+      for (const r of (allRatings ?? []) as any[]) {
+        const cur = ratingAvg.get(r.to_user_id) ?? { avg: 0, count: 0 };
+        const v = Number(r.overall ?? r.stars ?? 0);
+        const c = cur.count + 1;
+        ratingAvg.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
       }
     }
 
-    const items = pageRows.map((m: any) => {
-      const unlocked = unlockMap.has(m.id) || topThreeIds.has(m.id);
-      const wasFree = unlockMap.get(m.id)?.free_preview ?? topThreeIds.has(m.id);
-      const prof = profMap.get(m.freelancer_id);
+    const matchIds = [...allFull, ...allPartial].map((m: any) => m.id);
+    const freelancerIds = [...allFull, ...allPartial].map((m: any) => m.freelancer_id);
+    const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
+    const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
+    const [{ data: fps }, { data: unlocks }] = await Promise.all([
+      supabase.from("freelancer_profiles").select("*").in("user_id", idsSafe),
+      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
+    ]);
+    const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
+    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+
+    const buildItem = (m: any, i: number, scope: "full" | "partial", tierUnlockedSet: Set<number>) => {
+      const rank = i + 1;
+      const tier = rank <= 10 ? 1 : rank <= 10 + tier2Size ? 2 : 3;
+      const tierUnlocked = tier === 1 || tierUnlockedSet.has(tier);
+      const topThree = rank <= 3;
+      const perProfileUnlocked = unlockMap.has(m.id);
+      const showTech = tierUnlocked && (topThree || perProfileUnlocked);
+      const blurred = tierUnlocked && !showTech;
       const fp = fpMap.get(m.freelancer_id);
       return {
         match_id: m.id,
-        match_score: Number(m.match_score ?? 0),
+        scope,
+        rank,
+        tier,
+        tier_unlocked: tierUnlocked,
+        blurred,
+        top_three: topThree,
+        // UI shows pure skills affinity; ordering uses final_score internally.
+        match_score: Number(m.skills_score ?? m.match_score ?? 0),
+        skills_score: Number(m.skills_score ?? m.match_score ?? 0),
+        final_score: Number(m.final_score ?? m.match_score ?? 0),
         is_perfect: m.is_perfect,
         overlap_days: m.overlap_days,
+        missing_days: Number(m.missing_days ?? 0),
+        missing_pct: Number(m.missing_pct ?? 0),
+        is_partial: !!m.is_partial,
+        edge_only: m.edge_only !== false,
         missing_criteria: m.missing_criteria ?? [],
-        unlocked,
-        free_preview: wasFree,
+        unlocked: showTech,
+        free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
-        profile: unlocked
+        rating: {
+          average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
+          count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
+        },
+        profile: showTech
           ? {
-              display_name: prof?.display_name ?? "Freelancer",
-              avatar_url: prof?.avatar_url ?? null,
+              display_name: null,
+              avatar_url: null,
               headline: fp?.headline ?? null,
               role_group: fp?.role_group ?? null,
               sub_roles: fp?.sub_roles ?? [],
@@ -733,15 +937,31 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               education: fp?.education ?? null,
               experiences: fp?.experiences ?? [],
               languages: fp?.languages ?? [],
-              contact_email: emailMap.get(m.freelancer_id) ?? null,
-              phone_dial_code: phoneMap.get(m.freelancer_id)?.phone_dial_code ?? null,
-              phone_number: phoneMap.get(m.freelancer_id)?.phone_number ?? null,
+              contact_email: null,
+              phone_dial_code: null,
+              phone_number: null,
             }
           : null,
       };
-    });
+    };
 
-    // If request has been completed/filled, surface the confirmed freelancer's contacts
+    const itemsFull = allFull.map((m: any, i: number) => buildItem(m, i, "full", unlockedFull));
+    const itemsPartial = allPartial.map((m: any, i: number) => buildItem(m, i, "partial", unlockedPartial));
+    // Legacy `items` = full pool (existing UI code path)
+    const items = itemsFull;
+
+    // FOMO / service banner data
+    const bestFullSkill = itemsFull.length ? Math.max(...itemsFull.map((i) => i.skills_score)) : 0;
+    const bestPartialSkill = itemsPartial.length ? Math.max(...itemsPartial.map((i) => i.skills_score)) : 0;
+    const partialBanner = itemsPartial.length === 0
+      ? null
+      : {
+          case: bestPartialSkill > bestFullSkill ? ("A" as const) : ("B" as const),
+          best_full_skill: Math.round(bestFullSkill),
+          best_partial_skill: Math.round(bestPartialSkill),
+          partial_count: itemsPartial.length,
+        };
+
     let hired: any = null;
     if (req.status === "completed" || req.status === "filled") {
       const { data: eng } = await supabase
@@ -789,13 +1009,75 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // ---- Refund quote for zero-match trivio ----
+    const settingsRefund = await supabase
+      .from("platform_settings")
+      .select("key, value_num")
+      .in("key", ["refund_min_pct", "refund_hard_penalty_pct"]);
+    const rSet = new Map((settingsRefund.data ?? []).map((r: any) => [r.key, Number(r.value_num)]));
+    const minPct = rSet.get("refund_min_pct") ?? 20;
+    const dropPct = rSet.get("refund_hard_penalty_pct") ?? 10;
+
+    let hardCount = 0;
+    if ((req as any).role_hard) hardCount += 1;
+    if ((req as any).travel_required) hardCount += 1;
+    hardCount += ((req as any).skills_hard?.length ?? 0);
+    if (((req as any).education?.length ?? 0) > 0) hardCount += 1;
+    if ((req as any).location_relevance === "mandatory") hardCount += 1;
+    for (const l of ((req as any).languages ?? []) as any[]) if (l?.hard) hardCount += 1;
+    for (const e of ((req as any).experience_requirements ?? []) as any[]) if (e?.hard) hardCount += 1;
+
+    const { data: spendRows } = await supabase
+      .from("token_transactions")
+      .select("delta")
+      .eq("user_id", userId)
+      .eq("ref_id", data.request_id)
+      .eq("reason", "request_post");
+    const spent = (spendRows ?? []).reduce((a: number, r: any) => a + (-Number(r.delta) || 0), 0);
+    const pct = Math.max(0, Math.min(100, Math.max(minPct, 100 - hardCount * dropPct)));
+    let refundFull = Math.round((spent * pct) / 100);
+    if (spent > 0 && pct > 0 && refundFull < 1) refundFull = 1;
+    const refundPartial = Math.max(refundFull > 0 ? 1 : 0, Math.round(refundFull / 2));
+
     return {
       request: req,
       items,
+      items_partial: itemsPartial,
       hired,
-      pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) },
+      tiers: tiersFull,
+      tiers_partial: tiersPartial,
+      per_profile_cost: perProfileCost,
+      total_matches: allFull.length,
+      total_partial_matches: allPartial.length,
+      hard_cap: hardCap,
+      partial_banner: partialBanner,
+      refund_quote: {
+        spent,
+        hard_count: hardCount,
+        min_pct: minPct,
+        drop_pct: dropPct,
+        refund_pct: pct,
+        refund_full: refundFull,
+        refund_partial: refundPartial,
+      },
     };
   });
+
+export const refundAndCloseRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string; mode: "full" | "partial" }) =>
+    z.object({ request_id: z.string().uuid(), mode: z.enum(["full", "partial"]) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("refund_and_close_request" as any, {
+      _request_id: data.request_id,
+      _mode: data.mode,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return row as { refund_tokens: number; refund_pct: number; balance: number; kind: string };
+  });
+
 
 
 export const unlockMatch = createServerFn({ method: "POST" })
@@ -806,6 +1088,33 @@ export const unlockMatch = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { balance: balance as number };
   });
+
+export const unlockRequestTier = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string; tier: number; scope?: "full" | "partial" }) =>
+    z.object({
+      request_id: z.string().uuid(),
+      tier: z.number().int().min(2).max(3),
+      scope: z.enum(["full", "partial"]).default("full"),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("unlock_request_tier" as any, {
+      _request_id: data.request_id,
+      _tier: data.tier,
+      _scope: data.scope ?? "full",
+    } as any);
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return {
+      tier: Number(row?.tier ?? data.tier),
+      scope: data.scope ?? "full",
+      tokens_spent: Number(row?.tokens_spent ?? 0),
+      balance: Number(row?.balance ?? 0),
+      total_matches: Number(row?.total_matches ?? 0),
+    };
+  });
+
 
 // ---- Notifications ----
 export const getUnreadNotificationCount = createServerFn({ method: "GET" })
@@ -818,6 +1127,19 @@ export const getUnreadNotificationCount = createServerFn({ method: "GET" })
       .is("read_at", null);
     if (error) throw new Error(error.message);
     return { count: count ?? 0 };
+  });
+
+export const getMyNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("notifications")
+      .select("id, kind, payload, created_at, read_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return data ?? [];
   });
 
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
@@ -833,3 +1155,302 @@ export const markAllNotificationsRead = createServerFn({ method: "POST" })
   });
 
 
+
+// ==================== RATINGS V2 (double-blind) ====================
+
+export const submitRatingV2 = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      engagement_id: z.string().uuid(),
+      overall: z.number().min(1).max(5),
+      sub_scores: z.object({
+        technical: z.number().min(1).max(5).optional(),
+        punctuality: z.number().min(1).max(5).optional(),
+        stress: z.number().min(1).max(5).optional(),
+      }).default({}),
+      comment: z.string().max(500).optional().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: existing } = await context.supabase
+      .from("ratings")
+      .select("id")
+      .eq("engagement_id", data.engagement_id)
+      .eq("from_user_id", context.userId)
+      .maybeSingle();
+    if (existing) {
+      return { ok: false, already_rated: true } as const;
+    }
+    const { data: row, error } = await context.supabase.rpc("submit_rating_v2", {
+      _engagement_id: data.engagement_id,
+      _sub_scores: data.sub_scores,
+      _overall: data.overall,
+      _comment: data.comment ?? undefined,
+    });
+    if (error) {
+      const msg = error.message ?? "";
+      if (msg.includes("ratings_engagement_id_from_user_id_key") || (error as any).code === "23505") {
+        return { ok: false, already_rated: true } as const;
+      }
+      throw new Error(msg);
+    }
+    return { ok: true, row } as const;
+  });
+
+export const getUserRatingSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { user_id: string }) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase.rpc("get_user_rating_summary", { _user_id: data.user_id });
+    if (error) throw new Error(error.message);
+    const r = (Array.isArray(rows) ? rows[0] : rows) as any;
+    return {
+      count: r?.count ?? 0,
+      average: r?.average ? Number(r.average) : 0,
+      technical: r?.tech ? Number(r.tech) : null,
+      punctuality: r?.punct ? Number(r.punct) : null,
+      stress: r?.stress ? Number(r.stress) : null,
+    };
+  });
+
+export const unlockReviews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { target_user_id: string }) => z.object({ target_user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: bal, error } = await context.supabase.rpc("reveal_reviews", { _target: data.target_user_id });
+    if (error) throw new Error(error.message);
+    return { balance: bal as number };
+  });
+
+export const getAnonymousReviews = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { target_user_id: string }) => z.object({ target_user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const isSelf = userId === data.target_user_id;
+    let unlocked = isSelf;
+    if (!isSelf) {
+      const { data: u } = await context.supabase
+        .from("review_unlocks")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("target_user_id", data.target_user_id)
+        .maybeSingle();
+      unlocked = !!u;
+    }
+    if (!unlocked) return { unlocked: false, reviews: [] as any[] };
+    const { data: rows, error } = await context.supabase.rpc("get_anonymous_reviews", { _target: data.target_user_id });
+    if (error) throw new Error(error.message);
+    return { unlocked: true, reviews: (rows ?? []) as any[] };
+  });
+
+export const flagRating = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { rating_id: string; reason: string }) =>
+    z.object({ rating_id: z.string().uuid(), reason: z.string().trim().min(10).max(2000) }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("flag_rating" as any, {
+      _rating_id: data.rating_id,
+      _reason: data.reason,
+    } as any);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const getRatableEngagements = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: engs, error } = await supabase
+      .from("engagements")
+      .select("id, freelancer_id, team_id, start_date, end_date, status, request_id, request:requests(title, season_dates)")
+      .in("status", ["confirmed", "completed"])
+      .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`);
+    if (error) throw new Error(error.message);
+    const { data: nowSim } = await supabase.rpc("sim_now");
+    const items = [] as any[];
+    for (const e of (engs ?? []) as any[]) {
+      const { data: opens } = await supabase.rpc("rating_opens_at", { _engagement_id: e.id });
+      const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
+      items.push({ ...e, opens_at: opens, sim_now: nowSim, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
+    }
+    return items;
+  });
+
+// ==================== TIME MACHINE (admin) ====================
+
+export const adminGetTimeOffset = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.from("admin_time_settings").select("offset_days, updated_at").eq("id", true).maybeSingle();
+    if (error) throw new Error(error.message);
+    return { offset_days: (data as any)?.offset_days ?? 0, updated_at: (data as any)?.updated_at ?? null };
+  });
+
+export const adminSetTimeOffsetFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { offset_days: number }) => z.object({ offset_days: z.number().int().min(-3650).max(3650) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: out, error } = await context.supabase.rpc("admin_set_time_offset", { _days: data.offset_days });
+    if (error) throw new Error(error.message);
+    // Also emit any pending notifications right away
+    await context.supabase.rpc("emit_rating_available_notifications");
+    return { offset_days: out as number };
+  });
+
+export const adminTriggerRatingNotifications = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("emit_rating_available_notifications");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+export const adminTriggerCalendarStale = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("emit_calendar_stale_notifications");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+// ---- Cancellations & SOS Call ----
+export const cancelEngagement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({
+      engagement_id: z.string().uuid(),
+      reason: z.string().trim().max(500).optional().nullable(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("cancel_engagement", {
+      _engagement_id: data.engagement_id,
+      _reason: data.reason ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const triggerSosCall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("trigger_sos_call", { _request_id: data.request_id });
+    if (error) throw new Error(error.message);
+    return row as { id: string; target_count: number; min_pct: number };
+  });
+
+export const acceptSosCall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ sos_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("accept_sos_call", { _sos_id: data.sos_id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const getMyOpenSosCalls = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: targets } = await supabase
+      .from("sos_call_targets")
+      .select("sos_id, skills_score, distance_km, sos:sos_calls(id, request_id, triggered_at, resolved_at, min_pct, team_id)")
+      .eq("freelancer_id", userId);
+    const open = (targets ?? []).filter((t: any) => t.sos && !t.sos.resolved_at);
+    if (open.length === 0) return [] as any[];
+    const requestIds = Array.from(new Set(open.map((o: any) => o.sos.request_id)));
+    const teamIds = Array.from(new Set(open.map((o: any) => o.sos.team_id)));
+    const [reqRes, teamRes] = await Promise.all([
+      supabase.from("requests").select("id, title, role, discipline, start_date, end_date, location, circuit").in("id", requestIds),
+      supabase.from("team_profiles").select("user_id, team_name, location").in("user_id", teamIds),
+    ]);
+    const rMap = new Map(((reqRes.data ?? []) as any[]).map((r) => [r.id, r]));
+    const tMap = new Map(((teamRes.data ?? []) as any[]).map((r) => [r.user_id, r]));
+    return open.map((o: any) => ({
+      sos_id: o.sos.id,
+      request: rMap.get(o.sos.request_id) ?? null,
+      team: tMap.get(o.sos.team_id) ?? null,
+      skills_score: Number(o.skills_score),
+      distance_km: o.distance_km == null ? null : Number(o.distance_km),
+      triggered_at: o.sos.triggered_at,
+    }));
+  });
+
+export const getTeamCancellationStats = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ team_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("engagements")
+      .select("cancelled_at, start_date")
+      .eq("team_id", data.team_id)
+      .eq("cancellation_kind", "team_late");
+    const count = (rows ?? []).length;
+    return { count };
+  });
+
+// ---- Anti-Ghosting workflow ----
+export const freelancerAnswerContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z.object({ engagement_id: z.string().uuid(), contacted: z.boolean() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("freelancer_answer_contact", {
+      _engagement_id: data.engagement_id,
+      _contacted: data.contacted,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const teamConfirmContact = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ engagement_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("team_confirm_contact", {
+      _engagement_id: data.engagement_id,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+async function assertAdmin(supabase: any, userId: string) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Admin only");
+}
+
+export const adminEmitContactChecks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("emit_contact_checks");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+export const adminEmitTeamGhostingReminders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("emit_team_ghosting_reminders");
+    if (error) throw new Error(error.message);
+    return { inserted: (data as number) ?? 0 };
+  });
+
+export const adminReleaseGhostedEngagements = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("release_ghosted_engagements");
+    if (error) throw new Error(error.message);
+    return { released: (data as number) ?? 0 };
+  });

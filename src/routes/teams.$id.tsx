@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
 import { Lock } from "lucide-react";
 
 type Search = { req?: string };
@@ -33,17 +34,20 @@ function TeamProfile() {
     queryKey: ["team-detail", id, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }] = await Promise.all([
+      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }] = await Promise.all([
         supabase.from("team_profiles").select("*").eq("user_id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
         supabase.from("team_reveals").select("team_id").eq("user_id", user!.id).eq("team_id", id).maybeSingle(),
         supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id),
+        supabase.rpc("team_cancellation_stats", { _team_id: id }),
       ]);
+      const stats = Array.isArray(cancelStats) ? (cancelStats[0] as any) : (cancelStats as any);
       return {
         tp,
         requests: requests ?? [],
         fullUnlocked: !!fullReveal,
         revealedRequestIds: new Set((reqReveals ?? []).map((r) => r.request_id)),
+        cancelStats: stats ?? { count: 0, avg_days_notice: null },
       };
     },
   });
@@ -105,13 +109,19 @@ function TeamProfile() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
-        <div className="container-page py-16 text-center">
-          <div className="label-mono">[LOCKED]</div>
-          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Team is hidden</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).</p>
-          <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-            Unlock full team profile (5 tokens)
-          </button>
+        <div className="container-page py-16">
+          <div className="text-center">
+            <div className="label-mono">[LOCKED]</div>
+            <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Team is hidden</h1>
+            <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
+            <p className="mt-2 text-sm text-muted-foreground">Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).</p>
+            <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+              Unlock full team profile (5 tokens)
+            </button>
+          </div>
+          <div className="mx-auto mt-10 max-w-2xl">
+            <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
+          </div>
         </div>
         {confirmFull && <ConfirmModal onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
         <SiteFooter />
@@ -145,9 +155,18 @@ function TeamProfile() {
               {canSeeFull && tp.website && (
                 <div className="mt-2 text-xs"><a href={tp.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{tp.website}</a></div>
               )}
+              <div className="mt-2"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
             </div>
           </div>
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
+          {data.cancelStats && Number(data.cancelStats.count ?? 0) > 0 && (
+            <div className="mt-4 flex items-start gap-2 border border-racing-red/40 bg-racing-red/10 p-3 font-mono text-[11px] text-racing-red">
+              <span className="font-black">⚠ CANCELLATION HISTORY</span>
+              <span>
+                {data.cancelStats.count} late cancellation{Number(data.cancelStats.count) === 1 ? "" : "s"} recorded on confirmed matches.
+              </span>
+            </div>
+          )}
         </div>
 
         {!canSeeFull && (
@@ -195,6 +214,9 @@ function TeamProfile() {
               {requests.length - visibleRequests.length} other request(s) from this team are locked. Unlock the full profile to view them.
             </div>
           )}
+        </div>
+        <div className="mt-8">
+          <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
         </div>
       </div>
       {confirmFull && <ConfirmModal onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}

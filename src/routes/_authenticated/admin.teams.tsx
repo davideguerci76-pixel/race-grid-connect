@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { adminListTeams, adminSetTokens, adminSetBlocked, adminDeleteUser } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
+import { RatingIcons } from "@/components/rating-icons";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: AdminTeams,
@@ -111,6 +112,7 @@ function AdminTeams() {
                 <Th onClick={() => toggle("team.primary_discipline")} label={`Discipline${indicator("team.primary_discipline")}`} />
                 <Th onClick={() => toggle("team.location")} label={`Location${indicator("team.location")}`} />
                 <Th onClick={() => toggle("team.website")} label={`Website${indicator("team.website")}`} />
+                <Th onClick={() => toggle("rating_avg")} label={`Rating${indicator("rating_avg")}`} />
                 <Th onClick={() => toggle("token_balance")} label={`Tokens${indicator("token_balance")}`} align="right" />
                 <Th onClick={() => toggle("blocked_at")} label={`Status${indicator("blocked_at")}`} />
                 <th className="px-2 py-2 text-right">Actions</th>
@@ -125,6 +127,13 @@ function AdminTeams() {
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.primary_discipline ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.location ?? "—"}</td>
                   <td className="px-2 py-2 text-muted-foreground">{r.team?.website ?? "—"}</td>
+                  <td className="px-2 py-2">
+                    {r.rating_count > 0 ? (
+                      <RatingIcons variant="headset" value={r.rating_avg} count={r.rating_count} size={14} />
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="px-2 py-2 text-right font-bold">{r.token_balance}</td>
                   <td className="px-2 py-2">
                     {r.blocked_at ? <span className="text-racing-red">Blocked</span> : <span className="text-emerald-500">Active</span>}
