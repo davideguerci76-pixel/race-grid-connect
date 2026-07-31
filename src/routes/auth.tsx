@@ -92,6 +92,7 @@ function AuthPage() {
       <SiteHeader />
       <div className="container-page grid gap-12 py-16 md:grid-cols-2">
         <div className="hidden md:block">
+          <img src={logoFull.url} alt="Pit Call — Box. Now!" width={1200} height={675} className="mb-6 w-full max-w-sm object-contain" />
           <div className="label-mono mb-4">{isSignup ? "[REGISTRATION]" : "[SIGN IN]"}</div>
           <h1 className="text-5xl font-black uppercase italic tracking-tighter">
             {isSignup ? t("auth.signup_title") : t("auth.signin_title")}
