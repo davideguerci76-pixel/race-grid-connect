@@ -224,8 +224,10 @@ function NewRequestPage() {
       <div className="container-page py-12">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <div className="label-mono">[NEW REQUEST]</div>
+            <div className="label-mono">[NEW PIT CALL]</div>
             <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("requests.new")}</h1>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
+
           </div>
           <Link to="/dashboard/requests" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-racing-red">
             ← {t("requests.back")}
