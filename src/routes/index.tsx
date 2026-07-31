@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-pit.jpg";
+import logoFull from "@/assets/pitcall-logo-full.jpg.asset.json";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
