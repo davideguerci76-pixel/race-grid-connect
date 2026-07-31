@@ -42,8 +42,7 @@ function Home() {
           <img
             src={logoFull.url}
             alt="Pit Call — Box. Now!"
-            width={1200}
-            height={675}
+            width={1089} height={424}
             className="mb-8 w-full max-w-md object-contain mix-blend-screen"
           />
           <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">

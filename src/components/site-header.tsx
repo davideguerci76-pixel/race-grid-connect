@@ -90,8 +90,7 @@ export function SiteHeader() {
           <img
             src={logoCompact.url}
             alt="Pit Call"
-            width={640}
-            height={172}
+            width={1246} height={211}
             className="h-11 w-auto object-contain mix-blend-screen md:h-12"
           />
         </Link>
