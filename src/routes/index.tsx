@@ -38,6 +38,13 @@ function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         <div className="container-page relative py-24 md:py-32">
+          <img
+            src={logoFull.url}
+            alt="Pit Call — Box. Now!"
+            width={1200}
+            height={675}
+            className="mb-8 w-full max-w-md object-contain"
+          />
           <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">
