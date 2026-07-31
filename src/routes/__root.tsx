@@ -64,7 +64,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Pit Call" },
+      { title: "Pit Call — Box. Now! Motorsport freelancer matching" },
       { name: "description", content: "Race Connect is a social platform and job board for motorsport professionals and companies." },
       { property: "og:title", content: "Pit Call" },
       { property: "og:description", content: "Race Connect is a social platform and job board for motorsport professionals and companies." },
