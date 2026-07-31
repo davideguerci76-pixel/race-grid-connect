@@ -15,6 +15,7 @@ import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { RatingIcons } from "@/components/rating-icons";
 import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -50,6 +51,7 @@ function ProfilePage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-12 text-sm text-racing-red">
           {profileError instanceof Error ? profileError.message : "Profile could not be loaded."}
         </div>

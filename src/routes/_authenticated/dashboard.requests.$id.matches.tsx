@@ -11,6 +11,7 @@ import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequest
 import { disciplineLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
@@ -178,6 +179,7 @@ function RequestMatchesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-10">
         <Link to="/dashboard/requests" className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-3" /> Back to Pit Calls

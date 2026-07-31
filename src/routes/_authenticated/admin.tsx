@@ -7,6 +7,7 @@ import { checkAmIAdmin } from "@/lib/admin.functions";
 import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -41,6 +42,7 @@ function AdminLayout() {
   return (
     <>
     <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
     <div className="container-page py-8">
       <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
         <div>

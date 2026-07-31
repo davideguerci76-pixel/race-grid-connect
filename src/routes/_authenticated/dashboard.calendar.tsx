@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -94,6 +95,7 @@ function CalendarPage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-12 text-sm text-muted-foreground">Redirecting…</div>
         <SiteFooter />
       </div>

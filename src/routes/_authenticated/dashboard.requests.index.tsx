@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -56,6 +57,7 @@ function RequestsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="flex items-start justify-between gap-4">
           <div>

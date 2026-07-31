@@ -10,6 +10,7 @@ import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
 import { Lock } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 
 type Search = { req?: string };
 
@@ -73,6 +74,7 @@ function TeamProfile() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-16 text-center">
           <div className="label-mono">[LOCKED]</div>
           <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Sign in to view team</h1>

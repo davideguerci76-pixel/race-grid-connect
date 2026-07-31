@@ -10,6 +10,7 @@ import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngag
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
@@ -98,6 +99,7 @@ function MatchesPage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-12">
           <div className="label-mono">[MATCHES]</div>
           <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
