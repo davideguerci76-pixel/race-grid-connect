@@ -85,9 +85,14 @@ export function SiteHeader() {
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="container-page flex h-16 items-center justify-between gap-3">
-        <Link to={user ? "/dashboard" : "/"} className="flex shrink-0 items-center gap-2 text-xl font-black italic tracking-tighter" onClick={() => setOpen(false)}>
-          <span className="inline-block h-6 w-6 skew-x-[-15deg] bg-racing-red" />
-          PADDOCK<span className="text-racing-red">PRO</span>
+        <Link to={user ? "/dashboard" : "/"} className="flex shrink-0 items-center" onClick={() => setOpen(false)}>
+          <img
+            src={logoCompact.url}
+            alt="Pit Call"
+            width={640}
+            height={172}
+            className="h-9 w-auto object-contain md:h-10"
+          />
         </Link>
 
         {/* Desktop nav */}
