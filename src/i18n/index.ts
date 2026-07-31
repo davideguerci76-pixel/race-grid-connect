@@ -14,7 +14,7 @@ export const SUPPORTED_LANGS = [
   { code: "de", label: "DE" },
 ] as const;
 
-export const LANG_STORAGE_KEY = "paddockpro.lang";
+export const LANG_STORAGE_KEY = "pitcall.lang";
 
 if (!i18n.isInitialized) {
   i18n

@@ -46,7 +46,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="container-page flex items-center justify-between py-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          <span>© 2026 PaddockPro</span>
+          <span>© 2026 Pit Call</span>
           <span>Paddock Code 44.029 / Z-1</span>
         </div>
       </div>

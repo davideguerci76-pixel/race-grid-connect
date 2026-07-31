@@ -11,9 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — PaddockPro" },
+      { title: "Notifications — Pit Call" },
       { name: "description", content: "System alerts and reminders for your motorsport matches, calendar and engagements." },
-      { property: "og:title", content: "Notifications — PaddockPro" },
+      { property: "og:title", content: "Notifications — Pit Call" },
       { property: "og:description", content: "System alerts and reminders for your motorsport matches, calendar and engagements." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
