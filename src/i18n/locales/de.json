@@ -38,7 +38,7 @@
       "countries": "Länder",
       "rate": "Ø Tagessatz"
     },
-    "featured_jobs": "Offene Anfragen",
+    "featured_jobs": "Offene Pit Calls",
     "featured_freelancers": "Geprüfte Talente",
     "see_all": "Alle ansehen",
     "cta_ready": "Bereit für den Start?",
@@ -46,8 +46,8 @@
     "cta_start": "Loslegen →"
   },
   "jobs": {
-    "title": "Offene Anfragen",
-    "sub": "{{filtered}} von {{total}} Anfragen.",
+    "title": "Offene Pit Calls",
+    "sub": "{{filtered}} von {{total}} Pit Calls.",
     "filters": {
       "discipline": "Disziplin",
       "role": "Rolle",
@@ -56,7 +56,7 @@
     },
     "budget": "Budget",
     "apply": "Bewerben",
-    "post_request": "Anfrage posten",
+    "post_request": "Pit Call posten",
     "empty": "Keine Ergebnisse"
   },
   "freelancers": {
@@ -126,8 +126,8 @@
     "your_matches": "Deine Matches",
     "new_matches_pill": "{{count}} neue Matches",
     "manage_calendar": "Kalender verwalten",
-    "post_request": "Anfrage posten",
-    "requests_active": "Aktive Anfragen",
+    "post_request": "Pit Call posten",
+    "requests_active": "Aktive Pit Calls",
     "engagements": "Engagements",
     "rating_average": "Bewertung"
   },
@@ -135,7 +135,7 @@
     "title": "Verfügbarkeitskalender",
     "team_title": "Anfragekalender",
     "instructions_freelancer": "Tage klicken zum Umschalten.",
-    "instructions_team": "Anfrage mit Rolle und Datum hinzufügen.",
+    "instructions_team": "Pit Call mit Rolle und Datum hinzufügen.",
     "available_days": "{{count}} Tage verfügbar",
     "quick": {
       "next_weekend": "Nächstes Wochenende",
@@ -146,7 +146,7 @@
   "matches": {
     "title": "Matches",
     "empty": "Noch keine Matches.",
-    "empty_team": "Keine Matches. Anfrage posten.",
+    "empty_team": "Keine Matches. Pit Call posten.",
     "hidden_name": "Enthüllen für Name",
     "reveal_1_token": "Enthüllen (1 Token)",
     "reveal_confirm": "1 Token ausgeben um {{who}} zu enthüllen?",
@@ -218,17 +218,17 @@
     "cookie": "Cookies"
   },
   "requests": {
-    "title": "Meine Anfragen",
-    "subtitle": "Eine Anfrage pro Rolle. Je 5 Tokens.",
-    "new": "Neue Anfrage",
-    "empty": "Noch keine Anfragen.",
+    "title": "Meine Pit Calls",
+    "subtitle": "Eine Pit Call pro Rolle. Je 5 Tokens.",
+    "new": "Neue Pit Call",
+    "empty": "Noch keine Pit Calls.",
     "matches": "Matches",
     "view_matches": "Matches ansehen",
     "pause": "Pause",
     "resume": "Fortsetzen",
     "complete": "Als erledigt markieren",
     "close": "Schließen",
-    "confirm_close": "Anfrage schließen?",
+    "confirm_close": "Pit Call schließen?",
     "repost": "Ähnliche posten",
     "status_updated": "Status aktualisiert",
     "posted": "Veröffentlicht. 5 Tokens abgebucht.",
@@ -237,7 +237,8 @@
     "top_up": "Aufladen",
     "insufficient": "Nicht genug Tokens",
     "post_for": "Posten für",
-    "back": "Zurück"
+    "back": "Zurück",
+    "helper": "Pit Call — die Engagement-Anfrage eines Teams (Jobangebot)"
   },
   "education": {
     "label": "Ausbildung",

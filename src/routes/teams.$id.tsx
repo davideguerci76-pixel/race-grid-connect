@@ -174,7 +174,7 @@ function TeamProfile() {
             <div>
               <div className="label-mono text-racing-yellow">[PARTIAL ACCESS]</div>
               <p className="mt-1 text-sm text-muted-foreground">
-                You unlocked this team for one job posting. Direct contacts and the team's other active requests are hidden.
+                You unlocked this team for one job posting. Direct contacts and the team's other active Pit Calls are hidden.
               </p>
             </div>
             <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
@@ -184,9 +184,9 @@ function TeamProfile() {
         )}
 
         <div className="mt-8">
-          <div className="label-mono mb-3">{canSeeFull ? "Active requests" : "Requested position"}</div>
+          <div className="label-mono mb-3">{canSeeFull ? "Active Pit Calls" : "Requested position"}</div>
           {visibleRequests.length === 0 ? (
-            <div className="border border-border bg-card p-8 text-center text-sm text-muted-foreground">No active requests.</div>
+            <div className="border border-border bg-card p-8 text-center text-sm text-muted-foreground">No active Pit Calls.</div>
           ) : (
             <div className="grid gap-3">
               {visibleRequests.map((r) => (
@@ -211,7 +211,7 @@ function TeamProfile() {
           {!canSeeFull && requests.length > visibleRequests.length && (
             <div className="mt-4 flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
               <Lock className="size-4" />
-              {requests.length - visibleRequests.length} other request(s) from this team are locked. Unlock the full profile to view them.
+              {requests.length - visibleRequests.length} other Pit Call(s) from this team are locked. Unlock the full profile to view them.
             </div>
           )}
         </div>
@@ -232,7 +232,7 @@ function ConfirmModal({ onCancel, onConfirm, pending, error }: { onCancel: () =>
         <div className="label-mono">[UNLOCK FULL PROFILE]</div>
         <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Spend 5 tokens?</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Unlocks direct contacts (website) and the full list of active requests from this team. One-time payment for this team.
+          Unlocks direct contacts (website) and the full list of active Pit Calls from this team. One-time payment for this team.
         </p>
         {error && <div className="mt-3 border border-racing-red/40 bg-racing-red/10 p-3 text-xs text-racing-red">{error}</div>}
         <div className="mt-5 flex justify-end gap-2">

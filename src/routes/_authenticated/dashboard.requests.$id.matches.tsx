@@ -54,7 +54,7 @@ function RequestMatchesPage() {
   const confirmMut = useMutation({
     mutationFn: (match_id: string) => confirmFn({ data: { match_id } }),
     onSuccess: () => {
-      toast.success("Confirmation request sent to the freelancer");
+      toast.success("Match confirmation sent to the freelancer");
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
@@ -159,7 +159,7 @@ function RequestMatchesPage() {
                       requestFilled={!!requestFilled}
                       onUnlock={() => unlockMut.mutate(m.match_id)}
                       onConfirm={() => {
-                        if (confirm("Send a confirmation request for this match? If the freelancer accepts, the request is closed, all other pending requests for it are cancelled, and contacts are exchanged.")) {
+                        if (confirm("Send a confirmation request for this match? If the freelancer accepts, the Pit Call is closed, all other pending proposals for it are cancelled, and contacts are exchanged.")) {
                           confirmMut.mutate(m.match_id);
                         }
                       }}
@@ -180,7 +180,7 @@ function RequestMatchesPage() {
       <SiteHeader />
       <div className="container-page py-10">
         <Link to="/dashboard/requests" className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-3" /> Back to requests
+          <ArrowLeft className="size-3" /> Back to Pit Calls
         </Link>
 
         {isLoading && <div className="text-sm text-muted-foreground">Loading matches…</div>}
@@ -188,7 +188,7 @@ function RequestMatchesPage() {
         {data && (
           <>
             <div className="border border-border bg-card p-5">
-              <div className="label-mono">[REQUEST]</div>
+              <div className="label-mono">[PIT CALL]</div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{data.request.title}</h1>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
                 {data.request.sub_role ? `${subRoleLabel(data.request.sub_role)} (${levelLabel(data.request.sub_role_min_level ?? "junior")}+)` : roleGroupLabel(data.request.role_group)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
@@ -603,7 +603,7 @@ function ZeroMatchTrivio({
           <p className="mt-1 flex-1 text-xs text-muted-foreground">
             {hasPartials
               ? `See freelancers available only for part of the dates now. Refund is halved to ${quote.refund_partial} token${quote.refund_partial === 1 ? "" : "s"}. Request stays open — if a full match later confirms, no extra refund.`
-              : "No partial candidates exist for this request yet."}
+              : "No partial candidates exist for this Pit Call yet."}
           </p>
           <button
             onClick={onPartial}

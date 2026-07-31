@@ -59,15 +59,18 @@ function RequestsPage() {
       <div className="container-page py-12">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="label-mono">[MY REQUESTS]</div>
+            <div className="label-mono">[MY PIT CALLS]</div>
             <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("requests.title")}</h1>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("requests.subtitle")}</p>
           </div>
           <Link
             to="/dashboard/requests/new"
+            title={t("requests.helper")}
             className="shrink-0 bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
           >
             + {t("requests.new")}
+
           </Link>
         </div>
 

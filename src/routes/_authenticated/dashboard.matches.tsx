@@ -101,7 +101,7 @@ function MatchesPage() {
         <div className="container-page py-12">
           <div className="label-mono">[MATCHES]</div>
           <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">History and status of matches across all your requests.</p>
+          <p className="mt-2 text-sm text-muted-foreground">History and status of matches across all your Pit Calls.</p>
 
           {teamRequests.length === 0 ? (
             <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">{t("matches.empty_team")}</div>
@@ -255,7 +255,7 @@ function MatchesPage() {
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
                       <button
                         onClick={() => {
-                          if (confirm("Confirm this match? Your contact details will be shared with the team and the request will be closed.")) {
+                          if (confirm("Confirm this match? Your contact details will be shared with the team and the Pit Call will be closed.")) {
                             acceptMut.mutate(m.pending_engagement_id);
                           }
                         }}

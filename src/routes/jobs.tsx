@@ -109,14 +109,16 @@ function JobsPage() {
       <div className="container-page py-12">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="label-mono">[REQUESTS]</div>
+            <div className="label-mono">[PIT CALLS]</div>
             <h1 className="text-5xl font-black uppercase italic tracking-tighter">{t("jobs.title")}</h1>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("jobs.sub", { filtered: filtered.length, total: requests.length })}</p>
           </div>
           {isTeam ? (
-            <Link to="/dashboard/requests/new" className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+            <Link to="/dashboard/requests/new" title={t("requests.helper")} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
               {t("jobs.post_request")}
             </Link>
+
           ) : null}
         </div>
 
