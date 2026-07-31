@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site-header";
-import logoFull from "@/assets/pitcall-logo-full.jpg.asset.json";
+import logoFull from "@/assets/pitcall-logo-full.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
 
 const searchSchema = z.object({

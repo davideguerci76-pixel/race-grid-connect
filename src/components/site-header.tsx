@@ -11,7 +11,7 @@ import { TokenBadge } from "./token-badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
 import { getUnreadNotificationCount } from "@/lib/paddock.functions";
-import logoCompact from "@/assets/pitcall-logo-compact.jpg.asset.json";
+import logoCompact from "@/assets/pitcall-logo-compact.png.asset.json";
 
 
 export function SiteHeader() {

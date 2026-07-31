@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import logoCompact from "@/assets/pitcall-logo-compact.jpg.asset.json";
+import logoCompact from "@/assets/pitcall-logo-compact.png.asset.json";
 
 export function SiteFooter() {
   const { t } = useTranslation();
