@@ -249,7 +249,8 @@
     "top_up": "Ricarica",
     "insufficient": "Token insufficienti",
     "post_for": "Pubblica per",
-    "back": "Indietro"
+    "back": "Indietro",
+    "helper": "Pit Call — la richiesta d'ingaggio di un team (offerta di lavoro)"
   },
   "education": {
     "label": "Titolo di studio",
@@ -302,7 +303,7 @@
   },
   "languages": {
     "label": "Lingue parlate",
-    "required": "Lingue Pit Calls",
+    "required": "Lingue richieste",
     "en": "Inglese",
     "fr": "Francese",
     "es": "Spagnolo",

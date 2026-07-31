@@ -249,7 +249,8 @@
     "top_up": "Top up",
     "insufficient": "Not enough tokens",
     "post_for": "Post for",
-    "back": "Back"
+    "back": "Back",
+    "helper": "Pit Call — a team's engagement request (job offer)"
   },
   "education": {
     "label": "Education",
