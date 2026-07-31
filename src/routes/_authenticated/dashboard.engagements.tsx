@@ -230,7 +230,7 @@ function EngagementsPage() {
 
                 {req && (
                   <div className="mt-3 border-t border-border pt-3">
-                    <div className="label-mono mb-1">[REQUEST]</div>
+                    <div className="label-mono mb-1">[PIT CALL]</div>
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
                       {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
