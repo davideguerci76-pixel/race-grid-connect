@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
 import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -37,6 +38,7 @@ function FreelancerProfile() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-16 text-center">
           <div className="label-mono">[LOCKED]</div>
           <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Sign in to view freelancer</h1>

@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyNotifications, markAllNotificationsRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
   head: () => ({
@@ -57,6 +58,7 @@ function NotificationsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="label-mono">[NOTIFICATIONS]</div>
         <div className="flex flex-wrap items-end justify-between gap-3">

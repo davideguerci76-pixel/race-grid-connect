@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { purchaseTokensDemo, getTokenHistory } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
+import { BackButton } from "@/components/back-button";
 
 const PACKS = [
   { key: "small" as const, tokens: 10 },
@@ -41,6 +42,7 @@ function TokensPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="label-mono">[TOKENS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("tokens.title")}</h1>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BackButton } from "@/components/back-button";
 
 const DOCS: Record<string, { title: string; body: string[] }> = {
   privacy: {
@@ -65,6 +66,7 @@ function LegalPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-16">
         <div className="label-mono">[LEGAL]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{doc.title}</h1>

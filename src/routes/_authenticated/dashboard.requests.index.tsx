@@ -11,6 +11,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { Plus, Calendar, MapPin, Wrench, Eye, Pause, Play, CheckCircle2, XCircle, Copy, RotateCcw } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -56,20 +58,21 @@ function RequestsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="label-mono">[MY PIT CALLS]</div>
             <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("requests.title")}</h1>
-            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
+            <p className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("requests.subtitle")}</p>
           </div>
           <Link
             to="/dashboard/requests/new"
             title={t("requests.helper")}
-            className="shrink-0 bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
           >
-            + {t("requests.new")}
+            <Plus className="size-4" /> {t("requests.new")}
 
           </Link>
         </div>
@@ -77,37 +80,39 @@ function RequestsPage() {
         <div className="mt-8 grid gap-3">
           {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
           {!isLoading && requests.length === 0 && (
-            <div className="border border-dashed border-border bg-card p-10 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
               <p className="text-sm text-muted-foreground">{t("requests.empty")}</p>
-              <Link to="/dashboard/requests/new" className="mt-4 inline-block bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white">
+              <Link to="/dashboard/requests/new" className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white">
                 {t("requests.new")}
               </Link>
             </div>
           )}
           {requests.map((r) => (
-            <div key={r.id} className="border border-border bg-card p-5">
+            <div key={r.id} className="card-surface p-5 transition-colors hover:border-racing-red/60">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
-                    <span className="font-mono text-[11px] uppercase text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Wrench className="size-3.5" />
                       {(r as any).sub_role ? subRoleLabel((r as any).sub_role) : roleGroupLabel((r as any).role_group)} · {disciplineLabel(r.discipline)}
                     </span>
                   </div>
                   <h2 className="mt-1 text-xl font-bold">{r.title}</h2>
-                  <p className="mt-1 font-mono text-xs text-muted-foreground">
-                    {r.start_date} → {r.end_date}
-                    {r.circuit ? ` · ${r.circuit}` : ""}
-                    {r.location ? ` · ${r.location}` : ""}
+                  <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1.5"><Calendar className="size-3.5" />{r.start_date} → {r.end_date}</span>
+                    {(r.circuit || r.location) && (
+                      <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" />{[r.circuit, r.location].filter(Boolean).join(" · ")}</span>
+                    )}
                   </p>
                 </div>
-                <div className="text-right">
-                  <div className="font-mono text-[11px] uppercase text-muted-foreground">{t("requests.matches")}</div>
+                <div className="rounded-2xl border border-border bg-background px-4 py-2 text-right">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t("requests.matches")}</div>
                   <div className="text-2xl font-black text-racing-red">
                     {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id ? 1 : (r.matches_count ?? 0)}
                   </div>
                   {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id && (
-                    <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">Confirmed · Filled</div>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-racing-yellow">Confirmed · Filled</div>
                   )}
                 </div>
               </div>
@@ -115,8 +120,9 @@ function RequestsPage() {
                 <Link
                   to="/dashboard/requests/$id/matches"
                   params={{ id: r.id }}
-                  className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                 >
+                  <Eye className="size-4" />
                   {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id
                     ? `${t("requests.view_matches")} (1) — Confirmed · Filled`
                     : `${t("requests.view_matches")} (${r.matches_count ?? 0})`}
@@ -125,34 +131,34 @@ function RequestsPage() {
                 {r.status === "active" && (
                   <button
                     onClick={() => statusMut.mutate({ id: r.id, status: "paused" })}
-                    className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                   >
-                    {t("requests.pause")}
+                    <Pause className="size-4" /> {t("requests.pause")}
                   </button>
                 )}
                 {r.status === "paused" && (
                   <button
                     onClick={() => statusMut.mutate({ id: r.id, status: "active" })}
-                    className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                   >
-                    {t("requests.resume")}
+                    <Play className="size-4" /> {t("requests.resume")}
                   </button>
                 )}
                 {(r.status === "active" || r.status === "paused") && (
                   <>
                     <button
                       onClick={() => statusMut.mutate({ id: r.id, status: "completed" })}
-                      className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
                     >
-                      {t("requests.complete")}
+                      <CheckCircle2 className="size-4" /> {t("requests.complete")}
                     </button>
                     <button
                       onClick={() => {
                         if (confirm(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
                       }}
-                      className="border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-racing-red/60 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                     >
-                      {t("requests.close")}
+                      <XCircle className="size-4" /> {t("requests.close")}
                     </button>
                   </>
                 )}
@@ -161,16 +167,16 @@ function RequestsPage() {
                     <Link
                       to="/dashboard/requests/new"
                       search={{ from: r.id }}
-                      className="border border-racing-red px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-racing-red px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                     >
-                      Repost similar
+                      <RotateCcw className="size-4" /> Repost similar
                     </Link>
                     <Link
                       to="/dashboard/requests/new"
                       search={{ from: r.id, mode: "identical" }}
-                      className="border border-racing-yellow px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-racing-yellow px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
                     >
-                      Repost identical (discount)
+                      <Copy className="size-4" /> Repost identical (discount)
                     </Link>
                   </>
                 )}
@@ -194,7 +200,7 @@ function StatusBadge({ status }: { status: string }) {
     filled: "bg-racing-yellow/10 text-racing-yellow border-racing-yellow",
   };
   return (
-    <span className={`border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${styles[status] ?? ""}`}>
+    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${styles[status] ?? ""}`}>
       {status}
     </span>
   );

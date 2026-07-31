@@ -13,6 +13,7 @@ import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRati
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -162,6 +163,7 @@ function EngagementsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="label-mono">[ENGAGEMENTS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("engagements.title")}</h1>
