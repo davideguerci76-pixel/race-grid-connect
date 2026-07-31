@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import logoCompact from "@/assets/pitcall-logo-compact.jpg.asset.json";
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -7,10 +8,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <div className="flex items-center gap-2 text-xl font-black italic tracking-tighter">
-            <span className="inline-block h-6 w-6 skew-x-[-15deg] bg-racing-red" />
-            PADDOCK<span className="text-racing-red">PRO</span>
-          </div>
+          <img src={logoCompact.url} alt="Pit Call" width={640} height={172} className="h-10 w-auto object-contain" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
         <div>
