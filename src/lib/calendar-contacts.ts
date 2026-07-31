@@ -52,12 +52,12 @@ function icsEscape(s: string): string {
 export function buildIcsFile(ev: CalendarEvent): string {
   const dtStart = toCalDate(ev.startDate);
   const dtEnd = toCalDate(addDays(ev.endDate, 1)); // exclusive
-  const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@paddockmatch`;
+  const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@pitcall`;
   const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//PaddockMatch//EN",
+    "PRODID:-//PitCall//EN",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:${uid}`,
