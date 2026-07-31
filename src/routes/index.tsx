@@ -44,7 +44,7 @@ function Home() {
             alt="Pit Call — Box. Now!"
             width={1200}
             height={675}
-            className="mb-8 w-full max-w-md object-contain"
+            className="mb-8 w-full max-w-md object-contain mix-blend-screen"
           />
           <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />

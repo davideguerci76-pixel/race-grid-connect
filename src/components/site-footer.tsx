@@ -8,7 +8,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <img src={logoCompact.url} alt="Pit Call" width={640} height={172} className="h-10 w-auto object-contain" />
+          <img src={logoCompact.url} alt="Pit Call" width={640} height={172} className="h-12 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
         <div>
