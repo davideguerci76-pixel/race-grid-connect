@@ -107,7 +107,7 @@ function EngagementsPage() {
     mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
     onSuccess: (row: any) => {
       const kind = row?.cancellation_kind;
-      if (kind === "grace") toast.success("Cancelled within grace window — no penalty. The request is reopened.");
+      if (kind === "grace") toast.success("Cancelled within grace window — no penalty. The Pit Call is reopened.");
       else if (kind === "team_late") toast.warning("Late cancellation recorded on your team profile.");
       else if (kind === "freelancer_late") toast.warning("Late cancellation — those days stay blocked on your calendar.");
       else toast.success("Cancelled");
@@ -412,10 +412,10 @@ function EngagementsPage() {
                       ? "Cancel (late — days stay blocked)"
                       : "Cancel (late — logged on profile)";
                     const warn = inGrace
-                      ? "Cancel this confirmed match? You are within the 24h grace window: no penalty and the request reopens for other candidates."
+                      ? "Cancel this confirmed match? You are within the 24h grace window: no penalty and the Pit Call reopens for other candidates."
                       : isFreelancer
-                      ? "You are past the grace window. The engaged days remain blocked on your calendar and the request will be reopened for other candidates. Continue?"
-                      : "You are past the grace window. This cancellation will be recorded on your public team profile and the request will be archived. Continue?";
+                      ? "You are past the grace window. The engaged days remain blocked on your calendar and the Pit Call will be reopened for other candidates. Continue?"
+                      : "You are past the grace window. This cancellation will be recorded on your public team profile and the Pit Call will be archived. Continue?";
                     return (
                       <button
                         onClick={() => {

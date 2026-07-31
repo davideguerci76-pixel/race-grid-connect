@@ -895,7 +895,7 @@ function LanguagesEditor({
         </label>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">
-        Pick each language you speak and its level. Teams can require specific languages on their job requests.
+        Pick each language you speak and its level. Teams can require specific languages on their Pit Calls.
       </p>
       <div className="mt-2 space-y-2">
         {value.map((l, i) => (

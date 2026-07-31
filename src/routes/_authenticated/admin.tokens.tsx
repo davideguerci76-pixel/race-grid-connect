@@ -24,7 +24,7 @@ const CATEGORIES: { id: string; title: string; blurb: string }[] = [
   { id: "economics", title: "Token economics", blurb: "Retail value of a single token. All pack pricing on the buy page derives from this." },
   { id: "costs", title: "Operational costs (tokens spent)", blurb: "Amount of tokens deducted for each user action. Reads apply platform-wide on the next call." },
   { id: "rewards", title: "Rewards & incentives (tokens credited)", blurb: "Tokens credited automatically to users for the listed actions." },
-  { id: "refunds", title: "Zero-match refunds", blurb: "Refund policy when a Job Request returns 0 total matches. Percentages compute automatically from the number of hard filters on the request." },
+  { id: "refunds", title: "Zero-match refunds", blurb: "Refund policy when a Pit Call returns 0 total matches. Percentages compute automatically from the number of hard filters on the Pit Call." },
 ];
 
 function AdminTokensPage() {
@@ -73,7 +73,7 @@ function AdminTokensPage() {
         <div>
           <h2 className="text-xl font-bold">Token configuration</h2>
           <p className="text-sm text-muted-foreground">
-            Any change here takes effect immediately across the platform (post request, unlock, reveal, rating reward, signup bonus…). New future features that spend or credit tokens must register their cost here.
+            Any change here takes effect immediately across the platform (post Pit Call, unlock, reveal, rating reward, signup bonus…). New future features that spend or credit tokens must register their cost here.
           </p>
         </div>
         <button

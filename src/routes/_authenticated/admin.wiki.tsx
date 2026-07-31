@@ -100,7 +100,7 @@ function PlatformWiki() {
       </Section>
 
       <Section icon={MapPin} tag="[02 · GEOLOCATION]" title="Geographic matching — 3-state relevance switch">
-        <p>Each Job Request declares how strictly location affects matching, and against which anchor:</p>
+        <p>Each Pit Call declares how strictly location affects matching, and against which anchor:</p>
         <Table
           headers={["Relevance", "Behaviour", "Score impact"]}
           rows={[
@@ -118,7 +118,7 @@ function PlatformWiki() {
           ]}
         />
         <p className="text-xs text-muted-foreground">
-          Anchor selector: <span className="font-mono">This Location</span> uses the coordinates of the specific request
+          Anchor selector: <span className="font-mono">This Location</span> uses the coordinates of the specific Pit Call
           (e.g. the circuit). <span className="font-mono">Team Location</span> uses the team's headquarters address.
           Distance is computed as <span className="font-mono">haversine</span> great-circle distance (line-of-sight
           kilometres), never road distance.
@@ -129,7 +129,7 @@ function PlatformWiki() {
         <p className="font-bold uppercase text-racing-yellow">Natural closure</p>
         <p>
           A scheduled job (<span className="font-mono">close_expired_requests</span>) runs periodically. Any{" "}
-          <span className="font-mono">active</span> / <span className="font-mono">paused</span> request whose first
+          <span className="font-mono">active</span> / <span className="font-mono">paused</span> Pit Call whose first
           required day has already passed with no confirmed engagement is set to{" "}
           <span className="font-mono">completed</span> and archived as <span className="font-mono">Unfilled</span>.
         </p>
@@ -142,7 +142,7 @@ function PlatformWiki() {
           <li>The first required day has not yet started.</li>
         </ul>
         <p>
-          The engagement is stamped <span className="font-mono">cancellation_kind = 'grace'</span>. The request reopens
+          The engagement is stamped <span className="font-mono">cancellation_kind = 'grace'</span>. The Pit Call reopens
           (status returns to <span className="font-mono">active</span>) and previously waitlisted freelancers are
           notified.
         </p>
@@ -159,7 +159,7 @@ function PlatformWiki() {
           <span className="font-mono">cancellation_kind = 'freelancer_late'</span> or{" "}
           <span className="font-mono">'no_show'</span>. The originally engaged days remain{" "}
           <span className="font-bold text-racing-red">Locked Red</span> on the freelancer's calendar — they cannot be
-          re-offered, protecting the team's confidence in booked slots. The request reopens and same-day flows (SOS
+          re-offered, protecting the team's confidence in booked slots. The Pit Call reopens and same-day flows (SOS
           Call, no-show 1-star rating) are unlocked.
         </p>
       </Section>
@@ -176,7 +176,7 @@ function PlatformWiki() {
           </li>
           <li>
             The corresponding request is immediately marked <span className="font-mono">filled</span> and every other
-            still-<span className="font-mono">proposed</span> engagement on the same request is auto-cancelled.
+            still-<span className="font-mono">proposed</span> engagement on the same Pit Call is auto-cancelled.
           </li>
           <li>
             Reserve freelancers receive a <span className="font-mono">match_taken</span> notification with a
@@ -197,10 +197,10 @@ function PlatformWiki() {
         </p>
         <p className="font-bold uppercase text-racing-yellow">Activation conditions (ALL must be true)</p>
         <ul className="list-disc pl-5">
-          <li>The request is single-race (<span className="font-mono">duration ≠ full_season</span>).</li>
+          <li>The Pit Call is single-race (<span className="font-mono">duration ≠ full_season</span>).</li>
           <li>Today (simulated clock) equals the first required day.</li>
-          <li>No confirmed engagement exists on the request.</li>
-          <li>Team is the request owner.</li>
+          <li>No confirmed engagement exists on the Pit Call.</li>
+          <li>Team is the Pit Call owner.</li>
         </ul>
         <p className="font-bold uppercase text-racing-yellow">Behaviour</p>
         <ul className="list-disc pl-5">
@@ -251,21 +251,21 @@ function PlatformWiki() {
           rows={[
             [
               "1 — Keep searching",
-              "Leave the request live; wait for a new 100% match to appear.",
+              "Leave the Pit Call live; wait for a new 100% match to appear.",
               "None. The search stays alive.",
-              "Request stays active. Standard FCFS resumes as candidates surface.",
+              "Pit Call stays active. Standard FCFS resumes as candidates surface.",
             ],
             [
               "2 — Refund & close",
-              "Accept the full refund quote and archive the request as completed · unfilled.",
+              "Accept the full refund quote and archive the Pit Call as completed · unfilled.",
               "Full quote (see formula above).",
-              "Final. Request cannot be reopened.",
+              "Final. The Pit Call cannot be reopened.",
             ],
             [
               "3 — Unlock partials",
               "Reveal freelancers available only for part of the required dates.",
               "HALVED refund (refund_partial = round(refund_full / 2), min 1).",
-              "Request stays open. If a full match later confirms, no extra refund. If the team later engages a partial, no extra refund.",
+              "Pit Call stays open. If a full match later confirms, no extra refund. If the team later engages a partial, no extra refund.",
             ],
           ]}
         />

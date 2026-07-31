@@ -7,7 +7,7 @@ const DOCS: Record<string, { title: string; body: string[] }> = {
     title: "Privacy Policy",
     body: [
       "Pit Call processes personal data solely to operate the matching platform between motorsport freelancers and teams.",
-      "We store your profile, availability, requests, matches and ratings. We never sell your data.",
+      "We store your profile, availability, Pit Calls, matches and ratings. We never sell your data.",
       "You can request export or deletion of your account at any time by contacting privacy@pitcall.app.",
       "Placeholder document — replace with your final legal copy before launch.",
     ],
