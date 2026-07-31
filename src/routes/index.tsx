@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-pit.jpg";
+import logoFull from "@/assets/pitcall-logo-full.png.asset.json";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
@@ -38,6 +39,12 @@ function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         <div className="container-page relative py-24 md:py-32">
+          <img
+            src={logoFull.url}
+            alt="Pit Call — Box. Now!"
+            width={1089} height={424}
+            className="mb-8 w-full max-w-md object-contain mix-blend-screen"
+          />
           <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">

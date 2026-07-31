@@ -278,7 +278,7 @@ function RequestMatchesPage() {
                           email: data.hired.contact_email ?? null,
                           phone: data.hired.phone_number ? `${data.hired.phone_dial_code ?? ""}${data.hired.phone_number}`.replace(/\s+/g, "") : null,
                           title: data.hired.role_group ? roleGroupLabel(data.hired.role_group) : null,
-                          notes: `PaddockMatch — Match confirmed for "${data.request.title}"`,
+                          notes: `PitCall — Match confirmed for "${data.request.title}"`,
                         }}
                       />
                     </div>

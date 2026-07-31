@@ -227,7 +227,7 @@ function MatchesPage() {
                           <div className="label-mono mb-2 text-racing-yellow">[ADD TO CALENDAR]</div>
                           <CalendarQuickButtons
                             event={{
-                              title: `Match — ${m.request?.title ?? "PaddockMatch"}`,
+                              title: `Match — ${m.request?.title ?? "PitCall"}`,
                               startDate: m.request.start_date,
                               endDate: m.request.end_date,
                               location: m.request?.location ?? m.request?.circuit ?? null,

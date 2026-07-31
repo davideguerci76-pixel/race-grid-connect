@@ -369,7 +369,7 @@ function EngagementsPage() {
                               title: fp?.headline ?? undefined,
                               email: e.freelancer_contact?.email ?? undefined,
                               phone: e.freelancer_contact?.phone_number ? `${e.freelancer_contact?.phone_dial_code ?? ""} ${e.freelancer_contact.phone_number}`.trim() : undefined,
-                              notes: req?.title ? `PaddockMatch — ${req.title}` : undefined,
+                              notes: req?.title ? `PitCall — ${req.title}` : undefined,
                             }}
                           />
 
@@ -379,7 +379,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-2">[ADD TO CALENDAR]</div>
                     <CalendarQuickButtons
                       event={{
-                        title: `Match — ${req?.title ?? other?.display_name ?? "PaddockMatch"}`,
+                        title: `Match — ${req?.title ?? other?.display_name ?? "PitCall"}`,
                         startDate: e.start_date,
                         endDate: e.end_date,
                         location: req?.location ?? req?.circuit ?? null,

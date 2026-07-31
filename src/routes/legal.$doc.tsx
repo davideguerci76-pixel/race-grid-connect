@@ -6,18 +6,18 @@ const DOCS: Record<string, { title: string; body: string[] }> = {
   privacy: {
     title: "Privacy Policy",
     body: [
-      "PaddockPro processes personal data solely to operate the matching platform between motorsport freelancers and teams.",
+      "Pit Call processes personal data solely to operate the matching platform between motorsport freelancers and teams.",
       "We store your profile, availability, requests, matches and ratings. We never sell your data.",
-      "You can request export or deletion of your account at any time by contacting privacy@paddockpro.app.",
+      "You can request export or deletion of your account at any time by contacting privacy@pitcall.app.",
       "Placeholder document — replace with your final legal copy before launch.",
     ],
   },
   terms: {
     title: "Terms of Service",
     body: [
-      "By using PaddockPro you agree to provide accurate information, honour confirmed engagements, and rate counterparties fairly.",
+      "By using Pit Call you agree to provide accurate information, honour confirmed engagements, and rate counterparties fairly.",
       "Tokens purchased are non-refundable once spent to reveal a match.",
-      "PaddockPro is not a party to any contract between freelancer and team.",
+      "Pit Call is not a party to any contract between freelancer and team.",
       "Placeholder document — replace with your final legal copy before launch.",
     ],
   },
@@ -40,8 +40,8 @@ export const Route = createFileRoute("/legal/$doc")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.title ?? "Legal"} · PaddockPro` },
-      { name: "description", content: `${loaderData?.title ?? "Legal"} for PaddockPro.` },
+      { title: `${loaderData?.title ?? "Legal"} · Pit Call` },
+      { name: "description", content: `${loaderData?.title ?? "Legal"} for Pit Call.` },
     ],
   }),
   component: LegalPage,
