@@ -38,7 +38,7 @@
       "countries": "Países",
       "rate": "Tarifa media"
     },
-    "featured_jobs": "Solicitudes abiertas",
+    "featured_jobs": "Pit Calls abiertas",
     "featured_freelancers": "Talento verificado",
     "see_all": "Ver todo",
     "cta_ready": "¿Listo para la parrilla?",
@@ -46,8 +46,8 @@
     "cta_start": "Empieza →"
   },
   "jobs": {
-    "title": "Solicitudes abiertas",
-    "sub": "{{filtered}} de {{total}} solicitudes.",
+    "title": "Pit Calls abiertas",
+    "sub": "{{filtered}} de {{total}} Pit Calls.",
     "filters": {
       "discipline": "Disciplina",
       "role": "Rol",
@@ -56,7 +56,7 @@
     },
     "budget": "Presupuesto",
     "apply": "Postular",
-    "post_request": "Publicar solicitud",
+    "post_request": "Publicar Pit Call",
     "empty": "Sin resultados"
   },
   "freelancers": {
@@ -126,16 +126,16 @@
     "your_matches": "Tus matches",
     "new_matches_pill": "{{count}} nuevos matches",
     "manage_calendar": "Gestionar calendario",
-    "post_request": "Publicar solicitud",
-    "requests_active": "Solicitudes activas",
+    "post_request": "Publicar Pit Call",
+    "requests_active": "Pit Calls activas",
     "engagements": "Contratos",
     "rating_average": "Valoración"
   },
   "calendar": {
     "title": "Calendario disponibilidad",
-    "team_title": "Calendario solicitudes",
+    "team_title": "Calendario Pit Calls",
     "instructions_freelancer": "Haz clic para activar la disponibilidad.",
-    "instructions_team": "Añade una solicitud con rol y fechas.",
+    "instructions_team": "Añade una Pit Call con rol y fechas.",
     "available_days": "{{count}} días disponibles",
     "quick": {
       "next_weekend": "Próximo fin de semana",
@@ -146,7 +146,7 @@
   "matches": {
     "title": "Matches",
     "empty": "Sin matches todavía.",
-    "empty_team": "Sin matches. Publica una solicitud.",
+    "empty_team": "Sin matches. Publica una Pit Call.",
     "hidden_name": "Revela para ver el nombre",
     "reveal_1_token": "Revelar (1 token)",
     "reveal_confirm": "¿Gastar 1 token para revelar {{who}}?",
@@ -218,17 +218,17 @@
     "cookie": "Cookies"
   },
   "requests": {
-    "title": "Mis solicitudes",
-    "subtitle": "Una solicitud por puesto. 5 tokens cada una.",
-    "new": "Nueva solicitud",
-    "empty": "Sin solicitudes. Publica una para empezar.",
+    "title": "Mis Pit Calls",
+    "subtitle": "Una Pit Call por puesto. 5 tokens cada una.",
+    "new": "Nueva Pit Call",
+    "empty": "Sin Pit Calls. Publica una para empezar.",
     "matches": "Matches",
     "view_matches": "Ver matches",
     "pause": "Pausar",
     "resume": "Reanudar",
     "complete": "Marcar completada",
     "close": "Cerrar",
-    "confirm_close": "¿Cerrar esta solicitud?",
+    "confirm_close": "¿Cerrar esta Pit Call?",
     "repost": "Publicar similar",
     "status_updated": "Estado actualizado",
     "posted": "Publicada. 5 tokens debitados.",

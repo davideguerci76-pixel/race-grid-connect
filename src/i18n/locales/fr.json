@@ -38,7 +38,7 @@
       "countries": "Pays",
       "rate": "TJM moyen"
     },
-    "featured_jobs": "Demandes ouvertes",
+    "featured_jobs": "Pit Calls ouvertes",
     "featured_freelancers": "Talents vérifiés",
     "see_all": "Voir tout",
     "cta_ready": "Prêt à prendre la piste ?",
@@ -46,8 +46,8 @@
     "cta_start": "Commencer →"
   },
   "jobs": {
-    "title": "Demandes ouvertes",
-    "sub": "{{filtered}} sur {{total}} demandes.",
+    "title": "Pit Calls ouvertes",
+    "sub": "{{filtered}} sur {{total}} Pit Calls.",
     "filters": {
       "discipline": "Discipline",
       "role": "Rôle",
@@ -56,7 +56,7 @@
     },
     "budget": "Budget",
     "apply": "Postuler",
-    "post_request": "Publier une demande",
+    "post_request": "Publier une Pit Call",
     "empty": "Aucun résultat"
   },
   "freelancers": {
@@ -126,16 +126,16 @@
     "your_matches": "Vos matches",
     "new_matches_pill": "{{count}} nouveaux matches",
     "manage_calendar": "Gérer le calendrier",
-    "post_request": "Publier une demande",
-    "requests_active": "Demandes actives",
+    "post_request": "Publier une Pit Call",
+    "requests_active": "Pit Calls actives",
     "engagements": "Engagements",
     "rating_average": "Note"
   },
   "calendar": {
     "title": "Calendrier de disponibilité",
-    "team_title": "Calendrier des demandes",
+    "team_title": "Calendrier des Pit Calls",
     "instructions_freelancer": "Cliquez pour activer/désactiver la dispo.",
-    "instructions_team": "Ajoutez une demande avec rôle et dates.",
+    "instructions_team": "Ajoutez une Pit Call avec rôle et dates.",
     "available_days": "{{count}} jours dispos",
     "quick": {
       "next_weekend": "Prochain weekend",
@@ -146,7 +146,7 @@
   "matches": {
     "title": "Matches",
     "empty": "Aucun match pour le moment.",
-    "empty_team": "Aucun match. Publiez une demande.",
+    "empty_team": "Aucun match. Publiez une Pit Call.",
     "hidden_name": "Révéler pour voir le nom",
     "reveal_1_token": "Révéler (1 jeton)",
     "reveal_confirm": "Dépenser 1 jeton pour révéler {{who}} ?",
@@ -218,17 +218,17 @@
     "cookie": "Cookies"
   },
   "requests": {
-    "title": "Mes demandes",
-    "subtitle": "Une demande par poste. 5 tokens chacune.",
-    "new": "Nouvelle demande",
-    "empty": "Aucune demande. Publiez-en une pour commencer.",
+    "title": "Mes Pit Calls",
+    "subtitle": "Une Pit Call par poste. 5 tokens chacune.",
+    "new": "Nouvelle Pit Call",
+    "empty": "Aucune Pit Call. Publiez-en une pour commencer.",
     "matches": "Matches",
     "view_matches": "Voir les matches",
     "pause": "Pause",
     "resume": "Reprendre",
     "complete": "Marquer terminée",
     "close": "Fermer",
-    "confirm_close": "Fermer cette demande ?",
+    "confirm_close": "Fermer cette Pit Call ?",
     "repost": "Publier similaire",
     "status_updated": "Statut mis à jour",
     "posted": "Publiée. 5 tokens débités.",

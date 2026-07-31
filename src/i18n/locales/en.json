@@ -22,7 +22,7 @@
     "cta_freelancer_title": "I'm a Freelancer",
     "cta_freelancer_body": "Publish your availability and get matched",
     "cta_team_title": "We're a Team",
-    "cta_team_body": "Post request dates and find talent",
+    "cta_team_body": "Post Pit Call dates and find talent",
     "how_title": "How the match engine works",
     "how_1_t": "Publish your calendar",
     "how_1_b": "Freelancers mark available days. Teams post race weekends they need cover for.",
@@ -38,7 +38,7 @@
       "countries": "Countries covered",
       "rate": "Average day rate"
     },
-    "featured_jobs": "Open Requests",
+    "featured_jobs": "Open Pit Calls",
     "featured_freelancers": "Verified Talent",
     "see_all": "See all",
     "cta_ready": "Ready to hit the grid?",
@@ -46,8 +46,8 @@
     "cta_start": "Get started →"
   },
   "jobs": {
-    "title": "Open Requests",
-    "sub": "{{filtered}} of {{total}} open requests. Filter by discipline, role or duration.",
+    "title": "Open Pit Calls",
+    "sub": "{{filtered}} of {{total}} open Pit Calls. Filter by discipline, role or duration.",
     "filters": {
       "discipline": "Discipline",
       "role": "Role",
@@ -56,8 +56,8 @@
     },
     "budget": "Budget",
     "apply": "Apply",
-    "post_request": "Post a request",
-    "empty": "No requests match your filters"
+    "post_request": "Post a Pit Call",
+    "empty": "No Pit Calls match your filters"
   },
   "freelancers": {
     "title": "Freelancers",
@@ -126,16 +126,16 @@
     "your_matches": "Your matches",
     "new_matches_pill": "{{count}} new matches waiting",
     "manage_calendar": "Manage calendar",
-    "post_request": "Post a request",
-    "requests_active": "Active requests",
+    "post_request": "Post a Pit Call",
+    "requests_active": "Active Pit Calls",
     "engagements": "Engagements",
     "rating_average": "Rating"
   },
   "calendar": {
     "title": "Availability calendar",
-    "team_title": "Request calendar",
+    "team_title": "Pit Call calendar",
     "instructions_freelancer": "Click days to toggle your availability. Matches recompute automatically.",
-    "instructions_team": "Add a request with a role, discipline and date range. Matches recompute automatically.",
+    "instructions_team": "Add a Pit Call with a role, discipline and date range. Matches recompute automatically.",
     "available_days": "{{count}} days available",
     "quick": {
       "next_weekend": "Next weekend",
@@ -146,7 +146,7 @@
   "matches": {
     "title": "Matches",
     "empty": "No matches yet. Add availability to see teams that need you.",
-    "empty_team": "No matches yet. Post a request to find freelancers.",
+    "empty_team": "No matches yet. Post a Pit Call to find freelancers.",
     "hidden_name": "Reveal to see name",
     "reveal_1_token": "Reveal (1 token)",
     "reveal_confirm": "Spend 1 token to reveal {{who}}?",
@@ -230,20 +230,20 @@
     "cookie": "Cookie"
   },
   "requests": {
-    "title": "My requests",
-    "subtitle": "Post one request per role. 5 tokens each.",
-    "new": "New request",
-    "empty": "No requests yet. Post one to start matching freelancers.",
+    "title": "My Pit Calls",
+    "subtitle": "Post one Pit Call per role. 5 tokens each.",
+    "new": "New Pit Call",
+    "empty": "No Pit Calls yet. Post one to start matching freelancers.",
     "matches": "Matches",
     "view_matches": "View matches",
     "pause": "Pause",
     "resume": "Resume",
     "complete": "Mark completed",
     "close": "Close",
-    "confirm_close": "Close this request? It will stop matching.",
+    "confirm_close": "Close this Pit Call? It will stop matching.",
     "repost": "Post similar",
     "status_updated": "Status updated",
-    "posted": "Request posted. 5 tokens debited.",
+    "posted": "Pit Call posted. 5 tokens debited.",
     "cost": "Cost",
     "balance": "Balance",
     "top_up": "Top up",
