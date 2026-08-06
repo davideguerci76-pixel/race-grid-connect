@@ -29,22 +29,29 @@ function SlotRow({ rule, onToggle, compact }: { rule: boolean[]; onToggle: (i: n
   );
 }
 
+export type ApplyMode = "replace" | "merge";
+
 export function CalendarQuickFillDialog({
   open,
   onOpenChange,
   events,
   title = "Quick fill — logistics rule",
   onApply,
+  showMode = false,
+  existingCount = 0,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   events: CalendarEventItem[];
   title?: string;
-  onApply: (dates: string[]) => void;
+  onApply: (dates: string[], mode: ApplyMode) => void;
+  showMode?: boolean;
+  existingCount?: number;
 }) {
   const [rule, setRule] = useState<boolean[]>(DEFAULT_RULE);
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
+  const [mode, setMode] = useState<ApplyMode>("merge");
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
@@ -125,7 +132,36 @@ export function CalendarQuickFillDialog({
           )}
         </div>
 
-        <div className="font-mono text-xs text-racing-red">{result.length} day(s) will be selected</div>
+        {showMode && (
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="label-mono">[REPLACE OR MERGE]</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(["replace", "merge"] as ApplyMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMode(m)}
+                  className={`border px-3 py-2 text-[11px] font-bold uppercase tracking-widest ${
+                    mode === m ? "border-racing-red bg-racing-red/15 text-racing-red" : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {m === "replace" ? "Replace" : "Merge"}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              <strong>Replace:</strong> removes your {existingCount} currently selected day(s) and keeps only this calendar.
+              <br />
+              <strong>Merge:</strong> adds this calendar on top of your current availability — nothing you already selected is removed.
+            </p>
+          </div>
+        )}
+
+        <div className="font-mono text-xs text-racing-red">
+          {mode === "merge" && showMode
+            ? `${result.length} day(s) will be added to your current availability`
+            : `${result.length} day(s) will be selected`}
+        </div>
 
         <DialogFooter>
           <button
@@ -138,14 +174,15 @@ export function CalendarQuickFillDialog({
           <button
             type="button"
             onClick={() => {
-              onApply(result);
+              onApply(result, mode);
               onOpenChange(false);
             }}
             className="bg-racing-red px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110"
           >
-            Apply {result.length} days
+            {showMode ? (mode === "replace" ? `Confirm — replace with ${result.length} days` : `Confirm — merge ${result.length} days`) : `Apply ${result.length} days`}
           </button>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );

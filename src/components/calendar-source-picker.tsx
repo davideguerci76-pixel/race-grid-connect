@@ -157,7 +157,11 @@ export function CalendarSourcePicker({
           open={!!quickEvents}
           onOpenChange={(v) => !v && setQuickEvents(null)}
           events={quickEvents}
-          onApply={(dates) => onChange(dates)}
+          showMode
+          existingCount={value.length}
+          onApply={(dates, mode) =>
+            onChange(mode === "replace" ? [...new Set(dates)].sort() : [...new Set([...value, ...dates])].sort())
+          }
         />
       )}
     </div>
