@@ -1187,6 +1187,60 @@ export type Database = {
           },
         ]
       }
+      user_calendars: {
+        Row: {
+          created_at: string
+          dates: string[]
+          discipline: string | null
+          events: Json
+          id: string
+          name: string
+          owner_id: string
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          season_year: number | null
+          source: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dates?: string[]
+          discipline?: string | null
+          events?: Json
+          id?: string
+          name: string
+          owner_id: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          season_year?: number | null
+          source?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dates?: string[]
+          discipline?: string | null
+          events?: Json
+          id?: string
+          name?: string
+          owner_id?: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          season_year?: number | null
+          source?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
