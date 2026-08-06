@@ -28,6 +28,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
+import { Route as AuthenticatedDashboardCalendarsRouteImport } from './routes/_authenticated/dashboard.calendars'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedAdminWikiRouteImport } from './routes/_authenticated/admin.wiki'
 import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
@@ -139,6 +140,12 @@ const AuthenticatedDashboardEngagementsRoute =
     path: '/engagements',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardCalendarsRoute =
+  AuthenticatedDashboardCalendarsRouteImport.update({
+    id: '/calendars',
+    path: '/calendars',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardCalendarRoute =
   AuthenticatedDashboardCalendarRouteImport.update({
     id: '/calendar',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/calendars': typeof AuthenticatedDashboardCalendarsRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -245,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/dashboard/calendars': typeof AuthenticatedDashboardCalendarsRoute
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -277,6 +286,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/_authenticated/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
+  '/_authenticated/dashboard/calendars': typeof AuthenticatedDashboardCalendarsRoute
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/tokens'
     | '/admin/wiki'
     | '/dashboard/calendar'
+    | '/dashboard/calendars'
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/notifications'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin/tokens'
     | '/admin/wiki'
     | '/dashboard/calendar'
+    | '/dashboard/calendars'
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/notifications'
@@ -368,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/tokens'
     | '/_authenticated/admin/wiki'
     | '/_authenticated/dashboard/calendar'
+    | '/_authenticated/dashboard/calendars'
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
     | '/_authenticated/dashboard/notifications'
@@ -528,6 +541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEngagementsRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/calendars': {
+      id: '/_authenticated/dashboard/calendars'
+      path: '/calendars'
+      fullPath: '/dashboard/calendars'
+      preLoaderRoute: typeof AuthenticatedDashboardCalendarsRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/calendar': {
       id: '/_authenticated/dashboard/calendar'
       path: '/calendar'
@@ -626,6 +646,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
+  AuthenticatedDashboardCalendarsRoute: typeof AuthenticatedDashboardCalendarsRoute
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
@@ -640,6 +661,7 @@ interface AuthenticatedDashboardRouteChildren {
 const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
   {
     AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
+    AuthenticatedDashboardCalendarsRoute: AuthenticatedDashboardCalendarsRoute,
     AuthenticatedDashboardEngagementsRoute:
       AuthenticatedDashboardEngagementsRoute,
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
@@ -689,13 +711,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

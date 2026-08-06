@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CalendarRange, Upload, Save, ListChecks } from "lucide-react";
-import { listMyCalendars, saveCalendar } from "@/lib/calendars.functions";
+import { listMyCalendars, saveCalendar, type UserCalendar } from "@/lib/calendars.functions";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { daysToEvents, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
 
@@ -35,7 +35,9 @@ export function CalendarSourcePicker({
   const [saving, setSaving] = useState(false);
 
   const { data } = useQuery({ queryKey: ["my-calendars"], queryFn: () => list() });
-  const options = [...(data?.mine ?? []), ...(data?.shared ?? [])];
+  const mine: UserCalendar[] = data?.mine ?? [];
+  const shared: UserCalendar[] = data?.shared ?? [];
+  const options: UserCalendar[] = [...mine, ...shared];
 
   const handleFile = async (file: File) => {
     try {
@@ -89,18 +91,18 @@ export function CalendarSourcePicker({
         className="border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest"
       >
         <option value="">Use one of my calendars…</option>
-        {(data?.mine ?? []).length > 0 && (
+        {mine.length > 0 && (
           <optgroup label="My archive">
-            {data!.mine.map((c) => (
+            {mine.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
           </optgroup>
         )}
-        {(data?.shared ?? []).length > 0 && (
+        {shared.length > 0 && (
           <optgroup label="Platform calendars">
-            {data!.shared.map((c) => (
+            {shared.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
