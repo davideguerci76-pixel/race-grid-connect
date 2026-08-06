@@ -460,6 +460,11 @@ function NewRequestPage() {
               </p>
               <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
               <div className={`mt-3 ${identical ? "pointer-events-none opacity-70" : ""}`}>
+                <CalendarSourcePicker
+                  className="mb-3"
+                  value={seasonDatesIso}
+                  onChange={(dates) => setSeasonDates(dates.map(dateOf))}
+                />
                 <AvailabilityCalendar
                   selected={seasonDates}
                   onSelect={(d) => setSeasonDates(d ?? [])}
@@ -468,6 +473,7 @@ function NewRequestPage() {
                 />
 
               </div>
+
             </div>
           )}
 
