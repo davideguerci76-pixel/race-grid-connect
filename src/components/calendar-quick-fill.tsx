@@ -29,22 +29,29 @@ function SlotRow({ rule, onToggle, compact }: { rule: boolean[]; onToggle: (i: n
   );
 }
 
+export type ApplyMode = "replace" | "merge";
+
 export function CalendarQuickFillDialog({
   open,
   onOpenChange,
   events,
   title = "Quick fill — logistics rule",
   onApply,
+  showMode = false,
+  existingCount = 0,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   events: CalendarEventItem[];
   title?: string;
-  onApply: (dates: string[]) => void;
+  onApply: (dates: string[], mode: ApplyMode) => void;
+  showMode?: boolean;
+  existingCount?: number;
 }) {
   const [rule, setRule] = useState<boolean[]>(DEFAULT_RULE);
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
+  const [mode, setMode] = useState<ApplyMode>("merge");
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
