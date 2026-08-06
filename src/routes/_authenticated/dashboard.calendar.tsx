@@ -11,6 +11,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 import { BackButton } from "@/components/back-button";
+import { CalendarSourcePicker } from "@/components/calendar-source-picker";
+import { dateOf, isoOf } from "@/lib/ics";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -147,6 +149,12 @@ function CalendarPage() {
         </div>
 
         <div className="mt-6">
+          <CalendarSourcePicker
+            className="mb-3"
+            value={selectedDates.map(isoOf)}
+            onChange={(dates) => mutation.mutate(dates.map(dateOf))}
+            saveLabel="Save availability as calendar"
+          />
           <AvailabilityCalendar
             selected={selectedDates}
             blocked={blockedDates}

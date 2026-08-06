@@ -4,7 +4,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Calendar, Coins, Star, Users, User, Briefcase, Flame } from "lucide-react";
+import { Calendar, CalendarRange, Coins, Star, Users, User, Briefcase, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
@@ -159,6 +159,7 @@ function DashboardHome() {
           ) : (
             <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={t("dashboard.manage_calendar")} />
           )}
+          <DashCard to="/dashboard/calendars" icon={CalendarRange} label="Manage calendars" value="→" />
           <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(matchesCount)} />
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value="→" />
