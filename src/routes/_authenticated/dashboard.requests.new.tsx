@@ -16,6 +16,8 @@ import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 import { BackButton } from "@/components/back-button";
+import { CalendarSourcePicker } from "@/components/calendar-source-picker";
+import { dateOf } from "@/lib/ics";
 
 type LocRelevance = "not_relevant" | "relevant" | "mandatory";
 type LocAnchor = "this" | "team";
