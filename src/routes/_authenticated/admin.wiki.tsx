@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins } from "lucide-react";
+import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/wiki")({
   component: PlatformWiki,
@@ -188,6 +188,101 @@ function PlatformWiki() {
           </li>
         </ul>
       </Section>
+
+      <Section icon={ShieldCheck} tag="[07 · ADMIN · PIT CALL CONTROL]" title="Iron match rule, suspension & reopening — Admin panel">
+        <p>
+          Everything below is monitored and operated from <span className="font-mono">Admin → Pit Calls</span>. That tab
+          is the single audit surface for the lifecycle of every Pit Call and its match register.
+        </p>
+
+        <p className="font-bold uppercase text-racing-yellow">A · The iron match rule (first responder wins)</p>
+        <ul className="list-disc pl-5">
+          <li>
+            A Pit Call has exactly <span className="font-bold">one</span> assignable slot. The first freelancer whose
+            confirmation is accepted by <span className="font-mono">accept_match_confirmation</span> becomes the{" "}
+            <span className="font-bold">First responder (FCFS winner)</span> and is highlighted in yellow on the row
+            detail, with the exact <span className="font-mono">confirmed_at</span> timestamp.
+          </li>
+          <li>
+            From that instant the Pit Call is <span className="font-mono">filled</span> and the row shows the{" "}
+            <span className="font-bold text-racing-red">Slots closed</span> badge. No other freelancer can confirm — the
+            RPC rejects the attempt server-side, not just in the UI.
+          </li>
+        </ul>
+
+        <p className="font-bold uppercase text-racing-yellow">B · Database of contacted-but-locked-out freelancers</p>
+        <ul className="list-disc pl-5">
+          <li>
+            <span className="font-mono">Contacted but locked out</span> lists every freelancer the team proposed the
+            match to who never confirmed, with the outcome tag:
+            <span className="font-mono"> Slot closed first</span> (their proposal was auto-cancelled when the winner
+            confirmed) or <span className="font-mono">Locked (pending)</span> (still proposed, but confirmation is
+            blocked).
+          </li>
+          <li>
+            The <span className="font-mono">Match register</span> column lists the full ranked candidate pool with the
+            final score and any partial-availability gap, so an admin can reconstruct why a given freelancer was or was
+            not contacted.
+          </li>
+        </ul>
+
+        <p className="font-bold uppercase text-racing-red">C · Withdrawal & automatic reopening</p>
+        <ul className="list-disc pl-5">
+          <li>
+            Every withdrawal on a confirmed engagement is logged with who withdrew (team or freelancer), the{" "}
+            <span className="font-mono">cancellation_kind</span> (grace / team_late / freelancer_late / no_show), the
+            timestamp and the free-text reason.
+          </li>
+          <li>
+            <span className="font-mono">grace</span> and <span className="font-mono">freelancer_late</span> withdrawals
+            reopen the Pit Call automatically (<span className="font-mono">status → active</span>). Every previously
+            matched freelancer receives a <span className="font-mono">match_reopened</span> notification, and the FCFS
+            rule restarts: the first of the queue to confirm takes over the slot.
+          </li>
+          <li>
+            <span className="font-mono">team_late</span> does NOT reopen: the Pit Call is archived as{" "}
+            <span className="font-mono">completed · unfilled</span> and the team gets a Negative CV entry.
+          </li>
+          <li>
+            Reopened Pit Calls are flagged with the yellow <span className="font-mono">Reopened</span> badge and are
+            filterable via the status filter.
+          </li>
+        </ul>
+
+        <p className="font-bold uppercase text-racing-yellow">D · Admin controls & statistics</p>
+        <Table
+          headers={["Control", "Effect"]}
+          rows={[
+            ["Reopen", "Sets status = active, is_active = true and recomputes matches for that Pit Call."],
+            ["Suspend", "Sets status = paused. Hidden from matching; no new confirmations possible. Reversible."],
+            ["Close", "Sets status = closed. Terminal for the marketplace; kept for audit and statistics."],
+            ["Delete", "Hard-deletes the Pit Call and its match register. Blocked while a confirmed engagement exists."],
+          ]}
+        />
+        <ul className="list-disc pl-5 text-xs text-muted-foreground">
+          <li>Search by title, team or location; filter by status, Hot or Reopened; sort by recency, match count or start date.</li>
+          <li>
+            KPI strip: Total, Active, <span className="font-bold text-racing-red">Hot</span> (open Pit Call with 5+
+            candidates and no confirmation), Paused, Filled, Reopened, Closed.
+          </li>
+        </ul>
+
+        <p className="font-bold uppercase text-racing-yellow">E · General availability calendar</p>
+        <ul className="list-disc pl-5">
+          <li>
+            Month grid (Monday-first). Each day carries a <span className="font-bold">counter badge</span> with the
+            number of freelancers who declared that day available; the cell shading scales with the count. Hovering a day
+            reveals a sample of the names.
+          </li>
+          <li>
+            Filters map onto every field of the freelancer profile: macro-role, sub-role, minimum seniority, discipline,
+            skills (multiple), education, language, travel availability, maximum day rate, country and name search. The
+            counters recompute live for the filtered population; blocked accounts are always excluded.
+          </li>
+          <li>Use it to gauge coverage before approving or reopening a Pit Call on a given date window.</li>
+        </ul>
+      </Section>
+
 
       <Section icon={Siren} tag="[05 · SOS CALL]" title="Emergency SOS Call — high-affinity broadcast">
         <p>
