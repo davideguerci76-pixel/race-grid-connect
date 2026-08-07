@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins } from "lucide-react";
+import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/wiki")({
   component: PlatformWiki,
