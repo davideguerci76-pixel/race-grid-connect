@@ -30,6 +30,7 @@ function AdminLayout() {
   const tabs = [
     { to: "/admin", label: "Freelancers" },
     { to: "/admin/teams", label: "Teams" },
+    { to: "/admin/pitcalls", label: "Pit Calls" },
     { to: "/admin/permissions", label: "Permissions" },
     { to: "/admin/matching", label: "Matching" },
     { to: "/admin/tokens", label: "Tokens" },
