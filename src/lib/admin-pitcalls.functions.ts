@@ -143,7 +143,7 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
 
 export const adminSetPitCallStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         request_id: z.string().uuid(),
@@ -168,7 +168,7 @@ export const adminSetPitCallStatus = createServerFn({ method: "POST" })
 
 export const adminDeletePitCall = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ request_id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -189,7 +189,7 @@ export const adminDeletePitCall = createServerFn({ method: "POST" })
 /** Global availability heatmap: number of freelancers available per calendar day, with profile filters. */
 export const adminAvailabilityCalendar = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         from: z.string(),
