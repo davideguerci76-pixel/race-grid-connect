@@ -1,0 +1,44 @@
+{
+  "calendar": {
+    "label": "CALENDARIO",
+    "freshness_label": "ACTUALIDAD DEL CALENDARIO",
+    "last_confirmed": "Última confirmación hace {{days}} día(s) · {{date}}",
+    "never_confirmed": "Nunca confirmado",
+    "freshness_benefit": "Confirma con regularidad para mantener la máxima visibilidad en los match de los team.",
+    "confirm_button": "Confirmo mi disponibilidad",
+    "confirm_success": "Disponibilidad confirmada"
+  },
+  "reviews": {
+    "title": "Reseñas",
+    "my_reviews": "Reseñas recibidas",
+    "view_mine": "Ver mis reseñas",
+    "click_to_view": "Haz clic para ver las reseñas",
+    "anonymous": "Anónimo",
+    "locked_hint": "Desbloquea para leer las reseñas anónimas recibidas por este perfil.",
+    "unlock_cta": "Desbloquear reseñas (1 token)",
+    "unlocked_toast": "Reseñas desbloqueadas",
+    "flag_cta": "Reportar / Impugnar",
+    "flag_title": "Impugnar esta reseña",
+    "flag_help": "Explica por qué esta reseña es injusta o inexacta. Un administrador la revisará.",
+    "flag_placeholder": "Describe el problema (mín. 10 caracteres)…",
+    "flag_submit": "Enviar reporte",
+    "flag_submitted": "Reseña reportada. Nuestro equipo la revisará.",
+    "flag_pending": "Reportada"
+  },
+  "rating": {
+    "awaiting_other_party": "Esperando la valoración de la otra parte",
+    "double_blind_hint": "Doble ciego: tu reseña permanece sellada hasta que la otra parte también te valore, o pasen 30 días.",
+    "opens_on": "Se abre el {{date}}",
+    "overall": "Global",
+    "punctuality": "Puntualidad",
+    "stress": "Gestión del estrés",
+    "submitted_bonus": "Valoración enviada — ¡+1 token de regalo!",
+    "team_overall": "Valoración global del team",
+    "technical": "Habilidad técnica",
+    "visible_now": "Reseña visible"
+  },
+  "engagements": {
+    "confirmed_toast": "Engagement confirmado",
+    "marked_complete_toast": "Engagement marcado como completado"
+  }
+}

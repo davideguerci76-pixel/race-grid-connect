@@ -1,0 +1,28 @@
+{
+  "calendar": {
+    "label": "CALENDARIO",
+    "freshness_label": "AGGIORNAMENTO CALENDARIO",
+    "last_confirmed": "Ultima conferma {{days}} giorno/i fa · {{date}}",
+    "never_confirmed": "Mai confermato",
+    "freshness_benefit": "Conferma regolarmente per mantenere la massima visibilità nei match dei team.",
+    "confirm_button": "Confermo la mia disponibilità",
+    "confirm_success": "Disponibilità confermata"
+  },
+  "reviews": {
+    "title": "Recensioni",
+    "my_reviews": "Recensioni ricevute",
+    "view_mine": "Vedi le mie recensioni",
+    "click_to_view": "Clicca per vedere le recensioni",
+    "anonymous": "Anonimo",
+    "locked_hint": "Sblocca per leggere le recensioni anonime ricevute da questo profilo.",
+    "unlock_cta": "Sblocca recensioni (1 token)",
+    "unlocked_toast": "Recensioni sbloccate",
+    "flag_cta": "Segnala / Contesta",
+    "flag_title": "Contesta questa recensione",
+    "flag_help": "Spiega perché questa recensione è ingiusta o inesatta. Un amministratore la verificherà.",
+    "flag_placeholder": "Descrivi il problema (min. 10 caratteri)…",
+    "flag_submit": "Invia segnalazione",
+    "flag_submitted": "Recensione segnalata. La verificheremo al più presto.",
+    "flag_pending": "Segnalata"
+  }
+}
