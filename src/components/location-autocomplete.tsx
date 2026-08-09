@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const BROWSER_KEY = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 const CHANNEL = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as string | undefined;
 
 // Google's official inline dynamic loader. Idempotent and callback-free —
 // works with `importLibrary('places')` without needing `libraries=` or
-// `callback=` URL params.
+// `callback=` URL params. On a failed script load the bootstrap flag is reset
+// so a later attempt (focus, keystroke, retry button) can try again.
 let bootstrapped = false;
 function bootstrapMaps() {
-  if (bootstrapped) return;
   if (typeof window === "undefined") return;
   const w = window as any;
   if (w.google?.maps?.importLibrary) { bootstrapped = true; return; }
+  if (bootstrapped) return;
   if (!BROWSER_KEY) return;
   bootstrapped = true;
   // eslint-disable-next-line
@@ -26,14 +28,20 @@ function bootstrapMaps() {
     const d: any = b.maps || (b.maps = {});
     const r = new Set<string>();
     const e = new URLSearchParams();
-    const u = () => h || (h = new Promise<void>(async (f, n) => {
+    const u = () => h || (h = new Promise<void>((f, n) => {
       const a = m.createElement("script");
       e.set("libraries", [...r].join(","));
       for (const k in g) e.set(k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()), g[k]);
       e.set("callback", c + ".maps." + q);
       a.src = `https://maps.googleapis.com/maps/api/js?` + e.toString();
       d[q] = f;
-      a.onerror = () => { h = undefined; n(new Error("Google Maps could not load.")); };
+      a.onerror = () => {
+        h = undefined;
+        bootstrapped = false;
+        try { a.remove(); } catch { /* ignore */ }
+        try { delete d[l]; } catch { /* ignore */ }
+        n(new Error("Google Maps could not load."));
+      };
       a.nonce = (m.querySelector("script[nonce]") as HTMLScriptElement | null)?.nonce || "";
       m.head.append(a);
     }));
@@ -42,11 +50,19 @@ function bootstrapMaps() {
   })({ key: BROWSER_KEY, v: "weekly", ...(CHANNEL ? { channel: CHANNEL } : {}) });
 }
 
+let placesPromise: Promise<any> | null = null;
 async function loadPlaces(): Promise<any> {
-  bootstrapMaps();
-  const w = window as any;
-  if (!w.google?.maps?.importLibrary) throw new Error("Google Maps not available");
-  return await w.google.maps.importLibrary("places");
+  if (placesPromise) return placesPromise;
+  placesPromise = (async () => {
+    bootstrapMaps();
+    const w = window as any;
+    if (!w.google?.maps?.importLibrary) throw new Error("Google Maps not available");
+    return await w.google.maps.importLibrary("places");
+  })().catch((err) => {
+    placesPromise = null;
+    throw err;
+  });
+  return placesPromise;
 }
 
 export type LocationPick = {
@@ -75,6 +91,7 @@ export function LocationAutocomplete({
   /** Job Requests may target a named circuit; profiles remain limited to geographic areas. */
   includeAllPlaces?: boolean;
 }) {
+  const { t } = useTranslation();
   const [input, setInput] = useState(value);
   const [suggestions, setSuggestions] = useState<Array<{ text: string; placeId: string }>>([]);
   const [open, setOpen] = useState(false);
@@ -84,25 +101,39 @@ export function LocationAutocomplete({
   const sessionRef = useRef<any>(null);
   const debRef = useRef<number | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const attemptRef = useRef(0);
+  const pendingRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => { setInput(value); }, [value]);
 
-  useEffect(() => {
-    let cancelled = false;
-    loadPlaces()
-      .then((places) => {
-        if (cancelled) return;
-        placesRef.current = places;
-        sessionRef.current = new places.AutocompleteSessionToken();
-        setReady(true);
-        setLoadFailed(false);
-      })
-      .catch(() => {
-        setReady(false);
-        setLoadFailed(true);
-      });
-    return () => { cancelled = true; };
+  const ensureLoaded = useCallback(async (): Promise<any | null> => {
+    if (placesRef.current) return placesRef.current;
+    try {
+      const places = await loadPlaces();
+      if (!mountedRef.current) return null;
+      placesRef.current = places;
+      sessionRef.current = new places.AutocompleteSessionToken();
+      setReady(true);
+      setLoadFailed(false);
+      attemptRef.current = 0;
+      return places;
+    } catch {
+      if (!mountedRef.current) return null;
+      setReady(false);
+      setLoadFailed(true);
+      // Exponential backoff, capped — the input keeps working the moment it recovers.
+      const attempt = Math.min(attemptRef.current++, 4);
+      window.setTimeout(() => { if (mountedRef.current) void ensureLoaded(); }, 1000 * 2 ** attempt);
+      return null;
+    }
   }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    void ensureLoaded();
+    return () => { mountedRef.current = false; };
+  }, [ensureLoaded]);
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -112,32 +143,50 @@ export function LocationAutocomplete({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
+  const runQuery = useCallback(async (text: string, retry = true) => {
+    if (text.trim().length < 2) { setSuggestions([]); return; }
+    const places = placesRef.current ?? (await ensureLoaded());
+    if (!places) { pendingRef.current = text; return; }
+    try {
+      if (!sessionRef.current) sessionRef.current = new places.AutocompleteSessionToken();
+      const request: Record<string, unknown> = { input: text, sessionToken: sessionRef.current };
+      if (!includeAllPlaces) {
+        request.includedPrimaryTypes = ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"];
+      }
+      const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+      if (!mountedRef.current) return;
+      const mapped = (s ?? [])
+        .filter((x: any) => x.placePrediction)
+        .map((x: any) => ({
+          text: x.placePrediction.text?.toString?.() ?? x.placePrediction.text ?? "",
+          placeId: x.placePrediction.placeId,
+        }));
+      setSuggestions(mapped);
+      setLoadFailed(false);
+      setOpen(true);
+    } catch {
+      // A stale session token or a transient quota blip: refresh the token and retry once.
+      if (retry) {
+        try { sessionRef.current = new places.AutocompleteSessionToken(); } catch { /* ignore */ }
+        await runQuery(text, false);
+        return;
+      }
+      if (mountedRef.current) setSuggestions([]);
+    }
+  }, [ensureLoaded, includeAllPlaces]);
+
+  // Replay the last keystroke typed while the library was still loading.
+  useEffect(() => {
+    if (ready && pendingRef.current) {
+      const text = pendingRef.current;
+      pendingRef.current = null;
+      void runQuery(text);
+    }
+  }, [ready, runQuery]);
+
   const query = (text: string) => {
     if (debRef.current) window.clearTimeout(debRef.current);
-    debRef.current = window.setTimeout(async () => {
-      if (!ready || text.trim().length < 2) { setSuggestions([]); return; }
-      try {
-        const places = placesRef.current;
-        const request: Record<string, unknown> = {
-          input: text,
-          sessionToken: sessionRef.current,
-        };
-        if (!includeAllPlaces) {
-          request.includedPrimaryTypes = ["locality", "administrative_area_level_1", "administrative_area_level_2", "country"];
-        }
-        const { suggestions: s } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-        const mapped = (s ?? [])
-          .filter((x: any) => x.placePrediction)
-          .map((x: any) => ({
-            text: x.placePrediction.text?.toString?.() ?? x.placePrediction.text ?? "",
-            placeId: x.placePrediction.placeId,
-          }));
-        setSuggestions(mapped);
-        setOpen(true);
-      } catch {
-        setSuggestions([]);
-      }
-    }, 200);
+    debRef.current = window.setTimeout(() => { void runQuery(text); }, 200);
   };
 
   const pick = async (s: { text: string; placeId: string }) => {
@@ -178,7 +227,9 @@ export function LocationAutocomplete({
     if (!emitted) {
       onPick?.({ text: s.text, lat, lng, city: null, region: null, country: null, placeId: s.placeId });
     }
-    if (places) sessionRef.current = new places.AutocompleteSessionToken();
+    if (places) {
+      try { sessionRef.current = new places.AutocompleteSessionToken(); } catch { /* ignore */ }
+    }
   };
 
   return (
@@ -186,7 +237,7 @@ export function LocationAutocomplete({
       <input
         value={input}
         onChange={(e) => { setInput(e.target.value); onChange(e.target.value); query(e.target.value); }}
-        onFocus={() => { if (suggestions.length) setOpen(true); }}
+        onFocus={() => { void ensureLoaded(); if (suggestions.length) setOpen(true); }}
         placeholder={placeholder}
         className={className ?? "mt-1 w-full border border-border bg-background px-3 py-2 text-sm"}
         autoComplete="off"
@@ -195,8 +246,15 @@ export function LocationAutocomplete({
         aria-label={placeholder}
       />
       {loadFailed && (
-        <p className="mt-1 font-mono text-[10px] uppercase text-racing-red" role="alert">
-          Google Maps autocomplete is unavailable. Reload before saving a location.
+        <p className="mt-1 flex flex-wrap items-center gap-2 text-[10px] uppercase text-racing-red" role="alert">
+          {t("location.unavailable", { defaultValue: "Location suggestions are reconnecting…" })}
+          <button
+            type="button"
+            onClick={() => { attemptRef.current = 0; void ensureLoaded().then(() => { if (input) void runQuery(input); }); }}
+            className="underline"
+          >
+            {t("location.retry", { defaultValue: "Retry" })}
+          </button>
         </p>
       )}
       {open && suggestions.length > 0 && (
@@ -211,8 +269,8 @@ export function LocationAutocomplete({
               {s.text}
             </button>
           ))}
-          <div className="border-t border-border px-3 py-1.5 text-right font-mono text-[9px] uppercase text-muted-foreground">
-            Powered by Google
+          <div className="border-t border-border px-3 py-1.5 text-right text-[9px] uppercase text-muted-foreground">
+            {t("location.powered_by", { defaultValue: "Powered by Google" })}
           </div>
         </div>
       )}
