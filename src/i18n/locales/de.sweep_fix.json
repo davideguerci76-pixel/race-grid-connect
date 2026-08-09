@@ -1,0 +1,44 @@
+{
+  "calendar": {
+    "label": "KALENDER",
+    "freshness_label": "KALENDERAKTUALITÄT",
+    "last_confirmed": "Zuletzt vor {{days}} Tag(en) bestätigt · {{date}}",
+    "never_confirmed": "Noch nie bestätigt",
+    "freshness_benefit": "Bestätigen Sie regelmäßig, um in den Match der Team gut sichtbar zu bleiben.",
+    "confirm_button": "Ich bestätige meine Verfügbarkeit",
+    "confirm_success": "Verfügbarkeit bestätigt"
+  },
+  "reviews": {
+    "title": "Bewertungen",
+    "my_reviews": "Erhaltene Bewertungen",
+    "view_mine": "Meine Bewertungen ansehen",
+    "click_to_view": "Klicken, um Bewertungen zu sehen",
+    "anonymous": "Anonym",
+    "locked_hint": "Freischalten, um die anonymen Bewertungen dieses Profils zu lesen.",
+    "unlock_cta": "Bewertungen freischalten (1 Token)",
+    "unlocked_toast": "Bewertungen freigeschaltet",
+    "flag_cta": "Melden / Anfechten",
+    "flag_title": "Diese Bewertung anfechten",
+    "flag_help": "Erklären Sie, warum diese Bewertung unfair oder falsch ist. Ein Admin prüft sie.",
+    "flag_placeholder": "Beschreiben Sie das Problem (mind. 10 Zeichen)…",
+    "flag_submit": "Meldung senden",
+    "flag_submitted": "Bewertung gemeldet. Wir prüfen sie.",
+    "flag_pending": "Gemeldet"
+  },
+  "rating": {
+    "awaiting_other_party": "Warten auf die Bewertung der anderen Partei",
+    "double_blind_hint": "Doppelblind: Ihre Bewertung bleibt versiegelt, bis die andere Partei Sie ebenfalls bewertet oder 30 Tage vergangen sind.",
+    "opens_on": "Öffnet am {{date}}",
+    "overall": "Gesamt",
+    "punctuality": "Pünktlichkeit",
+    "stress": "Stressbewältigung",
+    "submitted_bonus": "Bewertung gesendet — +1 Token geschenkt!",
+    "team_overall": "Gesamtbewertung des Team",
+    "technical": "Technische Kompetenz",
+    "visible_now": "Bewertung sichtbar"
+  },
+  "engagements": {
+    "confirmed_toast": "Engagement bestätigt",
+    "marked_complete_toast": "Engagement als abgeschlossen markiert"
+  }
+}

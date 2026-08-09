@@ -1,0 +1,28 @@
+{
+  "calendar": {
+    "label": "CALENDAR",
+    "freshness_label": "CALENDAR FRESHNESS",
+    "last_confirmed": "Last confirmed {{days}} day(s) ago · {{date}}",
+    "never_confirmed": "Never confirmed yet",
+    "freshness_benefit": "Confirm regularly to keep top visibility in team matches.",
+    "confirm_button": "I confirm my availability",
+    "confirm_success": "Availability confirmed"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "my_reviews": "Reviews received",
+    "view_mine": "View my reviews",
+    "click_to_view": "Click to view reviews",
+    "anonymous": "Anonymous",
+    "locked_hint": "Unlock to read the anonymous reviews received by this profile.",
+    "unlock_cta": "Unlock reviews (1 token)",
+    "unlocked_toast": "Reviews unlocked",
+    "flag_cta": "Report / Contest",
+    "flag_title": "Contest this review",
+    "flag_help": "Explain why this review is unfair or inaccurate. An admin will check it.",
+    "flag_placeholder": "Describe the issue (min. 10 characters)…",
+    "flag_submit": "Submit report",
+    "flag_submitted": "Review reported. Our team will review it.",
+    "flag_pending": "Reported"
+  }
+}

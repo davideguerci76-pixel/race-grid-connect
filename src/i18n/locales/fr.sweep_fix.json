@@ -1,0 +1,44 @@
+{
+  "calendar": {
+    "label": "CALENDRIER",
+    "freshness_label": "FRAÎCHEUR DU CALENDRIER",
+    "last_confirmed": "Dernière confirmation il y a {{days}} jour(s) · {{date}}",
+    "never_confirmed": "Jamais confirmé",
+    "freshness_benefit": "Confirmez régulièrement pour rester bien visible dans les match des team.",
+    "confirm_button": "Je confirme ma disponibilité",
+    "confirm_success": "Disponibilité confirmée"
+  },
+  "reviews": {
+    "title": "Avis",
+    "my_reviews": "Avis reçus",
+    "view_mine": "Voir mes avis",
+    "click_to_view": "Cliquez pour voir les avis",
+    "anonymous": "Anonyme",
+    "locked_hint": "Déverrouillez pour lire les avis anonymes reçus par ce profil.",
+    "unlock_cta": "Déverrouiller les avis (1 token)",
+    "unlocked_toast": "Avis déverrouillés",
+    "flag_cta": "Signaler / Contester",
+    "flag_title": "Contester cet avis",
+    "flag_help": "Expliquez pourquoi cet avis est injuste ou inexact. Un administrateur le vérifiera.",
+    "flag_placeholder": "Décrivez le problème (min. 10 caractères)…",
+    "flag_submit": "Envoyer le signalement",
+    "flag_submitted": "Avis signalé. Notre équipe va le vérifier.",
+    "flag_pending": "Signalé"
+  },
+  "rating": {
+    "awaiting_other_party": "En attente de l'évaluation de l'autre partie",
+    "double_blind_hint": "Double aveugle : votre avis reste scellé jusqu'à ce que l'autre partie vous évalue aussi, ou après 30 jours.",
+    "opens_on": "Ouvre le {{date}}",
+    "overall": "Global",
+    "punctuality": "Ponctualité",
+    "stress": "Gestion du stress",
+    "submitted_bonus": "Évaluation envoyée — +1 token offert !",
+    "team_overall": "Évaluation globale du team",
+    "technical": "Compétence technique",
+    "visible_now": "Avis visible"
+  },
+  "engagements": {
+    "confirmed_toast": "Engagement confirmé",
+    "marked_complete_toast": "Engagement marqué comme terminé"
+  }
+}
