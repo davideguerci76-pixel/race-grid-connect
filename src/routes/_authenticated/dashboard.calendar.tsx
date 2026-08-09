@@ -110,14 +110,15 @@ function CalendarPage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="label-mono">[CALENDAR]</div>
+        <div className="label-mono">[{t("calendar.label")}]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("calendar.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
         <p className="mt-1 font-mono text-xs text-racing-red">{t("calendar.available_days", { count: myDays.filter((d: string) => !blockedSet.has(d)).length })}</p>
 
         <div className="mt-6 flex flex-wrap items-center gap-4 border border-border bg-card p-4">
           <div className="flex-1 min-w-[220px]">
-            <div className="label-mono">[CALENDAR FRESHNESS]</div>
+            <div className="label-mono">[{t("calendar.freshness_label")}]</div>
+
             <div className={`mt-1 font-mono text-xs ${freshTone}`}>
               {lastUpdated
                 ? t("calendar.last_confirmed", {
