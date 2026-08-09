@@ -94,6 +94,7 @@ function ManageCalendarsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page pt-6">
         <BackButton />
       </div>
