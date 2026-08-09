@@ -212,6 +212,12 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
     z
       .object({
         team_name: z.string().trim().min(2).max(120),
+        vat_number: z
+          .string()
+          .trim()
+          .min(5)
+          .max(24)
+          .refine((v) => isValidVat(v), "INVALID_VAT"),
         team_type: z.string().max(120).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
         location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
