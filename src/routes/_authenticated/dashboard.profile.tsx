@@ -66,6 +66,7 @@ function ProfilePage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
+        <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-12 text-sm text-muted-foreground">{t("sweep_profile.profile.loading")}</div>
         <SiteFooter />
       </div>
@@ -75,6 +76,7 @@ function ProfilePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
