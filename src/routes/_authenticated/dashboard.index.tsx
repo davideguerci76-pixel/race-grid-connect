@@ -102,8 +102,8 @@ function DashboardHome() {
   });
   const sosMut = useMutation({
     mutationFn: (sos_id: string) => acceptSos({ data: { sos_id } }),
-    onSuccess: () => { toast.success("Match locked in. Contacts unlocked."); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "SOS accept failed"),
+    onSuccess: () => { toast.success(t("sweep_profile.dashboard.match_locked")); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.dashboard.sos_accept_failed")),
   });
 
   const isTeam = profile?.user_type === "team";
@@ -134,18 +134,18 @@ function DashboardHome() {
                   <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-racing-red">
                     <Flame className="size-4" /> [SOS CALL — {Math.round(s.skills_score)}% affinity]
                   </div>
-                  <div className="mt-1 text-lg font-bold">{s.request?.title ?? "Emergency job"}</div>
+                  <div className="mt-1 text-lg font-bold">{s.request?.title ?? t("sweep_profile.dashboard.emergency_job")}</div>
                   <div className="font-mono text-[11px] uppercase text-muted-foreground">
-                    {s.team?.team_name ?? "Team"} · {s.request?.start_date}
+                    {s.team?.team_name ?? t("sweep_profile.dashboard.team_fallback")} · {s.request?.start_date}
                     {s.distance_km != null ? ` · ${Math.round(s.distance_km)} km` : ""}
                   </div>
                 </div>
                 <button
-                  onClick={() => { if (confirm("Accept this SOS Call? First to accept wins — this locks the match immediately.")) sosMut.mutate(s.sos_id); }}
+                  onClick={() => { if (confirm(t("sweep_profile.dashboard.accept_sos_confirm"))) sosMut.mutate(s.sos_id); }}
                   disabled={sosMut.isPending}
                   className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                 >
-                  Accept SOS
+                  {t("sweep_profile.dashboard.accept_sos")}
                 </button>
               </div>
             ))}
@@ -159,7 +159,7 @@ function DashboardHome() {
           ) : (
             <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={t("dashboard.manage_calendar")} />
           )}
-          <DashCard to="/dashboard/calendars" icon={CalendarRange} label="Manage calendars" value="→" />
+          <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
           <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(matchesCount)} />
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value="→" />

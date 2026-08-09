@@ -19,8 +19,13 @@ export const Route = createFileRoute("/teams/$id")({
     req: typeof s.req === "string" ? s.req : undefined,
   }),
   component: TeamProfile,
-  notFoundComponent: () => (<div className="flex min-h-screen items-center justify-center">Team not found</div>),
+  notFoundComponent: NotFoundComponent,
 });
+
+function NotFoundComponent() {
+  const { t } = useTranslation();
+  return <div className="flex min-h-screen items-center justify-center">{t("sweep_public.team_detail.not_found")}</div>;
+}
 
 function TeamProfile() {
   const { id } = Route.useParams();
@@ -77,9 +82,9 @@ function TeamProfile() {
       <div className="container-page pt-6"><BackButton /></div>
         <div className="container-page py-16 text-center">
           <div className="label-mono">[LOCKED]</div>
-          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Sign in to view team</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Team profiles are visible to authenticated members only.</p>
-          <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">Sign in / Register</Link>
+          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.sign_in_title")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t("sweep_public.team_detail.sign_in_desc")}</p>
+          <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">{t("sweep_public.team_detail.sign_in_button")}</Link>
         </div>
         <SiteFooter />
       </div>
@@ -93,7 +98,7 @@ function TeamProfile() {
         <SiteHeader />
         <div className="container-page py-16 text-center">
           <div className="label-mono">[NOT FOUND]</div>
-          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Team not found</h1>
+          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.not_found")}</h1>
         </div>
         <SiteFooter />
       </div>
@@ -114,11 +119,11 @@ function TeamProfile() {
         <div className="container-page py-16">
           <div className="text-center">
             <div className="label-mono">[LOCKED]</div>
-            <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Team is hidden</h1>
+            <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.team_hidden_title")}</h1>
             <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
-            <p className="mt-2 text-sm text-muted-foreground">Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("sweep_public.team_detail.team_hidden_desc")}</p>
             <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              Unlock full team profile (5 tokens)
+              {t("sweep_public.team_detail.unlock_full_button")}
             </button>
           </div>
           <div className="mx-auto mt-10 max-w-2xl">
@@ -145,8 +150,8 @@ function TeamProfile() {
             <div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{tp.team_name}</h1>
               <div className="mt-1 text-sm text-muted-foreground">
-                {tp.team_type ?? "Racing team"} · {tp.location ?? "—"}
-                {tp.founded_year ? ` · Est. ${tp.founded_year}` : ""}
+                {tp.team_type ?? t("sweep_public.team_detail.racing_team_default")} · {tp.location ?? "—"}
+                {tp.founded_year ? ` · ${t("sweep_public.team_detail.established", { year: tp.founded_year })}` : ""}
                 {tp.size ? ` · ${tp.size}` : ""}
               </div>
               {tp.primary_discipline && (
@@ -163,9 +168,9 @@ function TeamProfile() {
           {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
           {data.cancelStats && Number(data.cancelStats.count ?? 0) > 0 && (
             <div className="mt-4 flex items-start gap-2 border border-racing-red/40 bg-racing-red/10 p-3 font-mono text-[11px] text-racing-red">
-              <span className="font-black">⚠ CANCELLATION HISTORY</span>
+              <span className="font-black">{t("sweep_public.team_detail.cancellation_history")}</span>
               <span>
-                {data.cancelStats.count} late cancellation{Number(data.cancelStats.count) === 1 ? "" : "s"} recorded on confirmed matches.
+                {t(Number(data.cancelStats.count) === 1 ? "sweep_public.team_detail.late_cancellation" : "sweep_public.team_detail.late_cancellation_plural", { count: data.cancelStats.count })}
               </span>
             </div>
           )}
@@ -174,21 +179,21 @@ function TeamProfile() {
         {!canSeeFull && (
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-racing-yellow/40 bg-racing-yellow/5 p-5">
             <div>
-              <div className="label-mono text-racing-yellow">[PARTIAL ACCESS]</div>
+              <div className="label-mono text-racing-yellow">{t("sweep_public.team_detail.partial_access_title")}</div>
               <p className="mt-1 text-sm text-muted-foreground">
-                You unlocked this team for one job posting. Direct contacts and the team's other active Pit Calls are hidden.
+                {t("sweep_public.team_detail.partial_access_desc")}
               </p>
             </div>
             <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              Unlock full profile (5 tokens)
+              {t("sweep_public.team_detail.unlock_full_profile_button")}
             </button>
           </div>
         )}
 
         <div className="mt-8">
-          <div className="label-mono mb-3">{canSeeFull ? "Active Pit Calls" : "Requested position"}</div>
+          <div className="label-mono mb-3">{canSeeFull ? t("sweep_public.team_detail.active_pit_calls") : t("sweep_public.team_detail.requested_position")}</div>
           {visibleRequests.length === 0 ? (
-            <div className="border border-border bg-card p-8 text-center text-sm text-muted-foreground">No active Pit Calls.</div>
+            <div className="border border-border bg-card p-8 text-center text-sm text-muted-foreground">{t("sweep_public.team_detail.no_active_pit_calls")}</div>
           ) : (
             <div className="grid gap-3">
               {visibleRequests.map((r) => (
@@ -213,7 +218,7 @@ function TeamProfile() {
           {!canSeeFull && requests.length > visibleRequests.length && (
             <div className="mt-4 flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
               <Lock className="size-4" />
-              {requests.length - visibleRequests.length} other Pit Call(s) from this team are locked. Unlock the full profile to view them.
+              {t("sweep_public.team_detail.locked_other_pitcalls", { count: requests.length - visibleRequests.length })}
             </div>
           )}
         </div>
@@ -228,21 +233,22 @@ function TeamProfile() {
 }
 
 function ConfirmModal({ onCancel, onConfirm, pending, error }: { onCancel: () => void; onConfirm: () => void; pending: boolean; error: string | null }) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !pending && onCancel()}>
       <div className="w-full max-w-md border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
-        <div className="label-mono">[UNLOCK FULL PROFILE]</div>
-        <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Spend 5 tokens?</h2>
+        <div className="label-mono">{t("sweep_public.team_detail.modal.title")}</div>
+        <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.modal.heading")}</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Unlocks direct contacts (website) and the full list of active Pit Calls from this team. One-time payment for this team.
+          {t("sweep_public.team_detail.modal.desc")}
         </p>
         {error && <div className="mt-3 border border-racing-red/40 bg-racing-red/10 p-3 text-xs text-racing-red">{error}</div>}
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onCancel} disabled={pending} className="border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-muted">
-            Cancel
+            {t("sweep_public.team_detail.modal.cancel")}
           </button>
           <button type="button" onClick={onConfirm} disabled={pending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60">
-            {pending ? "Unlocking…" : "Unlock (5 tokens)"}
+            {pending ? t("sweep_public.team_detail.modal.unlocking") : t("sweep_public.team_detail.modal.unlock_button")}
           </button>
         </div>
       </div>

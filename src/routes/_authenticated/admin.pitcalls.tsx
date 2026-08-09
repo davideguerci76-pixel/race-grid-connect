@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import {
 } from "@/lib/admin-pitcalls.functions";
 import { roleGroupLabel, subRoleLabel, ROLE_GROUPS, subRolesForGroup, SUB_ROLE_LEVELS } from "@/lib/roles";
 import { disciplineLabel, DISCIPLINE_OPTIONS, SKILL_OPTIONS, EDUCATION_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/paddock";
+import { useDateFormat } from "@/lib/date-locale";
 import {
   AlertTriangle,
   CalendarDays,
@@ -58,6 +60,8 @@ function AdminPitCalls() {
 }
 
 function PitCallManagement() {
+  const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const qc = useQueryClient();
   const listFn = useServerFn(adminListPitCalls);
   const statusFn = useServerFn(adminSetPitCallStatus);
@@ -72,18 +76,18 @@ function PitCallManagement() {
   const statusMut = useMutation({
     mutationFn: (v: { request_id: string; status: any }) => statusFn({ data: v }),
     onSuccess: () => {
-      toast.success("Pit Call updated");
+      toast.success(t("sweep_admin_b.pitcalls.updated"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
   });
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { request_id: id } }),
     onSuccess: () => {
-      toast.success("Pit Call deleted");
+      toast.success(t("sweep_admin_b.pitcalls.deleted"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
   });
 
   const rows = useMemo(() => {
@@ -110,23 +114,22 @@ function PitCallManagement() {
   return (
     <section className="space-y-4">
       <div>
-        <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">Pit Call Management</div>
-        <h2 className="text-2xl font-black italic tracking-tighter">Lifecycle &amp; match rule monitor</h2>
+        <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{t("sweep_admin_b.pitcalls.management_title")}</div>
+        <h2 className="text-2xl font-black italic tracking-tighter">{t("sweep_admin_b.pitcalls.management_subtitle")}</h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-          Full audit of every Pit Call: who responded first, who was contacted but locked out, withdrawals and automatic
-          reopenings.
+          {t("sweep_admin_b.pitcalls.management_description")}
         </p>
       </div>
 
       {stats && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
-          <Stat label="Total" value={stats.total} />
-          <Stat label="Active" value={stats.active} tone="text-racing-yellow" />
-          <Stat label="Hot" value={stats.hot} tone="text-racing-red" />
-          <Stat label="Paused" value={stats.paused} />
-          <Stat label="Filled" value={stats.filled} tone="text-racing-red" />
-          <Stat label="Reopened" value={stats.reopened} />
-          <Stat label="Closed" value={stats.closed} />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_total")} value={stats.total} />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_active")} value={stats.active} tone="text-racing-yellow" />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_hot")} value={stats.hot} tone="text-racing-red" />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_paused")} value={stats.paused} />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_filled")} value={stats.filled} tone="text-racing-red" />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_reopened")} value={stats.reopened} />
+          <Stat label={t("sweep_admin_b.pitcalls.stat_closed")} value={stats.closed} />
         </div>
       )}
 
@@ -136,7 +139,7 @@ function PitCallManagement() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search title, team, location"
+            placeholder={t("sweep_admin_b.pitcalls.search_placeholder")}
             className="rounded-xl border border-border bg-background py-2 pl-7 pr-3 text-xs"
           />
         </div>
@@ -147,7 +150,7 @@ function PitCallManagement() {
         >
           {["all", "active", "hot", "reopened", "paused", "filled", "closed", "completed"].map((s) => (
             <option key={s} value={s}>
-              {s.toUpperCase()}
+              {t(`sweep_admin_b.pitcalls.status_${s}`)}
             </option>
           ))}
         </select>
@@ -156,19 +159,19 @@ function PitCallManagement() {
           onChange={(e) => setSort(e.target.value as any)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="recent">Sort: most recent</option>
-          <option value="matches">Sort: most matches</option>
-          <option value="start">Sort: start date</option>
+          <option value="recent">{t("sweep_admin_b.pitcalls.sort_recent")}</option>
+          <option value="matches">{t("sweep_admin_b.pitcalls.sort_matches")}</option>
+          <option value="start">{t("sweep_admin_b.pitcalls.sort_start")}</option>
         </select>
       </div>
 
       {isLoading ? (
         <div className="rounded-2xl border border-border bg-card p-8 text-center text-xs text-muted-foreground">
-          Loading Pit Calls…
+          {t("sweep_admin_b.pitcalls.loading")}
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-8 text-center text-xs text-muted-foreground">
-          No Pit Calls match these filters.
+          {t("sweep_admin_b.pitcalls.no_match")}
         </div>
       ) : (
         <div className="space-y-3">
@@ -191,17 +194,17 @@ function PitCallManagement() {
                         </span>
                         {r.slots_locked && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-racing-red px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-racing-red">
-                            <Lock className="size-3" /> Slots closed
+                            <Lock className="size-3" /> {t("sweep_admin_b.pitcalls.slots_closed")}
                           </span>
                         )}
                         {r.hot && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-racing-red bg-racing-red/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-racing-red">
-                            <Flame className="size-3" /> Hot
+                            <Flame className="size-3" /> {t("sweep_admin_b.pitcalls.hot")}
                           </span>
                         )}
                         {r.reopened && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-racing-yellow px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow">
-                            <RotateCcw className="size-3" /> Reopened
+                            <RotateCcw className="size-3" /> {t("sweep_admin_b.pitcalls.reopened")}
                           </span>
                         )}
                       </div>
@@ -214,7 +217,7 @@ function PitCallManagement() {
                   </button>
                   <div className="flex flex-col items-end gap-2">
                     <div className="text-right">
-                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Matches</div>
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_admin_b.pitcalls.matches")}</div>
                       <div className="text-2xl font-black text-racing-red">{r.matches_count}</div>
                     </div>
                     <div className="flex flex-wrap gap-1">
@@ -222,29 +225,29 @@ function PitCallManagement() {
                         onClick={() => statusMut.mutate({ request_id: r.id, status: "active" })}
                         className="inline-flex items-center gap-1 rounded-lg border border-racing-yellow px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
                       >
-                        <Play className="size-3" /> Reopen
+                        <Play className="size-3" /> {t("sweep_admin_b.pitcalls.reopen")}
                       </button>
                       <button
                         onClick={() => statusMut.mutate({ request_id: r.id, status: "paused" })}
                         className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
                       >
-                        <Pause className="size-3" /> Suspend
+                        <Pause className="size-3" /> {t("sweep_admin_b.pitcalls.suspend")}
                       </button>
                       <button
                         onClick={() => statusMut.mutate({ request_id: r.id, status: "closed" })}
                         className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
                       >
-                        <XCircle className="size-3" /> Close
+                        <XCircle className="size-3" /> {t("sweep_admin_b.pitcalls.close")}
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm("Delete this Pit Call and all its matches? This cannot be undone.")) {
+                          if (confirm(t("sweep_admin_b.pitcalls.confirm_delete"))) {
                             deleteMut.mutate(r.id);
                           }
                         }}
                         className="inline-flex items-center gap-1 rounded-lg border border-racing-red px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                       >
-                        <Trash2 className="size-3" /> Delete
+                        <Trash2 className="size-3" /> {t("sweep_admin_b.pitcalls.delete")}
                       </button>
                     </div>
                   </div>
@@ -254,39 +257,39 @@ function PitCallManagement() {
                   <div className="grid gap-4 border-t border-border p-4 md:grid-cols-2">
                     <div>
                       <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-racing-yellow">
-                        First responder (FCFS winner)
+                        {t("sweep_admin_b.pitcalls.first_responder_title")}
                       </div>
                       {r.first_responder ? (
                         <div className="rounded-xl border border-racing-yellow/50 bg-racing-yellow/5 p-3 text-xs">
                           <div className="font-bold">{r.first_responder.name}</div>
                           <div className="text-muted-foreground">
-                            Confirmed at{" "}
+                            {t("sweep_admin_b.pitcalls.confirmed_at")}{" "}
                             {r.first_responder.confirmed_at
-                              ? new Date(r.first_responder.confirmed_at).toLocaleString()
+                              ? formatDateTime(r.first_responder.confirmed_at)
                               : "—"}
                           </div>
                           <div className="mt-1 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-racing-red">
-                            <Lock className="size-3" /> All other candidates locked out
+                            <Lock className="size-3" /> {t("sweep_admin_b.pitcalls.all_locked_out")}
                           </div>
                         </div>
                       ) : (
                         <div className="rounded-xl border border-border p-3 text-xs text-muted-foreground">
-                          No confirmation yet — slot still open to the first responder.
+                          {t("sweep_admin_b.pitcalls.no_confirmation_yet")}
                         </div>
                       )}
 
                       <div className="mb-2 mt-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                        Contacted but locked out ({r.blocked_candidates.length})
+                        {t("sweep_admin_b.pitcalls.contacted_locked_out", { count: r.blocked_candidates.length })}
                       </div>
                       {r.blocked_candidates.length === 0 ? (
-                        <div className="text-xs text-muted-foreground">None.</div>
+                        <div className="text-xs text-muted-foreground">{t("sweep_admin_b.pitcalls.none")}</div>
                       ) : (
                         <ul className="space-y-1 text-xs">
                           {r.blocked_candidates.map((c: any) => (
                             <li key={c.freelancer_id} className="flex items-center justify-between gap-2 rounded-lg border border-border px-2 py-1">
                               <span>{c.name}</span>
                               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                                {c.outcome === "slot_closed" ? "Slot closed first" : "Locked (pending)"}
+                                {c.outcome === "slot_closed" ? t("sweep_admin_b.pitcalls.slot_closed_first") : t("sweep_admin_b.pitcalls.locked_pending")}
                               </span>
                             </li>
                           ))}
@@ -296,26 +299,26 @@ function PitCallManagement() {
 
                     <div>
                       <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-racing-red">
-                        Withdrawals &amp; automatic reopening
+                        {t("sweep_admin_b.pitcalls.withdrawals_title")}
                       </div>
                       {r.withdrawals.length === 0 ? (
-                        <div className="text-xs text-muted-foreground">No withdrawal recorded.</div>
+                        <div className="text-xs text-muted-foreground">{t("sweep_admin_b.pitcalls.no_withdrawal")}</div>
                       ) : (
                         <ul className="space-y-2 text-xs">
                           {r.withdrawals.map((w: any) => (
                             <li key={w.engagement_id} className="rounded-xl border border-racing-red/40 bg-racing-red/5 p-2">
                               <div className="flex items-center gap-1 font-bold">
                                 <AlertTriangle className="size-3 text-racing-red" /> {w.name} ·{" "}
-                                {w.by_team ? "team withdrew" : "freelancer withdrew"}
+                                {w.by_team ? t("sweep_admin_b.pitcalls.team_withdrew") : t("sweep_admin_b.pitcalls.freelancer_withdrew")}
                               </div>
                               <div className="text-muted-foreground">
-                                {w.kind} · {w.at ? new Date(w.at).toLocaleString() : "—"}
+                                {w.kind} · {formatDateTime(w.at)}
                               </div>
                               {w.reason && <div className="mt-1 italic text-muted-foreground">“{w.reason}”</div>}
                               <div className="mt-1 text-[10px] uppercase tracking-widest text-racing-yellow">
                                 {w.kind === "team_late"
-                                  ? "Archived — no reopening"
-                                  : "Pit Call reopened · queue notified · first to confirm takes the slot"}
+                                  ? t("sweep_admin_b.pitcalls.archived_no_reopening")
+                                  : t("sweep_admin_b.pitcalls.reopened_notified")}
                               </div>
                             </li>
                           ))}
@@ -323,10 +326,10 @@ function PitCallManagement() {
                       )}
 
                       <div className="mb-2 mt-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                        Match register (top {Math.min(20, r.candidates.length)})
+                        {t("sweep_admin_b.pitcalls.match_register", { count: Math.min(20, r.candidates.length) })}
                       </div>
                       {r.candidates.length === 0 ? (
-                        <div className="text-xs text-muted-foreground">No candidate generated.</div>
+                        <div className="text-xs text-muted-foreground">{t("sweep_admin_b.pitcalls.no_candidate")}</div>
                       ) : (
                         <ul className="space-y-1 text-xs">
                           {r.candidates.map((c: any) => (
@@ -363,6 +366,8 @@ function monthDays(year: number, month: number) {
 }
 
 function AvailabilityHeatmap() {
+  const { t } = useTranslation();
+  const { formatMonthYear } = useDateFormat();
   const calFn = useServerFn(adminAvailabilityCalendar);
   const today = new Date();
   const [cursor, setCursor] = useState({ y: today.getFullYear(), m: today.getMonth() });
@@ -414,11 +419,10 @@ function AvailabilityHeatmap() {
   return (
     <section className="space-y-4">
       <div>
-        <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">General calendar</div>
-        <h2 className="text-2xl font-black italic tracking-tighter">Freelancer availability heatmap</h2>
+        <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{t("sweep_admin_b.heatmap.title")}</div>
+        <h2 className="text-2xl font-black italic tracking-tighter">{t("sweep_admin_b.heatmap.subtitle")}</h2>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
-          Each day shows how many freelancers declared themselves available. Apply any profile filter to narrow the
-          count.
+          {t("sweep_admin_b.heatmap.description")}
         </p>
       </div>
 
@@ -428,7 +432,7 @@ function AvailabilityHeatmap() {
           onChange={(e) => setFilters((f: any) => ({ ...f, role_group: e.target.value, sub_role: "" }))}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any macro-role</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_macro_role")}</option>
           {ROLE_GROUPS.map((g) => (
             <option key={g.value} value={g.value}>
               {g.label}
@@ -440,7 +444,7 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("sub_role", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any sub-role</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_sub_role")}</option>
           {subRoles.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -452,10 +456,10 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("level", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any seniority</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_seniority")}</option>
           {SUB_ROLE_LEVELS.map((l) => (
             <option key={l} value={l}>
-              Min {l}
+              {t("sweep_admin_b.heatmap.min_level", { level: l })}
             </option>
           ))}
         </select>
@@ -464,7 +468,7 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("discipline", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any discipline</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_discipline")}</option>
           {DISCIPLINE_OPTIONS.map((d) => (
             <option key={d.value} value={d.value}>
               {d.label}
@@ -476,7 +480,7 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("education", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any education</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_education")}</option>
           {EDUCATION_OPTIONS.map((d) => (
             <option key={d.value} value={d.value}>
               {d.label}
@@ -488,7 +492,7 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("language", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Any language</option>
+          <option value="">{t("sweep_admin_b.heatmap.any_language")}</option>
           {LANGUAGE_OPTIONS.map((d) => (
             <option key={d.value} value={d.value}>
               {d.label}
@@ -500,27 +504,27 @@ function AvailabilityHeatmap() {
           onChange={(e) => set("travels", e.target.value)}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">Travel: any</option>
-          <option value="yes">Travels: yes</option>
-          <option value="no">Travels: no</option>
+          <option value="">{t("sweep_admin_b.heatmap.travel_any")}</option>
+          <option value="yes">{t("sweep_admin_b.heatmap.travels_yes")}</option>
+          <option value="no">{t("sweep_admin_b.heatmap.travels_no")}</option>
         </select>
         <input
           value={filters.max_day_rate}
           onChange={(e) => set("max_day_rate", e.target.value)}
-          placeholder="Max day rate (€)"
+          placeholder={t("sweep_admin_b.heatmap.max_day_rate")}
           type="number"
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         />
         <input
           value={filters.country}
           onChange={(e) => set("country", e.target.value)}
-          placeholder="Country"
+          placeholder={t("sweep_admin_b.heatmap.country")}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         />
         <input
           value={filters.search}
           onChange={(e) => set("search", e.target.value)}
-          placeholder="Name contains…"
+          placeholder={t("sweep_admin_b.heatmap.name_contains")}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         />
         <select
@@ -531,7 +535,7 @@ function AvailabilityHeatmap() {
           }}
           className="rounded-xl border border-border bg-background px-2 py-2 text-xs"
         >
-          <option value="">+ Add skill filter</option>
+          <option value="">{t("sweep_admin_b.heatmap.add_skill_filter")}</option>
           {SKILL_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -556,7 +560,7 @@ function AvailabilityHeatmap() {
           }
           className="rounded-xl border border-border px-2 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
         >
-          Reset filters
+          {t("sweep_admin_b.heatmap.reset_filters")}
         </button>
         {filters.skills.length > 0 && (
           <div className="col-span-full flex flex-wrap gap-1">
@@ -579,27 +583,27 @@ function AvailabilityHeatmap() {
             onClick={() => setCursor((c) => (c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 }))}
             className="rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
           >
-            ← Prev
+            {t("sweep_admin_b.heatmap.prev")}
           </button>
           <div className="inline-flex items-center gap-2 text-sm font-black uppercase italic tracking-tighter">
             <CalendarDays className="size-4 text-racing-red" />
-            {new Date(Date.UTC(cursor.y, cursor.m, 1)).toLocaleString(undefined, { month: "long", year: "numeric" })}
+            {formatMonthYear(new Date(Date.UTC(cursor.y, cursor.m, 1)))}
           </div>
           <button
             onClick={() => setCursor((c) => (c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 }))}
             className="rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
           >
-            Next →
+            {t("sweep_admin_b.heatmap.next")}
           </button>
         </div>
 
         <div className="mb-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-          <Users className="size-3" /> {data?.total_freelancers ?? 0} freelancers match the filters
-          {isFetching ? " · refreshing…" : ""}
+          <Users className="size-3" /> {t("sweep_admin_b.heatmap.freelancers_match", { count: data?.total_freelancers ?? 0 })}
+          {isFetching ? ` · ${t("sweep_admin_b.heatmap.refreshing")}` : ""}
         </div>
 
         <div className="grid grid-cols-7 gap-1">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+          {(t("sweep_admin_b.heatmap.weekdays", { returnObjects: true }) as string[]).map((d) => (
             <div key={d} className="py-1 text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
               {d}
             </div>
@@ -614,7 +618,7 @@ function AvailabilityHeatmap() {
             return (
               <div
                 key={day}
-                title={count ? `${count} available: ${(info?.names ?? []).join(", ")}` : "No availability"}
+                title={count ? t("sweep_admin_b.heatmap.available_tooltip", { count, names: (info?.names ?? []).join(", ") }) : t("sweep_admin_b.heatmap.no_availability")}
                 className="relative aspect-square rounded-lg border border-border p-1 text-[10px]"
                 style={count ? { backgroundColor: `color-mix(in srgb, var(--racing-yellow, #F2C200) ${intensity * 45}%, transparent)` } : undefined}
               >

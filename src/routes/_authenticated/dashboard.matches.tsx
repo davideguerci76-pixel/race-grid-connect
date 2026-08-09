@@ -17,34 +17,35 @@ export const Route = createFileRoute("/_authenticated/dashboard/matches")({
 });
 
 
-function formatCriterion(c: any): string {
+function formatCriterion(c: any, t: (k: string, o?: any) => string): string {
   switch (c.kind) {
-    case "role": return `Role: ${c.label ?? ""}`;
-    case "skill": return `Skill: ${c.label}`;
-    case "language": return `Lang: ${c.code} (${c.level})`;
-    case "education": return "Education";
-    case "day_rate": return "Day rate over budget";
-    case "location": return `Location: ${c.label ?? "distant"}`;
-    default: return c.kind ?? "criterion";
+    case "role": return t("sweep_engage.criteria.role", { label: c.label ?? "" });
+    case "skill": return t("sweep_engage.criteria.skill", { label: c.label });
+    case "language": return t("sweep_engage.criteria.language", { code: c.code, level: c.level });
+    case "education": return t("sweep_engage.criteria.education");
+    case "day_rate": return t("sweep_engage.criteria.day_rate");
+    case "location": return t("sweep_engage.criteria.location", { label: c.label ?? t("sweep_engage.criteria.distant") });
+    default: return c.kind ?? t("sweep_engage.criteria.criterion");
   }
 }
 
 function MissingCriteria({ list }: { list: any[] }) {
+  const { t } = useTranslation();
   if (!list || list.length === 0) {
     return (
       <div className="mt-3">
-        <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> Criteria</div>
-        <div className="font-mono text-[11px] text-racing-yellow">All soft criteria satisfied — perfect match</div>
+        <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {t("sweep_engage.matches.criteria")}</div>
+        <div className="font-mono text-[11px] text-racing-yellow">{t("sweep_engage.matches.perfect_criteria")}</div>
       </div>
     );
   }
   return (
     <div className="mt-3">
-      <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> Missing / partial criteria</div>
+      <div className="label-mono mb-1 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {t("sweep_engage.matches.missing_criteria")}</div>
       <div className="flex flex-wrap gap-1">
         {list.map((c: any, i: number) => (
           <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-            {formatCriterion(c)}
+            {formatCriterion(c, t)}
           </span>
         ))}
       </div>
@@ -80,14 +81,14 @@ function MatchesPage() {
 
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
-    onSuccess: () => { toast.success("Revealed"); qc.invalidateQueries(); },
+    onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : t("matches.insufficient_tokens")),
   });
 
   const acceptMut = useMutation({
     mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
-    onSuccess: () => { toast.success("Confirmed — contacts unlocked"); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onSuccess: () => { toast.success(t("sweep_engage.matches.confirmed_contacts_unlocked")); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
 
   });
 
@@ -103,7 +104,7 @@ function MatchesPage() {
         <div className="container-page py-12">
           <div className="label-mono">[MATCHES]</div>
           <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">History and status of matches across all your Pit Calls.</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("sweep_engage.matches.team_history_subtitle")}</p>
 
           {teamRequests.length === 0 ? (
             <div className="mt-8 border border-border bg-card p-12 text-center text-sm text-muted-foreground">{t("matches.empty_team")}</div>
@@ -128,12 +129,12 @@ function MatchesPage() {
                         <div className="mt-1 font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}</div>
                         {eng && (
                           <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                            Confirmed match: {eng.freelancer?.display_name ?? "Freelancer"}
+                            {t("sweep_engage.matches.confirmed_match")}: {eng.freelancer?.display_name ?? t("sweep_engage.matches.freelancer_fallback")}
                           </div>
                         )}
                       </div>
                       <div className="text-right">
-                        <div className="font-mono text-[11px] uppercase text-muted-foreground">Matches</div>
+                        <div className="font-mono text-[11px] uppercase text-muted-foreground">{t("sweep_engage.matches.matches_label")}</div>
                         <div className="text-2xl font-black text-racing-red">{eng ? 1 : (r.matches_count ?? 0)}</div>
                       </div>
                     </div>
@@ -182,36 +183,36 @@ function MatchesPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
-                        {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? "Perfect match" : "Match"}</span>
+                        {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? t("sweep_engage.matches.perfect_match") : t("sweep_engage.matches.match_label")}</span>
                       </div>
                       <div className="mt-1 text-lg font-bold">
                         {showName
-                          ? (isFreelancer ? (cp?.team_name ?? "Team") : "Freelancer")
+                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : t("sweep_engage.matches.freelancer_fallback"))
                           : t("matches.hidden_name")}
                       </div>
                       {m.revealedByMe && cp && (
                         <div className="mt-2 grid gap-1 text-xs">
                           {isFreelancer ? (
                             <>
-                              {cp.team_type && <div><span className="text-muted-foreground">Type:</span> <span className="font-medium">{cp.team_type}</span></div>}
-                              {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
+                              {cp.team_type && <div><span className="text-muted-foreground">{t("sweep_engage.matches.type_label")}:</span> <span className="font-medium">{cp.team_type}</span></div>}
+                              {cp.location && <div><span className="text-muted-foreground">{t("sweep_engage.matches.location_label")}:</span> <span className="font-medium">{cp.location}</span></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
                               {!isConfirmed && (
                                 <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                                  Team name is revealed only after you confirm the match.
+                                  {t("sweep_engage.matches.team_name_hidden")}
                                 </div>
                               )}
                             </>
                           ) : (
                             <>
                               {cp.headline && <div className="font-medium">{cp.headline}</div>}
-                              {cp.location && <div><span className="text-muted-foreground">Location:</span> <span className="font-medium">{cp.location}</span></div>}
-                              {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">Day rate:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
-                              {cp.travels !== null && <div><span className="text-muted-foreground">Travels:</span> <span className="font-medium">{cp.travels ? "Yes" : "No"}</span></div>}
+                              {cp.location && <div><span className="text-muted-foreground">{t("sweep_engage.matches.location_label")}:</span> <span className="font-medium">{cp.location}</span></div>}
+                              {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">{t("sweep_engage.matches.day_rate_label")}:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
+                              {cp.travels !== null && <div><span className="text-muted-foreground">{t("sweep_engage.matches.travels_label")}:</span> <span className="font-medium">{cp.travels ? t("sweep_engage.matches.yes") : t("sweep_engage.matches.no")}</span></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
                               {!isConfirmed && (
                                 <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                                  Name and contacts are revealed only after the freelancer confirms the match.
+                                  {t("sweep_engage.matches.name_contacts_hidden")}
                                 </div>
                               )}
                             </>
@@ -223,13 +224,13 @@ function MatchesPage() {
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
                         {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
-                      <div className="mt-1 font-mono text-[10px] text-racing-yellow">Overlap: {m.overlap_days} day(s)</div>
+                      <div className="mt-1 font-mono text-[10px] text-racing-yellow">{t("sweep_engage.matches.overlap", { count: m.overlap_days })}</div>
                       {isConfirmed && m.request?.start_date && m.request?.end_date && (
                         <div className="mt-3 border-t border-racing-yellow/30 pt-3">
                           <div className="label-mono mb-2 text-racing-yellow">[ADD TO CALENDAR]</div>
                           <CalendarQuickButtons
                             event={{
-                              title: `Match — ${m.request?.title ?? "PitCall"}`,
+                              title: t("sweep_engage.matches.calendar_title", { title: m.request?.title ?? "PitCall" }),
                               startDate: m.request.start_date,
                               endDate: m.request.end_date,
                               location: m.request?.location ?? m.request?.circuit ?? null,
@@ -257,7 +258,7 @@ function MatchesPage() {
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
                       <button
                         onClick={() => {
-                          if (confirm("Confirm this match? Your contact details will be shared with the team and the Pit Call will be closed.")) {
+                          if (confirm(t("sweep_engage.matches.confirm_match_prompt"))) {
                             acceptMut.mutate(m.pending_engagement_id);
                           }
                         }}
@@ -269,12 +270,12 @@ function MatchesPage() {
                     )}
                     {isFreelancer && matchTaken && (
                       <span className="inline-flex items-center justify-center border border-border bg-secondary/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        Match already assigned to another professional
+                        {t("sweep_engage.matches.assigned_elsewhere")}
                       </span>
                     )}
                     {isFreelancer && isConfirmed && (
                       <span className="inline-flex items-center justify-center border border-racing-yellow bg-racing-yellow/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        Match confirmed
+                        {t("sweep_engage.matches.match_confirmed_badge")}
                       </span>
                     )}
 

@@ -141,6 +141,12 @@
       "next_weekend": "Próximo fin de semana",
       "clear_month": "Limpiar mes",
       "all_weekends": "Todos los fines de semana"
+    },
+    "actions": {
+      "select_month": "Seleccionar mes",
+      "deselect_month": "Deseleccionar mes",
+      "select_all": "Seleccionar todo ({{months}}m)",
+      "deselect_all": "Deseleccionar todo"
     }
   },
   "matches": {

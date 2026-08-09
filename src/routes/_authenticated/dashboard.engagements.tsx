@@ -14,6 +14,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
+import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
 
 function EngagementsPage() {
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const { user } = useAuth();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
@@ -65,7 +67,7 @@ function EngagementsPage() {
           qc.invalidateQueries({ queryKey: ["engagements"] });
           qc.invalidateQueries({ queryKey: ["matches"] });
           if (oldRow.status === "proposed" && newRow.status === "cancelled" && !newRow.cancelled_by) {
-            toast.info("Another freelancer accepted first — you're on the waitlist. Your calendar stays open in case the match reopens.");
+            toast.info(t("sweep_engage.engagements.waitlist_toast"));
           }
         },
       )
@@ -100,7 +102,7 @@ function EngagementsPage() {
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
     onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to confirm"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.engagements.confirm_failed")),
   });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const cancelFn = useServerFn(cancelEngagement);
@@ -108,29 +110,29 @@ function EngagementsPage() {
     mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
     onSuccess: (row: any) => {
       const kind = row?.cancellation_kind;
-      if (kind === "grace") toast.success("Cancelled within grace window — no penalty. The Pit Call is reopened.");
-      else if (kind === "team_late") toast.warning("Late cancellation recorded on your team profile.");
-      else if (kind === "freelancer_late") toast.warning("Late cancellation — those days stay blocked on your calendar.");
-      else toast.success("Cancelled");
+      if (kind === "grace") toast.success(t("sweep_engage.engagements.cancel_grace_toast"));
+      else if (kind === "team_late") toast.warning(t("sweep_engage.engagements.cancel_team_late_toast"));
+      else if (kind === "freelancer_late") toast.warning(t("sweep_engage.engagements.cancel_freelancer_late_toast"));
+      else toast.success(t("sweep_engage.common.cancelled"));
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Cancel failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.engagements.cancel_failed")),
   });
 
   const answerContactFn = useServerFn(freelancerAnswerContact);
   const answerContactMut = useMutation({
     mutationFn: (v: { engagement_id: string; contacted: boolean }) => answerContactFn({ data: v }),
     onSuccess: (_r, v) => {
-      toast.success(v.contacted ? "Thanks — logged that the team reached out." : "Logged. We'll remind the team.");
+      toast.success(v.contacted ? t("sweep_engage.engagements.contact_logged_thanks") : t("sweep_engage.engagements.contact_logged_remind"));
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
   });
   const teamConfirmFn = useServerFn(teamConfirmContact);
   const teamConfirmMut = useMutation({
     mutationFn: (id: string) => teamConfirmFn({ data: { engagement_id: id } }),
-    onSuccess: () => { toast.success("Contact confirmed."); qc.invalidateQueries({ queryKey: ["engagements"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onSuccess: () => { toast.success(t("sweep_engage.engagements.contact_confirmed_toast")); qc.invalidateQueries({ queryKey: ["engagements"] }); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
   });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
@@ -156,7 +158,7 @@ function EngagementsPage() {
       qc.refetchQueries({ queryKey: ["engagements-ratable"] });
       qc.refetchQueries({ queryKey: ["my-rated-engagement-ids"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
   });
 
 
@@ -196,7 +198,7 @@ function EngagementsPage() {
                     <div className="flex items-center gap-3">
                       {pct !== null && (
                         <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
-                          {pct}% <span className="font-mono text-[10px] uppercase tracking-widest">{perfect ? "Perfect" : "Match"}</span>
+                          {pct}% <span className="font-mono text-[10px] uppercase tracking-widest">{perfect ? t("sweep_engage.matches.perfect_match") : t("sweep_engage.matches.match_label")}</span>
                         </div>
                       )}
                       <div className="font-bold">{isFreelancer ? (tp?.team_name ?? other?.display_name) : (fp?.headline ? `${other?.display_name}` : other?.display_name)}</div>
@@ -223,9 +225,9 @@ function EngagementsPage() {
 
                 {e.cancellation_kind === "team_ghosting" && (
                   <div className="mt-3 border border-racing-red bg-racing-red/10 p-3">
-                    <div className="label-mono text-racing-red">[TEAM DID NOT FOLLOW UP]</div>
+                    <div className="label-mono text-racing-red">{t("sweep_engage.engagements.team_no_followup_title")}</div>
                     <p className="mt-1 text-xs">
-                      The team never confirmed contact after the match. The engagement was auto-released and your calendar days reopened. You can still leave a rating for the team below.
+                      {t("sweep_engage.engagements.team_no_followup_body")}
                     </p>
                   </div>
                 )}
@@ -279,11 +281,11 @@ function EngagementsPage() {
 
                 {missing.length > 0 && (
                   <div className="mt-3 border-t border-border pt-3">
-                    <div className="label-mono mb-1">Missing / partial criteria</div>
+                    <div className="label-mono mb-1">{t("sweep_engage.matches.missing_criteria")}</div>
                     <div className="flex flex-wrap gap-1">
                       {missing.map((c: any, i: number) => (
                         <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-                          {c.kind === "role" ? `Role: ${c.label ?? ""}` : c.kind === "skill" ? `Skill: ${c.label}` : c.kind === "language" ? `Lang: ${c.code} (${c.level})` : c.kind === "education" ? "Education" : c.kind === "day_rate" ? "Day rate over budget" : c.kind === "location" ? `Location: ${c.label ?? "distant"}` : (c.kind ?? "criterion")}
+                          {c.kind === "role" ? t("sweep_engage.criteria.role", { label: c.label ?? "" }) : c.kind === "skill" ? t("sweep_engage.criteria.skill", { label: c.label }) : c.kind === "language" ? t("sweep_engage.criteria.language", { code: c.code, level: c.level }) : c.kind === "education" ? t("sweep_engage.criteria.education") : c.kind === "day_rate" ? t("sweep_engage.criteria.day_rate") : c.kind === "location" ? t("sweep_engage.criteria.location", { label: c.label ?? t("sweep_engage.criteria.distant") }) : (c.kind ?? t("sweep_engage.criteria.criterion"))}
                         </span>
                       ))}
                     </div>
@@ -302,11 +304,11 @@ function EngagementsPage() {
                         for a confirmed engagement until they confirm the team reached out. */}
                     {e.status === "confirmed" && isFreelancer && e.freelancer_contacted !== true && (
                       <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
-                        <div className="label-mono text-racing-yellow">[HAS THE TEAM REACHED OUT?]</div>
+                        <div className="label-mono text-racing-yellow">{t("sweep_engage.engagements.contact_check_title")}</div>
                         <p className="mt-1 text-xs">
                           {e.contact_check_sent_at
-                            ? "It's been a few days since the match — did the team already contact you?"
-                            : "As soon as the team gets in touch, click below. If they don't, we'll automatically remind them and — if they keep ghosting — release the match so your calendar reopens."}
+                            ? t("sweep_engage.engagements.contact_check_followup")
+                            : t("sweep_engage.engagements.contact_check_initial")}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           <button
@@ -314,7 +316,7 @@ function EngagementsPage() {
                             onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: true })}
                             className="bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
                           >
-                            The team contacted me
+                            {t("sweep_engage.engagements.team_contacted_me")}
                           </button>
                           {e.contact_check_sent_at && (
                             <button
@@ -322,7 +324,7 @@ function EngagementsPage() {
                               onClick={() => answerContactMut.mutate({ engagement_id: e.id, contacted: false })}
                               className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
                             >
-                              Not yet
+                              {t("sweep_engage.engagements.not_yet")}
                             </button>
                           )}
                         </div>
@@ -330,43 +332,43 @@ function EngagementsPage() {
                     )}
                     {e.status === "confirmed" && !isFreelancer && !e.team_confirmed_contact && (
                       <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-3">
-                        <div className="label-mono text-racing-yellow">[CONFIRM YOU'VE CONTACTED THE FREELANCER]</div>
+                        <div className="label-mono text-racing-yellow">{t("sweep_engage.engagements.confirm_contacted_title")}</div>
                         <p className="mt-1 text-xs">
-                          Confirm here as soon as you reach out to the freelancer. If you don't, automatic reminders will be sent and — after the deadline — the match will be released and logged on your team profile.
+                          {t("sweep_engage.engagements.confirm_contacted_body")}
                         </p>
                         <button
                           disabled={teamConfirmMut.isPending}
                           onClick={() => teamConfirmMut.mutate(e.id)}
                           className="mt-2 bg-racing-red px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
                         >
-                          I contacted the freelancer
+                          {t("sweep_engage.engagements.i_contacted_freelancer")}
                         </button>
                       </div>
                     )}
                     {e.status === "confirmed" && !isFreelancer && e.team_reminder2_sent_at && !e.team_confirmed_contact && (
                       <div className="mb-4 border border-racing-red bg-racing-red/10 p-3">
-                        <div className="label-mono text-racing-red">[URGENT — CONTACT THE FREELANCER]</div>
+                        <div className="label-mono text-racing-red">{t("sweep_engage.engagements.urgent_contact_title")}</div>
                         <p className="mt-1 text-xs">
-                          You still haven't confirmed contact with the freelancer. If you don't confirm soon, the engagement will be auto-released, the freelancer's calendar will reopen, and the incident will be recorded on your team profile.
+                          {t("sweep_engage.engagements.urgent_contact_body")}
                         </p>
                       </div>
                     )}
                     {!isFreelancer && (
                       <div className="mb-4">
-                        <div className="label-mono mb-2 text-racing-yellow">[FREELANCER CONTACT]</div>
+                        <div className="label-mono mb-2 text-racing-yellow">{t("sweep_engage.engagements.freelancer_contact_title")}</div>
                         <div className="grid gap-1 text-xs">
-                          <div><span className="text-muted-foreground">Name:</span> <span className="font-bold">{other?.display_name ?? fp?.headline ?? "Freelancer"}</span></div>
+                          <div><span className="text-muted-foreground">{t("sweep_engage.engagements.name_label")}:</span> <span className="font-bold">{other?.display_name ?? fp?.headline ?? t("sweep_engage.matches.freelancer_fallback")}</span></div>
                           {e.freelancer_contact?.email && (
-                            <div><span className="text-muted-foreground">Email:</span> <a href={`mailto:${e.freelancer_contact.email}`} className="font-mono text-racing-red hover:underline">{e.freelancer_contact.email}</a></div>
+                            <div><span className="text-muted-foreground">{t("sweep_engage.engagements.email_label")}:</span> <a href={`mailto:${e.freelancer_contact.email}`} className="font-mono text-racing-red hover:underline">{e.freelancer_contact.email}</a></div>
                           )}
                           {e.freelancer_contact?.phone_number && (
-                            <div><span className="text-muted-foreground">Phone:</span> <span className="font-mono">{e.freelancer_contact.phone_dial_code ?? ""} {e.freelancer_contact.phone_number}</span></div>
+                            <div><span className="text-muted-foreground">{t("sweep_engage.engagements.phone_label")}:</span> <span className="font-mono">{e.freelancer_contact.phone_dial_code ?? ""} {e.freelancer_contact.phone_number}</span></div>
                           )}
                         </div>
                         <div className="mt-2">
                           <ContactQuickButtons
                             contact={{
-                              fullName: other?.display_name ?? "Freelancer",
+                              fullName: other?.display_name ?? t("sweep_engage.matches.freelancer_fallback"),
                               organization: fp?.role ? String(fp.role) : undefined,
                               title: fp?.headline ?? undefined,
                               email: e.freelancer_contact?.email ?? undefined,
@@ -381,7 +383,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-2">[ADD TO CALENDAR]</div>
                     <CalendarQuickButtons
                       event={{
-                        title: `Match — ${req?.title ?? other?.display_name ?? "PitCall"}`,
+                        title: t("sweep_engage.matches.calendar_title", { title: req?.title ?? other?.display_name ?? "PitCall" }),
                         startDate: e.start_date,
                         endDate: e.end_date,
                         location: req?.location ?? req?.circuit ?? null,
@@ -409,20 +411,20 @@ function EngagementsPage() {
                     const now = Date.now();
                     const inGrace = graceEnd !== null && now < graceEnd && now < firstDay;
                     const label = inGrace
-                      ? `Cancel (grace: ${Math.max(0, Math.round((graceEnd! - now) / 3600000))}h left)`
+                      ? t("sweep_engage.engagements.cancel_grace_label", { hours: Math.max(0, Math.round((graceEnd! - now) / 3600000)) })
                       : isFreelancer
-                      ? "Cancel (late — days stay blocked)"
-                      : "Cancel (late — logged on profile)";
+                      ? t("sweep_engage.engagements.cancel_late_freelancer_label")
+                      : t("sweep_engage.engagements.cancel_late_team_label");
                     const warn = inGrace
-                      ? "Cancel this confirmed match? You are within the 24h grace window: no penalty and the Pit Call reopens for other candidates."
+                      ? t("sweep_engage.engagements.cancel_grace_confirm")
                       : isFreelancer
-                      ? "You are past the grace window. The engaged days remain blocked on your calendar and the Pit Call will be reopened for other candidates. Continue?"
-                      : "You are past the grace window. This cancellation will be recorded on your public team profile and the Pit Call will be archived. Continue?";
+                      ? t("sweep_engage.engagements.cancel_late_freelancer_confirm")
+                      : t("sweep_engage.engagements.cancel_late_team_confirm");
                     return (
                       <button
                         onClick={() => {
                           if (!confirm(warn)) return;
-                          const reason = window.prompt("Reason (optional):", "") ?? "";
+                          const reason = window.prompt(t("sweep_engage.engagements.reason_prompt"), "") ?? "";
                           cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
                         }}
                         className={`px-4 py-2 text-[11px] font-bold uppercase tracking-widest ${inGrace ? "border border-border hover:bg-secondary" : "border border-racing-red text-racing-red hover:bg-racing-red/10"}`}
@@ -452,7 +454,7 @@ function EngagementsPage() {
                     if (!canRate) {
                       return (
                         <span className="border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                          {t("rating.opens_on", { date: info?.opens_at ? new Date(info.opens_at).toLocaleDateString() : "—" })}
+                          {t("rating.opens_on", { date: info?.opens_at ? formatDate(info.opens_at) : "—" })}
                         </span>
                       );
                     }

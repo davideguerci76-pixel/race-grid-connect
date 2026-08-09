@@ -1,0 +1,160 @@
+{
+  "sweep_public": {
+    "freelancer_detail": {
+      "not_found": "Freelancer not found",
+      "sign_in_title": "Sign in to view freelancer",
+      "sign_in_button": "Sign in / Register",
+      "day_rate": "Day rate",
+      "calendar_confirmed": "Calendar confirmed {{days}}d ago · {{date}}",
+      "availability_title": "Availability (next 60 days)",
+      "no_availability": "No availability posted."
+    },
+    "freelancers_index": {
+      "no_freelancers": "No freelancers yet."
+    },
+    "team_detail": {
+      "not_found": "Team not found",
+      "sign_in_title": "Sign in to view team",
+      "sign_in_desc": "Team profiles are visible to authenticated members only.",
+      "sign_in_button": "Sign in / Register",
+      "team_hidden_title": "Team is hidden",
+      "team_hidden_desc": "Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).",
+      "unlock_full_button": "Unlock full team profile (5 tokens)",
+      "racing_team_default": "Racing team",
+      "established": "Est. {{year}}",
+      "active_pit_calls": "Active Pit Calls",
+      "requested_position": "Requested position",
+      "no_active_pit_calls": "No active Pit Calls.",
+      "partial_access_title": "[PARTIAL ACCESS]",
+      "partial_access_desc": "You unlocked this team for one job posting. Direct contacts and the team's other active Pit Calls are hidden.",
+      "unlock_full_profile_button": "Unlock full profile (5 tokens)",
+      "cancellation_history": "⚠ CANCELLATION HISTORY",
+      "late_cancellation": "{{count}} late cancellation recorded on confirmed matches.",
+      "late_cancellation_plural": "{{count}} late cancellations recorded on confirmed matches.",
+      "locked_other_pitcalls": "{{count}} other Pit Call(s) from this team are locked. Unlock the full profile to view them.",
+      "modal": {
+        "title": "[UNLOCK FULL PROFILE]",
+        "heading": "Spend 5 tokens?",
+        "desc": "Unlocks direct contacts (website) and the full list of active Pit Calls from this team. One-time payment for this team.",
+        "cancel": "Cancel",
+        "unlocking": "Unlocking…",
+        "unlock_button": "Unlock (5 tokens)"
+      }
+    },
+    "teams_index": {
+      "racing_team_default": "Racing team",
+      "no_teams": "No teams yet."
+    },
+    "jobs": {
+      "hidden_team": "Hidden Team",
+      "team_default": "Team",
+      "view_team": "View team",
+      "reveal_team_button": "Reveal team (2 tokens)",
+      "modal": {
+        "title": "[REVEAL TEAM]",
+        "heading": "Spend 2 tokens?",
+        "desc": "Revealing costs 2 tokens. After paying you can view the full team profile any time — no additional charge.",
+        "cancel": "Cancel",
+        "revealing": "Revealing…",
+        "reveal_button": "Reveal (2 tokens)"
+      }
+    },
+    "auth": {
+      "google_signin_failed": "Google sign-in failed",
+      "sign_in_failed": "Sign-in failed",
+      "welcome_toast": "Welcome to the paddock! 5 tokens credited.",
+      "auth_failed": "Auth failed",
+      "signup_desc": "Publish your calendar, get auto-matched, spend tokens to reveal counterparties.",
+      "signin_desc": "Pick up where you left off.",
+      "or_divider": "— or —"
+    },
+    "dashboard_calendar": {
+      "redirecting": "Redirecting…",
+      "legend_unavailable": "Unavailable",
+      "legend_available": "Available",
+      "legend_engaged": "Engaged (locked)",
+      "save_availability_label": "Save availability as calendar",
+      "calendar_legend": "Click a day to toggle availability. Red = confirmed match, cannot be edited.",
+      "save_failed": "Failed"
+    },
+    "dashboard_calendars": {
+      "meta_title": "Manage calendars — Pit Call",
+      "meta_description": "Create, import and share championship calendars to use in your Pit Calls and availability.",
+      "meta_og_description": "Build custom motorsport calendars, import .ics files and reuse them anywhere on Pit Call.",
+      "title": "My calendars",
+      "description": "Build your own championship calendars, import an existing .ics file, and reuse them instantly for your Pit Calls or your availability — even if they are not part of the official platform database.",
+      "new_calendar": "New calendar",
+      "import_ics": "Import .ics file",
+      "edit_calendar_bracket": "EDIT CALENDAR",
+      "new_calendar_bracket": "NEW CALENDAR",
+      "calendar_name_placeholder": "Calendar name (e.g. F4 Italian 2027)",
+      "quick_fill_button": "Quick fill (Mon → Mon rule)",
+      "quick_fill_error": "Select the race days first, then apply the logistics rule",
+      "save_calendar_button": "Save calendar ({{count}} days)",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "export_ics": "Export .ics",
+      "submit_review": "Submit for review",
+      "delete": "Delete",
+      "no_calendars": "No calendars yet — create one from scratch or import an .ics file.",
+      "platform_calendars": "[PLATFORM CALENDARS]",
+      "days_events_source": "{{days}} days · {{events}} events · {{source}}",
+      "days_approved": "{{days}} days · approved",
+      "copy_to_archive": "Copy to my archive",
+      "calendar_legend": "Selected (green) days = working days of this calendar.",
+      "toast": {
+        "calendar_saved": "Calendar saved",
+        "save_failed": "Save failed",
+        "calendar_deleted": "Calendar deleted",
+        "delete_failed": "Delete failed",
+        "submitted_for_review": "Sent to the platform for review. You'll be rewarded in tokens if it gets approved.",
+        "submit_failed": "Submit failed",
+        "no_events_in_ics": "No events found in this .ics file",
+        "could_not_read_ics": "Could not read the .ics file",
+        "give_calendar_name": "Give your calendar a name"
+      }
+    },
+    "calendar_quick_fill": {
+      "default_title": "Quick fill — logistics rule",
+      "description": "Set your standard logistics week (Monday → Monday). Friday, Saturday and Sunday are preselected — adjust them (e.g. leave on Wednesday, return on Monday) and apply the rule to all {{count}} event in one click. You can still fine-tune single rounds below.",
+      "description_plural": "Set your standard logistics week (Monday → Monday). Friday, Saturday and Sunday are preselected — adjust them (e.g. leave on Wednesday, return on Monday) and apply the rule to all {{count}} events in one click. You can still fine-tune single rounds below.",
+      "standard_week_label": "[STANDARD WEEK — APPLIED TO ALL EVENTS]",
+      "apply_to_all": "Apply to all events",
+      "reset_weekend_default": "Reset weekend default",
+      "fine_tune_toggle": "[{{action}} SINGLE EVENTS ({{count}})]",
+      "hide": "HIDE",
+      "fine_tune": "FINE-TUNE",
+      "replace_or_merge": "[REPLACE OR MERGE]",
+      "replace": "Replace",
+      "merge": "Merge",
+      "replace_desc": "<strong>Replace:</strong> removes your {{count}} currently selected day(s) and keeps only this calendar.",
+      "merge_desc": "<strong>Merge:</strong> adds this calendar on top of your current availability — nothing you already selected is removed.",
+      "days_will_be_added": "{{count}} day(s) will be added to your current availability",
+      "days_will_be_selected": "{{count}} day(s) will be selected",
+      "cancel": "Cancel",
+      "confirm_replace": "Confirm — replace with {{count}} days",
+      "confirm_merge": "Confirm — merge {{count}} days",
+      "apply_days": "Apply {{count}} days"
+    },
+    "calendar_source_picker": {
+      "use_calendar_placeholder": "Use one of my calendars…",
+      "my_archive_group": "My archive",
+      "platform_calendars_group": "Platform calendars",
+      "import_ics": "Import .ics file",
+      "quick_fill_button": "Quick fill (Mon → Mon rule)",
+      "manage_calendars": "Manage calendars",
+      "select_day_tip_title": "Select at least one day (or import a calendar) to build the rule",
+      "select_day_tip_desc": "Tip: pick the race day of each round, e.g. {{date}}",
+      "no_events_in_ics": "No events found in this .ics file",
+      "could_not_read_ics": "Could not read the .ics file",
+      "select_day_first": "Select at least one day first",
+      "name_prompt": "Calendar name (e.g. F4 Italian 2027)",
+      "calendar_saved": "Calendar saved to your archive",
+      "save_failed": "Save failed",
+      "save_as_my_calendar": "Save as my calendar"
+    },
+    "back_button": {
+      "label": "Back"
+    }
+  }
+}

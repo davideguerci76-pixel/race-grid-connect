@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_authenticated/admin/tokens")({
   component: AdminTokensPage,
@@ -20,14 +21,15 @@ type Setting = {
   updated_at: string;
 };
 
-const CATEGORIES: { id: string; title: string; blurb: string }[] = [
-  { id: "economics", title: "Token economics", blurb: "Retail value of a single token. All pack pricing on the buy page derives from this." },
-  { id: "costs", title: "Operational costs (tokens spent)", blurb: "Amount of tokens deducted for each user action. Reads apply platform-wide on the next call." },
-  { id: "rewards", title: "Rewards & incentives (tokens credited)", blurb: "Tokens credited automatically to users for the listed actions." },
-  { id: "refunds", title: "Zero-match refunds", blurb: "Refund policy when a Pit Call returns 0 total matches. Percentages compute automatically from the number of hard filters on the Pit Call." },
-];
+const CATEGORY_IDS = ["economics", "costs", "rewards", "refunds"] as const;
 
 function AdminTokensPage() {
+  const { t } = useTranslation();
+  const CATEGORIES = CATEGORY_IDS.map((id) => ({
+    id,
+    title: t(`sweep_admin_b.tokens.category_${id}_title`),
+    blurb: t(`sweep_admin_b.tokens.category_${id}_blurb`),
+  }));
   const qc = useQueryClient();
   const list = useServerFn(adminListSettings);
   const save = useServerFn(adminUpdateSettings);
@@ -56,14 +58,14 @@ function AdminTokensPage() {
   const mut = useMutation({
     mutationFn: () => save({ data: { updates: dirty } }),
     onSuccess: () => {
-      toast.success(`Saved ${dirty.length} change${dirty.length === 1 ? "" : "s"}`);
+      toast.success(t("sweep_admin_b.tokens.saved_changes", { count: dirty.length }));
       qc.invalidateQueries({ queryKey: ["admin-settings"] });
       qc.invalidateQueries({ queryKey: ["platform-settings"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.save_failed")),
   });
 
-  if (isLoading) return <div className="text-sm text-muted-foreground">Loading…</div>;
+  if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</div>;
   const rows = (data ?? []) as Setting[];
   const priceEur = values["token_price_eur"] ?? 0;
 
@@ -71,9 +73,9 @@ function AdminTokensPage() {
     <div className="max-w-3xl">
       <div className="mb-2 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold">Token configuration</h2>
+          <h2 className="text-xl font-bold">{t("sweep_admin_b.tokens.title")}</h2>
           <p className="text-sm text-muted-foreground">
-            Any change here takes effect immediately across the platform (post Pit Call, unlock, reveal, rating reward, signup bonus…). New future features that spend or credit tokens must register their cost here.
+            {t("sweep_admin_b.tokens.description")}
           </p>
         </div>
         <button
@@ -81,7 +83,7 @@ function AdminTokensPage() {
           onClick={() => mut.mutate()}
           className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
         >
-          {mut.isPending ? "Saving…" : `Save changes${dirty.length ? ` (${dirty.length})` : ""}`}
+          {mut.isPending ? t("sweep_admin_b.common.saving") : dirty.length ? t("sweep_admin_b.tokens.save_changes_count", { count: dirty.length }) : t("sweep_admin_b.tokens.save_changes")}
         </button>
       </div>
 
@@ -109,7 +111,7 @@ function AdminTokensPage() {
                       {s.description && <div className="mt-1 text-xs text-muted-foreground">{s.description}</div>}
                       {s.key === "token_price_eur" && priceEur > 0 && (
                         <div className="mt-1 font-mono text-[11px] text-muted-foreground">
-                          Pack preview: 10 → € {(priceEur * 10).toFixed(2)} · 50 → € {(priceEur * 50).toFixed(2)} · 200 → € {(priceEur * 200).toFixed(2)}
+                          {t("sweep_admin_b.tokens.pack_preview", { p10: (priceEur * 10).toFixed(2), p50: (priceEur * 50).toFixed(2), p200: (priceEur * 200).toFixed(2) })}
                         </div>
                       )}
                     </div>
@@ -134,7 +136,7 @@ function AdminTokensPage() {
       })}
 
       <div className="mt-8 border border-border/60 bg-secondary/40 p-3 text-[11px] text-muted-foreground">
-        <strong className="text-foreground">Developer note.</strong> Any new feature that spends or credits tokens must add its key to <code className="font-mono">platform_settings</code> and read the cost via <code className="font-mono">public.get_setting_num(&#39;key&#39;, default)</code>. It will then automatically appear in this panel.
+        <strong className="text-foreground">{t("sweep_admin_b.tokens.dev_note_label")}</strong> {t("sweep_admin_b.tokens.dev_note_part1")} <code className="font-mono">platform_settings</code> {t("sweep_admin_b.tokens.dev_note_part2")} <code className="font-mono">public.get_setting_num(&#39;key&#39;, default)</code>. {t("sweep_admin_b.tokens.dev_note_part3")}
       </div>
     </div>
   );

@@ -1,0 +1,108 @@
+{
+  "sweep_profile": {
+    "common": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "updated": "Mis à jour",
+      "failed": "Échec",
+      "yes": "Oui",
+      "no": "Non",
+      "bio": "Bio",
+      "select": "Sélectionner…",
+      "select_all": "Tout sélectionner",
+      "deselect_all": "Tout désélectionner",
+      "filter": "Filtrer…",
+      "no_matches": "Aucun résultat.",
+      "remove": "Supprimer"
+    },
+    "header": {
+      "notifications": "Notifications",
+      "admin": "ADMIN",
+      "toggle_menu": "Basculer le menu"
+    },
+    "profile": {
+      "loading": "Chargement…",
+      "personal_info": "Informations personnelles",
+      "freelancer_info": "Informations freelance",
+      "team_info": "Informations du team",
+      "no_ratings_yet": "Aucune évaluation pour le moment",
+      "email": "E-mail",
+      "team_name": "Nom du team",
+      "display_name": "Nom affiché",
+      "tokens_label": "Tokens",
+      "phone_placeholder": "333 123 4567"
+    },
+    "freelancer": {
+      "macro_role": "Macro-rôle",
+      "select_macro_role": "Sélectionnez un macro-rôle…",
+      "select_macro_role_first": "Sélectionnez d'abord un macro-rôle pour choisir vos sous-rôles.",
+      "headline": "Titre",
+      "headline_placeholder": "ex. Mécanicien F1 – 10 ans",
+      "disciplines": "Disciplines / Championnats",
+      "all_skills": "Toutes les compétences",
+      "skills_for_role": "Compétences de votre macro-rôle",
+      "show_macro_skills": "Afficher les compétences du macro-rôle",
+      "show_all_skills": "Afficher toutes les compétences",
+      "skills": "Compétences",
+      "day_rate": "Tarif journalier (EUR)",
+      "day_rate_value": "€{{rate}}/jour",
+      "location": "Localisation",
+      "location_placeholder": "Milan, Italie",
+      "travels_label": "Disponible pour se déplacer pendant les week-ends de course",
+      "travels": "Se déplace",
+      "sub_roles": "Sous-rôles",
+      "sub_roles_and_level": "Sous-rôles et niveau",
+      "motorsport_experience": "Expérience en motorsport",
+      "experience_hint": "Ajoutez jusqu'à {{max}} championnats/catégories passés et les années passées dans chacun. Choisissez « Aucune expérience » si vous êtes nouveau dans le motorsport.",
+      "add_experience": "+ Ajouter une expérience",
+      "add_another_experience": "+ Ajouter une autre expérience",
+      "languages": "Langues",
+      "languages_spoken": "Langues parlées",
+      "languages_hint": "Choisissez chaque langue que vous parlez et son niveau. Les teams peuvent exiger des langues spécifiques dans leurs Pit Calls.",
+      "language_name_placeholder": "Nom de la langue",
+      "add_language": "+ Ajouter une langue",
+      "add_another_language": "+ Ajouter une autre langue",
+      "saved": "Profil freelance enregistré",
+      "edit_info": "Modifier les informations freelance"
+    },
+    "team": {
+      "team_name": "Nom du team",
+      "team_type": "Type de team",
+      "team_type_placeholder": "ex. Team F2, Team GT, Factory",
+      "primary_discipline": "Discipline principale",
+      "website": "Site web",
+      "website_placeholder": "https://…",
+      "type": "Type",
+      "discipline": "Discipline",
+      "saved": "Profil du team enregistré",
+      "edit_info": "Modifier les informations du team"
+    },
+    "dashboard": {
+      "match_locked": "Match confirmé. Contacts débloqués.",
+      "sos_accept_failed": "Échec de l'acceptation du SOS",
+      "emergency_job": "Mission urgente",
+      "team_fallback": "Team",
+      "accept_sos_confirm": "Accepter ce SOS Call ? Le premier à accepter gagne — cela verrouille immédiatement le match.",
+      "accept_sos": "Accepter le SOS",
+      "manage_calendars": "Gérer les calendriers"
+    },
+    "tokens": {
+      "credited_demo": "+{{count}} tokens crédités (démo)",
+      "purchase_failed": "Échec de l'achat",
+      "demo_mode_notice": "MODE DÉMO : le paiement Stripe remplacera le crédit instantané une fois votre pays vendeur confirmé.",
+      "current_price": "Prix actuel du token : € {{price}} / token",
+      "tokens_label": "tokens"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "go_to_engagements": "Aller aux engagements",
+      "mark_all_read": "Tout marquer comme lu",
+      "unread": "NON LUES",
+      "no_notifications": "Aucune notification pour le moment.",
+      "calendar_stale_message": "Votre calendrier de disponibilité n'a pas été mis à jour depuis un moment. Gardez-le à jour pour mieux vous classer dans les recherches des teams.",
+      "update_calendar": "Mettre à jour le calendrier",
+      "view_engagement": "Voir l'engagement"
+    }
+  }
+}

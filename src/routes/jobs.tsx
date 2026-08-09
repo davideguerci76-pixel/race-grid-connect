@@ -150,7 +150,7 @@ function JobsPage() {
                   </div>
                   <div className="text-lg font-bold">{r.title}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {canSeeTeam ? (r.team?.team_name ?? "Team") : "Hidden Team"}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
+                    {canSeeTeam ? (r.team?.team_name ?? t("sweep_public.jobs.team_default")) : t("sweep_public.jobs.hidden_team")}{r.circuit ? ` · ${r.circuit}` : ""}{r.location ? ` · ${r.location}` : ""}
                   </div>
                   <div className="mt-2 font-mono text-xs text-muted-foreground">
                     {r.start_date} → {r.end_date}
@@ -167,7 +167,7 @@ function JobsPage() {
                     onClick={() => handleViewRequest(r)}
                     className="mt-2 inline-block bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white"
                   >
-                    {canSeeTeam ? "View team" : "Reveal team (2 tokens)"}
+                    {canSeeTeam ? t("sweep_public.jobs.view_team") : t("sweep_public.jobs.reveal_team_button")}
                   </button>
                 </div>
               </div>
@@ -179,16 +179,16 @@ function JobsPage() {
       {confirmRequestId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !revealMutation.isPending && setConfirmRequestId(null)}>
           <div className="w-full max-w-md border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="label-mono">[REVEAL TEAM]</div>
-            <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">Spend 2 tokens?</h2>
+            <div className="label-mono">{t("sweep_public.jobs.modal.title")}</div>
+            <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("sweep_public.jobs.modal.heading")}</h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Revealing costs 2 tokens. After paying you can view the full team profile any time — no additional charge.
+              {t("sweep_public.jobs.modal.desc")}
             </p>
             {isFreelancer === false && !isTeam ? null : null}
             {error && <div className="mt-3 border border-racing-red/40 bg-racing-red/10 p-3 text-xs text-racing-red">{error}</div>}
             <div className="mt-5 flex justify-end gap-2">
               <button type="button" onClick={() => setConfirmRequestId(null)} disabled={revealMutation.isPending} className="border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-muted">
-                Cancel
+                {t("sweep_public.jobs.modal.cancel")}
               </button>
               <button
                 type="button"
@@ -196,7 +196,7 @@ function JobsPage() {
                 disabled={revealMutation.isPending}
                 className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
               >
-                {revealMutation.isPending ? "Revealing…" : "Reveal (2 tokens)"}
+                {revealMutation.isPending ? t("sweep_public.jobs.modal.revealing") : t("sweep_public.jobs.modal.reveal_button")}
               </button>
             </div>
           </div>

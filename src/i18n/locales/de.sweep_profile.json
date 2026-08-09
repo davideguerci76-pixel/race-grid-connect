@@ -1,0 +1,108 @@
+{
+  "sweep_profile": {
+    "common": {
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "edit": "Bearbeiten",
+      "updated": "Aktualisiert",
+      "failed": "Fehlgeschlagen",
+      "yes": "Ja",
+      "no": "Nein",
+      "bio": "Bio",
+      "select": "Auswählen…",
+      "select_all": "Alle auswählen",
+      "deselect_all": "Alle abwählen",
+      "filter": "Filtern…",
+      "no_matches": "Keine Treffer.",
+      "remove": "Entfernen"
+    },
+    "header": {
+      "notifications": "Benachrichtigungen",
+      "admin": "ADMIN",
+      "toggle_menu": "Menü umschalten"
+    },
+    "profile": {
+      "loading": "Wird geladen…",
+      "personal_info": "Persönliche Angaben",
+      "freelancer_info": "Freelancer-Informationen",
+      "team_info": "Team-Informationen",
+      "no_ratings_yet": "Noch keine Bewertungen",
+      "email": "E-Mail",
+      "team_name": "Teamname",
+      "display_name": "Anzeigename",
+      "tokens_label": "Tokens",
+      "phone_placeholder": "333 123 4567"
+    },
+    "freelancer": {
+      "macro_role": "Hauptrolle",
+      "select_macro_role": "Hauptrolle auswählen…",
+      "select_macro_role_first": "Wählen Sie zuerst eine Hauptrolle, um Ihre Unterrollen auszuwählen.",
+      "headline": "Überschrift",
+      "headline_placeholder": "z. B. F1-Mechaniker – 10 Jahre",
+      "disciplines": "Disziplinen / Meisterschaften",
+      "all_skills": "Alle Fähigkeiten",
+      "skills_for_role": "Fähigkeiten für Ihre Hauptrolle",
+      "show_macro_skills": "Fähigkeiten der Hauptrolle anzeigen",
+      "show_all_skills": "Alle Fähigkeiten anzeigen",
+      "skills": "Fähigkeiten",
+      "day_rate": "Tagessatz (EUR)",
+      "day_rate_value": "€{{rate}}/Tag",
+      "location": "Standort",
+      "location_placeholder": "Mailand, Italien",
+      "travels_label": "Verfügbar für Reisen an Rennwochenenden",
+      "travels": "Reist",
+      "sub_roles": "Unterrollen",
+      "sub_roles_and_level": "Unterrollen & Niveau",
+      "motorsport_experience": "Motorsport-Erfahrung",
+      "experience_hint": "Fügen Sie bis zu {{max}} frühere Meisterschaften/Kategorien und die jeweiligen Jahre hinzu. Wählen Sie „Keine Erfahrung“, wenn Sie neu im Motorsport sind.",
+      "add_experience": "+ Erfahrung hinzufügen",
+      "add_another_experience": "+ Weitere Erfahrung hinzufügen",
+      "languages": "Sprachen",
+      "languages_spoken": "Gesprochene Sprachen",
+      "languages_hint": "Wählen Sie jede Sprache, die Sie sprechen, und deren Niveau. Teams können bei ihren Pit Calls bestimmte Sprachen verlangen.",
+      "language_name_placeholder": "Sprachname",
+      "add_language": "+ Sprache hinzufügen",
+      "add_another_language": "+ Weitere Sprache hinzufügen",
+      "saved": "Freelancer-Profil gespeichert",
+      "edit_info": "Freelancer-Informationen bearbeiten"
+    },
+    "team": {
+      "team_name": "Teamname",
+      "team_type": "Teamtyp",
+      "team_type_placeholder": "z. B. F2-Team, GT-Team, Werksteam",
+      "primary_discipline": "Hauptdisziplin",
+      "website": "Website",
+      "website_placeholder": "https://…",
+      "type": "Typ",
+      "discipline": "Disziplin",
+      "saved": "Team-Profil gespeichert",
+      "edit_info": "Team-Informationen bearbeiten"
+    },
+    "dashboard": {
+      "match_locked": "Match bestätigt. Kontakte freigeschaltet.",
+      "sos_accept_failed": "SOS-Annahme fehlgeschlagen",
+      "emergency_job": "Notfalljob",
+      "team_fallback": "Team",
+      "accept_sos_confirm": "Diesen SOS Call annehmen? Wer zuerst annimmt, gewinnt — dies sperrt den Match sofort.",
+      "accept_sos": "SOS annehmen",
+      "manage_calendars": "Kalender verwalten"
+    },
+    "tokens": {
+      "credited_demo": "+{{count}} Tokens gutgeschrieben (Demo)",
+      "purchase_failed": "Kauf fehlgeschlagen",
+      "demo_mode_notice": "DEMO-MODUS: Die Stripe-Kasse ersetzt die sofortige Gutschrift, sobald Sie Ihr Verkäuferland bestätigt haben.",
+      "current_price": "Aktueller Token-Preis: € {{price}} / Token",
+      "tokens_label": "Tokens"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "go_to_engagements": "Zu Engagements gehen",
+      "mark_all_read": "Alle als gelesen markieren",
+      "unread": "UNGELESEN",
+      "no_notifications": "Noch keine Benachrichtigungen.",
+      "calendar_stale_message": "Ihr Verfügbarkeitskalender wurde schon länger nicht aktualisiert. Halten Sie ihn aktuell, um bei Team-Suchen besser platziert zu werden.",
+      "update_calendar": "Kalender aktualisieren",
+      "view_engagement": "Engagement ansehen"
+    }
+  }
+}

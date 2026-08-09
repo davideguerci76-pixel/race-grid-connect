@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
@@ -8,6 +9,7 @@ import { getMyNotifications, markAllNotificationsRead } from "@/lib/paddock.func
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
+import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
   head: () => ({
@@ -24,6 +26,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/notifications")(
 });
 
 function NotificationsPage() {
+  const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const { user } = useAuth();
   const qc = useQueryClient();
   const notifsFn = useServerFn(getMyNotifications);
@@ -62,13 +66,13 @@ function NotificationsPage() {
       <div className="container-page py-12">
         <div className="label-mono">[NOTIFICATIONS]</div>
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter">Notifications</h1>
+          <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("sweep_profile.notifications.title")}</h1>
           <div className="flex items-center gap-2">
             <Link
               to="/dashboard/engagements"
               className="border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
             >
-              Go to engagements
+              {t("sweep_profile.notifications.go_to_engagements")}
             </Link>
             {unreadCount > 0 && (
               <button
@@ -82,7 +86,7 @@ function NotificationsPage() {
                 }}
                 className="border border-border px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
               >
-                Mark all as read
+                {t("sweep_profile.notifications.mark_all_read")}
               </button>
             )}
           </div>
@@ -90,10 +94,10 @@ function NotificationsPage() {
 
         <div className="mt-6 border border-border bg-card">
           <div className="border-b border-border px-4 py-2">
-            <span className="label-mono">[INBOX]{unreadCount > 0 ? ` · ${unreadCount} UNREAD` : ""}</span>
+            <span className="label-mono">[INBOX]{unreadCount > 0 ? ` · ${unreadCount} ${t("sweep_profile.notifications.unread")}` : ""}</span>
           </div>
           {notifications.length === 0 ? (
-            <div className="p-12 text-center text-sm text-muted-foreground">No notifications yet.</div>
+            <div className="p-12 text-center text-sm text-muted-foreground">{t("sweep_profile.notifications.no_notifications")}</div>
           ) : (
             <ul className="divide-y divide-border">
               {(notifications as any[]).map((n) => {
@@ -114,21 +118,21 @@ function NotificationsPage() {
                       <div className="flex items-center gap-2">
                         {unread && <span className="inline-block h-2 w-2 rounded-full bg-racing-red" />}
                         <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{n.kind}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</span>
                       </div>
                       <div className="mt-1 text-sm">
                         {isStale
-                          ? "Your availability calendar hasn't been updated in a while. Keep it fresh to rank higher in team searches."
+                          ? t("sweep_profile.notifications.calendar_stale_message")
                           : (n.payload?.message ?? n.kind)}
                       </div>
                     </div>
                     {isStale ? (
                       <Link to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
-                        Update calendar
+                        {t("sweep_profile.notifications.update_calendar")}
                       </Link>
                     ) : isEngagement ? (
                       <Link to="/dashboard/engagements" className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
-                        View engagement
+                        {t("sweep_profile.notifications.view_engagement")}
                       </Link>
                     ) : null}
                   </li>

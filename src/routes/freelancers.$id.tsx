@@ -9,6 +9,7 @@ import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonym
 import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { BackButton } from "@/components/back-button";
+import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/freelancers/$id")({
 function FreelancerProfile() {
   const { id } = Route.useParams();
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const { user, loading: authLoading } = useAuth();
 
   const { data, isLoading } = useQuery({
@@ -78,7 +80,7 @@ function FreelancerProfile() {
                 const tone = days < 30 ? "text-[#16a34a]" : days < 90 ? "text-racing-yellow" : "text-racing-red";
                 return (
                   <div className={`mt-2 font-mono text-[11px] uppercase tracking-widest ${tone}`}>
-                    Calendar confirmed {days}d ago · {d.toLocaleDateString()}
+                    Calendar confirmed {days}d ago · {formatDate(d)}
                   </div>
                 );
               })()}

@@ -1,0 +1,96 @@
+{
+  "sweep_admin_a": {
+    "checking_access": "Vérification de l'accès…",
+    "admin_label": "Admin",
+    "control_panel": "Panneau de Contrôle",
+    "tabs": {
+      "freelancers": "Freelancers",
+      "teams": "Teams",
+      "pitcalls": "Pit Calls",
+      "permissions": "Permissions",
+      "matching": "Correspondances",
+      "tokens": "Tokens",
+      "reviews": "Avis",
+      "calendars": "Calendriers",
+      "wiki": "Wiki de la Plateforme"
+    },
+    "time_machine": {
+      "title": "Machine à Remonter le Temps (Debug Admin)",
+      "description": "Avancez l'horloge simulée pour tester les fenêtres d'évaluation sans attendre de vrais jours. S'applique globalement à toutes les vérifications temporelles d'évaluation.",
+      "days_offset": "jours de décalage",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "emit_rating_now": "Envoyer les notifications d'évaluation maintenant",
+      "emit_calendar_now": "Envoyer les notifications de calendrier obsolète maintenant",
+      "simulated_clock": "Horloge simulée : +{{count}} jour(s)",
+      "emitted_rating": "{{count}} notifications d'évaluation envoyées",
+      "emitted_calendar": "{{count}} notifications de calendrier obsolète envoyées"
+    },
+    "failed": "Échec",
+    "loading": "Chargement…",
+    "invalid_number": "Nombre invalide",
+    "tokens_updated": "Tokens mis à jour",
+    "confirm_unblock": "Débloquer cet utilisateur ?",
+    "confirm_block": "Bloquer cet utilisateur ?",
+    "unblocked": "Débloqué",
+    "blocked": "Bloqué",
+    "confirm_delete": "Supprimer définitivement {{name}} ? Cette action est irréversible.",
+    "user_deleted": "Utilisateur supprimé",
+    "export_to_excel": "Exporter vers Excel",
+    "status": {
+      "blocked": "Bloqué",
+      "active": "Actif"
+    },
+    "columns": {
+      "name": "Nom",
+      "email": "E-mail",
+      "macro_role": "Macro-rôle",
+      "disciplines": "Disciplines",
+      "skills": "Compétences",
+      "languages": "Langues",
+      "location": "Localisation",
+      "phone": "Téléphone",
+      "rate": "Tarif",
+      "rating": "Évaluation",
+      "tokens": "Tokens",
+      "status": "Statut",
+      "actions": "Actions",
+      "action": "Action",
+      "team": "Team",
+      "contact": "Contact",
+      "discipline": "Discipline",
+      "website": "Site web",
+      "type": "Type",
+      "roles": "Rôles"
+    },
+    "actions": {
+      "view": "Voir",
+      "tokens": "Tokens",
+      "unblock": "Débloquer",
+      "block": "Bloquer",
+      "delete": "Supprimer"
+    },
+    "freelancers": {
+      "new_token_balance": "Nouveau solde de tokens :",
+      "search_placeholder": "Rechercher nom, e-mail, compétence…",
+      "all_roles": "Tous les rôles",
+      "count": "{{count}} freelancers"
+    },
+    "teams": {
+      "search_placeholder": "Rechercher team, contact, e-mail…",
+      "count": "{{count}} teams"
+    },
+    "permissions": {
+      "search_placeholder": "Rechercher des utilisateurs…",
+      "count": "{{count}} utilisateurs",
+      "confirm_revoke": "Révoquer les droits admin de {{name}} ?",
+      "confirm_grant": "Accorder les droits admin à {{name}} ?",
+      "role_updated": "Rôle mis à jour",
+      "admin_badge": "ADMIN",
+      "user_badge": "utilisateur",
+      "primary_admin": "Admin principal",
+      "revoke_admin": "Révoquer admin",
+      "grant_admin": "Accorder admin"
+    }
+  }
+}

@@ -110,7 +110,7 @@ export function SiteHeader() {
               </Link>
               {isAdmin && (
                 <Link to="/admin" className="text-racing-red transition-colors hover:brightness-125" activeProps={activeCls}>
-                  ADMIN
+                  {t("sweep_profile.header.admin")}
                 </Link>
               )}
             </>
@@ -125,7 +125,7 @@ export function SiteHeader() {
               <TokenBadge balance={profile?.token_balance ?? 0} />
               <Link
                 to="/dashboard/notifications"
-                aria-label="Notifications"
+                aria-label={t("sweep_profile.header.notifications")}
                 className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
               >
                 <Bell className="size-4" />
@@ -161,7 +161,7 @@ export function SiteHeader() {
           {user && (
             <Link
               to="/dashboard/notifications"
-              aria-label="Notifications"
+              aria-label={t("sweep_profile.header.notifications")}
               className="relative grid h-10 w-10 place-items-center border border-border transition-colors hover:bg-secondary"
             >
               <Bell className="size-4" />
@@ -174,7 +174,7 @@ export function SiteHeader() {
           )}
           <button
             onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label={t("sweep_profile.header.toggle_menu")}
             aria-expanded={open}
             className="grid h-10 w-10 shrink-0 place-items-center border border-border transition-colors hover:bg-secondary"
           >
@@ -201,7 +201,7 @@ export function SiteHeader() {
                 </Link>
                 {isAdmin && (
                   <Link to="/admin" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 text-racing-red hover:brightness-125" activeProps={activeCls}>
-                    ADMIN
+                    {t("sweep_profile.header.admin")}
                   </Link>
                 )}
               </>

@@ -141,6 +141,12 @@
       "next_weekend": "Prochain weekend",
       "clear_month": "Vider le mois",
       "all_weekends": "Tous les weekends"
+    },
+    "actions": {
+      "select_month": "Sélectionner le mois",
+      "deselect_month": "Désélectionner le mois",
+      "select_all": "Tout sélectionner ({{months}}m)",
+      "deselect_all": "Tout désélectionner"
     }
   },
   "matches": {

@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { purchaseTokensDemo, getTokenHistory } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { BackButton } from "@/components/back-button";
+import { useDateFormat } from "@/lib/date-locale";
 
 const PACKS = [
   { key: "small" as const, tokens: 10 },
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
 
 function TokensPage() {
   const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const qc = useQueryClient();
   const purchase = useServerFn(purchaseTokensDemo);
   const getHistory = useServerFn(getTokenHistory);
@@ -35,8 +37,8 @@ function TokensPage() {
 
   const mut = useMutation({
     mutationFn: (pack: "small" | "medium" | "large") => purchase({ data: { pack } }),
-    onSuccess: (r) => { toast.success(`+${r.added} tokens credited (demo)`); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Purchase failed"),
+    onSuccess: (r) => { toast.success(t("sweep_profile.tokens.credited_demo", { count: r.added })); qc.invalidateQueries(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.tokens.purchase_failed")),
   });
 
   return (
@@ -49,10 +51,10 @@ function TokensPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("tokens.sub")}</p>
 
         <div className="mt-4 rounded-none border border-racing-yellow/40 bg-racing-yellow/5 p-3 font-mono text-xs text-racing-yellow">
-          DEMO MODE: Stripe checkout will replace instant credit once you confirm your seller country.
+          {t("sweep_profile.tokens.demo_mode_notice")}
         </div>
         <div className="mt-2 font-mono text-[11px] text-muted-foreground">
-          Current token price: € {priceEur.toFixed(2)} / token
+          {t("sweep_profile.tokens.current_price", { price: priceEur.toFixed(2) })}
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -60,7 +62,7 @@ function TokensPage() {
             <div key={p.key} className="border border-border bg-card p-6">
               <div className="label-mono">{t(`tokens.packs.${p.key}`)}</div>
               <div className="mt-3 font-mono text-4xl font-black text-racing-red">{p.tokens}</div>
-              <div className="mt-1 text-xs text-muted-foreground">tokens</div>
+              <div className="mt-1 text-xs text-muted-foreground">{t("sweep_profile.tokens.tokens_label")}</div>
               <div className="mt-4 font-mono text-2xl font-bold text-racing-yellow">€ {(priceEur * p.tokens).toFixed(2)}</div>
               <button onClick={() => mut.mutate(p.key)} disabled={mut.isPending} className="mt-4 w-full bg-racing-red py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60">
                 {t("tokens.buy")}
@@ -79,7 +81,7 @@ function TokensPage() {
               <ul className="divide-y divide-border">
                 {history.map((r) => (
                   <li key={r.id} className="flex items-center justify-between px-4 py-3 font-mono text-sm">
-                    <span className="text-muted-foreground">{new Date(r.created_at).toLocaleString()} · {t(`tokens.reasons.${r.reason}`)}</span>
+                    <span className="text-muted-foreground">{formatDateTime(r.created_at)} · {t(`tokens.reasons.${r.reason}`)}</span>
                     <span className={r.delta >= 0 ? "text-racing-yellow" : "text-racing-red"}>{r.delta >= 0 ? `+${r.delta}` : r.delta}</span>
                   </li>
                 ))}

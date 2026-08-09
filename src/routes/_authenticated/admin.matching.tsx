@@ -4,23 +4,30 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { adminGetMatchingWeights, adminUpdateMatchingWeights } from "@/lib/admin.functions";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_authenticated/admin/matching")({
   component: AdminMatchingPage,
 });
 
-const FIELDS: { key: string; label: string; hint: string }[] = [
-  { key: "sub_role_weight", label: "Sub-role & level", hint: "Sub-role match, weighted by seniority level" },
-  { key: "skills_weight", label: "Skills", hint: "Requested skills possessed" },
-  { key: "disciplines_weight", label: "Disciplines & Experience", hint: "Championship / discipline overlap" },
-  { key: "day_rate_weight", label: "Day rate (EUR)", hint: "Rate vs budget" },
-  { key: "languages_weight", label: "Languages", hint: "Level >= required" },
-  { key: "education_weight", label: "Education", hint: "Study / motorsport academy" },
-  { key: "location_weight", label: "Location", hint: "Geographic proximity" },
-  { key: "calendar_freshness_weight", label: "Calendar freshness", hint: "Recent calendar confirmation (< 30 / 90 / 180 days)" },
-];
+const FIELD_KEYS = [
+  "sub_role_weight",
+  "skills_weight",
+  "disciplines_weight",
+  "day_rate_weight",
+  "languages_weight",
+  "education_weight",
+  "location_weight",
+  "calendar_freshness_weight",
+] as const;
 
 function AdminMatchingPage() {
+  const { t } = useTranslation();
+  const FIELDS = FIELD_KEYS.map((key) => ({
+    key,
+    label: t(`sweep_admin_b.matching.field_${key}_label`),
+    hint: t(`sweep_admin_b.matching.field_${key}_hint`),
+  }));
   const qc = useQueryClient();
   const load = useServerFn(adminGetMatchingWeights);
   const save = useServerFn(adminUpdateMatchingWeights);
@@ -62,17 +69,17 @@ function AdminMatchingPage() {
         } as any,
       }),
     onSuccess: () => {
-      toast.success("Weights saved and matches recomputed");
+      toast.success(t("sweep_admin_b.matching.saved"));
       qc.invalidateQueries({ queryKey: ["matching-weights"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.save_failed")),
   });
 
   return (
     <div>
-      <h2 className="mb-2 text-xl font-bold">Matching weights</h2>
+      <h2 className="mb-2 text-xl font-bold">{t("sweep_admin_b.matching.title")}</h2>
       <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
-        Percentages that determine the match score. Hard filters (macro-role, hard sub-role, skills hard, dates, travel, hard languages, hard experience) still exclude non-matching candidates regardless of these weights. Weights must sum to <span className="font-bold">100</span>.
+        {t("sweep_admin_b.matching.description")} <span className="font-bold">100</span>.
       </p>
 
       <div className="max-w-2xl grid gap-3">
@@ -100,11 +107,11 @@ function AdminMatchingPage() {
             {f.key === "sub_role_weight" && (
               <div className="ml-4 border-l-2 border-racing-red/40 pl-4 pt-3 grid gap-3">
                 <p className="font-mono text-[11px] uppercase text-muted-foreground">
-                  Seniority multipliers — same level or over-qualified = full weight
+                  {t("sweep_admin_b.matching.seniority_multipliers")}
                 </p>
                 {[
-                  { label: "Factor X — 1 level below", hint: "e.g. Intermediate required, Junior profile", value: factorX, set: setFactorX },
-                  { label: "Factor Y — 2 levels below", hint: "e.g. Senior required, Junior profile", value: factorY, set: setFactorY },
+                  { label: t("sweep_admin_b.matching.factor_x_label"), hint: t("sweep_admin_b.matching.factor_x_hint"), value: factorX, set: setFactorX },
+                  { label: t("sweep_admin_b.matching.factor_y_label"), hint: t("sweep_admin_b.matching.factor_y_hint"), value: factorY, set: setFactorY },
                 ].map((m) => (
                   <label key={m.label} className="flex items-center justify-between gap-4 border border-border bg-card p-3">
                     <div>
@@ -126,8 +133,8 @@ function AdminMatchingPage() {
                   </label>
                 ))}
                 <div className="font-mono text-[11px] text-muted-foreground">
-                  Effective: {(((values.sub_role_weight ?? 0) * factorX)).toFixed(2)}% (1 below) ·{" "}
-                  {(((values.sub_role_weight ?? 0) * factorY)).toFixed(2)}% (2 below)
+                  {t("sweep_admin_b.matching.effective_one_below", { value: (((values.sub_role_weight ?? 0) * factorX)).toFixed(2) })} ·{" "}
+                  {t("sweep_admin_b.matching.effective_two_below", { value: (((values.sub_role_weight ?? 0) * factorY)).toFixed(2) })}
                 </div>
               </div>
             )}
@@ -135,7 +142,7 @@ function AdminMatchingPage() {
         ))}
 
         <div className={`flex items-center justify-between border p-3 font-mono text-sm ${validSum ? "border-racing-yellow bg-racing-yellow/10 text-racing-yellow" : "border-racing-red bg-racing-red/10 text-racing-red"}`}>
-          <span>Total</span>
+          <span>{t("sweep_admin_b.matching.total")}</span>
           <span className="font-bold">{total.toFixed(2)}%</span>
         </div>
 
@@ -144,7 +151,7 @@ function AdminMatchingPage() {
           onClick={() => mut.mutate()}
           className="mt-2 bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
         >
-          {mut.isPending ? "Saving…" : "Save & recompute all matches"}
+          {mut.isPending ? t("sweep_admin_b.common.saving") : t("sweep_admin_b.matching.save_button")}
         </button>
       </div>
     </div>
