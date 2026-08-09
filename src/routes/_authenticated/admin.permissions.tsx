@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { adminListFreelancers, adminListTeams, adminSetAdminRole } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/admin/permissions")({
 });
 
 function AdminPermissions() {
+  const { t } = useTranslation();
   const listF = useServerFn(adminListFreelancers);
   const listT = useServerFn(adminListTeams);
   const setAdmin = useServerFn(adminSetAdminRole);
@@ -31,10 +33,10 @@ function AdminPermissions() {
   const { sorted, toggle, indicator } = useSort<any>(rows);
 
   async function onToggle(user_id: string, isAdmin: boolean, name: string) {
-    if (!confirm(isAdmin ? `Revoke admin from ${name}?` : `Grant admin to ${name}?`)) return;
+    if (!confirm(isAdmin ? t("sweep_admin_a.permissions.confirm_revoke", { name }) : t("sweep_admin_a.permissions.confirm_grant", { name }))) return;
     try {
       await setAdmin({ data: { user_id, is_admin: !isAdmin } });
-      toast.success("Role updated");
+      toast.success(t("sweep_admin_a.permissions.role_updated"));
       qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     } catch (e: any) {
@@ -48,7 +50,7 @@ function AdminPermissions() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search users…"
+          placeholder={t("sweep_admin_a.permissions.search_placeholder")}
           className="min-w-[220px] flex-1 border border-border bg-background px-3 py-2 text-sm"
         />
         <button
@@ -63,19 +65,19 @@ function AdminPermissions() {
           }
           className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
         >
-          Export to Excel
+          {t("sweep_admin_a.export_to_excel")}
         </button>
-        <div className="ml-auto text-xs text-muted-foreground self-center">{rows.length} users</div>
+        <div className="ml-auto text-xs text-muted-foreground self-center">{t("sweep_admin_a.permissions.count", { count: rows.length })}</div>
       </div>
       <div className="overflow-auto border border-border">
         <table className="w-full min-w-[800px] text-xs">
           <thead className="bg-secondary text-[10px] font-bold uppercase tracking-widest">
             <tr>
-              <Th onClick={() => toggle("display_name")} label={`Name${indicator("display_name")}`} />
-              <Th onClick={() => toggle("email")} label={`Email${indicator("email")}`} />
-              <Th onClick={() => toggle("user_type")} label={`Type${indicator("user_type")}`} />
-              <Th onClick={() => toggle("roles")} label={`Roles${indicator("roles")}`} />
-              <th className="px-2 py-2 text-right">Action</th>
+              <Th onClick={() => toggle("display_name")} label={`${t("sweep_admin_a.columns.name")}${indicator("display_name")}`} />
+              <Th onClick={() => toggle("email")} label={`${t("sweep_admin_a.columns.email")}${indicator("email")}`} />
+              <Th onClick={() => toggle("user_type")} label={`${t("sweep_admin_a.columns.type")}${indicator("user_type")}`} />
+              <Th onClick={() => toggle("roles")} label={`${t("sweep_admin_a.columns.roles")}${indicator("roles")}`} />
+              <th className="px-2 py-2 text-right">{t("sweep_admin_a.columns.action")}</th>
             </tr>
           </thead>
           <tbody>
@@ -88,11 +90,11 @@ function AdminPermissions() {
                   <td className="px-2 py-2 text-muted-foreground">{r.email}</td>
                   <td className="px-2 py-2">{r.user_type}</td>
                   <td className="px-2 py-2">
-                    {isAdmin ? <span className="font-bold text-racing-red">ADMIN</span> : <span className="text-muted-foreground">user</span>}
+                    {isAdmin ? <span className="font-bold text-racing-red">{t("sweep_admin_a.permissions.admin_badge")}</span> : <span className="text-muted-foreground">{t("sweep_admin_a.permissions.user_badge")}</span>}
                   </td>
                   <td className="px-2 py-2 text-right">
                     {isAdmin && isPrimary ? (
-                      <span className="text-[10px] uppercase text-muted-foreground">Primary admin</span>
+                      <span className="text-[10px] uppercase text-muted-foreground">{t("sweep_admin_a.permissions.primary_admin")}</span>
                     ) : (
                       <button
                         onClick={() => onToggle(r.id, isAdmin, r.display_name)}
@@ -100,7 +102,7 @@ function AdminPermissions() {
                           isAdmin ? "border-border hover:bg-secondary" : "border-racing-red text-racing-red hover:bg-racing-red/10"
                         }`}
                       >
-                        {isAdmin ? "Revoke admin" : "Grant admin"}
+                        {isAdmin ? t("sweep_admin_a.permissions.revoke_admin") : t("sweep_admin_a.permissions.grant_admin")}
                       </button>
                     )}
                   </td>

@@ -52,7 +52,7 @@ function RequestsPage() {
       qc.invalidateQueries({ queryKey: ["my-requests"] });
       toast.success(t("requests.status_updated"));
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
   });
 
   return (
@@ -78,7 +78,7 @@ function RequestsPage() {
         </div>
 
         <div className="mt-8 grid gap-3">
-          {isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
+          {isLoading && <div className="text-sm text-muted-foreground">{t("sweep_engage.common.loading")}</div>}
           {!isLoading && requests.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
               <p className="text-sm text-muted-foreground">{t("requests.empty")}</p>
@@ -112,7 +112,7 @@ function RequestsPage() {
                     {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id ? 1 : (r.matches_count ?? 0)}
                   </div>
                   {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id && (
-                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-racing-yellow">Confirmed · Filled</div>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-racing-yellow">{t("sweep_engage.requests.confirmed_filled")}</div>
                   )}
                 </div>
               </div>
@@ -124,7 +124,7 @@ function RequestsPage() {
                 >
                   <Eye className="size-4" />
                   {(r.status === "filled" || r.status === "completed") && r.confirmed_engagement_id
-                    ? `${t("requests.view_matches")} (1) — Confirmed · Filled`
+                    ? t("sweep_engage.requests.view_matches_confirmed", { label: t("requests.view_matches") })
                     : `${t("requests.view_matches")} (${r.matches_count ?? 0})`}
                 </Link>
 
@@ -169,14 +169,14 @@ function RequestsPage() {
                       search={{ from: r.id }}
                       className="inline-flex items-center gap-2 rounded-2xl border border-racing-red px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                     >
-                      <RotateCcw className="size-4" /> Repost similar
+                      <RotateCcw className="size-4" /> {t("sweep_engage.requests.repost_similar")}
                     </Link>
                     <Link
                       to="/dashboard/requests/new"
                       search={{ from: r.id, mode: "identical" }}
                       className="inline-flex items-center gap-2 rounded-2xl border border-racing-yellow px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
                     >
-                      <Copy className="size-4" /> Repost identical (discount)
+                      <Copy className="size-4" /> {t("sweep_engage.requests.repost_identical")}
                     </Link>
                   </>
                 )}
@@ -192,6 +192,7 @@ function RequestsPage() {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   const styles: Record<string, string> = {
     active: "bg-racing-red/15 text-racing-red border-racing-red",
     paused: "bg-yellow-500/10 text-yellow-500 border-yellow-500",
@@ -201,7 +202,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${styles[status] ?? ""}`}>
-      {status}
+      {t(`sweep_engage.requests.status.${status}`)}
     </span>
   );
 }

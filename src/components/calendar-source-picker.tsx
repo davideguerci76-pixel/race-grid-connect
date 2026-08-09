@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -19,7 +20,7 @@ const btn =
 export function CalendarSourcePicker({
   value,
   onChange,
-  saveLabel = "Save as my calendar",
+  saveLabel,
   className,
 }: {
   value: string[]; // ISO days
@@ -27,6 +28,8 @@ export function CalendarSourcePicker({
   saveLabel?: string;
   className?: string;
 }) {
+  const { t } = useTranslation();
+  const resolvedSaveLabel = saveLabel ?? t("sweep_public.calendar_source_picker.save_as_my_calendar");
   const qc = useQueryClient();
   const list = useServerFn(listMyCalendars);
   const save = useServerFn(saveCalendar);
@@ -44,12 +47,12 @@ export function CalendarSourcePicker({
       const text = await file.text();
       const events = parseIcs(text);
       if (!events.length) {
-        toast.error("No events found in this .ics file");
+        toast.error(t("sweep_public.calendar_source_picker.no_events_in_ics"));
         return;
       }
       setQuickEvents(events);
     } catch {
-      toast.error("Could not read the .ics file");
+      toast.error(t("sweep_public.calendar_source_picker.could_not_read_ics"));
     }
   };
 
@@ -63,18 +66,18 @@ export function CalendarSourcePicker({
 
   const saveCurrent = async () => {
     if (!value.length) {
-      toast.error("Select at least one day first");
+      toast.error(t("sweep_public.calendar_source_picker.select_day_first"));
       return;
     }
-    const name = window.prompt("Calendar name (e.g. F4 Italian 2027)");
+    const name = window.prompt(t("sweep_public.calendar_source_picker.name_prompt"));
     if (!name) return;
     setSaving(true);
     try {
       await save({ data: { name, events: daysToEvents(value), dates: value, source: "manual" } });
-      toast.success("Calendar saved to your archive");
+      toast.success(t("sweep_public.calendar_source_picker.calendar_saved"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Save failed");
+      toast.error(e instanceof Error ? e.message : t("sweep_public.calendar_source_picker.save_failed"));
     } finally {
       setSaving(false);
     }
@@ -90,9 +93,9 @@ export function CalendarSourcePicker({
         }}
         className="border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest"
       >
-        <option value="">Use one of my calendars…</option>
+        <option value="">{t("sweep_public.calendar_source_picker.use_calendar_placeholder")}</option>
         {mine.length > 0 && (
-          <optgroup label="My archive">
+          <optgroup label={t("sweep_public.calendar_source_picker.my_archive_group")}>
             {mine.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -101,7 +104,7 @@ export function CalendarSourcePicker({
           </optgroup>
         )}
         {shared.length > 0 && (
-          <optgroup label="Platform calendars">
+          <optgroup label={t("sweep_public.calendar_source_picker.platform_calendars_group")}>
             {shared.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -112,7 +115,7 @@ export function CalendarSourcePicker({
       </select>
 
       <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
-        <Upload className="size-3.5" /> Import .ics file
+        <Upload className="size-3.5" /> {t("sweep_public.calendar_source_picker.import_ics")}
       </button>
       <input
         ref={fileRef}
@@ -133,23 +136,23 @@ export function CalendarSourcePicker({
           const events = daysToEvents(value);
           if (!events.length) {
             const today = new Date();
-            toast.message("Select at least one day (or import a calendar) to build the rule", {
-              description: `Tip: pick the race day of each round, e.g. ${isoOf(today)}`,
+            toast.message(t("sweep_public.calendar_source_picker.select_day_tip_title"), {
+              description: t("sweep_public.calendar_source_picker.select_day_tip_desc", { date: isoOf(today) }),
             });
             return;
           }
           setQuickEvents(events);
         }}
       >
-        <ListChecks className="size-3.5" /> Quick fill (Mon → Mon rule)
+        <ListChecks className="size-3.5" /> {t("sweep_public.calendar_source_picker.quick_fill_button")}
       </button>
 
       <button type="button" className={btn} onClick={saveCurrent} disabled={saving}>
-        <Save className="size-3.5" /> {saveLabel}
+        <Save className="size-3.5" /> {resolvedSaveLabel}
       </button>
 
       <Link to="/dashboard/calendars" className={btn}>
-        <CalendarRange className="size-3.5" /> Manage calendars
+        <CalendarRange className="size-3.5" /> {t("sweep_public.calendar_source_picker.manage_calendars")}
       </Link>
 
       {quickEvents && (

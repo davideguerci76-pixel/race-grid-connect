@@ -1,0 +1,160 @@
+{
+  "sweep_public": {
+    "freelancer_detail": {
+      "not_found": "Freelance no encontrado",
+      "sign_in_title": "Inicia sesión para ver el freelance",
+      "sign_in_button": "Iniciar sesión / Registrarse",
+      "day_rate": "Tarifa diaria",
+      "calendar_confirmed": "Calendario confirmado hace {{days}}d · {{date}}",
+      "availability_title": "Disponibilidad (próximos 60 días)",
+      "no_availability": "No hay disponibilidad publicada."
+    },
+    "freelancers_index": {
+      "no_freelancers": "Todavía no hay freelances."
+    },
+    "team_detail": {
+      "not_found": "Team no encontrado",
+      "sign_in_title": "Inicia sesión para ver el team",
+      "sign_in_desc": "Los perfiles de team solo son visibles para miembros autenticados.",
+      "sign_in_button": "Iniciar sesión / Registrarse",
+      "team_hidden_title": "El team está oculto",
+      "team_hidden_desc": "Desbloquea una oferta específica desde el tablón de empleo (2 tokens) o el perfil completo del team a continuación (5 tokens).",
+      "unlock_full_button": "Desbloquear perfil completo del team (5 tokens)",
+      "racing_team_default": "Team de carreras",
+      "established": "Fundado en {{year}}",
+      "active_pit_calls": "Pit Calls activos",
+      "requested_position": "Posición solicitada",
+      "no_active_pit_calls": "No hay Pit Calls activos.",
+      "partial_access_title": "[ACCESO PARCIAL]",
+      "partial_access_desc": "Desbloqueaste este team para una sola oferta. Los contactos directos y los demás Pit Calls activos del team permanecen ocultos.",
+      "unlock_full_profile_button": "Desbloquear perfil completo (5 tokens)",
+      "cancellation_history": "⚠ HISTORIAL DE CANCELACIONES",
+      "late_cancellation": "{{count}} cancelación tardía registrada en matches confirmados.",
+      "late_cancellation_plural": "{{count}} cancelaciones tardías registradas en matches confirmados.",
+      "locked_other_pitcalls": "{{count}} otro(s) Pit Call(s) de este team están bloqueados. Desbloquea el perfil completo para verlos.",
+      "modal": {
+        "title": "[DESBLOQUEAR PERFIL COMPLETO]",
+        "heading": "¿Gastar 5 tokens?",
+        "desc": "Desbloquea los contactos directos (sitio web) y la lista completa de Pit Calls activos de este team. Pago único para este team.",
+        "cancel": "Cancelar",
+        "unlocking": "Desbloqueando…",
+        "unlock_button": "Desbloquear (5 tokens)"
+      }
+    },
+    "teams_index": {
+      "racing_team_default": "Team de carreras",
+      "no_teams": "Todavía no hay teams."
+    },
+    "jobs": {
+      "hidden_team": "Team oculto",
+      "team_default": "Team",
+      "view_team": "Ver team",
+      "reveal_team_button": "Revelar team (2 tokens)",
+      "modal": {
+        "title": "[REVELAR TEAM]",
+        "heading": "¿Gastar 2 tokens?",
+        "desc": "Revelar cuesta 2 tokens. Después del pago podrás ver el perfil completo del team en cualquier momento, sin costo adicional.",
+        "cancel": "Cancelar",
+        "revealing": "Revelando…",
+        "reveal_button": "Revelar (2 tokens)"
+      }
+    },
+    "auth": {
+      "google_signin_failed": "Error al iniciar sesión con Google",
+      "sign_in_failed": "Error al iniciar sesión",
+      "welcome_toast": "¡Bienvenido al paddock! 5 tokens acreditados.",
+      "auth_failed": "Error de autenticación",
+      "signup_desc": "Publica tu calendario, obtén matches automáticos y usa tokens para revelar contrapartes.",
+      "signin_desc": "Continúa donde lo dejaste.",
+      "or_divider": "— o —"
+    },
+    "dashboard_calendar": {
+      "redirecting": "Redirigiendo…",
+      "legend_unavailable": "No disponible",
+      "legend_available": "Disponible",
+      "legend_engaged": "Comprometido (bloqueado)",
+      "save_availability_label": "Guardar disponibilidad como calendario",
+      "calendar_legend": "Haz clic en un día para alternar la disponibilidad. Rojo = match confirmado, no se puede editar.",
+      "save_failed": "Error"
+    },
+    "dashboard_calendars": {
+      "meta_title": "Gestionar calendarios — Pit Call",
+      "meta_description": "Crea, importa y comparte calendarios de campeonato para usarlos en tus Pit Calls y tu disponibilidad.",
+      "meta_og_description": "Crea calendarios de motorsport personalizados, importa archivos .ics y reutilízalos en cualquier parte de Pit Call.",
+      "title": "Mis calendarios",
+      "description": "Crea tus propios calendarios de campeonato, importa un archivo .ics existente y reutilízalos al instante para tus Pit Calls o tu disponibilidad, incluso si no forman parte de la base de datos oficial de la plataforma.",
+      "new_calendar": "Nuevo calendario",
+      "import_ics": "Importar archivo .ics",
+      "edit_calendar_bracket": "EDITAR CALENDARIO",
+      "new_calendar_bracket": "NUEVO CALENDARIO",
+      "calendar_name_placeholder": "Nombre del calendario (ej. F4 Italiano 2027)",
+      "quick_fill_button": "Relleno rápido (regla Lun → Lun)",
+      "quick_fill_error": "Selecciona primero los días de carrera y luego aplica la regla logística",
+      "save_calendar_button": "Guardar calendario ({{count}} días)",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "export_ics": "Exportar .ics",
+      "submit_review": "Enviar para revisión",
+      "delete": "Eliminar",
+      "no_calendars": "Todavía no hay calendarios — crea uno desde cero o importa un archivo .ics.",
+      "platform_calendars": "[CALENDARIOS DE LA PLATAFORMA]",
+      "days_events_source": "{{days}} días · {{events}} eventos · {{source}}",
+      "days_approved": "{{days}} días · aprobado",
+      "copy_to_archive": "Copiar a mi archivo",
+      "calendar_legend": "Los días seleccionados (verdes) son los días laborables de este calendario.",
+      "toast": {
+        "calendar_saved": "Calendario guardado",
+        "save_failed": "Error al guardar",
+        "calendar_deleted": "Calendario eliminado",
+        "delete_failed": "Error al eliminar",
+        "submitted_for_review": "Enviado a la plataforma para revisión. Recibirás tokens si es aprobado.",
+        "submit_failed": "Error al enviar",
+        "no_events_in_ics": "No se encontraron eventos en este archivo .ics",
+        "could_not_read_ics": "No se pudo leer el archivo .ics",
+        "give_calendar_name": "Dale un nombre a tu calendario"
+      }
+    },
+    "calendar_quick_fill": {
+      "default_title": "Relleno rápido — regla logística",
+      "description": "Define tu semana logística estándar (lunes → lunes). Viernes, sábado y domingo están preseleccionados — ajústalos (ej. salir el miércoles, volver el lunes) y aplica la regla a {{count}} evento con un clic. Aún puedes ajustar rondas individuales abajo.",
+      "description_plural": "Define tu semana logística estándar (lunes → lunes). Viernes, sábado y domingo están preseleccionados — ajústalos (ej. salir el miércoles, volver el lunes) y aplica la regla a los {{count}} eventos con un clic. Aún puedes ajustar rondas individuales abajo.",
+      "standard_week_label": "[SEMANA ESTÁNDAR — APLICADA A TODOS LOS EVENTOS]",
+      "apply_to_all": "Aplicar a todos los eventos",
+      "reset_weekend_default": "Restablecer fin de semana predeterminado",
+      "fine_tune_toggle": "[{{action}} EVENTOS INDIVIDUALES ({{count}})]",
+      "hide": "OCULTAR",
+      "fine_tune": "AJUSTAR",
+      "replace_or_merge": "[REEMPLAZAR O FUSIONAR]",
+      "replace": "Reemplazar",
+      "merge": "Fusionar",
+      "replace_desc": "<strong>Reemplazar:</strong> elimina los {{count}} días actualmente seleccionados y conserva solo este calendario.",
+      "merge_desc": "<strong>Fusionar:</strong> añade este calendario a tu disponibilidad actual — nada de lo ya seleccionado se elimina.",
+      "days_will_be_added": "Se añadirán {{count}} día(s) a tu disponibilidad actual",
+      "days_will_be_selected": "Se seleccionarán {{count}} día(s)",
+      "cancel": "Cancelar",
+      "confirm_replace": "Confirmar — reemplazar con {{count}} días",
+      "confirm_merge": "Confirmar — fusionar {{count}} días",
+      "apply_days": "Aplicar {{count}} días"
+    },
+    "calendar_source_picker": {
+      "use_calendar_placeholder": "Usar uno de mis calendarios…",
+      "my_archive_group": "Mi archivo",
+      "platform_calendars_group": "Calendarios de la plataforma",
+      "import_ics": "Importar archivo .ics",
+      "quick_fill_button": "Relleno rápido (regla Lun → Lun)",
+      "manage_calendars": "Gestionar calendarios",
+      "select_day_tip_title": "Selecciona al menos un día (o importa un calendario) para crear la regla",
+      "select_day_tip_desc": "Consejo: elige el día de carrera de cada ronda, ej. {{date}}",
+      "no_events_in_ics": "No se encontraron eventos en este archivo .ics",
+      "could_not_read_ics": "No se pudo leer el archivo .ics",
+      "select_day_first": "Selecciona primero al menos un día",
+      "name_prompt": "Nombre del calendario (ej. F4 Italiano 2027)",
+      "calendar_saved": "Calendario guardado en tu archivo",
+      "save_failed": "Error al guardar",
+      "save_as_my_calendar": "Guardar como mi calendario"
+    },
+    "back_button": {
+      "label": "Atrás"
+    }
+  }
+}

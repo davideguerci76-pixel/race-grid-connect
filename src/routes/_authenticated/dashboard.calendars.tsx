@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -17,10 +19,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/calendars")({
   component: ManageCalendarsPage,
   head: () => ({
     meta: [
-      { title: "Manage calendars — Pit Call" },
-      { name: "description", content: "Create, import and share championship calendars to use in your Pit Calls and availability." },
-      { property: "og:title", content: "Manage calendars — Pit Call" },
-      { property: "og:description", content: "Build custom motorsport calendars, import .ics files and reuse them anywhere on Pit Call." },
+      { title: i18n.t("sweep_public.dashboard_calendars.meta_title") },
+      { name: "description", content: i18n.t("sweep_public.dashboard_calendars.meta_description") },
+      { property: "og:title", content: i18n.t("sweep_public.dashboard_calendars.meta_title") },
+      { property: "og:description", content: i18n.t("sweep_public.dashboard_calendars.meta_og_description") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,6 +33,7 @@ const btn =
   "inline-flex items-center gap-2 border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest hover:border-racing-red hover:text-racing-red transition-colors";
 
 function ManageCalendarsPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const list = useServerFn(listMyCalendars);
   const save = useServerFn(saveCalendar);
@@ -49,42 +52,42 @@ function ManageCalendarsPage() {
     mutationFn: (payload: { id?: string; name: string; dates: string[]; source: "manual" | "ics" }) =>
       save({ data: { ...payload, events: daysToEvents(payload.dates) } }),
     onSuccess: () => {
-      toast.success("Calendar saved");
+      toast.success(t("sweep_public.dashboard_calendars.toast.calendar_saved"));
       setEditing(null);
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.save_failed")),
   });
 
   const delMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: () => {
-      toast.success("Calendar deleted");
+      toast.success(t("sweep_public.dashboard_calendars.toast.calendar_deleted"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Delete failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.delete_failed")),
   });
 
   const submitMut = useMutation({
     mutationFn: (id: string) => submit({ data: { id } }),
     onSuccess: () => {
-      toast.success("Sent to the platform for review. You'll be rewarded in tokens if it gets approved.");
+      toast.success(t("sweep_public.dashboard_calendars.toast.submitted_for_review"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Submit failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.submit_failed")),
   });
 
   const importIcs = async (file: File) => {
     try {
       const events = parseIcs(await file.text());
       if (!events.length) {
-        toast.error("No events found in this .ics file");
+        toast.error(t("sweep_public.dashboard_calendars.toast.no_events_in_ics"));
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), dates: [] });
       setQuickEvents(events);
     } catch {
-      toast.error("Could not read the .ics file");
+      toast.error(t("sweep_public.dashboard_calendars.toast.could_not_read_ics"));
     }
   };
 
@@ -96,18 +99,17 @@ function ManageCalendarsPage() {
       </div>
       <div className="container-page py-12">
         <div className="label-mono">[MANAGE CALENDARS]</div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">My calendars</h1>
+        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("sweep_public.dashboard_calendars.title")}</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Build your own championship calendars, import an existing <span className="font-bold">.ics</span> file, and reuse them instantly for your Pit Calls
-          or your availability — even if they are not part of the official platform database.
+          {t("sweep_public.dashboard_calendars.description")}
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">
           <button type="button" className={btn} onClick={() => setEditing({ name: "", dates: [] })}>
-            <ListChecks className="size-3.5" /> New calendar
+            <ListChecks className="size-3.5" /> {t("sweep_public.dashboard_calendars.new_calendar")}
           </button>
           <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
-            <Upload className="size-3.5" /> Import .ics file
+            <Upload className="size-3.5" /> {t("sweep_public.dashboard_calendars.import_ics")}
           </button>
           <input
             ref={fileRef}
@@ -124,11 +126,11 @@ function ManageCalendarsPage() {
 
         {editing && (
           <div className="mt-6 border border-border bg-card p-6">
-            <div className="label-mono">[{editing.id ? "EDIT" : "NEW"} CALENDAR]</div>
+            <div className="label-mono">[{editing.id ? t("sweep_public.dashboard_calendars.edit_calendar_bracket") : t("sweep_public.dashboard_calendars.new_calendar_bracket")}]</div>
             <input
               value={editing.name}
               onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-              placeholder="Calendar name (e.g. F4 Italian 2027)"
+              placeholder={t("sweep_public.dashboard_calendars.calendar_name_placeholder")}
               className="mt-2 w-full max-w-md border border-border bg-background px-3 py-2 text-sm"
             />
             <div className="mt-3 flex flex-wrap gap-2">
@@ -138,23 +140,23 @@ function ManageCalendarsPage() {
                 onClick={() => {
                   const events = daysToEvents(editing.dates);
                   if (!events.length) {
-                    toast.error("Select the race days first, then apply the logistics rule");
+                    toast.error(t("sweep_public.dashboard_calendars.quick_fill_error"));
                     return;
                   }
                   setQuickEvents(events);
                 }}
               >
-                <ListChecks className="size-3.5" /> Quick fill (Mon → Mon rule)
+                <ListChecks className="size-3.5" /> {t("sweep_public.dashboard_calendars.quick_fill_button")}
               </button>
               <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
-                <Upload className="size-3.5" /> Import .ics file
+                <Upload className="size-3.5" /> {t("sweep_public.dashboard_calendars.import_ics")}
               </button>
             </div>
             <div className="mt-4">
               <AvailabilityCalendar
                 selected={editing.dates.map((d) => dateOf(d))}
                 onSelect={(dates) => setEditing({ ...editing, dates: (dates ?? []).map(isoOf).sort() })}
-                legend="Selected (green) days = working days of this calendar."
+                legend={t("sweep_public.dashboard_calendars.calendar_legend")}
               />
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -162,7 +164,7 @@ function ManageCalendarsPage() {
                 type="button"
                 onClick={() => {
                   if (!editing.name.trim()) {
-                    toast.error("Give your calendar a name");
+                    toast.error(t("sweep_public.dashboard_calendars.toast.give_calendar_name"));
                     return;
                   }
                   saveMut.mutate({ id: editing.id, name: editing.name.trim(), dates: editing.dates, source: "manual" });
@@ -170,10 +172,10 @@ function ManageCalendarsPage() {
                 disabled={saveMut.isPending}
                 className="bg-racing-red px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
               >
-                Save calendar ({editing.dates.length} days)
+                {t("sweep_public.dashboard_calendars.save_calendar_button", { count: editing.dates.length })}
               </button>
               <button type="button" className={btn} onClick={() => setEditing(null)}>
-                Cancel
+                {t("sweep_public.dashboard_calendars.cancel")}
               </button>
             </div>
           </div>
@@ -186,7 +188,7 @@ function ManageCalendarsPage() {
                 <div>
                   <div className="text-sm font-bold uppercase">{c.name}</div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {c.dates.length} days · {c.events.length} events · {c.source}
+                    {t("sweep_public.dashboard_calendars.days_events_source", { days: c.dates.length, events: c.events.length, source: c.source })}
                   </div>
                 </div>
                 <span
@@ -205,40 +207,40 @@ function ManageCalendarsPage() {
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button type="button" className={btn} onClick={() => setEditing({ id: c.id, name: c.name, dates: c.dates })}>
-                  Edit
+                  {t("sweep_public.dashboard_calendars.edit")}
                 </button>
                 <button
                   type="button"
                   className={btn}
                   onClick={() => downloadFile(`${c.name.replace(/[^a-z0-9\-_]+/gi, "_")}.ics`, buildIcsFromEvents(c.name, c.events.length ? c.events : daysToEvents(c.dates)), "text/calendar;charset=utf-8")}
                 >
-                  <Download className="size-3.5" /> Export .ics
+                  <Download className="size-3.5" /> {t("sweep_public.dashboard_calendars.export_ics")}
                 </button>
                 {(c.review_status === "private" || c.review_status === "rejected") && (
                   <button type="button" className={btn} onClick={() => submitMut.mutate(c.id)}>
-                    <Send className="size-3.5" /> Submit for review
+                    <Send className="size-3.5" /> {t("sweep_public.dashboard_calendars.submit_review")}
                   </button>
                 )}
                 <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
-                  <Trash2 className="size-3.5" /> Delete
+                  <Trash2 className="size-3.5" /> {t("sweep_public.dashboard_calendars.delete")}
                 </button>
               </div>
             </div>
           ))}
           {mine.length === 0 && !editing && (
-            <p className="text-sm text-muted-foreground">No calendars yet — create one from scratch or import an .ics file.</p>
+            <p className="text-sm text-muted-foreground">{t("sweep_public.dashboard_calendars.no_calendars")}</p>
           )}
         </div>
 
         {shared.length > 0 && (
           <div className="mt-12">
-            <div className="label-mono">[PLATFORM CALENDARS]</div>
+            <div className="label-mono">{t("sweep_public.dashboard_calendars.platform_calendars")}</div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               {shared.map((c) => (
                 <div key={c.id} className="border border-border bg-card p-4">
                   <div className="text-sm font-bold uppercase">{c.name}</div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {c.dates.length} days · approved
+                    {t("sweep_public.dashboard_calendars.days_approved", { days: c.dates.length })}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
@@ -246,7 +248,7 @@ function ManageCalendarsPage() {
                       className={btn}
                       onClick={() => setEditing({ name: `${c.name} (copy)`, dates: c.dates })}
                     >
-                      Copy to my archive
+                      {t("sweep_public.dashboard_calendars.copy_to_archive")}
                     </button>
                   </div>
                 </div>

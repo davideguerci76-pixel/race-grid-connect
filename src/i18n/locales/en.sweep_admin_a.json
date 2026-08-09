@@ -1,0 +1,96 @@
+{
+  "sweep_admin_a": {
+    "checking_access": "Checking access…",
+    "admin_label": "Admin",
+    "control_panel": "Control Panel",
+    "tabs": {
+      "freelancers": "Freelancers",
+      "teams": "Teams",
+      "pitcalls": "Pit Calls",
+      "permissions": "Permissions",
+      "matching": "Matching",
+      "tokens": "Tokens",
+      "reviews": "Reviews",
+      "calendars": "Calendars",
+      "wiki": "Platform Wiki"
+    },
+    "time_machine": {
+      "title": "Time Machine (Admin debug)",
+      "description": "Advance the simulated clock to test rating windows without waiting real days. Applies globally to all rating time checks.",
+      "days_offset": "days offset",
+      "apply": "Apply",
+      "reset": "Reset",
+      "emit_rating_now": "Emit rating notifications now",
+      "emit_calendar_now": "Emit calendar-stale notifications now",
+      "simulated_clock": "Simulated clock: +{{count}} day(s)",
+      "emitted_rating": "Emitted {{count}} rating notifications",
+      "emitted_calendar": "Emitted {{count}} calendar-stale notifications"
+    },
+    "failed": "Failed",
+    "loading": "Loading…",
+    "invalid_number": "Invalid number",
+    "tokens_updated": "Tokens updated",
+    "confirm_unblock": "Unblock this user?",
+    "confirm_block": "Block this user?",
+    "unblocked": "Unblocked",
+    "blocked": "Blocked",
+    "confirm_delete": "Permanently delete {{name}}? This cannot be undone.",
+    "user_deleted": "User deleted",
+    "export_to_excel": "Export to Excel",
+    "status": {
+      "blocked": "Blocked",
+      "active": "Active"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "macro_role": "Macro-role",
+      "disciplines": "Disciplines",
+      "skills": "Skills",
+      "languages": "Languages",
+      "location": "Location",
+      "phone": "Phone",
+      "rate": "Rate",
+      "rating": "Rating",
+      "tokens": "Tokens",
+      "status": "Status",
+      "actions": "Actions",
+      "action": "Action",
+      "team": "Team",
+      "contact": "Contact",
+      "discipline": "Discipline",
+      "website": "Website",
+      "type": "Type",
+      "roles": "Roles"
+    },
+    "actions": {
+      "view": "View",
+      "tokens": "Tokens",
+      "unblock": "Unblock",
+      "block": "Block",
+      "delete": "Delete"
+    },
+    "freelancers": {
+      "new_token_balance": "New token balance:",
+      "search_placeholder": "Search name, email, skill…",
+      "all_roles": "All roles",
+      "count": "{{count}} freelancers"
+    },
+    "teams": {
+      "search_placeholder": "Search team, contact, email…",
+      "count": "{{count}} teams"
+    },
+    "permissions": {
+      "search_placeholder": "Search users…",
+      "count": "{{count}} users",
+      "confirm_revoke": "Revoke admin from {{name}}?",
+      "confirm_grant": "Grant admin to {{name}}?",
+      "role_updated": "Role updated",
+      "admin_badge": "ADMIN",
+      "user_badge": "user",
+      "primary_admin": "Primary admin",
+      "revoke_admin": "Revoke admin",
+      "grant_admin": "Grant admin"
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalenda
 import { BackButton } from "@/components/back-button";
 import { CalendarSourcePicker } from "@/components/calendar-source-picker";
 import { dateOf, isoOf } from "@/lib/ics";
+import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
 
 function CalendarPage() {
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -64,7 +66,7 @@ function CalendarPage() {
       toast.success(t("calendar.confirm_success", { defaultValue: "Availability confirmed. You keep top visibility in matches." }));
       qc.invalidateQueries({ queryKey: ["my-calendar-freshness"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
   });
 
   const lastUpdated = freshness?.calendar_last_updated_at ? new Date(freshness.calendar_last_updated_at) : null;
@@ -90,7 +92,7 @@ function CalendarPage() {
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
   });
 
   if (profile?.user_type !== "freelancer") {
@@ -98,7 +100,7 @@ function CalendarPage() {
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
-        <div className="container-page py-12 text-sm text-muted-foreground">Redirecting…</div>
+        <div className="container-page py-12 text-sm text-muted-foreground">{t("sweep_public.dashboard_calendar.redirecting")}</div>
         <SiteFooter />
       </div>
     );
@@ -121,7 +123,7 @@ function CalendarPage() {
                 ? t("calendar.last_confirmed", {
                     defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}",
                     days: daysSince,
-                    date: lastUpdated.toLocaleDateString(),
+                    date: formatDate(lastUpdated),
                   })
                 : t("calendar.never_confirmed", { defaultValue: "Never confirmed yet" })}
             </div>
@@ -143,9 +145,9 @@ function CalendarPage() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-4 font-mono text-[11px] uppercase tracking-widest">
-          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> Unavailable</span>
-          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> Available</span>
-          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> Engaged (locked)</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> {t("sweep_public.dashboard_calendar.legend_unavailable")}</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> {t("sweep_public.dashboard_calendar.legend_available")}</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> {t("sweep_public.dashboard_calendar.legend_engaged")}</span>
         </div>
 
         <div className="mt-6">
@@ -153,14 +155,14 @@ function CalendarPage() {
             className="mb-3"
             value={selectedDates.map(isoOf)}
             onChange={(dates) => mutation.mutate(dates.map(dateOf))}
-            saveLabel="Save availability as calendar"
+            saveLabel={t("sweep_public.dashboard_calendar.save_availability_label")}
           />
           <AvailabilityCalendar
             selected={selectedDates}
             blocked={blockedDates}
             onSelect={(d) => mutation.mutate(d)}
             min={new Date()}
-            legend="Click a day to toggle availability. Red = confirmed match, cannot be edited."
+            legend={t("sweep_public.dashboard_calendar.calendar_legend")}
           />
         </div>
       </div>

@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Flag, Snowflake, Trash2, Check } from "lucide-react";
 import { adminListRatings, adminModerateRating } from "@/lib/admin.functions";
 import { RatingIcons } from "@/components/rating-icons";
+import { useDateFormat } from "@/lib/date-locale";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_authenticated/admin/reviews")({
   component: AdminReviews,
@@ -14,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/admin/reviews")({
 type Filter = "all" | "flagged" | "frozen" | "auto_suspicious";
 
 function AdminReviews() {
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const listFn = useServerFn(adminListRatings);
   const modFn = useServerFn(adminModerateRating);
   const qc = useQueryClient();
@@ -29,23 +33,23 @@ function AdminReviews() {
       modFn({ data: v }),
     onSuccess: (_r, v) => {
       const map: Record<string, string> = {
-        freeze: "Rating frozen",
-        delete: "Rating deleted",
-        approve: "Rating approved",
+        freeze: t("sweep_admin_b.reviews.rating_frozen"),
+        delete: t("sweep_admin_b.reviews.rating_deleted"),
+        approve: t("sweep_admin_b.reviews.rating_approved"),
       };
       toast.success(map[v.action]);
       qc.invalidateQueries({ queryKey: ["admin-ratings"] });
       qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: (e: any) => toast.error(e?.message ?? t("sweep_admin_b.common.failed")),
   });
 
   const filters: { key: Filter; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "flagged", label: "Flagged" },
-    { key: "frozen", label: "Frozen" },
-    { key: "auto_suspicious", label: "Auto-suspicious" },
+    { key: "all", label: t("sweep_admin_b.reviews.filter_all") },
+    { key: "flagged", label: t("sweep_admin_b.reviews.filter_flagged") },
+    { key: "frozen", label: t("sweep_admin_b.reviews.filter_frozen") },
+    { key: "auto_suspicious", label: t("sweep_admin_b.reviews.filter_auto_suspicious") },
   ];
 
   const rows = (data ?? []) as any[];
@@ -66,27 +70,27 @@ function AdminReviews() {
             {f.label}
           </button>
         ))}
-        <div className="ml-auto text-xs text-muted-foreground">{rows.length} ratings</div>
+        <div className="ml-auto text-xs text-muted-foreground">{t("sweep_admin_b.reviews.ratings_count", { count: rows.length })}</div>
       </div>
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground">Loading…</div>
+        <div className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</div>
       ) : rows.length === 0 ? (
         <div className="border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No ratings match this filter.
+          {t("sweep_admin_b.reviews.no_match")}
         </div>
       ) : (
         <div className="overflow-auto border border-border">
           <table className="w-full min-w-[1100px] text-xs">
             <thead className="bg-secondary text-[10px] font-bold uppercase tracking-widest">
               <tr>
-                <th className="px-2 py-2 text-left">Date</th>
-                <th className="px-2 py-2 text-left">From → To</th>
-                <th className="px-2 py-2 text-left">Engagement</th>
-                <th className="px-2 py-2 text-left">Rating</th>
-                <th className="px-2 py-2 text-left">Comment</th>
-                <th className="px-2 py-2 text-left">Status</th>
-                <th className="px-2 py-2 text-right">Actions</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_date")}</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_from_to")}</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_engagement")}</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_rating")}</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_comment")}</th>
+                <th className="px-2 py-2 text-left">{t("sweep_admin_b.reviews.col_status")}</th>
+                <th className="px-2 py-2 text-right">{t("sweep_admin_b.reviews.col_actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -106,7 +110,7 @@ function AdminReviews() {
                 return (
                   <tr key={r.id} className="border-t border-border/60 align-top hover:bg-secondary/40">
                     <td className="px-2 py-2 font-mono text-[10px] text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString()}
+                      {formatDate(r.created_at)}
                     </td>
                     <td className="px-2 py-2">
                       <div>{from?.display_name ?? "—"} <span className="text-muted-foreground">({from?.user_type ?? "?"})</span></div>
@@ -131,7 +135,7 @@ function AdminReviews() {
                       </span>
                       {r.auto_suspicious && (
                         <div className="mt-1 inline-flex items-center gap-1 border border-racing-yellow bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                          Auto-suspicious
+                          {t("sweep_admin_b.reviews.auto_suspicious")}
                         </div>
                       )}
                     </td>
@@ -142,25 +146,25 @@ function AdminReviews() {
                           disabled={mut.isPending || r.moderation_status === "frozen"}
                           className="inline-flex items-center gap-1 border border-racing-yellow px-2 py-1 font-mono text-[10px] font-bold uppercase text-racing-yellow hover:bg-racing-yellow/10 disabled:opacity-50"
                         >
-                          <Snowflake className="size-3" /> Freeze
+                          <Snowflake className="size-3" /> {t("sweep_admin_b.reviews.freeze")}
                         </button>
                         <button
                           onClick={() => mut.mutate({ rating_id: r.id, action: "approve" })}
                           disabled={mut.isPending || r.moderation_status === "approved"}
                           className="inline-flex items-center gap-1 border border-emerald-500 px-2 py-1 font-mono text-[10px] font-bold uppercase text-emerald-500 hover:bg-emerald-500/10 disabled:opacity-50"
                         >
-                          <Check className="size-3" /> Approve
+                          <Check className="size-3" /> {t("sweep_admin_b.reviews.approve")}
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm("Delete this rating permanently? This cannot be undone.")) {
+                            if (confirm(t("sweep_admin_b.reviews.confirm_delete"))) {
                               mut.mutate({ rating_id: r.id, action: "delete" });
                             }
                           }}
                           disabled={mut.isPending}
                           className="inline-flex items-center gap-1 border border-racing-red px-2 py-1 font-mono text-[10px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-50"
                         >
-                          <Trash2 className="size-3" /> Delete
+                          <Trash2 className="size-3" /> {t("sweep_admin_b.reviews.delete")}
                         </button>
                       </div>
                     </td>

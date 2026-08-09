@@ -1,0 +1,96 @@
+{
+  "sweep_admin_a": {
+    "checking_access": "Zugriff wird geprüft…",
+    "admin_label": "Admin",
+    "control_panel": "Kontrollzentrum",
+    "tabs": {
+      "freelancers": "Freelancer",
+      "teams": "Teams",
+      "pitcalls": "Pit Calls",
+      "permissions": "Berechtigungen",
+      "matching": "Matching",
+      "tokens": "Tokens",
+      "reviews": "Bewertungen",
+      "calendars": "Kalender",
+      "wiki": "Plattform-Wiki"
+    },
+    "time_machine": {
+      "title": "Zeitmaschine (Admin-Debug)",
+      "description": "Stellen Sie die simulierte Uhr vor, um Bewertungsfenster zu testen, ohne echte Tage abzuwarten. Gilt global für alle Zeitprüfungen bei Bewertungen.",
+      "days_offset": "Tage Versatz",
+      "apply": "Anwenden",
+      "reset": "Zurücksetzen",
+      "emit_rating_now": "Bewertungsbenachrichtigungen jetzt senden",
+      "emit_calendar_now": "Kalender-veraltet-Benachrichtigungen jetzt senden",
+      "simulated_clock": "Simulierte Uhr: +{{count}} Tag(e)",
+      "emitted_rating": "{{count}} Bewertungsbenachrichtigungen gesendet",
+      "emitted_calendar": "{{count}} Kalender-veraltet-Benachrichtigungen gesendet"
+    },
+    "failed": "Fehlgeschlagen",
+    "loading": "Wird geladen…",
+    "invalid_number": "Ungültige Zahl",
+    "tokens_updated": "Tokens aktualisiert",
+    "confirm_unblock": "Diesen Benutzer entsperren?",
+    "confirm_block": "Diesen Benutzer sperren?",
+    "unblocked": "Entsperrt",
+    "blocked": "Gesperrt",
+    "confirm_delete": "{{name}} dauerhaft löschen? Dies kann nicht rückgängig gemacht werden.",
+    "user_deleted": "Benutzer gelöscht",
+    "export_to_excel": "Nach Excel exportieren",
+    "status": {
+      "blocked": "Gesperrt",
+      "active": "Aktiv"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "E-Mail",
+      "macro_role": "Makro-Rolle",
+      "disciplines": "Disziplinen",
+      "skills": "Fähigkeiten",
+      "languages": "Sprachen",
+      "location": "Standort",
+      "phone": "Telefon",
+      "rate": "Tagessatz",
+      "rating": "Bewertung",
+      "tokens": "Tokens",
+      "status": "Status",
+      "actions": "Aktionen",
+      "action": "Aktion",
+      "team": "Team",
+      "contact": "Kontakt",
+      "discipline": "Disziplin",
+      "website": "Website",
+      "type": "Typ",
+      "roles": "Rollen"
+    },
+    "actions": {
+      "view": "Ansehen",
+      "tokens": "Tokens",
+      "unblock": "Entsperren",
+      "block": "Sperren",
+      "delete": "Löschen"
+    },
+    "freelancers": {
+      "new_token_balance": "Neuer Token-Kontostand:",
+      "search_placeholder": "Name, E-Mail, Fähigkeit suchen…",
+      "all_roles": "Alle Rollen",
+      "count": "{{count}} Freelancer"
+    },
+    "teams": {
+      "search_placeholder": "Team, Kontakt, E-Mail suchen…",
+      "count": "{{count}} Teams"
+    },
+    "permissions": {
+      "search_placeholder": "Benutzer suchen…",
+      "count": "{{count}} Benutzer",
+      "confirm_revoke": "Admin-Rechte von {{name}} widerrufen?",
+      "confirm_grant": "Admin-Rechte für {{name}} gewähren?",
+      "role_updated": "Rolle aktualisiert",
+      "admin_badge": "ADMIN",
+      "user_badge": "Benutzer",
+      "primary_admin": "Primärer Admin",
+      "revoke_admin": "Admin widerrufen",
+      "grant_admin": "Admin gewähren"
+    }
+  }
+}

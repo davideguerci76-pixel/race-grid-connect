@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { addDaysIso, mondayOf, type CalendarEventItem } from "@/lib/ics";
 
@@ -35,7 +36,7 @@ export function CalendarQuickFillDialog({
   open,
   onOpenChange,
   events,
-  title = "Quick fill — logistics rule",
+  title,
   onApply,
   showMode = false,
   existingCount = 0,
@@ -48,6 +49,8 @@ export function CalendarQuickFillDialog({
   showMode?: boolean;
   existingCount?: number;
 }) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("sweep_public.calendar_quick_fill.default_title");
   const [rule, setRule] = useState<boolean[]>(DEFAULT_RULE);
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
@@ -66,16 +69,15 @@ export function CalendarQuickFillDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">{title}</DialogTitle>
+          <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">{resolvedTitle}</DialogTitle>
         </DialogHeader>
 
         <p className="text-xs text-muted-foreground">
-          Set your standard logistics week (Monday → Monday). Friday, Saturday and Sunday are preselected — adjust them (e.g. leave on Wednesday, return on
-          Monday) and apply the rule to all {events.length} event{events.length === 1 ? "" : "s"} in one click. You can still fine-tune single rounds below.
+          {t(events.length === 1 ? "sweep_public.calendar_quick_fill.description" : "sweep_public.calendar_quick_fill.description_plural", { count: events.length })}
         </p>
 
         <div className="border border-border bg-card p-4">
-          <div className="label-mono">[STANDARD WEEK — APPLIED TO ALL EVENTS]</div>
+          <div className="label-mono">{t("sweep_public.calendar_quick_fill.standard_week_label")}</div>
           <div className="mt-2">
             <SlotRow rule={rule} onToggle={(i) => setRule(rule.map((v, j) => (j === i ? !v : v)))} />
           </div>
@@ -85,14 +87,14 @@ export function CalendarQuickFillDialog({
               onClick={() => setPerEvent({})}
               className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
             >
-              Apply to all events
+              {t("sweep_public.calendar_quick_fill.apply_to_all")}
             </button>
             <button
               type="button"
               onClick={() => setRule(DEFAULT_RULE)}
               className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
             >
-              Reset weekend default
+              {t("sweep_public.calendar_quick_fill.reset_weekend_default")}
             </button>
           </div>
         </div>
@@ -103,7 +105,7 @@ export function CalendarQuickFillDialog({
             onClick={() => setExpanded(!expanded)}
             className="label-mono hover:text-racing-red"
           >
-            [{expanded ? "HIDE" : "FINE-TUNE"} SINGLE EVENTS ({events.length})]
+            {t("sweep_public.calendar_quick_fill.fine_tune_toggle", { action: expanded ? t("sweep_public.calendar_quick_fill.hide") : t("sweep_public.calendar_quick_fill.fine_tune"), count: events.length })}
           </button>
           {expanded && (
             <div className="mt-3 space-y-3">
@@ -134,7 +136,7 @@ export function CalendarQuickFillDialog({
 
         {showMode && (
           <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="label-mono">[REPLACE OR MERGE]</div>
+            <div className="label-mono">{t("sweep_public.calendar_quick_fill.replace_or_merge")}</div>
             <div className="mt-2 flex flex-wrap gap-2">
               {(["replace", "merge"] as ApplyMode[]).map((m) => (
                 <button
@@ -145,22 +147,22 @@ export function CalendarQuickFillDialog({
                     mode === m ? "border-racing-red bg-racing-red/15 text-racing-red" : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {m === "replace" ? "Replace" : "Merge"}
+                  {m === "replace" ? t("sweep_public.calendar_quick_fill.replace") : t("sweep_public.calendar_quick_fill.merge")}
                 </button>
               ))}
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
-              <strong>Replace:</strong> removes your {existingCount} currently selected day(s) and keeps only this calendar.
+              <span dangerouslySetInnerHTML={{ __html: t("sweep_public.calendar_quick_fill.replace_desc", { count: existingCount }) }} />
               <br />
-              <strong>Merge:</strong> adds this calendar on top of your current availability — nothing you already selected is removed.
+              <span dangerouslySetInnerHTML={{ __html: t("sweep_public.calendar_quick_fill.merge_desc") }} />
             </p>
           </div>
         )}
 
         <div className="font-mono text-xs text-racing-red">
           {mode === "merge" && showMode
-            ? `${result.length} day(s) will be added to your current availability`
-            : `${result.length} day(s) will be selected`}
+            ? t("sweep_public.calendar_quick_fill.days_will_be_added", { count: result.length })
+            : t("sweep_public.calendar_quick_fill.days_will_be_selected", { count: result.length })}
         </div>
 
         <DialogFooter>
@@ -169,7 +171,7 @@ export function CalendarQuickFillDialog({
             onClick={() => onOpenChange(false)}
             className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
           >
-            Cancel
+            {t("sweep_public.calendar_quick_fill.cancel")}
           </button>
           <button
             type="button"
@@ -179,7 +181,11 @@ export function CalendarQuickFillDialog({
             }}
             className="bg-racing-red px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110"
           >
-            {showMode ? (mode === "replace" ? `Confirm — replace with ${result.length} days` : `Confirm — merge ${result.length} days`) : `Apply ${result.length} days`}
+            {showMode
+              ? mode === "replace"
+                ? t("sweep_public.calendar_quick_fill.confirm_replace", { count: result.length })
+                : t("sweep_public.calendar_quick_fill.confirm_merge", { count: result.length })
+              : t("sweep_public.calendar_quick_fill.apply_days", { count: result.length })}
           </button>
         </DialogFooter>
 

@@ -1,4 +1,6 @@
 import { DayPicker, type MonthCaptionProps } from "react-day-picker";
+import { useTranslation } from "react-i18next";
+import { useDateFormat } from "@/lib/date-locale";
 import "react-day-picker/style.css";
 
 function ymd(d: Date) {
@@ -27,6 +29,8 @@ export function AvailabilityCalendar({
   bulkMonths?: number;
   blocked?: Date[];
 }) {
+  const { t } = useTranslation();
+  const { formatMonthYear, dateFnsLocale } = useDateFormat();
   const blockedSet = new Set((blocked ?? []).map((d) => ymd(d)));
   const isBlocked = (d: Date) => blockedSet.has(ymd(d));
   const isDisabled = (d: Date) => {
@@ -77,8 +81,7 @@ export function AvailabilityCalendar({
     onSelect(selected.filter((d) => !(d.getFullYear() === year && d.getMonth() === month)));
   };
 
-  const monthLabel = (year: number, month: number) =>
-    new Date(year, month, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const monthLabel = (year: number, month: number) => formatMonthYear(new Date(year, month, 1));
 
   const MonthCaption = (props: MonthCaptionProps) => {
     const d = props.calendarMonth.date;
@@ -96,7 +99,7 @@ export function AvailabilityCalendar({
             onClick={() => (allChosen ? deselectMonth(y, m) : selectMonth(y, m))}
             className="border border-border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
           >
-            {allChosen ? "Deselect month" : "Select month"}
+            {allChosen ? t("calendar.actions.deselect_month") : t("calendar.actions.select_month")}
           </button>
         </div>
       </div>
@@ -120,14 +123,14 @@ export function AvailabilityCalendar({
                 onClick={selectAll}
                 className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
               >
-                Select all ({bulkMonths}m)
+                {t("calendar.actions.select_all", { months: bulkMonths })}
               </button>
               <button
                 type="button"
                 onClick={() => onSelect([])}
                 className="border border-border px-3 py-1 text-[10px] font-bold uppercase tracking-widest hover:border-racing-red hover:text-racing-red"
               >
-                Deselect all
+                {t("calendar.actions.deselect_all")}
               </button>
             </div>
           )}
@@ -140,6 +143,7 @@ export function AvailabilityCalendar({
         disabled={(d) => isDisabled(d)}
         modifiers={{ blocked: (d) => isBlocked(d) }}
         modifiersClassNames={{ blocked: "rdp-blocked" }}
+        locale={dateFnsLocale}
         weekStartsOn={1}
         showOutsideDays={false}
         numberOfMonths={2}

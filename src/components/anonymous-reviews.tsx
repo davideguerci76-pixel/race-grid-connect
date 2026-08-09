@@ -8,6 +8,7 @@ import { RatingIcons } from "@/components/rating-icons";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { getUserRatingSummary, getAnonymousReviews, unlockReviews, flagRating } from "@/lib/paddock.functions";
+import { useDateFormat } from "@/lib/date-locale";
 
 type Variant = "wrench" | "headset";
 
@@ -146,6 +147,7 @@ export function AnonymousReviewsSection({
   variant?: Variant;
   isOwner?: boolean;
 }) {
+  const { formatDate } = useDateFormat();
   const { t } = useTranslation();
   const qc = useQueryClient();
   const getReviews = useServerFn(getAnonymousReviews);
@@ -214,7 +216,7 @@ export function AnonymousReviewsSection({
                   <div className="flex flex-wrap items-center gap-3">
                     <RatingIcons value={overall} variant={variant} />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {t("reviews.anonymous", { defaultValue: "Anonymous" })} · {new Date(r.created_at).toLocaleDateString()}
+                      {t("reviews.anonymous", { defaultValue: "Anonymous" })} · {formatDate(r.created_at)}
                     </span>
                   </div>
                   {r.id && (

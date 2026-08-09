@@ -1,0 +1,108 @@
+{
+  "sweep_profile": {
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "updated": "Updated",
+      "failed": "Failed",
+      "yes": "Yes",
+      "no": "No",
+      "bio": "Bio",
+      "select": "Select…",
+      "select_all": "Select all",
+      "deselect_all": "Deselect all",
+      "filter": "Filter…",
+      "no_matches": "No matches.",
+      "remove": "Remove"
+    },
+    "header": {
+      "notifications": "Notifications",
+      "admin": "ADMIN",
+      "toggle_menu": "Toggle menu"
+    },
+    "profile": {
+      "loading": "Loading…",
+      "personal_info": "Personal Info",
+      "freelancer_info": "Freelancer Info",
+      "team_info": "Team Info",
+      "no_ratings_yet": "No ratings yet",
+      "email": "Email",
+      "team_name": "Team name",
+      "display_name": "Display name",
+      "tokens_label": "Tokens",
+      "phone_placeholder": "333 123 4567"
+    },
+    "freelancer": {
+      "macro_role": "Macro-role",
+      "select_macro_role": "Select a macro-role…",
+      "select_macro_role_first": "Select a macro-role first to pick your sub-roles.",
+      "headline": "Headline",
+      "headline_placeholder": "e.g. F1 Mechanic – 10 yrs",
+      "disciplines": "Disciplines / Championships",
+      "all_skills": "All skills",
+      "skills_for_role": "Skills for your macro-role",
+      "show_macro_skills": "Show macro-role skills",
+      "show_all_skills": "Show all skills",
+      "skills": "Skills",
+      "day_rate": "Day Rate (EUR)",
+      "day_rate_value": "€{{rate}}/day",
+      "location": "Location",
+      "location_placeholder": "Milan, Italy",
+      "travels_label": "Available to travel for race weekends",
+      "travels": "Travels",
+      "sub_roles": "Sub-roles",
+      "sub_roles_and_level": "Sub-roles & level",
+      "motorsport_experience": "Motorsport experience",
+      "experience_hint": "Add up to {{max}} past championships/categories and the years you spent in each. Pick \"No experience\" if you're new to motorsport.",
+      "add_experience": "+ Add experience",
+      "add_another_experience": "+ Add another experience",
+      "languages": "Languages",
+      "languages_spoken": "Languages spoken",
+      "languages_hint": "Pick each language you speak and its level. Teams can require specific languages on their Pit Calls.",
+      "language_name_placeholder": "Language name",
+      "add_language": "+ Add language",
+      "add_another_language": "+ Add another language",
+      "saved": "Freelancer profile saved",
+      "edit_info": "Edit Freelancer Info"
+    },
+    "team": {
+      "team_name": "Team Name",
+      "team_type": "Team Type",
+      "team_type_placeholder": "e.g. F2 Team, GT Team, Factory",
+      "primary_discipline": "Primary Discipline",
+      "website": "Website",
+      "website_placeholder": "https://…",
+      "type": "Type",
+      "discipline": "Discipline",
+      "saved": "Team profile saved",
+      "edit_info": "Edit Team Info"
+    },
+    "dashboard": {
+      "match_locked": "Match locked in. Contacts unlocked.",
+      "sos_accept_failed": "SOS accept failed",
+      "emergency_job": "Emergency job",
+      "team_fallback": "Team",
+      "accept_sos_confirm": "Accept this SOS Call? First to accept wins — this locks the match immediately.",
+      "accept_sos": "Accept SOS",
+      "manage_calendars": "Manage calendars"
+    },
+    "tokens": {
+      "credited_demo": "+{{count}} tokens credited (demo)",
+      "purchase_failed": "Purchase failed",
+      "demo_mode_notice": "DEMO MODE: Stripe checkout will replace instant credit once you confirm your seller country.",
+      "current_price": "Current token price: € {{price}} / token",
+      "tokens_label": "tokens"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "go_to_engagements": "Go to engagements",
+      "mark_all_read": "Mark all as read",
+      "unread": "UNREAD",
+      "no_notifications": "No notifications yet.",
+      "calendar_stale_message": "Your availability calendar hasn't been updated in a while. Keep it fresh to rank higher in team searches.",
+      "update_calendar": "Update calendar",
+      "view_engagement": "View engagement"
+    }
+  }
+}

@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin-calendars.functions";
 import { buildIcsFromEvents, daysToEvents, dateOf, isoOf, parseIcs, expandRange, type CalendarEventItem } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_authenticated/admin/calendars")({
   component: AdminCalendarsPage,
@@ -25,6 +26,7 @@ const btn =
   "inline-flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors hover:border-racing-red hover:text-racing-red";
 
 function AdminCalendarsPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const list = useServerFn(adminListCalendars);
   const approve = useServerFn(adminApproveCalendar);
@@ -43,12 +45,12 @@ function AdminCalendarsPage() {
   const rejected = rows.filter((r) => r.review_status === "rejected");
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin-calendars"] });
-  const fail = (e: unknown) => toast.error(e instanceof Error ? e.message : "Action failed");
+  const fail = (e: unknown) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.calendars.action_failed"));
 
   const approveMut = useMutation({
     mutationFn: (v: { id: string; name?: string }) => approve({ data: v }),
     onSuccess: (res: any) => {
-      toast.success(res?.credited ? `Approved — ${res.credited} tokens credited to the author` : "Calendar approved");
+      toast.success(res?.credited ? t("sweep_admin_b.calendars.approved_credited", { count: res.credited }) : t("sweep_admin_b.calendars.approved"));
       invalidate();
     },
     onError: fail,
@@ -56,7 +58,7 @@ function AdminCalendarsPage() {
   const rejectMut = useMutation({
     mutationFn: (v: { id: string; note?: string }) => reject({ data: v }),
     onSuccess: () => {
-      toast.success("Calendar rejected");
+      toast.success(t("sweep_admin_b.calendars.rejected"));
       invalidate();
     },
     onError: fail,
@@ -65,7 +67,7 @@ function AdminCalendarsPage() {
     mutationFn: (v: { id?: string; name: string; discipline: string | null; season_year: number | null; dates: string[]; source: "manual" | "ics" }) =>
       upsert({ data: { ...v, events: daysToEvents(v.dates) } }),
     onSuccess: () => {
-      toast.success("Official calendar saved");
+      toast.success(t("sweep_admin_b.calendars.saved"));
       setEditing(null);
       invalidate();
     },
@@ -74,7 +76,7 @@ function AdminCalendarsPage() {
   const delMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
     onSuccess: () => {
-      toast.success("Calendar deleted");
+      toast.success(t("sweep_admin_b.calendars.deleted"));
       invalidate();
     },
     onError: fail,
@@ -84,13 +86,13 @@ function AdminCalendarsPage() {
     try {
       const events = parseIcs(await file.text());
       if (!events.length) {
-        toast.error("No events found in this .ics file");
+        toast.error(t("sweep_admin_b.calendars.no_events_found"));
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), discipline: "", season: String(new Date(events[0]!.start).getFullYear()), dates: [], source: "ics" });
       setQuickEvents(events);
     } catch {
-      toast.error("Could not read the .ics file");
+      toast.error(t("sweep_admin_b.calendars.could_not_read_ics"));
     }
   };
 
@@ -108,10 +110,10 @@ function AdminCalendarsPage() {
     <div className="space-y-10">
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" className={btn} onClick={() => setEditing({ name: "", discipline: "", season: "", dates: [], source: "manual" })}>
-          <CalendarPlus className="size-3.5" /> New official calendar
+          <CalendarPlus className="size-3.5" /> {t("sweep_admin_b.calendars.new_official_calendar")}
         </button>
         <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
-          <Upload className="size-3.5" /> Import .ics file
+          <Upload className="size-3.5" /> {t("sweep_admin_b.calendars.import_ics")}
         </button>
         <input
           ref={fileRef}
@@ -128,24 +130,24 @@ function AdminCalendarsPage() {
 
       {editing && (
         <div className="card-surface rounded-2xl p-6">
-          <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{editing.id ? "Edit" : "New"} official calendar</div>
+          <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{editing.id ? t("sweep_admin_b.calendars.edit_official_calendar") : t("sweep_admin_b.calendars.new_official_calendar_title")}</div>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <input
               value={editing.name}
               onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-              placeholder="Official name (e.g. FIA Formula 1 2027)"
+              placeholder={t("sweep_admin_b.calendars.official_name_placeholder")}
               className="rounded-2xl border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
             />
             <input
               value={editing.season}
               onChange={(e) => setEditing({ ...editing, season: e.target.value.replace(/\D/g, "").slice(0, 4) })}
-              placeholder="Season year"
+              placeholder={t("sweep_admin_b.calendars.season_year_placeholder")}
               className="rounded-2xl border border-border bg-background px-3 py-2 text-sm"
             />
             <input
               value={editing.discipline}
               onChange={(e) => setEditing({ ...editing, discipline: e.target.value })}
-              placeholder="Discipline (optional)"
+              placeholder={t("sweep_admin_b.calendars.discipline_placeholder")}
               className="rounded-2xl border border-border bg-background px-3 py-2 text-sm"
             />
           </div>
@@ -156,23 +158,23 @@ function AdminCalendarsPage() {
               onClick={() => {
                 const events = daysToEvents(editing.dates);
                 if (!events.length) {
-                  toast.error("Select the race days first, then apply the logistics rule");
+                  toast.error(t("sweep_admin_b.calendars.select_race_days_first"));
                   return;
                 }
                 setQuickEvents(events);
               }}
             >
-              <ListChecks className="size-3.5" /> Quick fill (Mon → Mon rule)
+              <ListChecks className="size-3.5" /> {t("sweep_admin_b.calendars.quick_fill")}
             </button>
             <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
-              <Upload className="size-3.5" /> Import .ics file
+              <Upload className="size-3.5" /> {t("sweep_admin_b.calendars.import_ics")}
             </button>
           </div>
           <div className="mt-4">
             <AvailabilityCalendar
               selected={editing.dates.map((d) => dateOf(d))}
               onSelect={(dates) => setEditing({ ...editing, dates: (dates ?? []).map(isoOf).sort() })}
-              legend="Selected (green) days = official working days of this championship."
+              legend={t("sweep_admin_b.calendars.legend")}
             />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -181,7 +183,7 @@ function AdminCalendarsPage() {
               disabled={saveMut.isPending}
               onClick={() => {
                 if (!editing.name.trim()) {
-                  toast.error("Give the calendar an official name");
+                  toast.error(t("sweep_admin_b.calendars.give_official_name"));
                   return;
                 }
                 saveMut.mutate({
@@ -195,18 +197,18 @@ function AdminCalendarsPage() {
               }}
               className="rounded-2xl bg-racing-red px-4 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
             >
-              Publish calendar ({editing.dates.length} days)
+              {t("sweep_admin_b.calendars.publish_calendar", { count: editing.dates.length })}
             </button>
             <button type="button" className={btn} onClick={() => setEditing(null)}>
-              Cancel
+              {t("sweep_admin_b.calendars.cancel")}
             </button>
           </div>
         </div>
       )}
 
-      <Section title="Calendar submissions" subtitle="User-submitted calendars awaiting moderation">
-        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-        {!isLoading && pending.length === 0 && <p className="text-sm text-muted-foreground">No calendars pending review.</p>}
+      <Section title={t("sweep_admin_b.calendars.submissions_title")} subtitle={t("sweep_admin_b.calendars.submissions_subtitle")}>
+        {isLoading && <p className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</p>}
+        {!isLoading && pending.length === 0 && <p className="text-sm text-muted-foreground">{t("sweep_admin_b.calendars.no_pending")}</p>}
         <div className="grid gap-4 md:grid-cols-2">
           {pending.map((c) => (
             <SubmissionCard
@@ -220,18 +222,18 @@ function AdminCalendarsPage() {
         </div>
       </Section>
 
-      <Section title="Official platform calendars" subtitle="Approved and publicly reusable by every user">
-        {official.length === 0 && <p className="text-sm text-muted-foreground">No official calendars yet.</p>}
+      <Section title={t("sweep_admin_b.calendars.official_title")} subtitle={t("sweep_admin_b.calendars.official_subtitle")}>
+        {official.length === 0 && <p className="text-sm text-muted-foreground">{t("sweep_admin_b.calendars.no_official_yet")}</p>}
         <div className="grid gap-4 md:grid-cols-2">
           {official.map((c) => (
             <div key={c.id} className="card-surface rounded-2xl p-4">
               <div className="text-sm font-bold uppercase">{c.name}</div>
               <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                {c.dates.length} days · {c.events.length} events · {c.season_year ?? "—"} · by {c.owner_name}
+                {t("sweep_admin_b.calendars.calendar_summary", { days: c.dates.length, events: c.events.length, season: c.season_year ?? "—", owner: c.owner_name })}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button type="button" className={btn} onClick={() => startEdit(c)}>
-                  <Pencil className="size-3.5" /> Edit
+                  <Pencil className="size-3.5" /> {t("sweep_admin_b.calendars.edit")}
                 </button>
                 <button
                   type="button"
@@ -244,10 +246,10 @@ function AdminCalendarsPage() {
                     )
                   }
                 >
-                  <Download className="size-3.5" /> Export .ics
+                  <Download className="size-3.5" /> {t("sweep_admin_b.calendars.export_ics")}
                 </button>
                 <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
-                  <Trash2 className="size-3.5" /> Delete
+                  <Trash2 className="size-3.5" /> {t("sweep_admin_b.calendars.delete")}
                 </button>
               </div>
             </div>
@@ -256,18 +258,18 @@ function AdminCalendarsPage() {
       </Section>
 
       {rejected.length > 0 && (
-        <Section title="Rejected submissions" subtitle="Users can amend and resubmit these">
+        <Section title={t("sweep_admin_b.calendars.rejected_title")} subtitle={t("sweep_admin_b.calendars.rejected_subtitle")}>
           <div className="grid gap-4 md:grid-cols-2">
             {rejected.map((c) => (
               <div key={c.id} className="card-surface rounded-2xl p-4">
                 <div className="text-sm font-bold uppercase">{c.name}</div>
                 <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                  {c.dates.length} days · by {c.owner_name}
+                  {t("sweep_admin_b.calendars.days_by_owner", { days: c.dates.length, owner: c.owner_name })}
                 </div>
-                {c.review_note && <p className="mt-2 text-sm text-muted-foreground">Reason: {c.review_note}</p>}
+                {c.review_note && <p className="mt-2 text-sm text-muted-foreground">{t("sweep_admin_b.calendars.reason", { reason: c.review_note })}</p>}
                 <div className="mt-3">
                   <button type="button" className={btn} onClick={() => approveMut.mutate({ id: c.id })}>
-                    <Check className="size-3.5" /> Approve anyway
+                    <Check className="size-3.5" /> {t("sweep_admin_b.calendars.approve_anyway")}
                   </button>
                 </div>
               </div>
@@ -317,6 +319,7 @@ function SubmissionCard({
   onReject: (note: string) => void;
   onEdit: () => void;
 }) {
+  const { t } = useTranslation();
   const [name, setName] = useState(c.name);
   const [note, setNote] = useState("");
   const [open, setOpen] = useState(false);
@@ -324,16 +327,16 @@ function SubmissionCard({
   return (
     <div className="card-surface rounded-2xl p-4">
       <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
-        Submitted by {c.owner_name} · {c.dates.length} days · {events.length} rounds
+        {t("sweep_admin_b.calendars.submitted_by", { owner: c.owner_name, days: c.dates.length, rounds: events.length })}
       </div>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="mt-2 w-full rounded-2xl border border-border bg-background px-3 py-2 text-sm font-bold"
-        placeholder="Official name"
+        placeholder={t("sweep_admin_b.calendars.official_name_placeholder2")}
       />
       <button type="button" className="mt-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground" onClick={() => setOpen((v) => !v)}>
-        {open ? "Hide rounds" : `Review ${events.length} rounds`}
+        {open ? t("sweep_admin_b.calendars.hide_rounds") : t("sweep_admin_b.calendars.review_rounds", { count: events.length })}
       </button>
       {open && (
         <ul className="mt-2 max-h-52 space-y-1 overflow-auto text-sm">
@@ -347,11 +350,11 @@ function SubmissionCard({
           ))}
         </ul>
       )}
-      {c.review_note && <p className="mt-2 text-sm text-muted-foreground">Note: {c.review_note}</p>}
+      {c.review_note && <p className="mt-2 text-sm text-muted-foreground">{t("sweep_admin_b.calendars.note", { note: c.review_note })}</p>}
       <input
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder="Rejection reason (optional)"
+        placeholder={t("sweep_admin_b.calendars.rejection_reason_placeholder")}
         className="mt-3 w-full rounded-2xl border border-border bg-background px-3 py-2 text-sm"
       />
       <div className="mt-3 flex flex-wrap gap-2">
@@ -360,13 +363,13 @@ function SubmissionCard({
           className="inline-flex items-center gap-2 rounded-2xl bg-racing-red px-3 py-2 text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110"
           onClick={() => onApprove(name.trim() || c.name)}
         >
-          <Check className="size-3.5" /> Approve & publish
+          <Check className="size-3.5" /> {t("sweep_admin_b.calendars.approve_publish")}
         </button>
         <button type="button" className={btn} onClick={() => onReject(note.trim())}>
-          <X className="size-3.5" /> Reject
+          <X className="size-3.5" /> {t("sweep_admin_b.calendars.reject")}
         </button>
         <button type="button" className={btn} onClick={onEdit}>
-          <Pencil className="size-3.5" /> Edit dates
+          <Pencil className="size-3.5" /> {t("sweep_admin_b.calendars.edit_dates")}
         </button>
       </div>
     </div>

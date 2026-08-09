@@ -66,7 +66,7 @@ function ProfilePage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
-        <div className="container-page py-12 text-sm text-muted-foreground">Loading…</div>
+        <div className="container-page py-12 text-sm text-muted-foreground">{t("sweep_profile.profile.loading")}</div>
         <SiteFooter />
       </div>
     );
@@ -86,13 +86,13 @@ function ProfilePage() {
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
           <div className="border border-border bg-card p-6">
-            <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">Personal Info</h2>
+            <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">{t("sweep_profile.profile.personal_info")}</h2>
             <PersonalInfoSection profile={profile} />
           </div>
 
           <div className="border border-border bg-card p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">
-              {isFreelancer ? "Freelancer Info" : "Team Info"}
+              {isFreelancer ? t("sweep_profile.profile.freelancer_info") : t("sweep_profile.profile.team_info")}
             </h2>
             {isFreelancer ? (
               <FreelancerSection profile={profile?.freelancerProfile} />
@@ -118,7 +118,7 @@ function ProfileRatingBadge({ userId, isFreelancer }: { userId: string; isFreela
     return (
       <div className="border border-border bg-card px-4 py-3 text-right">
         <div className="label-mono text-[10px]">[RATING]</div>
-        <div className="mt-1 font-mono text-[11px] text-muted-foreground">No ratings yet</div>
+        <div className="mt-1 font-mono text-[11px] text-muted-foreground">{t("sweep_profile.profile.no_ratings_yet")}</div>
       </div>
     );
   }
@@ -214,10 +214,10 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
-      toast.success("Updated");
+      toast.success(t("sweep_profile.common.updated"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
   });
 
   const phoneMutation = useMutation({
@@ -247,7 +247,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   return (
     <div className="mt-4 space-y-3">
       <div className="text-sm">
-        <span className="text-muted-foreground">Email:</span>
+        <span className="text-muted-foreground">{t("sweep_profile.profile.email")}:</span>
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
       {isFreelancer && <LegalNameBlock profile={profile} />}
@@ -260,7 +260,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <>
           <div>
             <label className="text-xs text-muted-foreground">
-              {profile?.user_type === "team" ? "Team name" : "Display name"}
+              {profile?.user_type === "team" ? t("sweep_profile.profile.team_name") : t("sweep_profile.profile.display_name")}
             </label>
             <input
               value={displayName}
@@ -270,27 +270,27 @@ function PersonalInfoSection({ profile }: { profile: any }) {
           </div>
           <div className="flex gap-2">
             <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-              Save
+              {t("sweep_profile.common.save")}
             </button>
             <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-              Cancel
+              {t("sweep_profile.common.cancel")}
             </button>
           </div>
         </>
       ) : (
         <>
           <div className="text-sm">
-            <span className="text-muted-foreground">Display name:</span>
+            <span className="text-muted-foreground">{t("sweep_profile.profile.display_name")}:</span>
             <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
           </div>
           <button onClick={() => setEditing(true)} className="text-xs text-racing-red hover:underline">
-            Edit
+            {t("sweep_profile.common.edit")}
           </button>
         </>
       )}
 
       <div className="text-sm">
-        <span className="text-muted-foreground">Tokens:</span>
+        <span className="text-muted-foreground">{t("sweep_profile.profile.tokens_label")}:</span>
         <span className="ml-2 font-mono text-racing-red font-bold">{profile?.token_balance ?? 0}</span>
       </div>
 
@@ -312,7 +312,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="flex-1 min-w-0 border border-border bg-background px-3 py-2 text-sm"
-                  placeholder="333 123 4567"
+                  placeholder={t("sweep_profile.profile.phone_placeholder")}
                 />
               </div>
               <div className="mt-2 flex gap-2">
@@ -320,7 +320,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
                   {t("phone.save")}
                 </button>
                 <button onClick={() => setEditingPhone(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-                  Cancel
+                  {t("sweep_profile.common.cancel")}
                 </button>
               </div>
             </>
@@ -439,23 +439,23 @@ function FreelancerSection({ profile }: { profile: any }) {
         old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), ...(saved ?? {}) } } : old,
       );
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
-      toast.success("Freelancer profile saved");
+      toast.success(t("sweep_profile.freelancer.saved"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
   });
 
   if (editing) {
     return (
       <div className="mt-4 space-y-4">
         <div>
-          <label className="text-xs text-muted-foreground">Macro-role</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.macro_role")}</label>
           <select
             value={form.role_group}
             onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_roles: [], skills: [] })}
             className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
           >
-            <option value="">Select a macro-role…</option>
+            <option value="">{t("sweep_profile.freelancer.select_macro_role")}</option>
             {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
           </select>
         </div>
@@ -465,25 +465,25 @@ function FreelancerSection({ profile }: { profile: any }) {
           onChange={(v) => setForm({ ...form, sub_roles: v })}
         />
         <div>
-          <label className="text-xs text-muted-foreground">Headline</label>
-          <input value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="e.g. F1 Mechanic – 10 yrs" />
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.headline")}</label>
+          <input value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.freelancer.headline_placeholder")} />
         </div>
-        <MultiCheckboxBox label="Disciplines / Championships" options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
+        <MultiCheckboxBox label={t("sweep_profile.freelancer.disciplines")} options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
         <div>
           <div className="mb-1 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {showAllSkills || !form.role_group ? "All skills" : "Skills for your macro-role"}
+              {showAllSkills || !form.role_group ? t("sweep_profile.freelancer.all_skills") : t("sweep_profile.freelancer.skills_for_role")}
             </span>
             <button
               type="button"
               onClick={() => setShowAllSkills((v) => !v)}
               className="font-mono text-[10px] uppercase tracking-widest text-racing-red hover:underline"
             >
-              {showAllSkills ? "Show macro-role skills" : "Show all skills"}
+              {showAllSkills ? t("sweep_profile.freelancer.show_macro_skills") : t("sweep_profile.freelancer.show_all_skills")}
             </button>
           </div>
           <MultiCheckboxBox
-            label="Skills"
+            label={t("sweep_profile.freelancer.skills")}
             options={(showAllSkills || !form.role_group
               ? SKILL_OPTIONS.map((o) => o.value)
               : skillsForGroup(form.role_group)
@@ -501,21 +501,21 @@ function FreelancerSection({ profile }: { profile: any }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-muted-foreground">Day Rate (EUR)</label>
+            <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.day_rate")}</label>
             <input type="number" value={form.day_rate} onChange={(e) => setForm({ ...form, day_rate: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="450" />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Location</label>
+            <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.location")}</label>
             <LocationAutocomplete
               value={form.location}
               onChange={(v) => setForm({ ...form, location: v, location_lat: null, location_lng: null, location_city: null, location_region: null, location_country: null, location_place_id: null })}
               onPick={(p) => setForm({ ...form, location: p.text, location_lat: p.lat, location_lng: p.lng, location_city: p.city, location_region: p.region, location_country: p.country, location_place_id: p.placeId })}
-              placeholder="Milan, Italy"
+              placeholder={t("sweep_profile.freelancer.location_placeholder")}
             />
           </div>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Bio</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.common.bio")}</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
         <ExperienceEditor
@@ -528,11 +528,11 @@ function FreelancerSection({ profile }: { profile: any }) {
         />
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
-          <span className="text-sm">Available to travel for race weekends</span>
+          <span className="text-sm">{t("sweep_profile.freelancer.travels_label")}</span>
         </label>
         <div className="flex gap-2">
-          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">Save</button>
-          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">Cancel</button>
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">{t("sweep_profile.common.save")}</button>
+          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">{t("sweep_profile.common.cancel")}</button>
         </div>
       </div>
     );
@@ -540,9 +540,9 @@ function FreelancerSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <Row label="Macro-role" value={roleGroupLabel(profile?.role_group)} />
+      <Row label={t("sweep_profile.freelancer.macro_role")} value={roleGroupLabel(profile?.role_group)} />
       <div>
-        <div className="text-xs text-muted-foreground">Sub-roles</div>
+        <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.sub_roles")}</div>
         <div className="mt-1 flex flex-wrap gap-1">
           {parseSubRoles(profile?.sub_roles).length ? parseSubRoles(profile?.sub_roles).map((sr) => (
             <span key={sr.sub_role} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-yellow">
@@ -551,9 +551,9 @@ function FreelancerSection({ profile }: { profile: any }) {
           )) : <span className="text-sm">—</span>}
         </div>
       </div>
-      <Row label="Headline" value={profile?.headline ?? "—"} />
+      <Row label={t("sweep_profile.freelancer.headline")} value={profile?.headline ?? "—"} />
       <div>
-        <div className="text-xs text-muted-foreground">Disciplines</div>
+        <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.disciplines")}</div>
         <div className="mt-1 flex flex-wrap gap-1">
           {profile?.disciplines?.length ? profile.disciplines.map((d: string) => (
             <span key={d} className="border border-racing-red/40 bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{disciplineLabel(d)}</span>
@@ -561,20 +561,20 @@ function FreelancerSection({ profile }: { profile: any }) {
         </div>
       </div>
       <div>
-        <div className="text-xs text-muted-foreground">Skills</div>
+        <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.skills")}</div>
         <div className="mt-1 flex flex-wrap gap-1">
           {profile?.skills?.length ? profile.skills.map((s: string) => (
             <span key={s} className="border border-border bg-secondary/40 px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{skillLabel(s)}</span>
           )) : <span className="text-sm">—</span>}
         </div>
       </div>
-      <Row label="Day rate" value={profile?.day_rate ? `€${profile.day_rate}/day` : "—"} mono />
-      <Row label="Location" value={profile?.location ?? "—"} />
+      <Row label={t("sweep_profile.freelancer.day_rate")} value={profile?.day_rate ? t("sweep_profile.freelancer.day_rate_value", { rate: profile.day_rate }) : "—"} mono />
+      <Row label={t("sweep_profile.freelancer.location")} value={profile?.location ?? "—"} />
       
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
-      <Row label="Travels" value={profile?.travels ? "Yes" : "No"} />
+      <Row label={t("sweep_profile.freelancer.travels")} value={profile?.travels ? t("sweep_profile.common.yes") : t("sweep_profile.common.no")} />
       <div>
-        <div className="text-xs text-muted-foreground">Motorsport experience</div>
+        <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.motorsport_experience")}</div>
         <div className="mt-1 space-y-1">
           {Array.isArray(profile?.experiences) && profile.experiences.length ? (
             profile.experiences.map((e: any, i: number) => (
@@ -589,7 +589,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         </div>
       </div>
       <div>
-        <div className="text-xs text-muted-foreground">Languages</div>
+        <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.languages")}</div>
         <div className="mt-1 space-y-1">
           {Array.isArray(profile?.languages) && profile.languages.length ? (
             profile.languages.map((l: any, i: number) => (
@@ -603,8 +603,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           )}
         </div>
       </div>
-      <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
-      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Freelancer Info</button>
+      <div className="text-sm"><span className="text-muted-foreground">{t("sweep_profile.common.bio")}:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
+      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">{t("sweep_profile.freelancer.edit_info")}</button>
     </div>
   );
 }
@@ -678,17 +678,17 @@ function TeamSection({ profile }: { profile: any }) {
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
       qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
-      toast.success("Team profile saved");
+      toast.success(t("sweep_profile.team.saved"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
   });
 
   if (editing) {
     return (
       <div className="mt-4 space-y-4">
         <div>
-          <label className="text-xs text-muted-foreground">Team Name</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_name")}</label>
           <input value={form.team_name} onChange={(e) => setForm({ ...form, team_name: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
         <div>
@@ -705,11 +705,11 @@ function TeamSection({ profile }: { profile: any }) {
           )}
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Team Type</label>
-          <input value={form.team_type} onChange={(e) => setForm({ ...form, team_type: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="e.g. F2 Team, GT Team, Factory" />
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_type")}</label>
+          <input value={form.team_type} onChange={(e) => setForm({ ...form, team_type: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.team.team_type_placeholder")} />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Location</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.location")}</label>
           <LocationAutocomplete
             value={form.location}
             onChange={(v) => setForm({ ...form, location: v, location_lat: null, location_lng: null, location_city: null, location_region: null, location_country: null, location_place_id: null })}
@@ -717,23 +717,23 @@ function TeamSection({ profile }: { profile: any }) {
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Primary Discipline</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.primary_discipline")}</label>
           <select value={form.primary_discipline} onChange={(e) => setForm({ ...form, primary_discipline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
-            <option value="">Select…</option>
+            <option value="">{t("sweep_profile.common.select")}</option>
             {DISCIPLINE_OPTIONS.map((d) => (<option key={d.value} value={d.value}>{d.label}</option>))}
           </select>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Bio</label>
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.common.bio")}</label>
           <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground">Website</label>
-          <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder="https://…" />
+          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.website")}</label>
+          <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.team.website_placeholder")} />
         </div>
         <div className="flex gap-2">
-          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">Save</button>
-          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">Cancel</button>
+          <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">{t("sweep_profile.common.save")}</button>
+          <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">{t("sweep_profile.common.cancel")}</button>
         </div>
       </div>
     );
@@ -746,15 +746,15 @@ function TeamSection({ profile }: { profile: any }) {
       {!(profile as any)?.vat_number && (
         <p className="border border-racing-red/50 bg-racing-red/10 p-2 text-[11px] text-racing-red">{t("team.vat_required_banner")}</p>
       )}
-      <Row label="Type" value={profile?.team_type ?? "—"} />
-      <Row label="Location" value={profile?.location ?? "—"} />
-      <Row label="Discipline" value={disciplineLabel(profile?.primary_discipline)} mono />
+      <Row label={t("sweep_profile.team.type")} value={profile?.team_type ?? "—"} />
+      <Row label={t("sweep_profile.freelancer.location")} value={profile?.location ?? "—"} />
+      <Row label={t("sweep_profile.team.discipline")} value={disciplineLabel(profile?.primary_discipline)} mono />
       <div className="text-sm">
-        <span className="text-muted-foreground">Website:</span>
+        <span className="text-muted-foreground">{t("sweep_profile.team.website")}:</span>
         <span className="ml-2">{profile?.website ? <a href={profile.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{profile.website}</a> : "—"}</span>
       </div>
-      <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
-      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Team Info</button>
+      <div className="text-sm"><span className="text-muted-foreground">{t("sweep_profile.common.bio")}:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
+      <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">{t("sweep_profile.team.edit_info")}</button>
     </div>
   );
 }
@@ -839,6 +839,7 @@ function MultiCheckboxBox({
   value: string[];
   onChange: (v: string[]) => void;
 }) {
+  const { t } = useTranslation();
   const [q, setQ] = useState("");
   const filtered = options.filter((o) => o.label.toLowerCase().includes(q.toLowerCase()));
   const allSelected = filtered.length > 0 && filtered.every((o) => value.includes(o.value));
@@ -855,13 +856,13 @@ function MultiCheckboxBox({
           }}
           className="text-[10px] font-bold uppercase text-racing-red hover:underline"
         >
-          {allSelected ? "Deselect all" : "Select all"}
+          {allSelected ? t("sweep_profile.common.deselect_all") : t("sweep_profile.common.select_all")}
         </button>
       </div>
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Filter…"
+        placeholder={t("sweep_profile.common.filter")}
         className="mt-1 w-full border border-border bg-background px-2 py-1 text-xs"
       />
       <div className="mt-1 max-h-56 overflow-y-auto border border-border p-2">
@@ -879,7 +880,7 @@ function MultiCheckboxBox({
               </button>
             );
           })}
-          {filtered.length === 0 && <div className="text-xs text-muted-foreground">No matches.</div>}
+          {filtered.length === 0 && <div className="text-xs text-muted-foreground">{t("sweep_profile.common.no_matches")}</div>}
         </div>
       </div>
     </div>
@@ -893,6 +894,7 @@ function ExperienceEditor({
   value: FreelancerExperience[];
   onChange: (v: FreelancerExperience[]) => void;
 }) {
+  const { t } = useTranslation();
   const canAdd = value.length < MAX_FREELANCER_EXPERIENCES;
   const update = (i: number, patch: Partial<FreelancerExperience>) => {
     const next = value.map((e, idx) => (idx === i ? { ...e, ...patch } : e));
@@ -907,11 +909,11 @@ function ExperienceEditor({
     <div>
       <div className="flex items-center justify-between gap-2">
         <label className="text-xs text-muted-foreground">
-          Motorsport experience <span className="text-racing-red">({value.length}/{MAX_FREELANCER_EXPERIENCES})</span>
+          {t("sweep_profile.freelancer.motorsport_experience")} <span className="text-racing-red">({value.length}/{MAX_FREELANCER_EXPERIENCES})</span>
         </label>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">
-        Add up to {MAX_FREELANCER_EXPERIENCES} past championships/categories and the years you spent in each. Pick "No experience" if you're new to motorsport.
+        {t("sweep_profile.freelancer.experience_hint", { max: MAX_FREELANCER_EXPERIENCES })}
       </p>
       <div className="mt-2 space-y-2">
         {value.map((e, i) => (
@@ -939,7 +941,7 @@ function ExperienceEditor({
               onClick={() => remove(i)}
               className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
             >
-              Remove
+              {t("sweep_profile.common.remove")}
             </button>
           </div>
         ))}
@@ -950,7 +952,7 @@ function ExperienceEditor({
         disabled={!canAdd}
         className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
       >
-        {value.length === 0 ? "+ Add experience" : "+ Add another experience"}
+        {value.length === 0 ? t("sweep_profile.freelancer.add_experience") : t("sweep_profile.freelancer.add_another_experience")}
       </button>
     </div>
   );
@@ -963,6 +965,7 @@ function LanguagesEditor({
   value: FreelancerLanguage[];
   onChange: (v: FreelancerLanguage[]) => void;
 }) {
+  const { t } = useTranslation();
   const canAdd = value.length < MAX_FREELANCER_LANGUAGES;
   const update = (i: number, patch: Partial<FreelancerLanguage>) => {
     onChange(value.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
@@ -978,11 +981,11 @@ function LanguagesEditor({
     <div>
       <div className="flex items-center justify-between gap-2">
         <label className="text-xs text-muted-foreground">
-          Languages spoken <span className="text-racing-red">({value.length}/{MAX_FREELANCER_LANGUAGES})</span>
+          {t("sweep_profile.freelancer.languages_spoken")} <span className="text-racing-red">({value.length}/{MAX_FREELANCER_LANGUAGES})</span>
         </label>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">
-        Pick each language you speak and its level. Teams can require specific languages on their Pit Calls.
+        {t("sweep_profile.freelancer.languages_hint")}
       </p>
       <div className="mt-2 space-y-2">
         {value.map((l, i) => (
@@ -1010,13 +1013,13 @@ function LanguagesEditor({
               onClick={() => remove(i)}
               className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
             >
-              Remove
+              {t("sweep_profile.common.remove")}
             </button>
             {l.code === "other" && (
               <input
                 value={l.custom ?? ""}
                 onChange={(ev) => update(i, { custom: ev.target.value })}
-                placeholder="Language name"
+                placeholder={t("sweep_profile.freelancer.language_name_placeholder")}
                 className="sm:col-span-3 border border-border bg-background px-2 py-1 text-sm"
               />
             )}
@@ -1029,7 +1032,7 @@ function LanguagesEditor({
         disabled={!canAdd}
         className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
       >
-        {value.length === 0 ? "+ Add language" : "+ Add another language"}
+        {value.length === 0 ? t("sweep_profile.freelancer.add_language") : t("sweep_profile.freelancer.add_another_language")}
       </button>
     </div>
   );
@@ -1037,9 +1040,10 @@ function LanguagesEditor({
 
 
 function SubRolesEditor({ group, value, onChange }: { group: string; value: FreelancerSubRole[]; onChange: (v: FreelancerSubRole[]) => void }) {
+  const { t } = useTranslation();
   const options = subRolesForGroup(group);
   if (!group) {
-    return <div className="border border-border bg-card p-3 text-xs text-muted-foreground">Select a macro-role first to pick your sub-roles.</div>;
+    return <div className="border border-border bg-card p-3 text-xs text-muted-foreground">{t("sweep_profile.freelancer.select_macro_role_first")}</div>;
   }
   const toggle = (sub: string) => {
     const exists = value.find((v) => v.sub_role === sub);
@@ -1048,7 +1052,7 @@ function SubRolesEditor({ group, value, onChange }: { group: string; value: Free
   const setLevel = (sub: string, level: SubRoleLevel) => onChange(value.map((v) => (v.sub_role === sub ? { ...v, level } : v)));
   return (
     <div>
-      <label className="text-xs text-muted-foreground">Sub-roles &amp; level</label>
+      <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.sub_roles_and_level")}</label>
       <div className="mt-1 max-h-72 space-y-1 overflow-auto border border-border bg-card p-2">
         {options.map((o) => {
           const sel = value.find((v) => v.sub_role === o.value);

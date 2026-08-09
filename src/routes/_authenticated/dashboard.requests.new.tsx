@@ -254,7 +254,7 @@ function NewRequestPage() {
           <div className="mt-4 border-2 border-racing-yellow bg-racing-yellow/5 p-4">
             <div className="label-mono text-racing-yellow">[IDENTICAL REPOST]</div>
             <p className="mt-1 text-xs text-muted-foreground">
-              All fields below are locked to guarantee the discounted price ({repostCost} tokens instead of {baseCost}). Need to change something? Use <span className="font-bold">Repost similar</span> instead.
+              {t("sweep_engage.new_request.identical_locked_note", { repostCost, baseCost })} <span className="font-bold">{t("sweep_engage.requests.repost_similar")}</span> {t("sweep_engage.new_request.instead")}.
             </p>
           </div>
         )}
@@ -267,7 +267,7 @@ function NewRequestPage() {
               return;
             }
             if (isSeason && seasonDatesIso.length === 0) {
-              toast.error("Select at least one working day for the season");
+              toast.error(t("sweep_engage.new_request.select_working_day"));
               return;
             }
             mut.mutate();
@@ -277,20 +277,20 @@ function NewRequestPage() {
           <fieldset disabled={identical} className="contents">
 
           <div className="md:col-span-2">
-            <label className="label-mono">Title</label>
+            <label className="label-mono">{t("sweep_engage.new_request.title_label")}</label>
             <input
               required
               minLength={3}
               maxLength={120}
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="e.g. GT3 race mechanic – Spa 6h"
+              placeholder={t("sweep_engage.new_request.title_placeholder")}
               className="mt-1 w-full border border-border bg-background px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="label-mono">Macro-role</label>
+            <label className="label-mono">{t("sweep_engage.new_request.macro_role_label")}</label>
             <select
               value={form.role_group}
               onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_role: "" })}
@@ -299,19 +299,19 @@ function NewRequestPage() {
               {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
             </select>
             <p className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
-              Hard filter — only {roleGroupLabel(form.role_group)} professionals will match.
+              {t("sweep_engage.new_request.macro_role_hard_filter", { role: roleGroupLabel(form.role_group) })}
             </p>
           </div>
 
           <div>
-            <label className="label-mono">Sub-role &amp; minimum level</label>
+            <label className="label-mono">{t("sweep_engage.new_request.sub_role_label")}</label>
             <div className="mt-1 flex gap-2">
               <select
                 value={form.sub_role}
                 onChange={(e) => setForm({ ...form, sub_role: e.target.value })}
                 className="flex-1 border border-border bg-background px-3 py-2"
               >
-                <option value="">Any sub-role</option>
+                <option value="">{t("sweep_engage.new_request.any_sub_role")}</option>
                 {subRolesForGroup(form.role_group).map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
@@ -328,10 +328,10 @@ function NewRequestPage() {
                 type="button"
                 disabled={!form.sub_role}
                 onClick={() => setSubRoleHard(!subRoleHard)}
-                title={subRoleHard ? "Only this sub-role will match" : "Weighted preference only"}
+                title={subRoleHard ? t("sweep_engage.new_request.hard_only_tooltip") : t("sweep_engage.new_request.soft_weighted_tooltip")}
                 className={`border px-3 py-2 text-[11px] font-bold uppercase disabled:opacity-40 ${subRoleHard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
               >
-                {subRoleHard ? "Hard" : "Soft"}
+                {subRoleHard ? t("sweep_engage.new_request.hard") : t("sweep_engage.new_request.soft")}
               </button>
             </div>
           </div>
@@ -349,7 +349,7 @@ function NewRequestPage() {
             options={DURATIONS.map((r) => ({ value: r, label: t(`duration.${r}`) }))}
           />
           <div className="md:col-span-2 border border-border bg-background/40 p-3">
-            <label className="label-mono">Location / Circuit</label>
+            <label className="label-mono">{t("sweep_engage.new_request.location_circuit_label")}</label>
             <LocationAutocomplete
               value={form.location}
               onChange={(v) => {
@@ -362,7 +362,7 @@ function NewRequestPage() {
                 setLocationCoords({ lat: p.lat, lng: p.lng });
                 setLocationDetails({ city: p.city, region: p.region, country: p.country, placeId: p.placeId });
               }}
-              placeholder="City, circuit or country"
+              placeholder={t("sweep_engage.new_request.location_placeholder")}
               includeAllPlaces
               className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
             />
@@ -372,7 +372,7 @@ function NewRequestPage() {
                 onClick={() => {
                   setLocRelevance(locRelevance === "not_relevant" ? "relevant" : locRelevance === "relevant" ? "mandatory" : "not_relevant");
                 }}
-                title="Click to cycle: Not relevant → Relevant → Mandatory"
+                title={t("sweep_engage.new_request.location_cycle_tooltip")}
                 className={`border px-3 py-2 text-[11px] font-bold uppercase tracking-widest ${
                   locRelevance === "mandatory"
                     ? "border-racing-red bg-racing-red text-white"
@@ -381,7 +381,7 @@ function NewRequestPage() {
                     : "border-border bg-black text-white"
                 }`}
               >
-                {locRelevance === "mandatory" ? "Mandatory" : locRelevance === "relevant" ? "Relevant" : "Not relevant"}
+                {locRelevance === "mandatory" ? t("sweep_engage.new_request.mandatory") : locRelevance === "relevant" ? t("sweep_engage.new_request.relevant") : t("sweep_engage.new_request.not_relevant")}
               </button>
 
               {locRelevance !== "not_relevant" && (
@@ -392,19 +392,19 @@ function NewRequestPage() {
                       onClick={() => setLocAnchor("this")}
                       className={`px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "this" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
                     >
-                      This location
+                      {t("sweep_engage.new_request.this_location")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setLocAnchor("team")}
                       className={`border-l border-border px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "team" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
                     >
-                      Team location
+                      {t("sweep_engage.new_request.team_location")}
                     </button>
                   </div>
 
                   <label className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
-                    Max distance
+                    {t("sweep_engage.new_request.max_distance")}
                     <select
                       value={locRadius}
                       onChange={(e) => setLocRadius(e.target.value)}
@@ -419,15 +419,15 @@ function NewRequestPage() {
               )}
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
-              {locRelevance === "not_relevant" && "Distance is ignored — location has no effect on the match score."}
-              {locRelevance === "relevant" && "Freelancers inside the radius get the full location score, near-radius (≤ 1.2×) get half, further out zero."}
-              {locRelevance === "mandatory" && <span className="text-racing-red font-bold">Hard filter — freelancers outside the radius are excluded from matches.</span>}
-              {" "}Distance is measured as-the-crow-flies (Haversine).
-              {locRelevance !== "not_relevant" && locAnchor === "team" && " Anchor: your team's fixed location from your profile."}
-              {locRelevance !== "not_relevant" && locAnchor === "this" && " Anchor: the location entered above."}
+              {locRelevance === "not_relevant" && t("sweep_engage.new_request.distance_ignored")}
+              {locRelevance === "relevant" && t("sweep_engage.new_request.distance_relevant_note")}
+              {locRelevance === "mandatory" && <span className="text-racing-red font-bold">{t("sweep_engage.new_request.distance_mandatory_note")}</span>}
+              {" "}{t("sweep_engage.new_request.distance_haversine")}
+              {locRelevance !== "not_relevant" && locAnchor === "team" && ` ${t("sweep_engage.new_request.anchor_team")}`}
+              {locRelevance !== "not_relevant" && locAnchor === "this" && ` ${t("sweep_engage.new_request.anchor_this")}`}
             </p>
             {locRelevance !== "not_relevant" && locAnchor === "this" && !locationCoords.lat && (
-              <p className="mt-1 text-[11px] text-racing-yellow">Pick a location from the dropdown so we can capture its coordinates.</p>
+              <p className="mt-1 text-[11px] text-racing-yellow">{t("sweep_engage.new_request.pick_location_hint")}</p>
             )}
           </div>
 
@@ -435,32 +435,32 @@ function NewRequestPage() {
           {!isSeason && (
             <>
               <div>
-                <label className="label-mono">Start date</label>
+                <label className="label-mono">{t("sweep_engage.new_request.start_date")}</label>
                 <input type="date" required={!isSeason} value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
               </div>
               <div>
-                <label className="label-mono">End date</label>
+                <label className="label-mono">{t("sweep_engage.new_request.end_date")}</label>
                 <input type="date" required={!isSeason} value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
               </div>
             </>
           )}
 
           <div>
-            <label className="label-mono">Budget min (€)</label>
+            <label className="label-mono">{t("sweep_engage.new_request.budget_min")}</label>
             <input type="number" min="0" value={form.budget_min} onChange={(e) => setForm({ ...form, budget_min: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
           <div>
-            <label className="label-mono">Budget max (€)</label>
+            <label className="label-mono">{t("sweep_engage.new_request.budget_max")}</label>
             <input type="number" min="0" value={form.budget_max} onChange={(e) => setForm({ ...form, budget_max: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
 
           {isSeason && (
             <div className="md:col-span-2">
-              <label className="label-mono">Season working days</label>
+              <label className="label-mono">{t("sweep_engage.new_request.season_working_days")}</label>
               <p className="mt-1 text-xs text-muted-foreground">
-                Click every day you need the specialist on the ground across the season. Matches are computed against these exact days.
+                {t("sweep_engage.new_request.season_working_days_help")}
               </p>
-              <p className="mt-1 font-mono text-xs text-racing-red">{seasonDatesIso.length} day(s) selected</p>
+              <p className="mt-1 font-mono text-xs text-racing-red">{t("sweep_engage.new_request.days_selected", { count: seasonDatesIso.length })}</p>
               <div className={`mt-3 ${identical ? "pointer-events-none opacity-70" : ""}`}>
                 <CalendarSourcePicker
                   className="mb-3"
@@ -471,7 +471,7 @@ function NewRequestPage() {
                   selected={seasonDates}
                   onSelect={(d) => setSeasonDates(d ?? [])}
                   min={new Date()}
-                  legend="Selected (red) days = days you need the professional on-site."
+                  legend={t("sweep_engage.new_request.calendar_legend")}
                 />
 
               </div>
@@ -482,9 +482,9 @@ function NewRequestPage() {
           <div className="md:col-span-2 border border-border bg-background/40 p-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="label-mono">Available to travel</div>
+                <div className="label-mono">{t("sweep_engage.new_request.available_to_travel")}</div>
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Always a <span className="font-bold text-racing-red">HARD</span> requirement — only freelancers who marked themselves as available to travel will be matched.
+                  {t("sweep_engage.new_request.travel_hard_prefix")} <span className="font-bold text-racing-red">{t("sweep_engage.new_request.hard")}</span> {t("sweep_engage.new_request.travel_hard_suffix")}
                 </p>
               </div>
               <button
@@ -492,14 +492,14 @@ function NewRequestPage() {
                 onClick={() => setTravelRequired(!travelRequired)}
                 className={`border px-3 py-2 text-[11px] font-bold uppercase ${travelRequired ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
               >
-                {travelRequired ? "Required (HARD)" : "Not required"}
+                {travelRequired ? t("sweep_engage.new_request.required_hard") : t("sweep_engage.new_request.not_required")}
               </button>
             </div>
           </div>
 
           <div className="md:col-span-2">
             <label className="label-mono">
-              Required skills <span className="text-racing-red">({skills.length + skillsHard.length})</span>
+              {t("sweep_engage.new_request.required_skills")} <span className="text-racing-red">({skills.length + skillsHard.length})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
               <button
@@ -507,9 +507,9 @@ function NewRequestPage() {
                 onClick={() => setShowAllSkills((v) => !v)}
                 className="float-right font-mono text-[10px] uppercase tracking-widest text-racing-red hover:underline"
               >
-                {showAllSkills ? "Show macro-role skills" : "Show all skills"}
+                {showAllSkills ? t("sweep_engage.new_request.show_macro_skills") : t("sweep_engage.new_request.show_all_skills")}
               </button>
-              Click a skill once for <span className="font-bold text-yellow-500">SOFT</span> (preference), twice for <span className="font-bold text-racing-red">HARD</span> (freelancer must have it), a third time to deselect.
+              {t("sweep_engage.new_request.skill_cycle_help_prefix")} <span className="font-bold text-yellow-500">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_mid")} <span className="font-bold text-racing-red">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_suffix")}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {(showAllSkills ? SKILL_OPTIONS.map((o) => o.value) : skillsForGroup(form.role_group)).map((sv) => {
@@ -536,7 +536,7 @@ function NewRequestPage() {
                     key={o.value}
                     type="button"
                     onClick={cycle}
-                    title={isHard ? "HARD — required" : isSoft ? "SOFT — preferred" : "Not selected"}
+                    title={isHard ? t("sweep_engage.new_request.hard_required_tooltip") : isSoft ? t("sweep_engage.new_request.soft_preferred_tooltip") : t("sweep_engage.new_request.not_selected_tooltip")}
                     className={`border px-2 py-1 text-[11px] font-bold transition-colors ${cls}`}
                   >
                     {skillLabel(o.value)}{isHard ? " ●" : isSoft ? " ○" : ""}
@@ -548,10 +548,10 @@ function NewRequestPage() {
 
           <div className="md:col-span-2">
             <label className="label-mono">
-              Preferred education <span className="text-racing-red">({education.length})</span>
+              {t("sweep_engage.new_request.preferred_education")} <span className="text-racing-red">({education.length})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Soft preference only — freelancers with other education levels can still match. Click to toggle.
+              {t("sweep_engage.new_request.education_soft_note")}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {EDUCATION_OPTIONS.map((o) => {
@@ -573,10 +573,10 @@ function NewRequestPage() {
 
           <div className="md:col-span-2">
             <label className="label-mono">
-              Experience requirements <span className="text-racing-red">({experienceReqs.length}/{MAX_REQUEST_EXPERIENCE_REQS})</span>
+              {t("sweep_engage.new_request.experience_requirements")} <span className="text-racing-red">({experienceReqs.length}/{MAX_REQUEST_EXPERIENCE_REQS})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Add up to {MAX_REQUEST_EXPERIENCE_REQS} categories with minimum years. Mark each as <span className="text-racing-red font-bold">HARD</span> (freelancers who don't meet it are excluded from matches) or leave as <span className="font-bold">SOFT</span> preference.
+              {t("sweep_engage.new_request.experience_add_up_to", { max: MAX_REQUEST_EXPERIENCE_REQS })} <span className="text-racing-red font-bold">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.experience_hard_note")} <span className="font-bold">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.experience_soft_note")}
             </p>
             <div className="mt-2 space-y-2">
               {experienceReqs.map((req, i) => (
@@ -596,7 +596,7 @@ function NewRequestPage() {
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
                     {EXPERIENCE_YEARS_OPTIONS.filter((o) => o.value !== "0").map((o) => (
-                      <option key={o.value} value={o.value}>min {o.label}</option>
+                      <option key={o.value} value={o.value}>{t("sweep_engage.new_request.min_prefix")} {o.label}</option>
                     ))}
                   </select>
                   <button
@@ -604,14 +604,14 @@ function NewRequestPage() {
                     onClick={() => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
                     className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
                   >
-                    {req.hard ? "Hard" : "Soft"}
+                    {req.hard ? t("sweep_engage.new_request.hard") : t("sweep_engage.new_request.soft")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setExperienceReqs(experienceReqs.filter((_, idx) => idx !== i))}
                     className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
                   >
-                    Remove
+                    {t("sweep_engage.new_request.remove")}
                   </button>
                 </div>
               ))}
@@ -625,16 +625,16 @@ function NewRequestPage() {
               disabled={experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS}
               className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
             >
-              {experienceReqs.length === 0 ? "+ Add experience requirement" : "+ Add another experience requirement"}
+              {experienceReqs.length === 0 ? t("sweep_engage.new_request.add_experience_req") : t("sweep_engage.new_request.add_another_experience_req")}
             </button>
           </div>
 
           <div className="md:col-span-2">
             <label className="label-mono">
-              Required languages <span className="text-racing-red">({languageReqs.length}/{MAX_REQUEST_LANGUAGES})</span>
+              {t("sweep_engage.new_request.required_languages")} <span className="text-racing-red">({languageReqs.length}/{MAX_REQUEST_LANGUAGES})</span>
             </label>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Add up to {MAX_REQUEST_LANGUAGES} required languages and their minimum level. Mark as <span className="text-racing-red font-bold">HARD</span> to exclude freelancers who don't meet it, or leave <span className="font-bold">SOFT</span> as preference.
+              {t("sweep_engage.new_request.languages_add_up_to", { max: MAX_REQUEST_LANGUAGES })} <span className="text-racing-red font-bold">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.languages_hard_note")} <span className="font-bold">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.languages_soft_note")}
             </p>
             <div className="mt-2 space-y-2">
               {languageReqs.map((req, i) => (
@@ -654,7 +654,7 @@ function NewRequestPage() {
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
                     {LANGUAGE_LEVELS.map((lv) => (
-                      <option key={lv} value={lv}>min {languageLevelLabel(lv)}</option>
+                      <option key={lv} value={lv}>{t("sweep_engage.new_request.min_prefix")} {languageLevelLabel(lv)}</option>
                     ))}
                   </select>
                   <button
@@ -662,20 +662,20 @@ function NewRequestPage() {
                     onClick={() => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, hard: !r.hard } : r))}
                     className={`border px-2 py-1 text-[11px] font-bold uppercase ${req.hard ? "border-racing-red bg-racing-red/10 text-racing-red" : "border-border text-muted-foreground"}`}
                   >
-                    {req.hard ? "Hard" : "Soft"}
+                    {req.hard ? t("sweep_engage.new_request.hard") : t("sweep_engage.new_request.soft")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setLanguageReqs(languageReqs.filter((_, idx) => idx !== i))}
                     className="border border-border px-3 py-1 text-[11px] font-bold uppercase text-muted-foreground hover:border-racing-red hover:text-racing-red"
                   >
-                    Remove
+                    {t("sweep_engage.new_request.remove")}
                   </button>
                   {req.code === "other" && (
                     <input
                       value={req.custom ?? ""}
                       onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, custom: ev.target.value } : r))}
-                      placeholder="Language name"
+                      placeholder={t("sweep_engage.new_request.language_name_placeholder")}
                       className="md:col-span-4 border border-border bg-background px-2 py-1 text-sm"
                     />
                   )}
@@ -691,7 +691,7 @@ function NewRequestPage() {
               disabled={languageReqs.length >= MAX_REQUEST_LANGUAGES}
               className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
             >
-              {languageReqs.length === 0 ? "+ Add language requirement" : "+ Add another language requirement"}
+              {languageReqs.length === 0 ? t("sweep_engage.new_request.add_language_req") : t("sweep_engage.new_request.add_another_language_req")}
             </button>
           </div>
 
@@ -699,7 +699,7 @@ function NewRequestPage() {
 
 
           <div className="md:col-span-2">
-            <label className="label-mono">Notes</label>
+            <label className="label-mono">{t("sweep_engage.new_request.notes")}</label>
             <textarea maxLength={1000} rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
           </div>
 
@@ -712,7 +712,7 @@ function NewRequestPage() {
             disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
-            {mut.isPending ? "…" : `${t("requests.post_for")} ${cost} tokens`}
+            {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost, label: t("requests.post_for") })}
           </button>
         </form>
       </div>

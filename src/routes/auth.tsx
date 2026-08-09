@@ -44,14 +44,14 @@ function AuthPage() {
       }
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if (result.error) {
-        toast.error(result.error.message ?? "Google sign-in failed");
+        toast.error(result.error.message ?? t("sweep_public.auth.google_signin_failed"));
         setLoading(false);
         return;
       }
       if (result.redirected) return;
       navigate({ to: "/dashboard" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Sign-in failed");
+      toast.error(e instanceof Error ? e.message : t("sweep_public.auth.sign_in_failed"));
       setLoading(false);
     }
   }
@@ -70,7 +70,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to the paddock! 5 tokens credited.");
+        toast.success(t("sweep_public.auth.welcome_toast"));
         navigate({ to: "/dashboard" });
       } else {
         if (typeof window !== "undefined") {
@@ -82,7 +82,7 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Auth failed");
+      toast.error(err instanceof Error ? err.message : t("sweep_public.auth.auth_failed"));
     } finally {
       setLoading(false);
     }
@@ -100,8 +100,8 @@ function AuthPage() {
           </h1>
           <p className="mt-4 max-w-md text-sm text-muted-foreground">
             {isSignup
-              ? "Publish your calendar, get auto-matched, spend tokens to reveal counterparties."
-              : "Pick up where you left off."}
+              ? t("sweep_public.auth.signup_desc")
+              : t("sweep_public.auth.signin_desc")}
           </p>
         </div>
 
@@ -172,7 +172,7 @@ function AuthPage() {
             </button>
           </form>
 
-          <div className="my-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">— or —</div>
+          <div className="my-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_public.auth.or_divider")}</div>
 
           <button
             onClick={handleGoogle}
