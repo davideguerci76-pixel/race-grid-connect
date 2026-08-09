@@ -10,7 +10,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
-import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
