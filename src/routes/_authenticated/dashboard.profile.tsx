@@ -10,6 +10,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
+import { setMyLegalName } from "@/lib/identity.functions";
+import { isValidVat, VAT_PLACEHOLDER } from "@/lib/vat";
 import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { RatingIcons } from "@/components/rating-icons";
@@ -248,10 +250,11 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="text-muted-foreground">Email:</span>
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
+      {isFreelancer && <LegalNameBlock profile={profile} />}
       <div className="text-sm">
-        <span className="text-muted-foreground">Account type:</span>
+        <span className="text-muted-foreground">{t("profile.account_type")}:</span>
         <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
-        <span className="ml-2 text-[11px] text-muted-foreground">(cannot be changed)</span>
+        <span className="ml-2 text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
       {editing ? (
         <>
@@ -607,12 +610,14 @@ function FreelancerSection({ profile }: { profile: any }) {
 }
 
 function TeamSection({ profile }: { profile: any }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveTeamProfile = useServerFn(updateMyTeamProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     team_name: "",
+    vat_number: "",
     team_type: "",
     location: "",
     location_lat: null as number | null,
@@ -630,6 +635,7 @@ function TeamSection({ profile }: { profile: any }) {
     if (editing) return;
     setForm({
       team_name: profile?.team_name ?? "",
+      vat_number: (profile as any)?.vat_number ?? "",
       team_type: profile?.team_type ?? "",
       location: profile?.location ?? "",
       location_lat: (profile as any)?.location_lat ?? null,
@@ -647,10 +653,12 @@ function TeamSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      if (!form.team_name.trim()) throw new Error("Team name is required");
+      if (!form.team_name.trim()) throw new Error(t("team.name_required"));
+      if (!isValidVat(form.vat_number)) throw new Error(t("team.vat_invalid"));
       return saveTeamProfile({
         data: {
           team_name: form.team_name,
+          vat_number: form.vat_number,
           team_type: form.team_type || null,
           location: form.location || null,
           location_lat: form.location_lat ?? null,
@@ -682,6 +690,19 @@ function TeamSection({ profile }: { profile: any }) {
         <div>
           <label className="text-xs text-muted-foreground">Team Name</label>
           <input value={form.team_name} onChange={(e) => setForm({ ...form, team_name: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground">{t("team.vat")} <span className="text-racing-red">*</span></label>
+          <input
+            value={form.vat_number}
+            onChange={(e) => setForm({ ...form, vat_number: e.target.value })}
+            placeholder={VAT_PLACEHOLDER}
+            className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm uppercase"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">{t("team.vat_hint")}</p>
+          {form.vat_number.trim().length > 0 && !isValidVat(form.vat_number) && (
+            <p className="mt-1 text-[11px] text-racing-red">{t("team.vat_invalid")}</p>
+          )}
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Team Type</label>
@@ -720,7 +741,11 @@ function TeamSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <Row label="Team name" value={profile?.team_name ?? "—"} bold />
+      <Row label={t("team.name")} value={profile?.team_name ?? "—"} bold />
+      <Row label={t("team.vat")} value={(profile as any)?.vat_number ?? "—"} mono />
+      {!(profile as any)?.vat_number && (
+        <p className="border border-racing-red/50 bg-racing-red/10 p-2 text-[11px] text-racing-red">{t("team.vat_required_banner")}</p>
+      )}
       <Row label="Type" value={profile?.team_type ?? "—"} />
       <Row label="Location" value={profile?.location ?? "—"} />
       <Row label="Discipline" value={disciplineLabel(profile?.primary_discipline)} mono />
@@ -730,6 +755,66 @@ function TeamSection({ profile }: { profile: any }) {
       </div>
       <div className="text-sm"><span className="text-muted-foreground">Bio:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
       <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">Edit Team Info</button>
+    </div>
+  );
+}
+
+function LegalNameBlock({ profile }: { profile: any }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  const saveName = useServerFn(setMyLegalName);
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
+  const locked = Boolean(profile?.first_name && profile?.last_name);
+
+  const mutation = useMutation({
+    mutationFn: async () => saveName({ data: { first_name: first, last_name: last } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      toast.success(t("profile.legal_name_saved"));
+    },
+    onError: (e) => {
+      const raw = e instanceof Error ? e.message : "";
+      toast.error(raw.includes("NAME_LOCKED") ? t("profile.legal_name_locked") : t("profile.legal_name_invalid"));
+    },
+  });
+
+  if (locked) {
+    return (
+      <div className="text-sm">
+        <span className="text-muted-foreground">{t("profile.legal_name")}:</span>
+        <span className="ml-2 font-bold">{profile.first_name} {profile.last_name}</span>
+        <span className="ml-2 text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-racing-yellow/40 bg-racing-yellow/5 p-3">
+      <div className="label-mono text-[10px] text-racing-yellow">{t("profile.legal_name")}</div>
+      <p className="mt-1 text-[11px] text-muted-foreground">{t("profile.legal_name_hint")}</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <input
+          value={first}
+          onChange={(e) => setFirst(e.target.value)}
+          placeholder={t("profile.first_name")}
+          className="w-full min-w-0 border border-border bg-background px-3 py-2 text-sm"
+        />
+        <input
+          value={last}
+          onChange={(e) => setLast(e.target.value)}
+          placeholder={t("profile.last_name")}
+          className="w-full min-w-0 border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <button
+        onClick={() => mutation.mutate()}
+        disabled={mutation.isPending || first.trim().length < 2 || last.trim().length < 2}
+        className="mt-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white disabled:opacity-50"
+      >
+        {t("profile.legal_name_confirm")}
+      </button>
     </div>
   );
 }

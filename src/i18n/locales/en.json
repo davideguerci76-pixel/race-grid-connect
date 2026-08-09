@@ -328,5 +328,30 @@
     "invalid": "Please enter a valid phone number",
     "save": "Save phone",
     "edit": "Edit phone"
+  },
+  "profile": {
+    "legal_name": "Legal name",
+    "legal_name_hint": "First and last name can be set only once. After confirmation they can no longer be changed.",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "legal_name_confirm": "Confirm name (permanent)",
+    "legal_name_saved": "Name saved",
+    "legal_name_locked": "Your legal name is already set and cannot be changed.",
+    "legal_name_invalid": "Please enter a valid first and last name.",
+    "account_type": "Account type",
+    "cannot_be_changed": "cannot be changed"
+  },
+  "team": {
+    "name": "Team name",
+    "name_required": "Team name is required",
+    "vat": "VAT number",
+    "vat_hint": "International format: country prefix + national number (e.g. IT01234567890).",
+    "vat_invalid": "Please enter a valid VAT number for your country.",
+    "vat_required_banner": "VAT number is required to complete your team profile."
+  },
+  "location": {
+    "unavailable": "Location suggestions are reconnecting…",
+    "retry": "Retry",
+    "powered_by": "Powered by Google"
   }
 }

@@ -78,7 +78,12 @@
     border-color: var(--color-border);
     font-family: var(--font-display);
   }
+  html {
+    overflow-x: hidden;
+  }
   body {
+    overflow-x: hidden;
+    max-width: 100vw;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-display);
@@ -97,6 +102,7 @@
 }
 
 @utility container-page {
+  width: 100%;
   max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1.5rem;
