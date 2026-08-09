@@ -316,5 +316,30 @@
     "invalid": "Introduce un número de teléfono válido",
     "save": "Guardar teléfono",
     "edit": "Editar teléfono"
+  },
+  "profile": {
+    "legal_name": "Nombre y apellidos",
+    "legal_name_hint": "El nombre y los apellidos se establecen una sola vez. Tras confirmarlos no se pueden cambiar.",
+    "first_name": "Nombre",
+    "last_name": "Apellidos",
+    "legal_name_confirm": "Confirmar nombre (definitivo)",
+    "legal_name_saved": "Nombre guardado",
+    "legal_name_locked": "Tu nombre ya está establecido y no se puede cambiar.",
+    "legal_name_invalid": "Introduce un nombre y apellidos válidos.",
+    "account_type": "Tipo de cuenta",
+    "cannot_be_changed": "no modificable"
+  },
+  "team": {
+    "name": "Nombre del team",
+    "name_required": "El nombre del team es obligatorio",
+    "vat": "Número de IVA (VAT)",
+    "vat_hint": "Formato internacional: prefijo del país + número (p. ej. ES A12345678).",
+    "vat_invalid": "Introduce un número de IVA válido para tu país.",
+    "vat_required_banner": "El número de IVA es obligatorio para completar el perfil del team."
+  },
+  "location": {
+    "unavailable": "Reconectando las sugerencias de ubicación…",
+    "retry": "Reintentar",
+    "powered_by": "Powered by Google"
   }
 }

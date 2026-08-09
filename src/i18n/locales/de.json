@@ -316,5 +316,30 @@
     "invalid": "Bitte gib eine gültige Telefonnummer ein",
     "save": "Telefon speichern",
     "edit": "Telefon bearbeiten"
+  },
+  "profile": {
+    "legal_name": "Vor- und Nachname",
+    "legal_name_hint": "Vor- und Nachname können nur einmal festgelegt werden. Nach der Bestätigung sind sie nicht mehr änderbar.",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "legal_name_confirm": "Name bestätigen (endgültig)",
+    "legal_name_saved": "Name gespeichert",
+    "legal_name_locked": "Dein Name ist bereits festgelegt und kann nicht geändert werden.",
+    "legal_name_invalid": "Bitte gib einen gültigen Vor- und Nachnamen ein.",
+    "account_type": "Kontotyp",
+    "cannot_be_changed": "nicht änderbar"
+  },
+  "team": {
+    "name": "Teamname",
+    "name_required": "Teamname ist erforderlich",
+    "vat": "USt-IdNr. (VAT)",
+    "vat_hint": "Internationales Format: Länderpräfix + Nummer (z. B. DE123456789).",
+    "vat_invalid": "Bitte gib eine gültige USt-IdNr. für dein Land ein.",
+    "vat_required_banner": "Die USt-IdNr. ist erforderlich, um das Teamprofil abzuschließen."
+  },
+  "location": {
+    "unavailable": "Standortvorschläge werden neu verbunden…",
+    "retry": "Erneut versuchen",
+    "powered_by": "Powered by Google"
   }
 }

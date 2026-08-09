@@ -328,5 +328,30 @@
     "invalid": "Inserire un numero di telefono valido",
     "save": "Salva telefono",
     "edit": "Modifica telefono"
+  },
+  "profile": {
+    "legal_name": "Nome e cognome",
+    "legal_name_hint": "Nome e cognome si impostano una sola volta. Dopo la conferma non sono più modificabili.",
+    "first_name": "Nome",
+    "last_name": "Cognome",
+    "legal_name_confirm": "Conferma nome (definitivo)",
+    "legal_name_saved": "Nome salvato",
+    "legal_name_locked": "Il tuo nome è già impostato e non può essere modificato.",
+    "legal_name_invalid": "Inserisci un nome e cognome validi.",
+    "account_type": "Tipo di account",
+    "cannot_be_changed": "non modificabile"
+  },
+  "team": {
+    "name": "Nome team",
+    "name_required": "Il nome del team è obbligatorio",
+    "vat": "Partita IVA / VAT number",
+    "vat_hint": "Formato internazionale: prefisso nazione + numero (es. IT01234567890).",
+    "vat_invalid": "Inserisci una partita IVA valida per il tuo Paese.",
+    "vat_required_banner": "La partita IVA è obbligatoria per completare il profilo team."
+  },
+  "location": {
+    "unavailable": "Suggerimenti località in riconnessione…",
+    "retry": "Riprova",
+    "powered_by": "Powered by Google"
   }
 }
