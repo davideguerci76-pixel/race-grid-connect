@@ -578,7 +578,9 @@ export type Database = {
           blocked_at: string | null
           created_at: string
           display_name: string
+          first_name: string | null
           id: string
+          last_name: string | null
           preferred_language: string
           token_balance: number
           updated_at: string
@@ -589,7 +591,9 @@ export type Database = {
           blocked_at?: string | null
           created_at?: string
           display_name: string
+          first_name?: string | null
           id: string
+          last_name?: string | null
           preferred_language?: string
           token_balance?: number
           updated_at?: string
@@ -600,7 +604,9 @@ export type Database = {
           blocked_at?: string | null
           created_at?: string
           display_name?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           preferred_language?: string
           token_balance?: number
           updated_at?: string
@@ -1078,6 +1084,7 @@ export type Database = {
           team_type: string | null
           updated_at: string
           user_id: string
+          vat_number: string | null
           website: string | null
         }
         Insert: {
@@ -1097,6 +1104,7 @@ export type Database = {
           team_type?: string | null
           updated_at?: string
           user_id: string
+          vat_number?: string | null
           website?: string | null
         }
         Update: {
@@ -1116,6 +1124,7 @@ export type Database = {
           team_type?: string | null
           updated_at?: string
           user_id?: string
+          vat_number?: string | null
           website?: string | null
         }
         Relationships: [
@@ -1940,6 +1949,7 @@ export type Database = {
         | "team_contact_reminder_2"
         | "ghosting_released"
         | "team_ghosted"
+        | "admin_alert"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -2199,6 +2209,7 @@ export const Constants = {
         "team_contact_reminder_2",
         "ghosting_released",
         "team_ghosted",
+        "admin_alert",
       ],
       rating_moderation_status: [
         "active",
