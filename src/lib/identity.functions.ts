@@ -60,6 +60,7 @@ export const setMyLegalName = createServerFn({ method: "POST" })
           .eq("role", "admin");
         const payload = {
           type: "homonym",
+          message: `Homonym detected: ${first} ${last} — verify duplicate freelancer identities.`,
           first_name: first,
           last_name: last,
           user_id: userId,
