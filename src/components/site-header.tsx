@@ -85,13 +85,13 @@ export function SiteHeader() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="container-page flex h-16 items-center justify-between gap-3">
+      <div className="container-page flex h-16 min-w-0 items-center justify-between gap-2 sm:gap-3">
         <Link to={user ? "/dashboard" : "/"} className="flex shrink-0 items-center" onClick={() => setOpen(false)}>
           <img
             src={logoCompact.url}
             alt="Pit Call"
             width={1246} height={211}
-            className="h-11 w-auto object-contain mix-blend-screen md:h-12"
+            className="h-8 w-auto max-w-[45vw] object-contain mix-blend-screen sm:h-11 md:h-12"
           />
         </Link>
 
@@ -156,7 +156,7 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile/tablet: token badge + hamburger */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
           {user && <TokenBadge balance={profile?.token_balance ?? 0} />}
           {user && (
             <Link

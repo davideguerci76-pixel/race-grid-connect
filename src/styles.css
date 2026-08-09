@@ -102,6 +102,7 @@
 }
 
 @utility container-page {
+  width: 100%;
   max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1.5rem;
