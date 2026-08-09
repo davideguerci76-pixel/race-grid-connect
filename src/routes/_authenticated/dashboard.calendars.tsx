@@ -95,9 +95,6 @@ function ManageCalendarsPage() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
-      <div className="container-page pt-6">
-        <BackButton />
-      </div>
       <div className="container-page py-12">
         <div className="label-mono">[MANAGE CALENDARS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("sweep_public.dashboard_calendars.title")}</h1>
