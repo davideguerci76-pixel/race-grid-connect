@@ -523,7 +523,37 @@ export const getMyMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // Legal names + phone of the counterparty are only fetched for CONFIRMED matches.
+    const legalNameById = new Map<string, string | null>();
+    const phoneById = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
+    const confirmedOtherIds = Array.from(new Set(
+      rawMatches.filter((m: any) => confirmedMatchIds.has(m.id)).map((m: any) => (isFreelancer ? m.team_id : m.freelancer_id)),
+    ));
+    if (confirmedOtherIds.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: ps } = await supabaseAdmin
+          .from("profiles")
+          .select("id, display_name, first_name, last_name, user_type")
+          .in("id", confirmedOtherIds);
+        for (const p of (ps ?? []) as any[]) {
+          const legal = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
+          legalNameById.set(p.id, p.user_type === "freelancer" ? (legal || null) : p.display_name);
+        }
+        if (!isFreelancer) {
+          const { data: cs } = await supabaseAdmin
+            .from("freelancer_contacts")
+            .select("user_id, phone_dial_code, phone_number")
+            .in("user_id", confirmedOtherIds);
+          for (const c of (cs ?? []) as any[]) {
+            phoneById.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number });
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
     const redacted = rawMatches.map((m: any) => {
+
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
       const isConfirmed = confirmedMatchIds.has(m.id);
       // Names/contacts stay hidden until a confirmed engagement links the two parties.
