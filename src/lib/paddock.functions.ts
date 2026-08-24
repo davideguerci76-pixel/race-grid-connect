@@ -576,6 +576,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
+          const ph = isConfirmed ? phoneById.get(m.freelancer_id) : null;
           counterparty = fp ? {
             headline: fp.headline,
             role_group: fp.role_group,
@@ -586,16 +587,28 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            // Contacts only after confirmed match
+            // Legal name + contacts only after a confirmed match
+            legal_name: isConfirmed ? (legalNameById.get(m.freelancer_id) ?? null) : null,
             contact_email: isConfirmed ? (emailsById.get(m.freelancer_id) ?? null) : null,
+            phone_dial_code: ph?.phone_dial_code ?? null,
+            phone_number: ph?.phone_number ?? null,
           } : null;
         }
       }
-      // Always hide display_name in the joined profile rows unless the engagement is confirmed
+      // Names in the joined profile rows: hidden until confirmed, legal name after.
       if (!isConfirmed) {
         if (m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
         if (m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
+      } else {
+        const otherId = isFreelancer ? m.team_id : m.freelancer_id;
+        const nm = legalNameById.get(otherId) ?? null;
+        if (isFreelancer) {
+          if (m.team) m.team = { ...m.team, display_name: nm ?? m.team.display_name };
+        } else if (m.freelancer) {
+          m.freelancer = { ...m.freelancer, display_name: nm ?? m.freelancer.display_name };
+        }
       }
+
       return {
         ...m,
         revealedByMe,
