@@ -179,7 +179,7 @@ function MatchesPage() {
                   <div className="flex items-start gap-4">
                     <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${showName ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
                       {showName
-                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : "?"))
+                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : (cp?.legal_name ?? "?")))
                         : <Lock className="size-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -188,9 +188,10 @@ function MatchesPage() {
                       </div>
                       <div className="mt-1 text-lg font-bold">
                         {showName
-                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : t("sweep_engage.matches.freelancer_fallback"))
+                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : (cp?.legal_name ?? t("sweep_engage.matches.freelancer_fallback")))
                           : t("matches.hidden_name")}
                       </div>
+
                       {m.revealedByMe && cp && (
                         <div className="mt-2 grid gap-1 text-xs">
                           {isFreelancer ? (
@@ -211,11 +212,18 @@ function MatchesPage() {
                               {typeof cp.day_rate === "number" && <div><span className="text-muted-foreground">{t("sweep_engage.matches.day_rate_label")}:</span> <span className="font-medium">€{cp.day_rate}</span></div>}
                               {cp.travels !== null && <div><span className="text-muted-foreground">{t("sweep_engage.matches.travels_label")}:</span> <span className="font-medium">{cp.travels ? t("sweep_engage.matches.yes") : t("sweep_engage.matches.no")}</span></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
+                              {isConfirmed && (cp.contact_email || cp.phone_number) && (
+                                <div className="mt-2 grid gap-1">
+                                  {cp.contact_email && <div><span className="text-muted-foreground">Email:</span> <span className="font-medium break-all">{cp.contact_email}</span></div>}
+                                  {cp.phone_number && <div><span className="text-muted-foreground">{t("phone.label")}:</span> <span className="font-medium">{cp.phone_dial_code ?? ""} {cp.phone_number}</span></div>}
+                                </div>
+                              )}
                               {!isConfirmed && (
                                 <div className="mt-2 rounded border border-border bg-background/50 p-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                                   {t("sweep_engage.matches.name_contacts_hidden")}
                                 </div>
                               )}
+
                             </>
                           )}
                         </div>

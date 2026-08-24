@@ -24,7 +24,7 @@ function DashboardHome() {
     enabled: !!user,
     queryFn: async () => {
       const [{ data: p }, { data: balance }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, avatar_url, user_type, preferred_language, created_at").eq("id", user!.id).maybeSingle(),
+        supabase.from("profiles").select("id, display_name, first_name, last_name, avatar_url, user_type, preferred_language, created_at").eq("id", user!.id).maybeSingle(),
         supabase.rpc("my_token_balance"),
       ]);
       return p ? { ...p, token_balance: (balance as number | null) ?? 0 } : null;
@@ -113,7 +113,7 @@ function DashboardHome() {
       
       <div className="container-page py-12">
         <div className="label-mono">[DASHBOARD]</div>
-        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("dashboard.welcome", { name: profile?.display_name ?? "" })}</h1>
+        <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("dashboard.welcome", { name: (profile?.user_type === "freelancer" ? [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") : profile?.display_name) || "" })}</h1>
 
         {matchesCount > 0 && (
           <Link to="/dashboard/matches" className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">

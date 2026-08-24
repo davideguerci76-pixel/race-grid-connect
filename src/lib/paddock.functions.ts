@@ -82,12 +82,20 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
   });
 
 // ---- Profile saving ----
+// Teams only: the profile "name" is the team name. Freelancers are identified
+// exclusively by their locked legal name (first_name + last_name).
 export const updateMyDisplayName = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z.object({ display_name: z.string().trim().min(2).max(80) }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    const { data: me } = await context.supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if ((me as any)?.user_type === "freelancer") throw new Error("NAME_LOCKED");
     const { data: row, error } = await context.supabase
       .from("profiles")
       .update({ display_name: data.display_name })
@@ -97,6 +105,7 @@ export const updateMyDisplayName = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
 
 export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -514,7 +523,37 @@ export const getMyMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // Legal names + phone of the counterparty are only fetched for CONFIRMED matches.
+    const legalNameById = new Map<string, string | null>();
+    const phoneById = new Map<string, { phone_dial_code: string | null; phone_number: string | null }>();
+    const confirmedOtherIds = Array.from(new Set(
+      rawMatches.filter((m: any) => confirmedMatchIds.has(m.id)).map((m: any) => (isFreelancer ? m.team_id : m.freelancer_id)),
+    ));
+    if (confirmedOtherIds.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: ps } = await supabaseAdmin
+          .from("profiles")
+          .select("id, display_name, first_name, last_name, user_type")
+          .in("id", confirmedOtherIds);
+        for (const p of (ps ?? []) as any[]) {
+          const legal = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
+          legalNameById.set(p.id, p.user_type === "freelancer" ? (legal || null) : p.display_name);
+        }
+        if (!isFreelancer) {
+          const { data: cs } = await supabaseAdmin
+            .from("freelancer_contacts")
+            .select("user_id, phone_dial_code, phone_number")
+            .in("user_id", confirmedOtherIds);
+          for (const c of (cs ?? []) as any[]) {
+            phoneById.set(c.user_id, { phone_dial_code: c.phone_dial_code, phone_number: c.phone_number });
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
     const redacted = rawMatches.map((m: any) => {
+
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
       const isConfirmed = confirmedMatchIds.has(m.id);
       // Names/contacts stay hidden until a confirmed engagement links the two parties.
@@ -537,6 +576,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
           } : null;
         } else {
           const fp = freelancerProfilesById.get(m.freelancer_id);
+          const ph = isConfirmed ? phoneById.get(m.freelancer_id) : null;
           counterparty = fp ? {
             headline: fp.headline,
             role_group: fp.role_group,
@@ -547,16 +587,28 @@ export const getMyMatches = createServerFn({ method: "GET" })
             day_rate: fp.day_rate,
             bio: fp.bio,
             travels: fp.travels,
-            // Contacts only after confirmed match
+            // Legal name + contacts only after a confirmed match
+            legal_name: isConfirmed ? (legalNameById.get(m.freelancer_id) ?? null) : null,
             contact_email: isConfirmed ? (emailsById.get(m.freelancer_id) ?? null) : null,
+            phone_dial_code: ph?.phone_dial_code ?? null,
+            phone_number: ph?.phone_number ?? null,
           } : null;
         }
       }
-      // Always hide display_name in the joined profile rows unless the engagement is confirmed
+      // Names in the joined profile rows: hidden until confirmed, legal name after.
       if (!isConfirmed) {
         if (m.team) m.team = { display_name: "Hidden Team", avatar_url: null };
         if (m.freelancer) m.freelancer = { display_name: "Hidden Specialist", avatar_url: null };
+      } else {
+        const otherId = isFreelancer ? m.team_id : m.freelancer_id;
+        const nm = legalNameById.get(otherId) ?? null;
+        if (isFreelancer) {
+          if (m.team) m.team = { ...m.team, display_name: nm ?? m.team.display_name };
+        } else if (m.freelancer) {
+          m.freelancer = { ...m.freelancer, display_name: nm ?? m.freelancer.display_name };
+        }
       }
+
       return {
         ...m,
         revealedByMe,
@@ -685,8 +737,13 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       if (allIds.length) {
-        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", allIds);
-        for (const p of (ps ?? []) as any[]) nameMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url });
+        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, first_name, last_name, user_type, avatar_url").in("id", allIds);
+        for (const p of (ps ?? []) as any[]) {
+          // Freelancers are identified by their locked legal name only.
+          const legal = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
+          const name = p.user_type === "freelancer" ? (legal || null) : p.display_name;
+          nameMap.set(p.id, { display_name: name, avatar_url: p.avatar_url });
+        }
       }
       // For confirmed/completed engagements only, surface freelancer contact to team viewer
       const confirmedFids = Array.from(new Set(rows.filter((r) => (r.status === "confirmed" || r.status === "completed") && r.team_id === userId).map((r) => r.freelancer_id)));
@@ -708,15 +765,21 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const fName = nameMap.get(r.freelancer_id);
       const tName = nameMap.get(r.team_id);
       const contact = contactsMap.get(r.freelancer_id) ?? null;
+      // The freelancer's legal name is only disclosed to the team once the match is confirmed.
+      const disclosed = r.status === "confirmed" || r.status === "completed" || r.freelancer_id === userId;
       return {
         ...r,
-        freelancer: { display_name: fName?.display_name ?? null, avatar_url: fName?.avatar_url ?? null },
+        freelancer: {
+          display_name: disclosed ? (fName?.display_name ?? null) : null,
+          avatar_url: disclosed ? (fName?.avatar_url ?? null) : null,
+        },
         team: { display_name: tName?.display_name ?? null, avatar_url: tName?.avatar_url ?? null },
         team_profile: tpMap.get(r.team_id) ?? null,
         freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
         freelancer_contact: contact,
       };
     });
+
   });
 
 
@@ -1012,8 +1075,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: p } = await supabaseAdmin.from("profiles").select("display_name, avatar_url").eq("id", fid).maybeSingle();
-          if (p) hProf = p as any;
+          const { data: p } = await supabaseAdmin.from("profiles").select("first_name, last_name, avatar_url").eq("id", fid).maybeSingle();
+          if (p) {
+            const legal = [(p as any).first_name, (p as any).last_name].filter(Boolean).join(" ").trim();
+            hProf = { display_name: legal || null, avatar_url: (p as any).avatar_url };
+          }
           const { data: c } = await supabaseAdmin.from("freelancer_contacts").select("phone_dial_code, phone_number").eq("user_id", fid).maybeSingle();
           if (c) hPhone = { phone_dial_code: (c as any).phone_dial_code, phone_number: (c as any).phone_number };
           const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
@@ -1025,6 +1091,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           engagement_id: (eng as any).id,
           confirmed_at: (eng as any).updated_at,
           display_name: hProf?.display_name ?? "Freelancer",
+
           avatar_url: hProf?.avatar_url ?? null,
           headline: (hFp as any)?.headline ?? null,
           role_group: (hFp as any)?.role_group ?? null,

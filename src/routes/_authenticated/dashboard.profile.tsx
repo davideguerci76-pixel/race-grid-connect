@@ -258,11 +258,11 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
         <span className="ml-2 text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
-      {editing ? (
+      {!isFreelancer && (editing ? (
         <>
           <div>
             <label className="text-xs text-muted-foreground">
-              {profile?.user_type === "team" ? t("sweep_profile.profile.team_name") : t("sweep_profile.profile.display_name")}
+              {t("sweep_profile.profile.team_name")}
             </label>
             <input
               value={displayName}
@@ -282,14 +282,15 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       ) : (
         <>
           <div className="text-sm">
-            <span className="text-muted-foreground">{t("sweep_profile.profile.display_name")}:</span>
+            <span className="text-muted-foreground">{t("sweep_profile.profile.team_name")}:</span>
             <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
           </div>
           <button onClick={() => setEditing(true)} className="text-xs text-racing-red hover:underline">
             {t("sweep_profile.common.edit")}
           </button>
         </>
-      )}
+      ))}
+
 
       <div className="text-sm">
         <span className="text-muted-foreground">{t("sweep_profile.profile.tokens_label")}:</span>

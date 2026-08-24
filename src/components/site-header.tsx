@@ -27,10 +27,16 @@ export function SiteHeader() {
     queryFn: async () => {
       if (!user) return null;
       const [{ data: p }, { data: balance }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, avatar_url, user_type, preferred_language").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("id, display_name, first_name, last_name, avatar_url, user_type, preferred_language").eq("id", user.id).maybeSingle(),
         supabase.rpc("my_token_balance"),
       ]);
-      return p ? { ...p, token_balance: (balance as number | null) ?? 0 } : null;
+      if (!p) return null;
+      const legal = [(p as any).first_name, (p as any).last_name].filter(Boolean).join(" ").trim();
+      return {
+        ...p,
+        display_name: (p as any).user_type === "freelancer" ? (legal || (p as any).display_name) : (p as any).display_name,
+        token_balance: (balance as number | null) ?? 0,
+      };
     },
   });
 
