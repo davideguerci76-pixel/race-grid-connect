@@ -694,8 +694,13 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       if (allIds.length) {
-        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, avatar_url").in("id", allIds);
-        for (const p of (ps ?? []) as any[]) nameMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url });
+        const { data: ps } = await supabaseAdmin.from("profiles").select("id, display_name, first_name, last_name, user_type, avatar_url").in("id", allIds);
+        for (const p of (ps ?? []) as any[]) {
+          // Freelancers are identified by their locked legal name only.
+          const legal = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
+          const name = p.user_type === "freelancer" ? (legal || null) : p.display_name;
+          nameMap.set(p.id, { display_name: name, avatar_url: p.avatar_url });
+        }
       }
       // For confirmed/completed engagements only, surface freelancer contact to team viewer
       const confirmedFids = Array.from(new Set(rows.filter((r) => (r.status === "confirmed" || r.status === "completed") && r.team_id === userId).map((r) => r.freelancer_id)));
@@ -717,15 +722,21 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const fName = nameMap.get(r.freelancer_id);
       const tName = nameMap.get(r.team_id);
       const contact = contactsMap.get(r.freelancer_id) ?? null;
+      // The freelancer's legal name is only disclosed to the team once the match is confirmed.
+      const disclosed = r.status === "confirmed" || r.status === "completed" || r.freelancer_id === userId;
       return {
         ...r,
-        freelancer: { display_name: fName?.display_name ?? null, avatar_url: fName?.avatar_url ?? null },
+        freelancer: {
+          display_name: disclosed ? (fName?.display_name ?? null) : null,
+          avatar_url: disclosed ? (fName?.avatar_url ?? null) : null,
+        },
         team: { display_name: tName?.display_name ?? null, avatar_url: tName?.avatar_url ?? null },
         team_profile: tpMap.get(r.team_id) ?? null,
         freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
         freelancer_contact: contact,
       };
     });
+
   });
 
 
