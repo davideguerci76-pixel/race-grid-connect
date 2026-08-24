@@ -179,7 +179,7 @@ function MatchesPage() {
                   <div className="flex items-start gap-4">
                     <div className={`flex size-12 shrink-0 items-center justify-center font-mono text-sm font-black ${showName ? "bg-racing-red text-white" : "bg-secondary text-muted-foreground"}`}>
                       {showName
-                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : "?"))
+                        ? initialsFor((isFreelancer ? (cp?.team_name ?? "?") : (cp?.legal_name ?? "?")))
                         : <Lock className="size-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -188,9 +188,10 @@ function MatchesPage() {
                       </div>
                       <div className="mt-1 text-lg font-bold">
                         {showName
-                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : t("sweep_engage.matches.freelancer_fallback"))
+                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : (cp?.legal_name ?? t("sweep_engage.matches.freelancer_fallback")))
                           : t("matches.hidden_name")}
                       </div>
+
                       {m.revealedByMe && cp && (
                         <div className="mt-2 grid gap-1 text-xs">
                           {isFreelancer ? (
