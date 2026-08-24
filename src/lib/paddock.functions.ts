@@ -82,12 +82,20 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
   });
 
 // ---- Profile saving ----
+// Teams only: the profile "name" is the team name. Freelancers are identified
+// exclusively by their locked legal name (first_name + last_name).
 export const updateMyDisplayName = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z.object({ display_name: z.string().trim().min(2).max(80) }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    const { data: me } = await context.supabase
+      .from("profiles")
+      .select("user_type")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if ((me as any)?.user_type === "freelancer") throw new Error("NAME_LOCKED");
     const { data: row, error } = await context.supabase
       .from("profiles")
       .update({ display_name: data.display_name })
@@ -97,6 +105,7 @@ export const updateMyDisplayName = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
 
 export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
