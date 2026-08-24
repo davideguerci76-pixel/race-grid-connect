@@ -1075,8 +1075,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: p } = await supabaseAdmin.from("profiles").select("display_name, avatar_url").eq("id", fid).maybeSingle();
-          if (p) hProf = p as any;
+          const { data: p } = await supabaseAdmin.from("profiles").select("first_name, last_name, avatar_url").eq("id", fid).maybeSingle();
+          if (p) {
+            const legal = [(p as any).first_name, (p as any).last_name].filter(Boolean).join(" ").trim();
+            hProf = { display_name: legal || null, avatar_url: (p as any).avatar_url };
+          }
           const { data: c } = await supabaseAdmin.from("freelancer_contacts").select("phone_dial_code, phone_number").eq("user_id", fid).maybeSingle();
           if (c) hPhone = { phone_dial_code: (c as any).phone_dial_code, phone_number: (c as any).phone_number };
           const { data: u } = await supabaseAdmin.auth.admin.getUserById(fid);
@@ -1088,6 +1091,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           engagement_id: (eng as any).id,
           confirmed_at: (eng as any).updated_at,
           display_name: hProf?.display_name ?? "Freelancer",
+
           avatar_url: hProf?.avatar_url ?? null,
           headline: (hFp as any)?.headline ?? null,
           role_group: (hFp as any)?.role_group ?? null,
