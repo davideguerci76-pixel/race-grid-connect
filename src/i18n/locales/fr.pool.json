@@ -28,6 +28,12 @@
     "missing_days": "{{count}} jour(s) manquant(s)",
     "my_code": "Mon code unique",
     "my_code_hint": "Communiquez ce code à un team pour rejoindre son pool.",
-    "code_copied": "Code copié"
+    "code_copied": "Code copié",
+    "mode_title": "Mode de recherche",
+    "mode_standard": "Pit call standard",
+    "mode_standard_desc": "Ouverte à tout le réseau PitCall. Les noms restent masqués jusqu'à la confirmation du match.",
+    "mode_pool": "Pit call dans My Pool",
+    "mode_pool_desc": "Recherche uniquement dans votre cercle de confiance. Les noms sont affichés en clair dès le premier résultat.",
+    "mode_pool_note": "Recherche dans votre pool ({{count}} freelances) — noms en clair, coût de déblocage {{cost}} tokens."
   }
 }
