@@ -9,7 +9,7 @@ import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Cloc
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest } from "@/lib/paddock.functions";
-import { disciplineLabel } from "@/lib/paddock";
+import { disciplineLabel, initialsFor } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
@@ -86,9 +86,9 @@ function RequestMatchesPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.refund_failed")),
   });
 
-  const requestFilled = data?.request.status === "filled" || data?.request.status === "completed";
-  const isFirstDayToday = data ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
-  const sosEligible = data && !requestFilled && isFirstDayToday && data.request.duration !== "full_season";
+  const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
+  const isFirstDayToday = data?.request?.start_date ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
+  const sosEligible = Boolean(data?.request && !requestFilled && isFirstDayToday && data.request.duration !== "full_season");
 
   const renderPool = (
     label: string,
@@ -98,50 +98,51 @@ function RequestMatchesPage() {
   ) => {
     return (
       <div>
-        {tiers.map((t) => {
-          if (t.real_count === 0) return null;
-          const tierItems = items.filter((i) => i.tier === t.tier);
-          const isLocked = !t.unlocked;
+        {(Array.isArray(tiers) ? tiers : []).map((tierInfo) => {
+          if ((tierInfo?.real_count ?? 0) === 0) return null;
+          const safeItems = Array.isArray(items) ? items : [];
+          const tierItems = safeItems.filter((i) => i?.tier === tierInfo.tier);
+          const isLocked = !tierInfo.unlocked;
           return (
-            <section key={`${scope}-${t.tier}`} className="mt-8">
+            <section key={`${scope}-${tierInfo.tier}`} className="mt-8">
               <div className="mb-3 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-2">
                 <div>
                   <div className="label-mono">
-                    [{label} · TIER {t.tier}] {(() => {
-                      const t2 = tiers.find((x) => x.tier === 2)?.size ?? 10;
-                      if (t.tier === 1) return t("sweep_engage.request_matches.top_matches_1_10");
-                      if (t.tier === 2) return t("sweep_engage.request_matches.matches_range", { from: 11, to: 10 + t.size });
-                      return t("sweep_engage.request_matches.matches_range", { from: 11 + t2, to: 10 + t2 + t.size });
+                    [{label} · TIER {tierInfo.tier}] {(() => {
+                      const t2 = (Array.isArray(tiers) ? tiers : []).find((x) => x?.tier === 2)?.size ?? 10;
+                      if (tierInfo.tier === 1) return t("sweep_engage.request_matches.top_matches_1_10");
+                      if (tierInfo.tier === 2) return t("sweep_engage.request_matches.matches_range", { from: 11, to: 10 + (tierInfo.size ?? 0) });
+                      return t("sweep_engage.request_matches.matches_range", { from: 11 + t2, to: 10 + t2 + (tierInfo.size ?? 0) });
                     })()}
                   </div>
                   <div className="mt-1 text-xl font-black italic tracking-tighter">
-                    {t.tier === 1 ? t("sweep_engage.request_matches.free_preview") : t.unlocked ? t("sweep_engage.request_matches.unlocked_label") : t("sweep_engage.request_matches.locked_to_open", { count: t.entry_cost })}
+                    {tierInfo.tier === 1 ? t("sweep_engage.request_matches.free_preview") : tierInfo.unlocked ? t("sweep_engage.request_matches.unlocked_label") : t("sweep_engage.request_matches.locked_to_open", { count: tierInfo.entry_cost ?? 0 })}
                   </div>
                   <div className="font-mono text-[11px] uppercase text-muted-foreground">
-                    {t("sweep_engage.request_matches.real_matches_in_tier", { count: t.real_count })}
+                    {t("sweep_engage.request_matches.real_matches_in_tier", { count: tierInfo.real_count ?? 0 })}
                   </div>
                 </div>
                 {isLocked && (
                   <div className="max-w-md text-right">
-                    {t.proportional && (
+                    {tierInfo.proportional && (
                       <div className="mb-2 flex items-start gap-2 border border-racing-yellow/50 bg-racing-yellow/10 p-2 text-left font-mono text-[11px] text-racing-yellow">
                         <AlertTriangle className="mt-0.5 size-3 shrink-0" />
                         <span>
-                          {t("sweep_engage.request_matches.proportional_note", { count: t.real_count, max: t.size, full: t.entry_cost_full, cost: t.entry_cost })}
+                          {t("sweep_engage.request_matches.proportional_note", { count: tierInfo.real_count ?? 0, max: tierInfo.size ?? 0, full: tierInfo.entry_cost_full ?? 0, cost: tierInfo.entry_cost ?? 0 })}
                         </span>
                       </div>
                     )}
                     <button
                       onClick={() => {
-                        const msg = t.proportional
-                          ? t("sweep_engage.request_matches.unlock_tier_confirm_reduced", { label: label.toLowerCase(), tier: t.tier, cost: t.entry_cost, full: t.entry_cost_full, count: t.real_count })
-                          : t("sweep_engage.request_matches.unlock_tier_confirm", { label: label.toLowerCase(), tier: t.tier, cost: t.entry_cost, count: t.real_count });
-                        if (confirm(msg)) tierMut.mutate({ tier: t.tier, scope });
+                        const msg = tierInfo.proportional
+                          ? t("sweep_engage.request_matches.unlock_tier_confirm_reduced", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, full: tierInfo.entry_cost_full ?? 0, count: tierInfo.real_count ?? 0 })
+                          : t("sweep_engage.request_matches.unlock_tier_confirm", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, count: tierInfo.real_count ?? 0 });
+                        if (confirm(msg)) tierMut.mutate({ tier: tierInfo.tier, scope });
                       }}
                       disabled={tierMut.isPending}
                       className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                     >
-                      <Unlock className="mr-1 inline size-3" /> {t("sweep_engage.request_matches.unlock_tier_button", { tier: t.tier, cost: t.entry_cost })}
+                      <Unlock className="mr-1 inline size-3" /> {t("sweep_engage.request_matches.unlock_tier_button", { tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0 })}
                     </button>
                   </div>
                 )}
@@ -149,8 +150,8 @@ function RequestMatchesPage() {
 
               {isLocked ? (
                 <div className="grid gap-3">
-                  {Array.from({ length: t.real_count }).map((_, i) => (
-                    <TierPlaceholder key={i} rank={(t.tier === 2 ? 11 : 11 + (tiers.find((x) => x.tier === 2)?.size ?? 10)) + i} />
+                  {Array.from({ length: tierInfo.real_count ?? 0 }).map((_, i) => (
+                    <TierPlaceholder key={i} rank={(tierInfo.tier === 2 ? 11 : 11 + ((Array.isArray(tiers) ? tiers : []).find((x) => x?.tier === 2)?.size ?? 10)) + i} />
                   ))}
                 </div>
               ) : (
@@ -321,14 +322,14 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {data.items.length === 0 && data.items_partial.length === 0 && !((data.total_matches === 0) && !requestFilled) && (
+            {(data.items ?? []).length === 0 && (data.items_partial ?? []).length === 0 && !((data.total_matches === 0) && !requestFilled) && (
               <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
                 {t("sweep_engage.request_matches.no_matches_yet")}
               </div>
             )}
 
             {/* FULL matches */}
-            {renderPool("FULL", "full", data.tiers, data.items)}
+            {renderPool("FULL", "full", data.tiers ?? [], data.items ?? [])}
 
             {/* FOMO banner */}
             {data.partial_banner && (
@@ -358,9 +359,9 @@ function RequestMatchesPage() {
             )}
 
             {/* PARTIAL matches */}
-            {data.items_partial.length > 0 && (
+            {(data.items_partial ?? []).length > 0 && (
               <div ref={partialRef}>
-                {renderPool("PARTIAL", "partial", data.tiers_partial, data.items_partial)}
+                {renderPool("PARTIAL", "partial", data.tiers_partial ?? [], data.items_partial ?? [])}
               </div>
             )}
           </>
@@ -391,11 +392,19 @@ function TierPlaceholder({ rank }: { rank: number }) {
 
 function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProfileCost }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean; perProfileCost: number }) {
   const { t } = useTranslation();
-  const pct = Math.round(match.skills_score ?? match.match_score);
-  const perfect = match.is_perfect;
-  const blurred = match.blurred;
-  const isPartial = match.is_partial;
-  const edgeOnly = match.edge_only;
+  const pct = Math.round(Number(match?.skills_score ?? match?.match_score ?? 0));
+  const perfect = !!match?.is_perfect;
+  const blurred = !!match?.blurred;
+  const isPartial = !!match?.is_partial;
+  const edgeOnly = match?.edge_only !== false;
+  const profile = match?.profile ?? null;
+  const missingCriteria = Array.isArray(match?.missing_criteria) ? match.missing_criteria : [];
+  const subRoles = parseSubRoles(profile?.sub_roles);
+  const disciplines = Array.isArray(profile?.disciplines) ? profile.disciplines : [];
+  const skills = Array.isArray(profile?.skills) ? profile.skills : [];
+  const showIdentity = typeof profile?.display_name === "string" && profile.display_name.trim().length > 0;
+  const phoneLabel = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join(" ").trim();
+  const telHref = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
   const gapLabel = edgeOnly ? t("sweep_engage.request_matches.gap_edge_only") : t("sweep_engage.request_matches.gap_central");
   const partialBorder = edgeOnly ? "border-racing-yellow/60 bg-racing-yellow/5" : "border-racing-red/60 bg-racing-red/5";
   const gapBadge = edgeOnly
@@ -407,24 +416,24 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
     <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : isPartial ? partialBorder : "border-border bg-card"}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          {match.unlocked ? <Unlock className="size-4 text-racing-yellow" /> : <Lock className="size-4 text-muted-foreground" />}
+          {match?.unlocked ? <Unlock className="size-4 text-racing-yellow" /> : <Lock className="size-4 text-muted-foreground" />}
           <div>
             <div className={`text-3xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
               {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? t("sweep_engage.request_matches.perfect_match_short") : t("sweep_engage.request_matches.skills_affinity")}</span>
             </div>
-            {match.in_pool && <div className="mb-1"><PoolBadge /></div>}
+            {match?.in_pool && <div className="mb-1"><PoolBadge /></div>}
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match.rank, tier: match.tier, count: match.overlap_days })}
-              {match.top_three && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.top3_free")}</span>}
-              {match.free_preview && !match.top_three && match.unlocked && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.unlocked_tag")}</span>}
+              {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match?.rank ?? "—", tier: match?.tier ?? "—", count: match?.overlap_days ?? 0 })}
+              {match?.top_three && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.top3_free")}</span>}
+              {match?.free_preview && !match?.top_three && match?.unlocked && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.unlocked_tag")}</span>}
             </div>
             {isPartial && (
               <div className={`mt-1 inline-flex items-center gap-2 border ${gapBadge} px-2 py-1 font-mono text-[10px] uppercase tracking-widest`} title={gapLabel}>
                 <span className={`inline-block size-2 rounded-full ${gapDot}`} />
-                <Clock className="size-3" /> {t("sweep_engage.request_matches.missing_days_badge", { count: match.missing_days })} · {gapLabel}
+                <Clock className="size-3" /> {t("sweep_engage.request_matches.missing_days_badge", { count: match?.missing_days ?? 0 })} · {gapLabel}
               </div>
             )}
-            {match.rating && match.rating.count > 0 && (
+            {match?.rating && match.rating.count > 0 && (
               <div className="mt-1">
                 <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
               </div>
@@ -441,7 +450,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
               <Unlock className="size-3" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
             </button>
           )}
-          {match.unlocked && !requestFilled && (
+          {match?.unlocked && !requestFilled && (
             <button
               onClick={onConfirm}
               disabled={loading}
@@ -458,46 +467,55 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
         </div>
       </div>
 
-      {match.unlocked && match.profile ? (
+      {match?.unlocked && profile ? (
         <div className="mt-4 grid gap-4 border-t border-border pt-4 md:grid-cols-2">
           <div>
             <div className="flex items-center gap-3">
               <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase text-muted-foreground">
-                <Lock className="size-4" />
+                {showIdentity ? initialsFor(profile.display_name) : <Lock className="size-4" />}
               </div>
               <div>
-                <div className="text-lg font-bold text-muted-foreground">{t("sweep_engage.request_matches.hidden_freelancer")}</div>
-                {match.profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(match.profile.role_group)}{parseSubRoles(match.profile.sub_roles).length ? ` · ${parseSubRoles(match.profile.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
+                <div className={showIdentity ? "text-lg font-bold" : "text-lg font-bold text-muted-foreground"}>
+                  {showIdentity ? profile.display_name : t("sweep_engage.request_matches.hidden_freelancer")}
+                </div>
+                {profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(profile.role_group)}{subRoles.length ? ` · ${subRoles.map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
               </div>
             </div>
-            {match.profile.headline && <p className="mt-3 text-sm">{match.profile.headline}</p>}
-            {match.profile.bio && <p className="mt-2 text-xs text-muted-foreground">{match.profile.bio}</p>}
+            {profile.headline && <p className="mt-3 text-sm">{profile.headline}</p>}
+            {profile.bio && <p className="mt-2 text-xs text-muted-foreground">{profile.bio}</p>}
             <div className="mt-3 space-y-1 font-mono text-[11px] uppercase text-muted-foreground">
-              {match.profile.location && <div>📍 {match.profile.location}</div>}
-              {match.profile.day_rate != null && <div>{t("sweep_engage.request_matches.day_rate_per_day", { rate: match.profile.day_rate })}</div>}
-              <div>{t("sweep_engage.request_matches.travels_line", { answer: match.profile.travels ? t("sweep_engage.matches.yes") : t("sweep_engage.matches.no") })}</div>
+              {profile.location && <div>📍 {profile.location}</div>}
+              {profile.day_rate != null && <div>{t("sweep_engage.request_matches.day_rate_per_day", { rate: profile.day_rate })}</div>}
+              <div>{t("sweep_engage.request_matches.travels_line", { answer: profile.travels ? t("sweep_engage.matches.yes") : t("sweep_engage.matches.no") })}</div>
             </div>
           </div>
           <div>
             <div className="label-mono mb-1">[CONTACT]</div>
-            <div className="rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {t("sweep_engage.matches.name_contacts_hidden")}
-            </div>
-            {match.profile.disciplines?.length > 0 && (
+            {profile.contact_email || profile.phone_number ? (
+              <div className="grid gap-1 border border-racing-yellow/40 bg-racing-yellow/5 p-3 font-mono text-xs">
+                {profile.contact_email && <a href={`mailto:${profile.contact_email}`} className="break-all text-racing-red hover:underline">{profile.contact_email}</a>}
+                {profile.phone_number && <a href={`tel:${telHref}`} className="text-racing-red hover:underline">{phoneLabel || profile.phone_number}</a>}
+              </div>
+            ) : (
+              <div className="rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                {t("sweep_engage.matches.name_contacts_hidden")}
+              </div>
+            )}
+            {disciplines.length > 0 && (
               <>
                 <div className="label-mono mb-1 mt-3">[DISCIPLINES]</div>
                 <div className="flex flex-wrap gap-1">
-                  {match.profile.disciplines.map((d: string) => (
+                  {disciplines.map((d: string) => (
                     <span key={d} className="border border-border bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase">{disciplineLabel(d)}</span>
                   ))}
                 </div>
               </>
             )}
-            {match.profile.skills?.length > 0 && (
+            {skills.length > 0 && (
               <>
                 <div className="label-mono mb-1 mt-3">[SKILLS]</div>
                 <div className="flex flex-wrap gap-1">
-                  {match.profile.skills.map((s: string) => (
+                  {skills.map((s: string) => (
                     <span key={s} className="border border-border bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase">{s}</span>
                   ))}
                 </div>
@@ -506,12 +524,12 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
           </div>
 
           <div className="md:col-span-2 border-t border-border pt-4">
-            <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {match.missing_criteria.length === 0 ? t("sweep_engage.matches.criteria") : t("sweep_engage.matches.missing_criteria")}</div>
-            {match.missing_criteria.length === 0 ? (
+            <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {missingCriteria.length === 0 ? t("sweep_engage.matches.criteria") : t("sweep_engage.matches.missing_criteria")}</div>
+            {missingCriteria.length === 0 ? (
               <div className="font-mono text-[11px] text-racing-yellow">{t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
             ) : (
               <div className="flex flex-wrap gap-1">
-                {match.missing_criteria.map((c: any, i: number) => (
+                {missingCriteria.map((c: any, i: number) => (
                   <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
                     {formatCriterion(c, t)}
                   </span>
@@ -523,11 +541,11 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
       ) : (
         <div className="mt-4 border-t border-border pt-4">
           <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {t("sweep_engage.matches.missing_criteria")}</div>
-          {match.missing_criteria.length === 0 ? (
+            {missingCriteria.length === 0 ? (
             <div className="font-mono text-[11px] text-racing-yellow">{t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
           ) : (
             <div className="flex flex-wrap gap-1">
-              {match.missing_criteria.map((c: any, i: number) => (
+                {missingCriteria.map((c: any, i: number) => (
                 <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
                   {formatCriterion(c, t)}
                 </span>

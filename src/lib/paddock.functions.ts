@@ -984,6 +984,29 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    const poolFreelancerIds = freelancerIds.filter((id: string) => poolSet.has(id));
+    const poolProfileMap = new Map<string, any>();
+    const poolContactMap = new Map<string, any>();
+    const poolEmailMap = new Map<string, string | null>();
+    if (poolFreelancerIds.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const [{ data: poolProfiles }, { data: poolContacts }] = await Promise.all([
+          supabaseAdmin.from("profiles").select("id, first_name, last_name, display_name, avatar_url").in("id", poolFreelancerIds),
+          supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", poolFreelancerIds),
+        ]);
+        for (const p of (poolProfiles ?? []) as any[]) poolProfileMap.set(p.id, p);
+        for (const c of (poolContacts ?? []) as any[]) poolContactMap.set(c.user_id, c);
+        await Promise.all(
+          poolFreelancerIds.map(async (fid) => {
+            const { data: userData } = await supabaseAdmin.auth.admin.getUserById(fid);
+            poolEmailMap.set(fid, userData?.user?.email ?? null);
+          }),
+        );
+      } catch {
+        // Pool identity is a convenience layer; keep match details resilient if contact lookup is unavailable.
+      }
+    }
 
     const buildItem = (m: any, i: number, scope: "full" | "partial", tierUnlockedSet: Set<number>) => {
       const rank = i + 1;
@@ -994,6 +1017,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const showTech = tierUnlocked && (topThree || perProfileUnlocked);
       const blurred = tierUnlocked && !showTech;
       const fp = fpMap.get(m.freelancer_id);
+      const inPool = poolSet.has(m.freelancer_id);
+      const poolProfile = poolProfileMap.get(m.freelancer_id);
+      const poolContact = poolContactMap.get(m.freelancer_id);
+      const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
       return {
         match_id: m.id,
         scope,
@@ -1016,15 +1043,15 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         unlocked: showTech,
         free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
-        in_pool: poolSet.has(m.freelancer_id),
+        in_pool: inPool,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
           count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
         },
         profile: showTech
           ? {
-              display_name: null,
-              avatar_url: null,
+              display_name: inPool ? legalName || poolProfile?.display_name || "Freelancer" : null,
+              avatar_url: inPool ? poolProfile?.avatar_url ?? null : null,
               headline: fp?.headline ?? null,
               role_group: fp?.role_group ?? null,
               sub_roles: fp?.sub_roles ?? [],
@@ -1037,9 +1064,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
               education: fp?.education ?? null,
               experiences: fp?.experiences ?? [],
               languages: fp?.languages ?? [],
-              contact_email: null,
-              phone_dial_code: null,
-              phone_number: null,
+              contact_email: inPool ? poolEmailMap.get(m.freelancer_id) ?? null : null,
+              phone_dial_code: inPool ? poolContact?.phone_dial_code ?? null : null,
+              phone_number: inPool ? poolContact?.phone_number ?? null : null,
             }
           : null,
       };
