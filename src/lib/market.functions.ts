@@ -23,6 +23,7 @@ export type MarketStats = {
   trend: MarketTrend[];
   top_disciplines: { discipline: string; requests: number }[];
   top_role_groups: { role_group: string; requests: number }[];
+  by_country: MarketCountry[];
 };
 
 export const getMarketStats = createServerFn({ method: "GET" }).handler(async (): Promise<MarketStats | null> => {
