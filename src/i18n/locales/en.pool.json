@@ -28,6 +28,12 @@
     "missing_days": "{{count}} day(s) missing",
     "my_code": "My unique code",
     "my_code_hint": "Give this code to a team so they can add you to their pool.",
-    "code_copied": "Code copied"
+    "code_copied": "Code copied",
+    "mode_title": "Search mode",
+    "mode_standard": "Standard pit call",
+    "mode_standard_desc": "Open to the whole PitCall network. Names stay hidden until the match is confirmed.",
+    "mode_pool": "My Pool pit call",
+    "mode_pool_desc": "Search only inside your trusted circle. Names are shown in clear from the first result.",
+    "mode_pool_note": "Searching inside your pool ({{count}} freelancers) — names in clear, unlock cost {{cost}} tokens."
   }
 }

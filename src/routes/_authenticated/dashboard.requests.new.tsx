@@ -12,6 +12,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
+import { getMyPool } from "@/lib/pool.functions";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
@@ -42,10 +44,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
   component: NewRequestPage,
 });
 
-const COST_SINGLE = 5;
-const COST_SEASON = 15;
-const COST_SINGLE_REPOST = 3;
-const COST_SEASON_REPOST = 10;
+type SearchMode = "standard" | "pool";
+
 
 
 function fmt(d: Date): string {
@@ -79,6 +79,20 @@ function NewRequestPage() {
 
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);
+  const fetchSettings = useServerFn(getPlatformSettings);
+  const fetchPool = useServerFn(getMyPool);
+
+  const { data: settings = [] } = useQuery({
+    queryKey: ["platform-settings"],
+    queryFn: () => fetchSettings(),
+    staleTime: 0,
+  });
+  const setting = (key: string, fallbackValue: number) =>
+    Number((settings as Array<{ key: string; value_num: number }>).find((s) => s.key === key)?.value_num ?? fallbackValue);
+
+  const { data: pool = [] } = useQuery({ queryKey: ["my-pool"], queryFn: () => fetchPool(), enabled: !!user });
+  const [searchMode, setSearchMode] = useState<SearchMode>("standard");
+
 
   const { data: existing } = useQuery({
     queryKey: ["my-requests", user?.id],
@@ -160,9 +174,14 @@ function NewRequestPage() {
   }, [source, identical]);
 
   const isSeason = form.duration === "full_season";
-  const baseCost = isSeason ? COST_SEASON : COST_SINGLE;
-  const repostCost = isSeason ? COST_SEASON_REPOST : COST_SINGLE_REPOST;
+  const baseCost = isSeason
+    ? setting("cost_request_full_season", 15)
+    : setting("cost_request_race_weekend", 5);
+  const repostCost = isSeason
+    ? setting("cost_repost_identical_full_season", 10)
+    : setting("cost_repost_identical_race_weekend", 3);
   const cost = identical ? repostCost : baseCost;
+  const poolSearchCost = setting("cost_pool_search", 5);
 
   const balance = profile?.token_balance ?? 0;
   const canAfford = balance >= cost;
@@ -216,7 +235,7 @@ function NewRequestPage() {
     onSuccess: () => {
       toast.success(t("requests.posted"));
       qc.invalidateQueries();
-      navigate({ to: "/dashboard/requests" });
+      navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -236,6 +255,50 @@ function NewRequestPage() {
           <Link to="/dashboard/requests" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-racing-red">
             ← {t("requests.back")}
           </Link>
+        </div>
+
+        {/* Standard vs My Pool search mode */}
+        <div className="mt-6 border border-border bg-card p-4">
+          <div className="label-mono">[{t("pool.mode_title")}]</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {(["standard", "pool"] as SearchMode[]).map((m) => {
+              const active = searchMode === m;
+              const isPool = m === "pool";
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSearchMode(m)}
+                  className={`border p-4 text-left transition-colors ${
+                    active
+                      ? isPool
+                        ? "border-sky-400 bg-sky-400/10"
+                        : "border-racing-red bg-racing-red/10"
+                      : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-block size-3 rounded-full border ${
+                        active ? (isPool ? "border-sky-400 bg-sky-400" : "border-racing-red bg-racing-red") : "border-muted-foreground"
+                      }`}
+                    />
+                    <span className="text-sm font-bold uppercase tracking-widest">
+                      {isPool ? t("pool.mode_pool") : t("pool.mode_standard")}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {isPool ? t("pool.mode_pool_desc") : t("pool.mode_standard_desc")}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          {searchMode === "pool" && (
+            <div className="mt-3 border border-sky-400/50 bg-sky-400/5 p-3 text-xs text-sky-200">
+              {t("pool.mode_pool_note", { count: (pool as any[]).length, cost: poolSearchCost })}
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
