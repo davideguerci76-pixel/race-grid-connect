@@ -13,6 +13,7 @@ import { disciplineLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
+import { PoolBadge } from "@/components/pool-badge";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   component: RequestMatchesPage,
@@ -411,6 +412,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
             <div className={`text-3xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
               {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? t("sweep_engage.request_matches.perfect_match_short") : t("sweep_engage.request_matches.skills_affinity")}</span>
             </div>
+            {match.in_pool && <div className="mb-1"><PoolBadge /></div>}
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
               {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match.rank, tier: match.tier, count: match.overlap_days })}
               {match.top_three && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.top3_free")}</span>}
