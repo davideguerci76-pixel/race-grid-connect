@@ -121,13 +121,20 @@ function AdminReviews() {
                       <RatingIcons value={overall} variant={variant} size={14} />
                     </td>
                     <td className="px-2 py-2 text-muted-foreground">
-                      <div className="max-w-[240px] truncate" title={r.comment ?? ""}>{r.comment ?? "—"}</div>
+                      <button
+                        onClick={() => setDetail(r)}
+                        className="max-w-[240px] truncate text-left underline decoration-dotted underline-offset-2 hover:text-foreground"
+                        title={t("sweep_admin_b.reviews.open_full", { defaultValue: "Open full review" })}
+                      >
+                        {r.comment || t("sweep_admin_b.reviews.open_full", { defaultValue: "Open full review" })}
+                      </button>
                       {r.flag_reason && (
                         <div className="mt-1 max-w-[240px] border-l-2 border-racing-red pl-2 text-[11px] italic text-racing-red">
                           "{r.flag_reason}"
                         </div>
                       )}
                     </td>
+
                     <td className="px-2 py-2">
                       <span className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${badge}`}>
                         {r.moderation_status === "flagged" && <Flag className="size-3" />}
