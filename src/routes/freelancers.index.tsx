@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { initialsFor } from "@/lib/paddock";
+import { PoolBadge } from "@/components/pool-badge";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/freelancers/")({
   component: FreelancersIndex,
@@ -13,6 +15,16 @@ export const Route = createFileRoute("/freelancers/")({
 
 function FreelancersIndex() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { data: poolIds = [] } = useQuery({
+    queryKey: ["my-pool-ids", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", user!.id);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.freelancer_id as string);
+    },
+  });
   const { data: rows = [] } = useQuery({
     queryKey: ["public-freelancers"],
     queryFn: async () => {
@@ -49,6 +61,7 @@ function FreelancersIndex() {
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-bold">{f.display_name}</div>
                     <div className="text-xs text-muted-foreground">{p ? roleGroupLabel(p.role_group) : ""}</div>
+                    {poolIds.includes(f.id) && <div className="mt-1"><PoolBadge /></div>}
                   </div>
                 </div>
                 {p?.headline && <div className="mt-3 line-clamp-2 text-sm text-muted-foreground">{p.headline}</div>}
