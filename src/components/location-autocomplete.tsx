@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useServerFn } from "@tanstack/react-start";
-import { searchPlaces, type GeoResult } from "@/lib/geocode.functions";
+import { searchPlaces, type GeoResult } from "@/lib/geocode";
+
 
 export type LocationPick = {
   text: string;
@@ -33,7 +33,7 @@ export function LocationAutocomplete({
   includeAllPlaces?: boolean;
 }) {
   const { t, i18n } = useTranslation();
-  const search = useServerFn(searchPlaces);
+
   const [input, setInput] = useState(value);
   const [suggestions, setSuggestions] = useState<GeoResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -62,8 +62,10 @@ export function LocationAutocomplete({
     if (text.trim().length < 2) { setSuggestions([]); setOpen(false); return; }
     const id = ++reqRef.current;
     try {
-      const results = await search({
-        data: { q: text, lang: i18n.language, citiesOnly: !includeAllPlaces },
+      const results = await searchPlaces({
+        q: text,
+        lang: i18n.language,
+        citiesOnly: !includeAllPlaces,
       });
       if (!mountedRef.current || id !== reqRef.current) return;
       setSuggestions(results);
@@ -74,7 +76,8 @@ export function LocationAutocomplete({
       setSuggestions([]);
       setFailed(true);
     }
-  }, [search, i18n.language, includeAllPlaces]);
+  }, [i18n.language, includeAllPlaces]);
+
 
   const query = (text: string) => {
     if (debRef.current) window.clearTimeout(debRef.current);
