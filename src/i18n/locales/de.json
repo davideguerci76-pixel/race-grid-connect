@@ -237,7 +237,7 @@
     "confirm_close": "Pit Call schließen?",
     "repost": "Ähnliche posten",
     "status_updated": "Status aktualisiert",
-    "posted": "Veröffentlicht. 5 Tokens abgebucht.",
+    "posted": "Veröffentlicht. {{cost}} Tokens abgebucht.",
     "cost": "Kosten",
     "balance": "Guthaben",
     "top_up": "Aufladen",

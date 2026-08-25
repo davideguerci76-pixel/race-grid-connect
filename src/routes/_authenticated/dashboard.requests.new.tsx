@@ -234,7 +234,7 @@ function NewRequestPage() {
         } as never,
       }),
     onSuccess: () => {
-      toast.success(t("requests.posted"));
+      toast.success(t("requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
       navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
     },
