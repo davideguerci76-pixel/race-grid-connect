@@ -1,0 +1,33 @@
+{
+  "pool": {
+    "badge": "My Pool",
+    "title": "My Pool",
+    "sub": "Your trusted circle: every freelancer you completed a pit call with, plus anyone you add through their unique code. Searching inside the pool costs fewer tokens and always shows names in clear.",
+    "nav": "My Pool",
+    "add_by_code": "Add by code",
+    "add_by_code_hint": "Ask the freelancer for the unique code shown on their profile.",
+    "add_button": "Add to pool",
+    "added": "Freelancer added to your pool",
+    "add_failed": "Could not add this code",
+    "members": "Pool members",
+    "count": "{{count}} freelancers",
+    "empty": "Your pool is empty. Complete a pit call or add a freelancer by code.",
+    "source_code": "Added by code",
+    "source_engagement": "Completed pit call",
+    "search_title": "Search inside my pool",
+    "search_hint": "Pick one of your pit calls and match it only against your pool.",
+    "select_pitcall": "Select a pit call…",
+    "locked_title": "Pool search locked",
+    "locked_desc": "{{count}} freelancers in your pool. Unlock this pool search for {{cost}} tokens (reduced cost).",
+    "unlock_button": "Unlock pool search ({{cost}} tokens)",
+    "unlocked": "Pool search unlocked — {{cost}} tokens spent · balance {{balance}}",
+    "unlock_failed": "Pool search unlock failed",
+    "column_full": "Full matches",
+    "column_partial": "Partial matches",
+    "no_results": "No pool freelancer matches this pit call.",
+    "missing_days": "{{count}} day(s) missing",
+    "my_code": "My unique code",
+    "my_code_hint": "Give this code to a team so they can add you to their pool.",
+    "code_copied": "Code copied"
+  }
+}

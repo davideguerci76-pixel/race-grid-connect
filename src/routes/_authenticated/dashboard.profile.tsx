@@ -1,3 +1,4 @@
+import { getMyPitCode } from "@/lib/pool.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -253,6 +254,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
       {isFreelancer && <LegalNameBlock profile={profile} />}
+      {isFreelancer && <PitCodeBlock />}
       <div className="text-sm">
         <span className="text-muted-foreground">{t("profile.account_type")}:</span>
         <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
@@ -1078,6 +1080,31 @@ function SubRolesEditor({ group, value, onChange }: { group: string; value: Free
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function PitCodeBlock() {
+  const { t } = useTranslation();
+  const getCode = useServerFn(getMyPitCode);
+  const { data } = useQuery({ queryKey: ["my-pit-code"], queryFn: () => getCode() });
+  if (!data?.pit_code) return null;
+  return (
+    <div className="border border-sky-400/40 bg-sky-400/5 p-3">
+      <div className="font-mono text-[10px] uppercase tracking-widest text-sky-300">{t("pool.my_code")}</div>
+      <div className="mt-1 flex items-center gap-3">
+        <span className="font-mono text-lg font-black tracking-widest">{data.pit_code}</span>
+        <button
+          onClick={() => {
+            navigator.clipboard?.writeText(data.pit_code as string);
+            toast.success(t("pool.code_copied"));
+          }}
+          className="border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-widest hover:bg-secondary"
+        >
+          copy
+        </button>
+      </div>
+      <div className="mt-1 text-[11px] text-muted-foreground">{t("pool.my_code_hint")}</div>
     </div>
   );
 }

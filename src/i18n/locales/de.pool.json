@@ -1,0 +1,33 @@
+{
+  "pool": {
+    "badge": "My Pool",
+    "title": "My Pool",
+    "sub": "Dein Vertrauenskreis: jeder Freelancer, mit dem du einen Pit Call abgeschlossen hast, plus alle, die du über ihren eindeutigen Code hinzufügst. Die Suche im Pool kostet weniger Token und Namen sind immer sichtbar.",
+    "nav": "My Pool",
+    "add_by_code": "Per Code hinzufügen",
+    "add_by_code_hint": "Frage den Freelancer nach dem eindeutigen Code auf seinem Profil.",
+    "add_button": "Zum Pool hinzufügen",
+    "added": "Freelancer zu deinem Pool hinzugefügt",
+    "add_failed": "Dieser Code konnte nicht hinzugefügt werden",
+    "members": "Pool-Mitglieder",
+    "count": "{{count}} Freelancer",
+    "empty": "Dein Pool ist leer. Schließe einen Pit Call ab oder füge einen Freelancer per Code hinzu.",
+    "source_code": "Per Code hinzugefügt",
+    "source_engagement": "Abgeschlossener Pit Call",
+    "search_title": "In meinem Pool suchen",
+    "search_hint": "Wähle einen deiner Pit Calls und gleiche ihn nur mit deinem Pool ab.",
+    "select_pitcall": "Pit Call auswählen…",
+    "locked_title": "Pool-Suche gesperrt",
+    "locked_desc": "{{count}} Freelancer in deinem Pool. Schalte diese Suche für {{cost}} Token frei (reduzierter Preis).",
+    "unlock_button": "Pool-Suche freischalten ({{cost}} Token)",
+    "unlocked": "Pool-Suche freigeschaltet — {{cost}} Token ausgegeben · Guthaben {{balance}}",
+    "unlock_failed": "Freischaltung fehlgeschlagen",
+    "column_full": "Volle Matches",
+    "column_partial": "Teilweise Matches",
+    "no_results": "Kein Pool-Freelancer passt zu diesem Pit Call.",
+    "missing_days": "{{count}} fehlende Tag(e)",
+    "my_code": "Mein eindeutiger Code",
+    "my_code_hint": "Gib diesen Code an ein Team weiter, um in dessen Pool aufgenommen zu werden.",
+    "code_copied": "Code kopiert"
+  }
+}

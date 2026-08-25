@@ -1,0 +1,33 @@
+{
+  "pool": {
+    "badge": "My Pool",
+    "title": "My Pool",
+    "sub": "Votre cercle de confiance : chaque freelance avec qui vous avez conclu une pit call, plus ceux que vous ajoutez via leur code unique. La recherche dans le pool coûte moins de tokens et les noms sont toujours visibles.",
+    "nav": "My Pool",
+    "add_by_code": "Ajouter par code",
+    "add_by_code_hint": "Demandez au freelance le code unique affiché sur son profil.",
+    "add_button": "Ajouter au pool",
+    "added": "Freelance ajouté à votre pool",
+    "add_failed": "Impossible d'ajouter ce code",
+    "members": "Membres du pool",
+    "count": "{{count}} freelances",
+    "empty": "Votre pool est vide. Terminez une pit call ou ajoutez un freelance par code.",
+    "source_code": "Ajouté par code",
+    "source_engagement": "Pit call terminée",
+    "search_title": "Rechercher dans mon pool",
+    "search_hint": "Choisissez une de vos pit calls et comparez-la uniquement à votre pool.",
+    "select_pitcall": "Sélectionnez une pit call…",
+    "locked_title": "Recherche dans le pool verrouillée",
+    "locked_desc": "{{count}} freelances dans votre pool. Déverrouillez cette recherche pour {{cost}} tokens (coût réduit).",
+    "unlock_button": "Déverrouiller la recherche pool ({{cost}} tokens)",
+    "unlocked": "Recherche déverrouillée — {{cost}} tokens dépensés · solde {{balance}}",
+    "unlock_failed": "Échec du déverrouillage",
+    "column_full": "Matchs complets",
+    "column_partial": "Matchs partiels",
+    "no_results": "Aucun freelance du pool ne correspond à cette pit call.",
+    "missing_days": "{{count}} jour(s) manquant(s)",
+    "my_code": "Mon code unique",
+    "my_code_hint": "Communiquez ce code à un team pour rejoindre son pool.",
+    "code_copied": "Code copié"
+  }
+}

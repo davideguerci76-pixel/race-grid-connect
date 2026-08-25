@@ -951,6 +951,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const scope = (r.scope ?? "full") as string;
       (scope === "partial" ? unlockedPartial : unlockedFull).add(Number(r.tier));
     }
+    const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
+    const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
+
     const tiersFull = tiersFor(allFull.length, unlockedFull);
     const tiersPartial = tiersFor(allPartial.length, unlockedPartial);
 
@@ -1012,6 +1015,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         unlocked: showTech,
         free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
+        in_pool: poolSet.has(m.freelancer_id),
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
           count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
