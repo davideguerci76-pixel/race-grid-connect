@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as MarketRouteImport } from './routes/market'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -45,6 +46,11 @@ import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './r
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketRoute = MarketRouteImport.update({
+  id: '/market',
+  path: '/market',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsRoute = JobsRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/jobs': typeof JobsRoute
+  '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/jobs': typeof JobsRoute
+  '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/jobs': typeof JobsRoute
+  '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/jobs'
+    | '/market'
     | '/sitemap.xml'
     | '/admin'
     | '/dashboard'
@@ -357,6 +367,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/jobs'
+    | '/market'
     | '/sitemap.xml'
     | '/freelancers/$id'
     | '/legal/$doc'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/jobs'
+    | '/market'
     | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
@@ -424,6 +436,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   JobsRoute: typeof JobsRoute
+  MarketRoute: typeof MarketRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FreelancersIdRoute: typeof FreelancersIdRoute
   LegalDocRoute: typeof LegalDocRoute
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market': {
+      id: '/market'
+      path: '/market'
+      fullPath: '/market'
+      preLoaderRoute: typeof MarketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs': {
@@ -745,6 +765,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   JobsRoute: JobsRoute,
+  MarketRoute: MarketRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FreelancersIdRoute: FreelancersIdRoute,
   LegalDocRoute: LegalDocRoute,

@@ -1,0 +1,38 @@
+{
+  "market": {
+    "label": "MARKET DATA",
+    "highlights_title": "Market highlights",
+    "page_title": "Motorsport market data",
+    "page_sub": "Aggregated, anonymous data on match volume, Pit Call demand and freelancer availability across the paddock.",
+    "see_all": "Full statistics",
+    "total_matches": "Matches generated",
+    "confirmed_engagements": "Confirmed engagements",
+    "completed_engagements": "Completed engagements",
+    "open_pitcalls": "Open Pit Calls",
+    "specialists": "Specialists",
+    "teams": "Teams",
+    "available_specialists": "Available specialists",
+    "open_sos": "Open SOS calls",
+    "avg_day_rate": "Average day rate",
+    "hot_days_demand": "Hot days — demand spike",
+    "hot_days_demand_hint": "Days with more Pit Calls than available specialists.",
+    "hot_days_supply": "Hot days — supply spike",
+    "hot_days_supply_hint": "Days with many available specialists and few Pit Calls.",
+    "demand_short": "Pit Calls",
+    "supply_short": "Available",
+    "trend_title": "Last 6 months",
+    "trend_requests": "Pit Calls",
+    "trend_matches": "Matches",
+    "trend_engagements": "Engagements",
+    "top_disciplines": "Demand by discipline",
+    "top_roles": "Demand by role group",
+    "no_data": "No data yet",
+    "updated": "Updated"
+  },
+  "nav": {
+    "market": "Market data"
+  },
+  "footer": {
+    "market": "Market data"
+  }
+}
