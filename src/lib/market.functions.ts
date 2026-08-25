@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
 export type MarketDay = { day: string; demand: number; supply: number; gap: number };
+export type MarketCountry = { country: string; demand: number; supply: number; teams: number; gap: number; lat: number | null; lng: number | null };
 export type MarketTrend = { month: string; requests: number; matches: number; engagements: number };
 export type MarketStats = {
   generated_at: string;
@@ -22,6 +23,7 @@ export type MarketStats = {
   trend: MarketTrend[];
   top_disciplines: { discipline: string; requests: number }[];
   top_role_groups: { role_group: string; requests: number }[];
+  by_country: MarketCountry[];
 };
 
 export const getMarketStats = createServerFn({ method: "GET" }).handler(async (): Promise<MarketStats | null> => {

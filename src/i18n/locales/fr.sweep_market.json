@@ -27,7 +27,16 @@
     "top_disciplines": "Demande par discipline",
     "top_roles": "Demande par groupe de rôles",
     "no_data": "Pas encore de données",
-    "updated": "Mis à jour"
+    "updated": "Mis à jour",
+    "geo_label": "DONNÉES GÉO",
+    "geo_title": "Marché par pays",
+    "geo_sub": "Demande et offre agrégées par pays. Aucun détail par région ou ville.",
+    "geo_demand": "Pit Calls",
+    "geo_supply": "Spécialistes disponibles",
+    "geo_legend_demand": "Pays à forte demande",
+    "geo_legend_supply": "Pays à forte offre",
+    "geo_demand_by_country": "Demande par pays",
+    "geo_supply_by_country": "Offre par pays"
   },
   "nav": {
     "market": "Données marché"

@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
+
+const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
 export const Route = createFileRoute("/market")({
   head: () => ({
@@ -41,6 +44,9 @@ function MarketPage() {
   const maxTrend = Math.max(1, ...trend.map((m) => Math.max(m.requests, m.matches, m.engagements)));
   const maxDisc = Math.max(1, ...(data?.top_disciplines ?? []).map((d) => d.requests));
   const maxRole = Math.max(1, ...(data?.top_role_groups ?? []).map((d) => d.requests));
+  const countries = data?.by_country ?? [];
+  const maxCountryDemand = Math.max(1, ...countries.map((c) => c.demand));
+  const maxCountrySupply = Math.max(1, ...countries.map((c) => c.supply));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -137,6 +143,52 @@ function MarketPage() {
               {!isLoading && (data?.top_role_groups ?? []).length === 0 && (
                 <div className="py-3 font-mono text-xs text-muted-foreground">{t("market.no_data")}</div>
               )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <div className="label-mono">{t("market.geo_label")}</div>
+          <h2 className="text-2xl font-black uppercase italic tracking-tighter md:text-3xl">{t("market.geo_title")}</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{t("market.geo_sub")}</p>
+
+          <div className="mt-4">
+            <ClientOnly fallback={<div className="h-[420px] w-full border border-border bg-card" />}>
+              <Suspense fallback={<div className="h-[420px] w-full border border-border bg-card" />}>
+                <MarketWorldMap
+                  countries={countries}
+                  labels={{ demand: t("market.geo_demand"), supply: t("market.geo_supply"), teams: t("market.teams") }}
+                />
+              </Suspense>
+            </ClientOnly>
+            <div className="mt-2 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span><span className="mr-1 inline-block size-2 bg-racing-red align-middle" />{t("market.geo_legend_demand")}</span>
+              <span><span className="mr-1 inline-block size-2 bg-racing-yellow align-middle" />{t("market.geo_legend_supply")}</span>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="border border-border bg-card p-5">
+              <div className="label-mono text-racing-red">{t("market.geo_demand_by_country")}</div>
+              <div className="mt-3">
+                {[...countries].sort((a, b) => b.demand - a.demand).slice(0, 10).map((c) => (
+                  <Bar key={`d-${c.country}`} label={c.country} value={c.demand} max={maxCountryDemand} />
+                ))}
+                {!isLoading && countries.length === 0 && (
+                  <div className="py-3 font-mono text-xs text-muted-foreground">{t("market.no_data")}</div>
+                )}
+              </div>
+            </div>
+            <div className="border border-border bg-card p-5">
+              <div className="label-mono text-racing-yellow">{t("market.geo_supply_by_country")}</div>
+              <div className="mt-3">
+                {[...countries].sort((a, b) => b.supply - a.supply).slice(0, 10).map((c) => (
+                  <Bar key={`s-${c.country}`} label={c.country} value={c.supply} max={maxCountrySupply} />
+                ))}
+                {!isLoading && countries.length === 0 && (
+                  <div className="py-3 font-mono text-xs text-muted-foreground">{t("market.no_data")}</div>
+                )}
+              </div>
             </div>
           </div>
         </div>

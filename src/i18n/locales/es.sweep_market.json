@@ -27,7 +27,16 @@
     "top_disciplines": "Demanda por disciplina",
     "top_roles": "Demanda por grupo de rol",
     "no_data": "Sin datos todavía",
-    "updated": "Actualizado"
+    "updated": "Actualizado",
+    "geo_label": "DATOS GEO",
+    "geo_title": "Mercado por país",
+    "geo_sub": "Demanda y oferta agregadas por país. Sin detalle de región o ciudad.",
+    "geo_demand": "Pit Calls",
+    "geo_supply": "Especialistas disponibles",
+    "geo_legend_demand": "País con más demanda",
+    "geo_legend_supply": "País con más oferta",
+    "geo_demand_by_country": "Demanda por país",
+    "geo_supply_by_country": "Oferta por país"
   },
   "nav": {
     "market": "Datos mercado"
