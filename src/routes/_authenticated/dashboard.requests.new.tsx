@@ -180,11 +180,12 @@ function NewRequestPage() {
   const repostCost = isSeason
     ? setting("cost_repost_identical_full_season", 10)
     : setting("cost_repost_identical_race_weekend", 3);
-  const cost = identical ? repostCost : baseCost;
+  const standardCost = identical ? repostCost : baseCost;
   const poolSearchCost = setting("cost_pool_search", 5);
+  const displayCost = searchMode === "pool" ? poolSearchCost : standardCost;
 
   const balance = profile?.token_balance ?? 0;
-  const canAfford = balance >= cost;
+  const canAfford = balance >= displayCost;
 
   const seasonDatesIso = useMemo(() => seasonDates.map(fmt).sort(), [seasonDates]);
 
@@ -229,7 +230,7 @@ function NewRequestPage() {
           location_relevance: locRelevance,
           location_anchor: locAnchor,
           location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
-
+          search_mode: searchMode,
         } as never,
       }),
     onSuccess: () => {
@@ -303,7 +304,7 @@ function NewRequestPage() {
 
         <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
           <span className="font-mono text-xs uppercase text-muted-foreground">{t("requests.cost")}:</span>
-          <span className="font-bold text-racing-red">{cost} tokens</span>
+          <span className="font-bold text-racing-red">{displayCost} tokens</span>
           <span className="ml-auto font-mono text-xs uppercase text-muted-foreground">{t("requests.balance")}:</span>
           <span className={`font-bold ${canAfford ? "text-foreground" : "text-racing-red"}`}>{balance}</span>
           {!canAfford && (
@@ -775,7 +776,7 @@ function NewRequestPage() {
             disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
-            {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost, label: t("requests.post_for") })}
+            {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost: displayCost, label: t("requests.post_for") })}
           </button>
         </form>
       </div>

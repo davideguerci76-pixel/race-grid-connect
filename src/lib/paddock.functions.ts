@@ -339,6 +339,7 @@ export const createRequest = createServerFn({ method: "POST" })
         location_relevance: z.enum(["not_relevant","relevant","mandatory"]).optional().default("not_relevant"),
         location_anchor: z.enum(["this","team"]).optional().default("this"),
         location_radius_km: z.number().int().min(1).max(20000).optional().nullable(),
+        search_mode: z.enum(["standard", "pool"]).optional().default("standard"),
       })
       .parse(data),
   )
