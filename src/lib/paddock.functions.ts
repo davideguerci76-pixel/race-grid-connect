@@ -339,6 +339,7 @@ export const createRequest = createServerFn({ method: "POST" })
         location_relevance: z.enum(["not_relevant","relevant","mandatory"]).optional().default("not_relevant"),
         location_anchor: z.enum(["this","team"]).optional().default("this"),
         location_radius_km: z.number().int().min(1).max(20000).optional().nullable(),
+        search_mode: z.enum(["standard", "pool"]).optional().default("standard"),
       })
       .parse(data),
   )
@@ -376,7 +377,7 @@ export const createRequest = createServerFn({ method: "POST" })
       location_relevance: data.location_relevance ?? "not_relevant",
       location_anchor: data.location_anchor ?? "this",
       location_radius_km: data.location_radius_km ?? null,
-
+      search_mode: data.search_mode ?? "standard",
     };
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
