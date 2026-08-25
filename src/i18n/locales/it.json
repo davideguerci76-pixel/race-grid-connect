@@ -249,7 +249,7 @@
     "confirm_close": "Chiudere questa Pit Call? Smetterà di generare match.",
     "repost": "Ripubblica simile",
     "status_updated": "Stato aggiornato",
-    "posted": "Pit Call pubblicata. Addebitati 5 token.",
+    "posted": "Pit Call pubblicata. Addebitati {{cost}} token.",
     "cost": "Costo",
     "balance": "Saldo",
     "top_up": "Ricarica",

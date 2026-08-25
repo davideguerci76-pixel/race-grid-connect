@@ -237,7 +237,7 @@
     "confirm_close": "Fermer cette Pit Call ?",
     "repost": "Publier similaire",
     "status_updated": "Statut mis à jour",
-    "posted": "Publiée. 5 tokens débités.",
+    "posted": "Publiée. {{cost}} tokens débités.",
     "cost": "Coût",
     "balance": "Solde",
     "top_up": "Recharger",

@@ -182,7 +182,7 @@ function NewRequestPage() {
     : setting("cost_repost_identical_race_weekend", 3);
   const standardCost = identical ? repostCost : baseCost;
   const poolSearchCost = setting("cost_pool_search", 5);
-  const displayCost = searchMode === "pool" ? poolSearchCost : standardCost;
+  const displayCost = searchMode === "pool" && !identical ? poolSearchCost : standardCost;
 
   const balance = profile?.token_balance ?? 0;
   const canAfford = balance >= displayCost;
@@ -234,7 +234,7 @@ function NewRequestPage() {
         } as never,
       }),
     onSuccess: () => {
-      toast.success(t("requests.posted"));
+      toast.success(t("requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
       navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
     },

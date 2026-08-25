@@ -249,7 +249,7 @@
     "confirm_close": "Close this Pit Call? It will stop matching.",
     "repost": "Post similar",
     "status_updated": "Status updated",
-    "posted": "Pit Call posted. 5 tokens debited.",
+    "posted": "Pit Call posted. {{cost}} tokens debited.",
     "cost": "Cost",
     "balance": "Balance",
     "top_up": "Top up",
