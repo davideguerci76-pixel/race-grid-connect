@@ -61,23 +61,60 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("start_date, end_date, status")
+      .select("start_date, end_date, status, request:requests(start_date, end_date, season_dates)")
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed"]);
     if (error) throw new Error(error.message);
-    const out = new Set<string>();
-    for (const r of (data ?? []) as Array<{ start_date: string; end_date: string }>) {
-      const s = new Date(r.start_date + "T00:00:00");
-      const e = new Date(r.end_date + "T00:00:00");
-      const cur = new Date(s);
-      while (cur <= e) {
-        const y = cur.getFullYear();
-        const m = String(cur.getMonth() + 1).padStart(2, "0");
-        const d = String(cur.getDate()).padStart(2, "0");
-        out.add(`${y}-${m}-${d}`);
-        cur.setDate(cur.getDate() + 1);
+
+    const toIso = (d: Date) => {
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+    const daysBetween = (start: string, end: string) => {
+      const days: string[] = [];
+      const cur = new Date(`${start.slice(0, 10)}T00:00:00.000Z`);
+      const last = new Date(`${end.slice(0, 10)}T00:00:00.000Z`);
+      while (!Number.isNaN(cur.getTime()) && !Number.isNaN(last.getTime()) && cur.getTime() <= last.getTime()) {
+        days.push(toIso(cur));
+        cur.setUTCDate(cur.getUTCDate() + 1);
+      }
+      return days;
+    };
+
+    const engagements = (data ?? []) as Array<{
+      start_date: string;
+      end_date: string;
+      request?: { start_date?: string | null; end_date?: string | null; season_dates?: string[] | null } | null;
+    }>;
+    const requiredByEngagement = engagements.map((r) => {
+      const seasonDates = Array.isArray(r.request?.season_dates) ? r.request?.season_dates : [];
+      if (seasonDates.length) return seasonDates.map((d) => String(d).slice(0, 10));
+      const start = r.request?.start_date ?? r.start_date;
+      const end = r.request?.end_date ?? r.end_date;
+      return daysBetween(start, end);
+    });
+    const allRequired = Array.from(new Set(requiredByEngagement.flat()));
+    const available = new Set<string>();
+    if (allRequired.length) {
+      const { data: availableDays } = await supabase
+        .from("availability")
+        .select("day")
+        .eq("freelancer_id", userId)
+        .in("day", allRequired);
+      for (const row of (availableDays ?? []) as Array<{ day: string }>) {
+        available.add(String(row.day).slice(0, 10));
       }
     }
+
+    const out = new Set<string>();
+    engagements.forEach((engagement, index) => {
+      const required = requiredByEngagement[index] ?? [];
+      const worked = required.filter((day) => available.has(day));
+      const daysToBlock = worked.length ? worked : daysBetween(engagement.start_date, engagement.end_date);
+      daysToBlock.forEach((day) => out.add(day));
+    });
     return Array.from(out);
   });
 
