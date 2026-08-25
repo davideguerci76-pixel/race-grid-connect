@@ -15,7 +15,6 @@ export type MarketStats = {
     freelancers: number;
     teams: number;
     available_freelancers: number;
-    avg_day_rate: number | null;
     open_sos: number;
   };
   hot_days_demand: MarketDay[];
@@ -42,5 +41,9 @@ export const getMarketStats = createServerFn({ method: "GET" }).handler(async ()
   });
   const { data, error } = await client.rpc("market_stats" as never);
   if (error) throw new Error(error.message);
-  return (data as unknown as MarketStats) ?? null;
+  if (!data) return null;
+  const stats = data as unknown as MarketStats & { totals: Record<string, unknown> };
+  // Average day rate is admin-only: never expose it on public market pages.
+  if (stats?.totals) delete stats.totals["avg_day_rate"];
+  return stats;
 });
