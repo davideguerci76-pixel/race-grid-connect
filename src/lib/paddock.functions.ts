@@ -877,6 +877,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (reqErr) throw new Error(reqErr.message);
     if (!req) throw new Error("Request not found");
     if (req.team_id !== userId) throw new Error("Not owner of this request");
+    const isPoolRequest = (req as any).search_mode === "pool";
 
     const settingKeys = [
       "cost_tier2_entry",
@@ -904,14 +905,20 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
+    const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
+    const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
+    const requestMatches = isPoolRequest
+      ? (allMatches ?? []).filter((m: any) => poolSet.has(m.freelancer_id))
+      : (allMatches ?? []);
+
     // Sort by final_score DESC (penalty applied), tiebreak by created_at
     const sortFn = (a: any, b: any) => {
       const ds = Number(b.final_score ?? b.match_score ?? 0) - Number(a.final_score ?? a.match_score ?? 0);
       if (ds !== 0) return ds;
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     };
-    const allFull = (allMatches ?? []).filter((m: any) => !m.is_partial).slice().sort(sortFn).slice(0, hardCap);
-    const allPartial = (allMatches ?? []).filter((m: any) => m.is_partial).slice().sort(sortFn).slice(0, hardCap);
+    const allFull = requestMatches.filter((m: any) => !m.is_partial).slice().sort(sortFn).slice(0, hardCap);
+    const allPartial = requestMatches.filter((m: any) => m.is_partial).slice().sort(sortFn).slice(0, hardCap);
 
     const computeTierCost = (base: number, slots: number, size: number) => {
       if (slots <= 0) return 0;
@@ -952,11 +959,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const scope = (r.scope ?? "full") as string;
       (scope === "partial" ? unlockedPartial : unlockedFull).add(Number(r.tier));
     }
-    const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
-    const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
-
-    const tiersFull = tiersFor(allFull.length, unlockedFull);
-    const tiersPartial = tiersFor(allPartial.length, unlockedPartial);
+    const poolUnlockedTiers = new Set([2, 3]);
+    const tiersFull = tiersFor(allFull.length, isPoolRequest ? poolUnlockedTiers : unlockedFull);
+    const tiersPartial = tiersFor(allPartial.length, isPoolRequest ? poolUnlockedTiers : unlockedPartial);
 
     const allFreelancerIds = Array.from(new Set([...allFull, ...allPartial].map((m: any) => m.freelancer_id)));
     const ratingAvg = new Map<string, { avg: number; count: number }>();
@@ -1014,10 +1019,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const tierUnlocked = tier === 1 || tierUnlockedSet.has(tier);
       const topThree = rank <= 3;
       const perProfileUnlocked = unlockMap.has(m.id);
-      const showTech = tierUnlocked && (topThree || perProfileUnlocked);
-      const blurred = tierUnlocked && !showTech;
       const fp = fpMap.get(m.freelancer_id);
       const inPool = poolSet.has(m.freelancer_id);
+      const poolVisible = isPoolRequest && inPool;
+      const showTech = poolVisible || (tierUnlocked && (topThree || perProfileUnlocked));
+      const blurred = !poolVisible && tierUnlocked && !showTech;
       const poolProfile = poolProfileMap.get(m.freelancer_id);
       const poolContact = poolContactMap.get(m.freelancer_id);
       const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
@@ -1041,7 +1047,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         edge_only: m.edge_only !== false,
         missing_criteria: m.missing_criteria ?? [],
         unlocked: showTech,
-        free_preview: topThree || unlockMap.get(m.id)?.free_preview === true,
+        free_preview: poolVisible || topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
         rating: {
