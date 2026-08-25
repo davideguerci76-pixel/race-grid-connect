@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site-header";
-import logoFull from "@/assets/pitcall-logo-full.png.asset.json";
+import logoClean from "@/assets/pitcall-logo-clean.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
 
 const searchSchema = z.object({
@@ -93,7 +93,7 @@ function AuthPage() {
       <SiteHeader />
       <div className="container-page grid gap-12 py-16 md:grid-cols-2">
         <div className="hidden md:block">
-          <img src={logoFull.url} alt="Pit Call — Box. Now!" width={1089} height={424} className="mb-6 w-full max-w-sm object-contain mix-blend-screen" />
+          <img src={logoClean.url} alt="Pit Call" width={1933} height={274} className="mb-6 w-full max-w-sm object-contain mix-blend-screen" />
           <div className="label-mono mb-4">{isSignup ? "[REGISTRATION]" : "[SIGN IN]"}</div>
           <h1 className="text-5xl font-black uppercase italic tracking-tighter">
             {isSignup ? t("auth.signup_title") : t("auth.signin_title")}
