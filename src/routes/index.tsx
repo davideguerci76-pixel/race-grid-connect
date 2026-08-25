@@ -106,7 +106,15 @@ function Home() {
         </div>
       </section>
 
+      {/* MARKET HIGHLIGHTS */}
+      <section className="border-b border-border">
+        <div className="container-page py-20">
+          <MarketHighlights />
+        </div>
+      </section>
+
       {/* STATS */}
+
       <section className="border-b border-border bg-pit">
         <div className="container-page grid grid-cols-2 divide-x divide-border md:grid-cols-4">
           {[
