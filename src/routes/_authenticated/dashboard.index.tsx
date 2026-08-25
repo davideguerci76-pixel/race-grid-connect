@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
+import { MarketHighlights } from "@/components/market-highlights";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -163,6 +164,8 @@ function DashboardHome() {
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value="→" />
         </div>
+
+        <MarketHighlights compact />
       </div>
       <SiteFooter />
     </div>

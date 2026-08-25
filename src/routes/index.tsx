@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { MarketHighlights } from "@/components/market-highlights";
 
 export const Route = createFileRoute("/")({
   component: Home,
