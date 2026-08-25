@@ -11,7 +11,7 @@ import { TokenBadge } from "./token-badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
 import { getUnreadNotificationCount } from "@/lib/paddock.functions";
-import logoCompact from "@/assets/pitcall-logo-compact.png.asset.json";
+import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 
 export function SiteHeader() {
@@ -96,7 +96,7 @@ export function SiteHeader() {
           <img
             src={logoCompact.url}
             alt="Pit Call"
-            width={1246} height={211}
+            width={1933} height={274}
             className="h-8 w-auto max-w-[45vw] object-contain mix-blend-screen sm:h-11 md:h-12"
           />
         </Link>

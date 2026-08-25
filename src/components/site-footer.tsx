@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import logoCompact from "@/assets/pitcall-logo-compact.png.asset.json";
+import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -8,7 +8,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <img src={logoCompact.url} alt="Pit Call" width={1246} height={211} className="h-12 w-auto object-contain mix-blend-screen" />
+          <img src={logoCompact.url} alt="Pit Call" width={1933} height={274} className="h-10 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
         <div>
