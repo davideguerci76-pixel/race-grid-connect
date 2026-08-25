@@ -175,9 +175,9 @@ function DashboardHome() {
             <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={t("dashboard.manage_calendar")} />
           )}
           <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
-          <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(matchesCount)} />
+          <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
-          <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value="→" />
+          <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={String(matchesCount)} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}
         </div>
 
