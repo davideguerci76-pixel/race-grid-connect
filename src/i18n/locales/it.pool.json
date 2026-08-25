@@ -25,6 +25,8 @@
     "column_full": "Match totali",
     "column_partial": "Match parziali",
     "no_results": "Nessun freelance del pool corrisponde a questa pit call.",
+    "no_email": "Email non disponibile",
+    "no_phone": "Telefono non disponibile",
     "missing_days": "{{count}} giorno/i mancanti",
     "missing_dates_many": "Giorni mancanti:",
     "missing_dates_one": "Manca il giorno:",

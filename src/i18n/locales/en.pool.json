@@ -25,6 +25,8 @@
     "column_full": "Full matches",
     "column_partial": "Partial matches",
     "no_results": "No pool freelancer matches this pit call.",
+    "no_email": "Email not available",
+    "no_phone": "Phone not available",
     "missing_days": "{{count}} day(s) missing",
     "missing_dates_many": "Missing days:",
     "missing_dates_one": "Missing day:",
