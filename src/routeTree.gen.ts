@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
+import { Route as AuthenticatedDashboardPoolRouteImport } from './routes/_authenticated/dashboard.pool'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
 import { Route as AuthenticatedDashboardMatchesRouteImport } from './routes/_authenticated/dashboard.matches'
 import { Route as AuthenticatedDashboardEngagementsRouteImport } from './routes/_authenticated/dashboard.engagements'
@@ -122,6 +123,12 @@ const AuthenticatedDashboardProfileRoute =
   AuthenticatedDashboardProfileRouteImport.update({
     id: '/profile',
     path: '/profile',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardPoolRoute =
+  AuthenticatedDashboardPoolRouteImport.update({
+    id: '/pool',
+    path: '/pool',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardNotificationsRoute =
@@ -244,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -275,6 +283,7 @@ export interface FileRoutesByTo {
   '/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -310,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/engagements': typeof AuthenticatedDashboardEngagementsRoute
   '/_authenticated/dashboard/matches': typeof AuthenticatedDashboardMatchesRoute
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
+  '/_authenticated/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/notifications'
+    | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
     | '/admin/'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/dashboard/engagements'
     | '/dashboard/matches'
     | '/dashboard/notifications'
+    | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
     | '/admin'
@@ -410,6 +422,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/engagements'
     | '/_authenticated/dashboard/matches'
     | '/_authenticated/dashboard/notifications'
+    | '/_authenticated/dashboard/pool'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/tokens'
     | '/_authenticated/admin/'
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/dashboard/profile'
       preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/pool': {
+      id: '/_authenticated/dashboard/pool'
+      path: '/pool'
+      fullPath: '/dashboard/pool'
+      preLoaderRoute: typeof AuthenticatedDashboardPoolRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/notifications': {
@@ -694,6 +714,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardEngagementsRoute: typeof AuthenticatedDashboardEngagementsRoute
   AuthenticatedDashboardMatchesRoute: typeof AuthenticatedDashboardMatchesRoute
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
+  AuthenticatedDashboardPoolRoute: typeof AuthenticatedDashboardPoolRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -711,6 +732,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardMatchesRoute: AuthenticatedDashboardMatchesRoute,
     AuthenticatedDashboardNotificationsRoute:
       AuthenticatedDashboardNotificationsRoute,
+    AuthenticatedDashboardPoolRoute: AuthenticatedDashboardPoolRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,

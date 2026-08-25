@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Clock, Lock, Unlock, Users } from "lucide-react";
+import { Clock, Unlock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackButton } from "@/components/back-button";
@@ -255,5 +255,3 @@ function PoolColumn({ title, items, partial = false }: { title: string; items: a
     </div>
   );
 }
-
-export { Users, Lock };
