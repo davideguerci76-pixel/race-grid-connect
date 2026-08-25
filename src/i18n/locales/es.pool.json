@@ -26,6 +26,8 @@
     "column_partial": "Coincidencias parciales",
     "no_results": "Ningún freelance del pool coincide con esta pit call.",
     "missing_days": "{{count}} día(s) faltantes",
+    "missing_dates_many": "Días faltantes:",
+    "missing_dates_one": "Falta el día:",
     "my_code": "Mi código único",
     "my_code_hint": "Comparte este código con un team para que te añada a su pool.",
     "code_copied": "Código copiado",

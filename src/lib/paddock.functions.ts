@@ -989,6 +989,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const ratingAvg = new Map<string, { avg: number; count: number }>();
     const availabilityByFreelancer = new Map<string, Set<string>>();
     if (allFreelancerIds.length) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: allRatings }, { data: availableDays }] = await Promise.all([
         supabase
           .from("ratings")
@@ -996,7 +997,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           .in("to_user_id", allFreelancerIds)
           .not("unlocked_at", "is", null),
         requiredDays.length
-          ? supabase
+          ? supabaseAdmin
               .from("availability")
               .select("freelancer_id, day")
               .in("freelancer_id", allFreelancerIds)

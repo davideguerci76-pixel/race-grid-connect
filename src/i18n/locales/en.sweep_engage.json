@@ -177,6 +177,8 @@
       "matches_intro_2": "are always previewable for free (technical details, no contacts). Ranks 4–10 stay blurred until you spend {{cost}} token(s) per profile. Tiers 2 (11–20) and 3 (21–50) require a one-time entry fee — reduced proportionally when fewer matches exist. Nothing beyond rank {{hardCap}} is ever exposed.",
       "matches_range": "Matches {{from}}–{{to}}",
       "missing_days_badge": "{{count}} missing day(s)",
+      "missing_dates_many": "Missing days:",
+      "missing_dates_one": "Missing day:",
       "no_email_on_file": "No email on file",
       "no_matches_yet": "No matches for this request yet.",
       "no_phone_on_file": "No phone on file",

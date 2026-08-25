@@ -177,6 +177,8 @@
       "matches_intro_2": "sono sempre visualizzabili gratuitamente in anteprima (dettagli tecnici, senza contatti). Le posizioni 4–10 restano sfocate finché non spendi {{cost}} token per profilo. I livelli 2 (11–20) e 3 (21–50) richiedono una quota d'ingresso una tantum — ridotta proporzionalmente se ci sono meno match. Nulla oltre la posizione {{hardCap}} viene mai mostrato.",
       "matches_range": "Match {{from}}–{{to}}",
       "missing_days_badge": "{{count}} giorno/i mancante/i",
+      "missing_dates_many": "Giorni mancanti:",
+      "missing_dates_one": "Manca il giorno:",
       "no_email_on_file": "Nessuna email registrata",
       "no_matches_yet": "Ancora nessun match per questa richiesta.",
       "no_phone_on_file": "Nessun telefono registrato",

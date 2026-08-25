@@ -26,6 +26,8 @@
     "column_partial": "Matchs partiels",
     "no_results": "Aucun freelance du pool ne correspond à cette pit call.",
     "missing_days": "{{count}} jour(s) manquant(s)",
+    "missing_dates_many": "Jours manquants :",
+    "missing_dates_one": "Jour manquant :",
     "my_code": "Mon code unique",
     "my_code_hint": "Communiquez ce code à un team pour rejoindre son pool.",
     "code_copied": "Code copié",

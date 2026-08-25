@@ -188,7 +188,8 @@ export const getPoolMatches = createServerFn({ method: "GET" })
 
     const availabilityByFreelancer = new Map<string, Set<string>>();
     if (poolIds.length && requiredDays.length) {
-      const { data: availableDays } = await supabase
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: availableDays } = await supabaseAdmin
         .from("availability")
         .select("freelancer_id, day")
         .in("freelancer_id", poolIds)

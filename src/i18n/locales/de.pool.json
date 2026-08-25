@@ -26,6 +26,8 @@
     "column_partial": "Teilweise Matches",
     "no_results": "Kein Pool-Freelancer passt zu diesem Pit Call.",
     "missing_days": "{{count}} fehlende Tag(e)",
+    "missing_dates_many": "Fehlende Tage:",
+    "missing_dates_one": "Fehlender Tag:",
     "my_code": "Mein eindeutiger Code",
     "my_code_hint": "Gib diesen Code an ein Team weiter, um in dessen Pool aufgenommen zu werden.",
     "code_copied": "Code kopiert",
