@@ -32,8 +32,13 @@ export const getMarketStats = createServerFn({ method: "GET" }).handler(async ()
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
       fetch: (input, init) => {
-        const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        const h = new Headers(
+          typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+        );
+        if (init?.headers) new Headers(init.headers).forEach((v, k2) => h.set(k2, v));
+        // Public market stats are anon-only: never forward a caller JWT
+        // (a skewed/expired user token makes PostgREST reject the request).
+        h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
