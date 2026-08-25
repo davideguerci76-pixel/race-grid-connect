@@ -79,6 +79,20 @@ function NewRequestPage() {
 
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);
+  const fetchSettings = useServerFn(getPlatformSettings);
+  const fetchPool = useServerFn(getMyPool);
+
+  const { data: settings = [] } = useQuery({
+    queryKey: ["platform-settings"],
+    queryFn: () => fetchSettings(),
+    staleTime: 0,
+  });
+  const setting = (key: string, fallbackValue: number) =>
+    Number((settings as Array<{ key: string; value_num: number }>).find((s) => s.key === key)?.value_num ?? fallbackValue);
+
+  const { data: pool = [] } = useQuery({ queryKey: ["my-pool"], queryFn: () => fetchPool(), enabled: !!user });
+  const [searchMode, setSearchMode] = useState<SearchMode>("standard");
+
 
   const { data: existing } = useQuery({
     queryKey: ["my-requests", user?.id],
