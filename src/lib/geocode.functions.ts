@@ -24,38 +24,56 @@ export type GeoResult = {
 export const searchPlaces = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }): Promise<GeoResult[]> => {
-    const params = new URLSearchParams({
-      q: data.q,
-      format: "jsonv2",
-      addressdetails: "1",
-      limit: "8",
-      "accept-language": data.lang || "en",
-    });
-    if (data.citiesOnly) params.set("featureType", "settlement");
-
-    let res: Response;
     try {
-      res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-        headers: {
-          "User-Agent": "PitCall/1.0 (motorsport freelancer platform)",
-          Accept: "application/json",
-        },
+      const params = new URLSearchParams({
+        q: data.q,
+        format: "jsonv2",
+        addressdetails: "1",
+        limit: "8",
+        "accept-language": data.lang || "en",
       });
-    } catch {
+      if (data.citiesOnly) params.set("featureType", "settlement");
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      let res: Response;
+      try {
+        res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          headers: {
+            "User-Agent": "PitCall/1.0 (motorsport freelancer platform)",
+            Accept: "application/json",
+          },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+      if (!res.ok) return [];
+
+      const raw = await res.text();
+      let json: unknown;
+      try {
+        json = JSON.parse(raw);
+      } catch {
+        return [];
+      }
+      if (!Array.isArray(json)) return [];
+
+      return (json as any[]).map((r) => {
+        const a = r?.address ?? {};
+        return {
+          id: String(r?.place_id ?? `${r?.lat},${r?.lon}`),
+          text: String(r?.display_name ?? ""),
+          lat: r?.lat != null ? Number(r.lat) : null,
+          lng: r?.lon != null ? Number(r.lon) : null,
+          city: a.city ?? a.town ?? a.village ?? a.municipality ?? a.hamlet ?? null,
+          region: a.state ?? a.region ?? a.county ?? null,
+          country: a.country ?? null,
+        };
+      });
+    } catch (err) {
+      console.error("searchPlaces failed", err);
       return [];
     }
-    if (!res.ok) return [];
-    const json = (await res.json()) as any[];
-    return (Array.isArray(json) ? json : []).map((r) => {
-      const a = r.address ?? {};
-      return {
-        id: String(r.place_id ?? `${r.lat},${r.lon}`),
-        text: String(r.display_name ?? ""),
-        lat: r.lat != null ? Number(r.lat) : null,
-        lng: r.lon != null ? Number(r.lon) : null,
-        city: a.city ?? a.town ?? a.village ?? a.municipality ?? a.hamlet ?? null,
-        region: a.state ?? a.region ?? a.county ?? null,
-        country: a.country ?? null,
-      };
-    });
   });
+
