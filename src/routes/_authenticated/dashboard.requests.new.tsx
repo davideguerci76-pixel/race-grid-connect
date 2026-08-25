@@ -235,7 +235,7 @@ function NewRequestPage() {
     onSuccess: () => {
       toast.success(t("requests.posted"));
       qc.invalidateQueries();
-      navigate({ to: "/dashboard/requests" });
+      navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
