@@ -174,9 +174,14 @@ function NewRequestPage() {
   }, [source, identical]);
 
   const isSeason = form.duration === "full_season";
-  const baseCost = isSeason ? COST_SEASON : COST_SINGLE;
-  const repostCost = isSeason ? COST_SEASON_REPOST : COST_SINGLE_REPOST;
+  const baseCost = isSeason
+    ? setting("cost_request_full_season", 15)
+    : setting("cost_request_race_weekend", 5);
+  const repostCost = isSeason
+    ? setting("cost_repost_identical_full_season", 10)
+    : setting("cost_repost_identical_race_weekend", 3);
   const cost = identical ? repostCost : baseCost;
+  const poolSearchCost = setting("cost_pool_search", 5);
 
   const balance = profile?.token_balance ?? 0;
   const canAfford = balance >= cost;
