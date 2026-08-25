@@ -343,7 +343,7 @@ function RequestMatchesPage() {
             )}
 
             {isPoolRequest ? (
-              <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">
+              <div className="mt-8 grid items-start gap-6 md:grid-cols-2">
                 <section className="border border-border bg-card p-4">
                   <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-border pb-3">
                     <div className="min-w-0">
