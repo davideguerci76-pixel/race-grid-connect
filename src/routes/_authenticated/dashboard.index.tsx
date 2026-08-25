@@ -93,6 +93,18 @@ function DashboardHome() {
     },
   });
 
+  const { data: activeMatchesCount = 0 } = useQuery({
+    queryKey: ["active-matches-count", user?.id],
+    enabled: !!user && !!profile,
+    queryFn: async () => {
+      const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
+      const { count } = await supabase.from("matches").select("*", { count: "exact", head: true }).eq(col, user!.id);
+      return count ?? 0;
+    },
+  });
+
+
+
 
   const isFreelancer = profile?.user_type === "freelancer";
   const listSos = useServerFn(getMyOpenSosCalls);
