@@ -42,10 +42,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
   component: NewRequestPage,
 });
 
-const COST_SINGLE = 5;
-const COST_SEASON = 15;
-const COST_SINGLE_REPOST = 3;
-const COST_SEASON_REPOST = 10;
+type SearchMode = "standard" | "pool";
+
 
 
 function fmt(d: Date): string {
