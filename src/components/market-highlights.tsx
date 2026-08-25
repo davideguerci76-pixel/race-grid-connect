@@ -61,7 +61,7 @@ export function MarketHighlights({ compact = false }: { compact?: boolean }) {
         <Stat icon={Activity} label={t("market.total_matches")} value={isLoading ? "—" : String(totals?.total_matches ?? 0)} />
         <Stat icon={CalendarClock} label={t("market.open_pitcalls")} value={isLoading ? "—" : String(totals?.active_requests ?? 0)} />
         <Stat icon={Users} label={t("market.available_specialists")} value={isLoading ? "—" : String(totals?.available_freelancers ?? 0)} />
-        <Stat icon={Flame} label={t("market.avg_day_rate")} value={isLoading || !totals?.avg_day_rate ? "—" : `€ ${totals.avg_day_rate}`} />
+        <Stat icon={Flame} label={t("market.completed_engagements")} value={isLoading ? "—" : String(totals?.completed_engagements ?? 0)} />
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">

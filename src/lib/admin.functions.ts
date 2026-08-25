@@ -387,3 +387,196 @@ export const adminModerateRating = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const adminMarketPrivateStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("freelancer_profiles")
+      .select("day_rate, currency")
+      .not("day_rate", "is", null);
+    if (error) throw new Error(error.message);
+    const rates = ((data ?? []) as any[]).map((r) => Number(r.day_rate)).filter((n) => n > 0);
+    const avg = rates.length ? Math.round(rates.reduce((a, b) => a + b, 0) / rates.length) : null;
+    const sorted = [...rates].sort((a, b) => a - b);
+    const median = sorted.length ? sorted[Math.floor(sorted.length / 2)] ?? null : null;
+    return {
+      avg_day_rate: avg,
+      median_day_rate: median,
+      min_day_rate: sorted.length ? sorted[0]! : null,
+      max_day_rate: sorted.length ? sorted[sorted.length - 1]! : null,
+      sample: rates.length,
+    };
+  });
+
+const freelancerPatch = z.object({
+  user_id: z.string().uuid(),
+  display_name: z.string().trim().max(120).optional(),
+  first_name: z.string().trim().max(80).nullable().optional(),
+  last_name: z.string().trim().max(80).nullable().optional(),
+  token_balance: z.number().int().min(0).max(1_000_000).optional(),
+  headline: z.string().trim().max(200).nullable().optional(),
+  role_group: z.string().trim().max(80).nullable().optional(),
+  location: z.string().trim().max(200).nullable().optional(),
+  day_rate: z.number().int().min(0).max(1_000_000).nullable().optional(),
+  currency: z.string().trim().max(8).optional(),
+  disciplines: z.array(z.string()).optional(),
+  skills: z.array(z.string()).optional(),
+  education: z.string().trim().max(400).nullable().optional(),
+  years_experience: z.number().int().min(0).max(80).nullable().optional(),
+  bio: z.string().trim().max(4000).nullable().optional(),
+  phone_dial_code: z.string().trim().max(8).nullable().optional(),
+  phone_number: z.string().trim().max(40).nullable().optional(),
+});
+
+export const adminUpdateFreelancer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => freelancerPatch.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { user_id, display_name, first_name, last_name, token_balance, phone_dial_code, phone_number, ...fp } = data;
+
+    const profilePatch: Record<string, unknown> = {};
+    if (display_name !== undefined) profilePatch["display_name"] = display_name;
+    if (first_name !== undefined) profilePatch["first_name"] = first_name;
+    if (last_name !== undefined) profilePatch["last_name"] = last_name;
+    if (token_balance !== undefined) {
+      const { data: prof } = await supabaseAdmin.from("profiles").select("token_balance").eq("id", user_id).single();
+      const delta = token_balance - (prof?.token_balance ?? 0);
+      if (delta !== 0) {
+        await supabaseAdmin.from("token_transactions").insert({
+          user_id,
+          delta,
+          reason: delta > 0 ? "admin_credit" : "admin_debit",
+          note: `Admin inline edit by ${context.userId}`,
+        } as never);
+      }
+      profilePatch["token_balance"] = token_balance;
+    }
+    if (Object.keys(profilePatch).length) {
+      const { error } = await supabaseAdmin.from("profiles").update(profilePatch as never).eq("id", user_id);
+      if (error) throw new Error(error.message);
+    }
+
+    const fpPatch = Object.fromEntries(Object.entries(fp).filter(([, v]) => v !== undefined));
+    if (Object.keys(fpPatch).length) {
+      const { error } = await supabaseAdmin
+        .from("freelancer_profiles")
+        .upsert({ user_id, ...fpPatch } as never, { onConflict: "user_id" });
+      if (error) throw new Error(error.message);
+    }
+
+    if (phone_dial_code !== undefined || phone_number !== undefined) {
+      const patch: Record<string, unknown> = { user_id };
+      if (phone_dial_code !== undefined) patch["phone_dial_code"] = phone_dial_code;
+      if (phone_number !== undefined) patch["phone_number"] = phone_number;
+      const { error } = await supabaseAdmin
+        .from("freelancer_contacts")
+        .upsert(patch as never, { onConflict: "user_id" });
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+const teamPatch = z.object({
+  user_id: z.string().uuid(),
+  display_name: z.string().trim().max(120).optional(),
+  token_balance: z.number().int().min(0).max(1_000_000).optional(),
+  team_name: z.string().trim().max(160).optional(),
+  team_type: z.string().trim().max(80).nullable().optional(),
+  location: z.string().trim().max(200).nullable().optional(),
+  primary_discipline: z.string().trim().max(80).nullable().optional(),
+  website: z.string().trim().max(300).nullable().optional(),
+  vat_number: z.string().trim().max(60).nullable().optional(),
+  size: z.string().trim().max(60).nullable().optional(),
+  founded_year: z.number().int().min(1800).max(2200).nullable().optional(),
+  bio: z.string().trim().max(4000).nullable().optional(),
+});
+
+export const adminUpdateTeam = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => teamPatch.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { user_id, display_name, token_balance, ...tp } = data;
+
+    const profilePatch: Record<string, unknown> = {};
+    if (display_name !== undefined) profilePatch["display_name"] = display_name;
+    if (token_balance !== undefined) {
+      const { data: prof } = await supabaseAdmin.from("profiles").select("token_balance").eq("id", user_id).single();
+      const delta = token_balance - (prof?.token_balance ?? 0);
+      if (delta !== 0) {
+        await supabaseAdmin.from("token_transactions").insert({
+          user_id,
+          delta,
+          reason: delta > 0 ? "admin_credit" : "admin_debit",
+          note: `Admin inline edit by ${context.userId}`,
+        } as never);
+      }
+      profilePatch["token_balance"] = token_balance;
+    }
+    if (Object.keys(profilePatch).length) {
+      const { error } = await supabaseAdmin.from("profiles").update(profilePatch as never).eq("id", user_id);
+      if (error) throw new Error(error.message);
+    }
+
+    const tpPatch = Object.fromEntries(Object.entries(tp).filter(([, v]) => v !== undefined));
+    if (Object.keys(tpPatch).length) {
+      const { data: existing } = await supabaseAdmin.from("team_profiles").select("team_name").eq("user_id", user_id).maybeSingle();
+      const payload: Record<string, unknown> = { user_id, ...tpPatch };
+      if (!existing && payload["team_name"] === undefined) payload["team_name"] = display_name ?? "Team";
+      const { error } = await supabaseAdmin
+        .from("team_profiles")
+        .upsert(payload as never, { onConflict: "user_id" });
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+export const adminGetTeamPool = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ team_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: pool, error } = await supabaseAdmin
+      .from("team_pool")
+      .select("freelancer_id, source, created_at")
+      .eq("team_id", data.team_id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const ids = ((pool ?? []) as any[]).map((p) => p.freelancer_id);
+    if (ids.length === 0) return [];
+    const [{ data: profiles }, { data: fps }, { data: contacts }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id, display_name, first_name, last_name").in("id", ids),
+      supabaseAdmin.from("freelancer_profiles").select("user_id, pit_code, location, role_group").in("user_id", ids),
+      supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", ids),
+    ]);
+    const pMap = new Map(((profiles ?? []) as any[]).map((p) => [p.id, p]));
+    const fMap = new Map(((fps ?? []) as any[]).map((p) => [p.user_id, p]));
+    const cMap = new Map(((contacts ?? []) as any[]).map((p) => [p.user_id, p]));
+    const out: any[] = [];
+    for (const row of (pool ?? []) as any[]) {
+      const id = row.freelancer_id;
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
+      const c = cMap.get(id);
+      out.push({
+        id,
+        first_name: pMap.get(id)?.first_name ?? null,
+        last_name: pMap.get(id)?.last_name ?? null,
+        display_name: pMap.get(id)?.display_name ?? "—",
+        email: u?.user?.email ?? null,
+        phone: c?.phone_number ? `${c.phone_dial_code ?? ""} ${c.phone_number}`.trim() : null,
+        pit_code: fMap.get(id)?.pit_code ?? null,
+        role_group: fMap.get(id)?.role_group ?? null,
+        location: fMap.get(id)?.location ?? null,
+        source: row.source,
+        created_at: row.created_at,
+      });
+    }
+    return out;
+  });

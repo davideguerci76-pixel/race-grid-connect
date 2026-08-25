@@ -76,13 +76,6 @@ function MarketPage() {
           ))}
         </div>
 
-        <div className="mt-4 border border-border bg-pit p-5">
-          <div className="label-mono">{t("market.avg_day_rate")}</div>
-          <div className="mt-1 font-mono text-4xl font-black tracking-tighter">
-            {isLoading || !totals?.avg_day_rate ? "—" : `€ ${totals.avg_day_rate}`}
-          </div>
-        </div>
-
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <div className="border border-border bg-card p-5">
             <div className="label-mono text-racing-red">{t("market.hot_days_demand")}</div>
