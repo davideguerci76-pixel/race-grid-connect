@@ -33,7 +33,7 @@ export function LocationAutocomplete({
   includeAllPlaces?: boolean;
 }) {
   const { t, i18n } = useTranslation();
-  const search = useServerFn(searchPlaces);
+
   const [input, setInput] = useState(value);
   const [suggestions, setSuggestions] = useState<GeoResult[]>([]);
   const [open, setOpen] = useState(false);
