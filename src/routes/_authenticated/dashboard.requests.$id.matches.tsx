@@ -102,6 +102,7 @@ function RequestMatchesPage() {
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
+  const hasAnyMatches = fullItems.length + partialItems.length > 0 || Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0;
 
   const renderPool = (
     label: string,
@@ -308,7 +309,7 @@ function RequestMatchesPage() {
             )}
 
             {/* Trivio: zero total matches, still active, no refund yet */}
-            {data.total_matches === 0 && !requestFilled && !(data.request as any).partial_refund_taken && (
+            {!hasAnyMatches && !requestFilled && !(data.request as any).partial_refund_taken && (
               <ZeroMatchTrivio
                 quote={(data as any).refund_quote}
                 hasPartials={data.total_partial_matches > 0}
@@ -336,7 +337,7 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {!isPoolRequest && (data.items ?? []).length === 0 && (data.items_partial ?? []).length === 0 && !((data.total_matches === 0) && !requestFilled) && (
+            {!isPoolRequest && (data.items ?? []).length === 0 && (data.items_partial ?? []).length === 0 && !(!hasAnyMatches && !requestFilled) && (
               <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
                 {t("sweep_engage.request_matches.no_matches_yet")}
               </div>
