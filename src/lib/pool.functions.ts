@@ -170,6 +170,38 @@ export const getPoolMatches = createServerFn({ method: "GET" })
       .in("freelancer_id", poolIds);
     if (mErr) throw new Error(mErr.message);
 
+    const requiredDays = (() => {
+      const seasonDates = Array.isArray((req as any).season_dates) ? (req as any).season_dates : [];
+      if (seasonDates.length) return seasonDates.map((d: string) => String(d).slice(0, 10));
+      const start = String((req as any).start_date ?? "").slice(0, 10);
+      const end = String((req as any).end_date ?? "").slice(0, 10);
+      if (!start || !end) return [] as string[];
+      const days: string[] = [];
+      const cursor = new Date(`${start}T00:00:00.000Z`);
+      const last = new Date(`${end}T00:00:00.000Z`);
+      while (!Number.isNaN(cursor.getTime()) && !Number.isNaN(last.getTime()) && cursor.getTime() <= last.getTime()) {
+        days.push(cursor.toISOString().slice(0, 10));
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+      }
+      return days;
+    })();
+
+    const availabilityByFreelancer = new Map<string, Set<string>>();
+    if (poolIds.length && requiredDays.length) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: availableDays } = await supabaseAdmin
+        .from("availability")
+        .select("freelancer_id, day")
+        .in("freelancer_id", poolIds)
+        .in("day", requiredDays);
+      for (const row of (availableDays ?? []) as any[]) {
+        const fid = row.freelancer_id as string;
+        const current = availabilityByFreelancer.get(fid) ?? new Set<string>();
+        current.add(String(row.day).slice(0, 10));
+        availabilityByFreelancer.set(fid, current);
+      }
+    }
+
     const sortFn = (a: any, b: any) => {
       const ds = Number(b.final_score ?? b.match_score ?? 0) - Number(a.final_score ?? a.match_score ?? 0);
       if (ds !== 0) return ds;
@@ -202,6 +234,8 @@ export const getPoolMatches = createServerFn({ method: "GET" })
       const p = pMap.get(m.freelancer_id);
       const f = fMap.get(m.freelancer_id);
       const legal = [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim();
+      const availableSet = availabilityByFreelancer.get(m.freelancer_id) ?? new Set<string>();
+      const missingDates = requiredDays.filter((day: string) => !availableSet.has(day));
       return {
         match_id: m.id,
         rank: i + 1,
@@ -212,6 +246,7 @@ export const getPoolMatches = createServerFn({ method: "GET" })
         is_partial: !!m.is_partial,
         edge_only: m.edge_only !== false,
         missing_days: Number(m.missing_days ?? 0),
+        missing_dates: missingDates,
         overlap_days: m.overlap_days,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,

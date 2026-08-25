@@ -450,6 +450,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
   const edgeOnly = match?.edge_only !== false;
   const profile = match?.profile ?? null;
   const missingCriteria = Array.isArray(match?.missing_criteria) ? match.missing_criteria : [];
+  const missingDates = Array.isArray(match?.missing_dates) ? match.missing_dates.filter((d: unknown) => typeof d === "string") : [];
   const subRoles = parseSubRoles(profile?.sub_roles);
   const disciplines = Array.isArray(profile?.disciplines) ? profile.disciplines : [];
   const skills = Array.isArray(profile?.skills) ? profile.skills : [];
@@ -479,9 +480,23 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
               {match?.free_preview && !match?.top_three && match?.unlocked && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.unlocked_tag")}</span>}
             </div>
             {isPartial && (
-              <div className={`mt-1 inline-flex items-center gap-2 border ${gapBadge} px-2 py-1 font-mono text-[10px] uppercase tracking-widest`} title={gapLabel}>
-                <span className={`inline-block size-2 rounded-full ${gapDot}`} />
-                <Clock className="size-3" /> {t("sweep_engage.request_matches.missing_days_badge", { count: match?.missing_days ?? 0 })} · {gapLabel}
+              <div className="mt-2 space-y-2">
+                <div className={`inline-flex items-center gap-2 border ${gapBadge} px-2 py-1 font-mono text-[10px] uppercase tracking-widest`} title={gapLabel}>
+                  <span className={`inline-block size-2 rounded-full ${gapDot}`} />
+                  <Clock className="size-3" /> {t("sweep_engage.request_matches.missing_days_badge", { count: match?.missing_days ?? 0 })} · {gapLabel}
+                </div>
+                {missingDates.length > 0 && (
+                  <div className="border border-racing-yellow/50 bg-background/60 p-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+                    <div className="mb-1">{t(missingDates.length === 1 ? "sweep_engage.request_matches.missing_dates_one" : "sweep_engage.request_matches.missing_dates_many")}</div>
+                    <div className="flex flex-wrap gap-1">
+                      {missingDates.map((day: string) => (
+                        <time key={day} dateTime={day} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5">
+                          {day}
+                        </time>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {match?.rating && match.rating.count > 0 && (

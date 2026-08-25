@@ -177,6 +177,8 @@
       "matches_intro_2": "sont toujours prévisualisables gratuitement (détails techniques, sans contacts). Les rangs 4–10 restent flous jusqu'à ce que vous dépensiez {{cost}} token(s) par profil. Les niveaux 2 (11–20) et 3 (21–50) nécessitent des frais d'entrée uniques — réduits proportionnellement s'il y a moins de matches. Rien au-delà du rang {{hardCap}} n'est jamais exposé.",
       "matches_range": "Matches {{from}}–{{to}}",
       "missing_days_badge": "{{count}} jour(s) manquant(s)",
+      "missing_dates_many": "Jours manquants :",
+      "missing_dates_one": "Jour manquant :",
       "no_email_on_file": "Aucun e-mail enregistré",
       "no_matches_yet": "Aucun match pour cette demande pour le moment.",
       "no_phone_on_file": "Aucun téléphone enregistré",

@@ -177,6 +177,8 @@
       "matches_intro_2": "sind immer kostenlos als Vorschau verfügbar (technische Details, keine Kontakte). Ränge 4–10 bleiben unscharf, bis Sie {{cost}} Token pro Profil ausgeben. Stufen 2 (11–20) und 3 (21–50) erfordern eine einmalige Eintrittsgebühr — proportional reduziert, wenn weniger Matches vorhanden sind. Nichts jenseits von Rang {{hardCap}} wird jemals offengelegt.",
       "matches_range": "Matches {{from}}–{{to}}",
       "missing_days_badge": "{{count}} fehlende(r) Tag(e)",
+      "missing_dates_many": "Fehlende Tage:",
+      "missing_dates_one": "Fehlender Tag:",
       "no_email_on_file": "Keine E-Mail hinterlegt",
       "no_matches_yet": "Noch keine Matches für diese Anfrage.",
       "no_phone_on_file": "Keine Telefonnummer hinterlegt",

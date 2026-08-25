@@ -971,18 +971,50 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const tiersPartial = tiersFor(allPartial.length, isPoolRequest ? poolUnlockedTiers : unlockedPartial);
 
     const allFreelancerIds = Array.from(new Set([...allFull, ...allPartial].map((m: any) => m.freelancer_id)));
+    const requiredDays = (() => {
+      const seasonDates = Array.isArray((req as any).season_dates) ? (req as any).season_dates : [];
+      if (seasonDates.length) return seasonDates.map((d: string) => String(d).slice(0, 10));
+      const start = String((req as any).start_date ?? "").slice(0, 10);
+      const end = String((req as any).end_date ?? "").slice(0, 10);
+      if (!start || !end) return [] as string[];
+      const days: string[] = [];
+      const cursor = new Date(`${start}T00:00:00.000Z`);
+      const last = new Date(`${end}T00:00:00.000Z`);
+      while (!Number.isNaN(cursor.getTime()) && !Number.isNaN(last.getTime()) && cursor.getTime() <= last.getTime()) {
+        days.push(cursor.toISOString().slice(0, 10));
+        cursor.setUTCDate(cursor.getUTCDate() + 1);
+      }
+      return days;
+    })();
     const ratingAvg = new Map<string, { avg: number; count: number }>();
+    const availabilityByFreelancer = new Map<string, Set<string>>();
     if (allFreelancerIds.length) {
-      const { data: allRatings } = await supabase
-        .from("ratings")
-        .select("to_user_id, stars, overall, unlocked_at")
-        .in("to_user_id", allFreelancerIds)
-        .not("unlocked_at", "is", null);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [{ data: allRatings }, { data: availableDays }] = await Promise.all([
+        supabase
+          .from("ratings")
+          .select("to_user_id, stars, overall, unlocked_at")
+          .in("to_user_id", allFreelancerIds)
+          .not("unlocked_at", "is", null),
+        requiredDays.length
+          ? supabaseAdmin
+              .from("availability")
+              .select("freelancer_id, day")
+              .in("freelancer_id", allFreelancerIds)
+              .in("day", requiredDays)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
       for (const r of (allRatings ?? []) as any[]) {
         const cur = ratingAvg.get(r.to_user_id) ?? { avg: 0, count: 0 };
         const v = Number(r.overall ?? r.stars ?? 0);
         const c = cur.count + 1;
         ratingAvg.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
+      }
+      for (const row of (availableDays ?? []) as any[]) {
+        const fid = row.freelancer_id as string;
+        const current = availabilityByFreelancer.get(fid) ?? new Set<string>();
+        current.add(String(row.day).slice(0, 10));
+        availabilityByFreelancer.set(fid, current);
       }
     }
 
@@ -1034,6 +1066,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const poolProfile = poolProfileMap.get(m.freelancer_id);
       const poolContact = poolContactMap.get(m.freelancer_id);
       const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
+      const availableSet = availabilityByFreelancer.get(m.freelancer_id) ?? new Set<string>();
+      const missingDates = requiredDays.filter((day: string) => !availableSet.has(day));
       return {
         match_id: m.id,
         scope,
@@ -1049,6 +1083,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         is_perfect: m.is_perfect,
         overlap_days: m.overlap_days,
         missing_days: Number(m.missing_days ?? 0),
+        missing_dates: missingDates,
         missing_pct: Number(m.missing_pct ?? 0),
         is_partial: !!m.is_partial,
         edge_only: m.edge_only !== false,
