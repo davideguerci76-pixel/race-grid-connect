@@ -249,6 +249,7 @@ export type Database = {
           location_lng: number | null
           location_place_id: string | null
           location_region: string | null
+          pit_code: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
           skills: string[]
@@ -275,6 +276,7 @@ export type Database = {
           location_lng?: number | null
           location_place_id?: string | null
           location_region?: string | null
+          pit_code?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           skills?: string[]
@@ -301,6 +303,7 @@ export type Database = {
           location_lng?: number | null
           location_place_id?: string | null
           location_region?: string | null
+          pit_code?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           skills?: string[]
@@ -601,6 +604,45 @@ export type Database = {
           value_num?: number
         }
         Relationships: []
+      }
+      pool_search_unlocks: {
+        Row: {
+          id: string
+          request_id: string
+          team_id: string
+          tokens_spent: number
+          unlocked_at: string
+        }
+        Insert: {
+          id?: string
+          request_id: string
+          team_id: string
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Update: {
+          id?: string
+          request_id?: string
+          team_id?: string
+          tokens_spent?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_search_unlocks_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pool_search_unlocks_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1096,6 +1138,48 @@ export type Database = {
           },
         ]
       }
+      team_pool: {
+        Row: {
+          created_at: string
+          engagement_id: string | null
+          freelancer_id: string
+          id: string
+          source: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          engagement_id?: string | null
+          freelancer_id: string
+          id?: string
+          source?: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          engagement_id?: string | null
+          freelancer_id?: string
+          id?: string
+          source?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_pool_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_pool_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_profiles: {
         Row: {
           bio: string | null
@@ -1385,6 +1469,23 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      add_pool_member_by_code: {
+        Args: { _code: string }
+        Returns: {
+          created_at: string
+          engagement_id: string | null
+          freelancer_id: string
+          id: string
+          source: string
+          team_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "team_pool"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
         Returns: {
@@ -1573,6 +1674,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      gen_pit_code: { Args: never; Returns: string }
       get_anonymous_reviews: {
         Args: { _target: string }
         Returns: {
@@ -1857,6 +1959,13 @@ export type Database = {
         }
       }
       unlock_match_for_team: { Args: { _match_id: string }; Returns: number }
+      unlock_pool_search: {
+        Args: { _request_id: string }
+        Returns: {
+          balance: number
+          tokens_spent: number
+        }[]
+      }
       unlock_request_tier: {
         Args: { _request_id: string; _scope?: string; _tier: number }
         Returns: {
