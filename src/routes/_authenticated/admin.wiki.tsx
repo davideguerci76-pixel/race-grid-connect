@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins, ShieldCheck } from "lucide-react";
+import { useRef } from "react";
+import { BookOpen, Calendar, MapPin, Clock, ListChecks, Siren, Coins, ShieldCheck, Users, Download, Sliders } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/wiki")({
   component: PlatformWiki,
@@ -57,9 +58,35 @@ function Table({ headers, rows }: { headers: string[]; rows: (string | React.Rea
   );
 }
 
+function download(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function PlatformWiki() {
+  const ref = useRef<HTMLDivElement>(null);
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  function downloadDocx() {
+    const body = ref.current?.innerHTML ?? "";
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Platform Wiki</title><style>body{font-family:Arial,sans-serif;font-size:11pt;color:#111}h1{font-size:20pt}h2{font-size:14pt;border-bottom:1px solid #999}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:4px;font-size:9pt;text-align:left}</style></head><body>${body}</body></html>`;
+    download(`platform-wiki-${stamp}.doc`, html, "application/msword");
+  }
+
+  function downloadTxt() {
+    const text = (ref.current?.innerText ?? "").replace(/\n{3,}/g, "\n\n");
+    download(`platform-wiki-${stamp}.txt`, text, "text/plain;charset=utf-8");
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={ref}>
       <div className="border-l-4 border-racing-red bg-racing-red/5 p-4">
         <div className="flex items-center gap-2">
           <BookOpen className="size-4 text-racing-red" />
@@ -73,6 +100,20 @@ function PlatformWiki() {
           admin-only. Numeric parameters mentioned as "configurable" live in{" "}
           <span className="font-mono">Admin → Tokens</span> and <span className="font-mono">Admin → Matching</span>.
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            onClick={downloadDocx}
+            className="inline-flex items-center gap-2 bg-racing-red px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110"
+          >
+            <Download className="size-3" /> Download Wiki (Word)
+          </button>
+          <button
+            onClick={downloadTxt}
+            className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+          >
+            <Download className="size-3" /> Download Wiki (TXT)
+          </button>
+        </div>
       </div>
 
       <Section icon={Calendar} tag="[01 · CALENDAR]" title="Freelancer availability calendar — day states">
@@ -367,6 +408,140 @@ function PlatformWiki() {
         <p className="text-xs text-muted-foreground">
           Token integration rule: taking Option 3 disables any subsequent refund on the same request — the halved amount
           is the total compensation for that request's outcome.
+        </p>
+      </Section>
+
+
+      <Section icon={Users} tag="[08 · MY POOL]" title="My Pool — private circle of trusted freelancers">
+        <p>
+          Every team owns a private <span className="font-bold">My Pool</span>: the shortlist of freelancers it already
+          worked with or explicitly invited. Pool membership changes what the team sees and what a search costs.
+        </p>
+        <p className="font-bold uppercase text-racing-yellow">A · How a freelancer enters the pool</p>
+        <Table
+          headers={["Entry path", "Trigger", "Source tag"]}
+          rows={[
+            ["Completed engagement", "A confirmed engagement between the team and the freelancer reaches status completed. A database trigger inserts the pool row automatically.", "engagement"],
+            ["Pit Code invitation", "The team types the freelancer's unique Pit Code in Dashboard → My Pool. The RPC add_pool_member_by_code resolves the code and adds the member instantly.", "code"],
+          ]}
+        />
+        <p className="text-xs text-muted-foreground">
+          The <span className="font-mono">Pit Code</span> is a unique, permanent identifier generated for every
+          freelancer profile. It is visible to the freelancer in their own dashboard, is shown in{" "}
+          <span className="font-mono">Admin → Freelancers</span> in a dedicated column, and is the only way to join a
+          pool without a completed engagement. Pool composition per team is inspectable from the{" "}
+          <span className="font-mono">Pool</span> column in <span className="font-mono">Admin → Teams</span> (name,
+          surname, phone, email and Pit Code of each member).
+        </p>
+        <p className="font-bold uppercase text-racing-yellow">B · Pool search mode on a Pit Call</p>
+        <ul className="list-disc pl-5">
+          <li>
+            When composing a Pit Call the team chooses <span className="font-mono">Standard</span> (whole marketplace) or{" "}
+            <span className="font-mono">My Pool</span> (only its own circle). The choice is stored on the request as{" "}
+            <span className="font-mono">search_mode</span>.
+          </li>
+          <li>
+            The cost box updates live: the pool search is cheaper than a standard Pit Call. Both prices are configurable
+            in <span className="font-mono">Admin → Tokens</span> and are read at posting time, never hard-coded in the UI.
+          </li>
+          <li>
+            In pool mode the matching engine restricts candidates to <span className="font-mono">team_pool</span> members
+            and the pool unlock is applied automatically at posting: no additional per-match unlock is charged.
+          </li>
+        </ul>
+        <p className="font-bold uppercase text-racing-yellow">C · Names in clear & badge</p>
+        <ul className="list-disc pl-5">
+          <li>
+            Pool members are never redacted for the owning team: full name is shown in clear on every match card, next to
+            the dedicated <span className="font-bold text-racing-yellow">POOL</span> badge.
+          </li>
+          <li>Direct contacts (phone, email) still follow the standard rule: revealed only once the match is confirmed.</li>
+          <li>For every other team the same freelancer stays anonymous until unlocked in the normal way.</li>
+        </ul>
+        <p className="font-bold uppercase text-racing-yellow">D · Rating & pool closure of a Pit Call</p>
+        <ul className="list-disc pl-5">
+          <li>
+            Concluding a Pit Call with a pool freelancer follows the same lifecycle as a standard one: propose → confirm →
+            complete → double-blind rating.
+          </li>
+          <li>
+            The double-blind rating window opens as soon as the relationship becomes a pool relationship (engagement
+            completed), so trusted circles accumulate reputation faster.
+          </li>
+          <li>Late cancellations by a pool member follow the same Negative CV and Locked-slot rules as everyone else.</li>
+        </ul>
+      </Section>
+
+      <Section icon={Sliders} tag="[09 · TOKEN ECONOMY]" title="Dynamic token economy — everything configurable from Admin">
+        <p>
+          No token price is hard-coded. Every cost, bonus and threshold lives in the{" "}
+          <span className="font-mono">platform_settings</span> table and is edited live in{" "}
+          <span className="font-mono">Admin → Tokens</span>, grouped by category (posting, unlocks, refunds, matching,
+          bonuses). Changes take effect immediately for every new operation; already-charged operations are never
+          re-priced retroactively.
+        </p>
+        <Table
+          headers={["Category", "What it drives"]}
+          rows={[
+            ["Posting", "Cost of a single-race Pit Call, a full-season Pit Call, and the reduced cost of a My Pool search."],
+            ["Unlocks", "Progressive per-block cost of revealing matches beyond the free tier, single-request team reveal vs full team profile reveal, and the cost of opening anonymous review text."],
+            ["Refunds", "refund_min_pct and refund_hard_penalty_pct used by the zero-match trivio formula."],
+            ["Matching", "sos_min_match_pct, partial-match thresholds and penalties, calendar-freshness influence."],
+            ["Bonuses", "Signup bonus and the token bonus credited when a rating is submitted."],
+          ]}
+        />
+        <p className="text-xs text-muted-foreground">
+          Every debit and credit is written to <span className="font-mono">token_transactions</span> with a reason code,
+          including manual admin adjustments made by editing a balance inline in the Freelancers or Teams table
+          (<span className="font-mono">admin_credit</span> / <span className="font-mono">admin_debit</span>).
+        </p>
+      </Section>
+
+      <Section icon={ListChecks} tag="[10 · MATCH COLUMNS & BADGES]" title="Double match columns, badges and sorting">
+        <p className="font-bold uppercase text-racing-yellow">A · The two match columns</p>
+        <Table
+          headers={["Column", "Content", "Token behaviour"]}
+          rows={[
+            ["Perfect matches (100%)", "Candidates available on every required day and passing every hard filter.", "First free tier is included in the Pit Call price; further reveals are charged per progressive block."],
+            ["Partial matches", "Candidates missing part of the required days, scored with a proportional penalty and shown with the missing-days gap.", "Unlockable only after taking Option 3 of the trivio, or directly when the team accepts the partial-coverage view."],
+          ]}
+        />
+        <p className="font-bold uppercase text-racing-yellow">B · Badge legend</p>
+        <Table
+          headers={["Badge", "Meaning"]}
+          rows={[
+            ["POOL (yellow)", "Freelancer already belongs to the team's My Pool: name in clear, reduced friction."],
+            ["PERFECT (green)", "100% date coverage and all hard requirements satisfied."],
+            ["PARTIAL (amber)", "Availability gap; the badge carries the number of missing days and the coverage percentage."],
+            ["LOCKED (grey/blur)", "Candidate exists but is not unlocked yet: identity blurred, cost shown on the unlock button."],
+            ["NEGATIVE CV (red)", "Counterparty has late cancellations or no-shows on record."],
+            ["CALENDAR STALE (yellow)", "Availability not confirmed recently; the freshness factor lowers the final score."],
+          ]}
+        />
+        <p className="text-xs text-muted-foreground">
+          Sorting rule: final score first (weighted score × freshness × penalties), then rating average, then recency.
+          Pool members are surfaced above equal-score non-pool candidates.
+        </p>
+      </Section>
+
+      <Section icon={ShieldCheck} tag="[11 · ADMIN CONTROL SURFACE]" title="Admin Control Panel — full capability map">
+        <Table
+          headers={["Tab", "What the admin can do"]}
+          rows={[
+            ["Freelancers", "Full inline editing of every field (name, macro-role, disciplines, skills, location, phone, day rate, token balance) with a per-row Save changes button. Dedicated Pit Code column. Block/unblock, delete, Excel export. Admin-only day-rate statistics strip (average, median, min, max) — this data is never shown on public market pages."],
+            ["Teams", "Full inline editing (team name, contact, discipline, location, website, VAT, token balance) with per-row Save changes. Dedicated Pool column opening a modal with the complete pool roster: name, surname, phone, email and Pit Code. Block/unblock, delete, Excel export."],
+            ["Pit Calls", "Lifecycle audit: reopen, suspend, close, delete; match register, FCFS winner, locked-out candidates, KPI strip and the general availability calendar."],
+            ["Permissions", "Grant or revoke the admin role."],
+            ["Matching", "Weight sliders for every scoring dimension, including calendar freshness and seniority tolerance."],
+            ["Tokens", "Live editing of every operational cost and bonus (see section 09)."],
+            ["Reviews", "Moderation queue with filters (all / flagged / frozen / auto-suspicious). Clicking a comment opens a modal with the full text, sub-scores, engagement reference and flag reason. Actions: approve, freeze, delete."],
+            ["Calendars", "Review and approve imported season calendars."],
+            ["Wiki", "This manual, downloadable as Word (.doc) or plain text."],
+          ]}
+        />
+        <p className="text-xs text-muted-foreground">
+          The Time Machine banner (simulated clock offset) applies to every date-dependent job: rating windows,
+          anti-ghosting escalations, calendar-stale notifications and Pit Call expiry.
         </p>
       </Section>
 
