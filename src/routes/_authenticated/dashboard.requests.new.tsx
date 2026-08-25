@@ -257,6 +257,50 @@ function NewRequestPage() {
           </Link>
         </div>
 
+        {/* Standard vs My Pool search mode */}
+        <div className="mt-6 border border-border bg-card p-4">
+          <div className="label-mono">[{t("pool.mode_title")}]</div>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {(["standard", "pool"] as SearchMode[]).map((m) => {
+              const active = searchMode === m;
+              const isPool = m === "pool";
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSearchMode(m)}
+                  className={`border p-4 text-left transition-colors ${
+                    active
+                      ? isPool
+                        ? "border-sky-400 bg-sky-400/10"
+                        : "border-racing-red bg-racing-red/10"
+                      : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-block size-3 rounded-full border ${
+                        active ? (isPool ? "border-sky-400 bg-sky-400" : "border-racing-red bg-racing-red") : "border-muted-foreground"
+                      }`}
+                    />
+                    <span className="text-sm font-bold uppercase tracking-widest">
+                      {isPool ? t("pool.mode_pool") : t("pool.mode_standard")}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {isPool ? t("pool.mode_pool_desc") : t("pool.mode_standard_desc")}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          {searchMode === "pool" && (
+            <div className="mt-3 border border-sky-400/50 bg-sky-400/5 p-3 text-xs text-sky-200">
+              {t("pool.mode_pool_note", { count: (pool as any[]).length, cost: poolSearchCost })}
+            </div>
+          )}
+        </div>
+
         <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
           <span className="font-mono text-xs uppercase text-muted-foreground">{t("requests.cost")}:</span>
           <span className="font-bold text-racing-red">{cost} tokens</span>
