@@ -1067,7 +1067,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const poolContact = poolContactMap.get(m.freelancer_id);
       const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
       const availableSet = availabilityByFreelancer.get(m.freelancer_id) ?? new Set<string>();
-      const missingDates = requiredDays.filter((day) => !availableSet.has(day));
+      const missingDates = requiredDays.filter((day: string) => !availableSet.has(day));
       return {
         match_id: m.id,
         scope,

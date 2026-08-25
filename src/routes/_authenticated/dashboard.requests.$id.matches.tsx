@@ -489,7 +489,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
                   <div className="border border-racing-yellow/50 bg-background/60 p-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
                     <div className="mb-1">{t(missingDates.length === 1 ? "sweep_engage.request_matches.missing_dates_one" : "sweep_engage.request_matches.missing_dates_many")}</div>
                     <div className="flex flex-wrap gap-1">
-                      {missingDates.map((day) => (
+                      {missingDates.map((day: string) => (
                         <time key={day} dateTime={day} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5">
                           {day}
                         </time>

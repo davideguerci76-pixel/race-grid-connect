@@ -235,7 +235,7 @@ export const getPoolMatches = createServerFn({ method: "GET" })
       const f = fMap.get(m.freelancer_id);
       const legal = [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim();
       const availableSet = availabilityByFreelancer.get(m.freelancer_id) ?? new Set<string>();
-      const missingDates = requiredDays.filter((day) => !availableSet.has(day));
+      const missingDates = requiredDays.filter((day: string) => !availableSet.has(day));
       return {
         match_id: m.id,
         rank: i + 1,
