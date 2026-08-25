@@ -67,7 +67,7 @@ export function LocationAutocomplete({
       });
       if (!mountedRef.current || id !== reqRef.current) return;
       setSuggestions(results);
-      setFailed(results.length === 0 ? false : false);
+      setFailed(false);
       setOpen(results.length > 0);
     } catch {
       if (!mountedRef.current || id !== reqRef.current) return;
