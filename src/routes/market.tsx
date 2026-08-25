@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
+
+const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
 export const Route = createFileRoute("/market")({
   head: () => ({
