@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Clock, Unlock } from "lucide-react";
+import { Clock, Mail, Phone, Unlock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackButton } from "@/components/back-button";
@@ -103,25 +103,45 @@ function PoolPage() {
             </div>
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
-              {(pool as any[]).map((m) => (
-                <div key={m.id} className="border border-sky-400/40 bg-card p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-lg font-black italic tracking-tighter">{m.name}</div>
-                      {m.headline && <div className="text-xs text-muted-foreground">{m.headline}</div>}
-                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {m.role_group && roleGroupLabel(m.role_group)}
-                        {m.location && <> · 📍 {m.location}</>}
+              {(pool as any[]).map((m) => {
+                const phoneLabel = [m.phone_dial_code, m.phone_number].filter(Boolean).join(" ").trim();
+                const telHref = [m.phone_dial_code, m.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
+                return (
+                  <div key={m.id} className="border border-sky-400/40 bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-lg font-black italic tracking-tighter">{m.name}</div>
+                        {m.headline && <div className="text-xs text-muted-foreground">{m.headline}</div>}
+                        <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
+                          {m.role_group && roleGroupLabel(m.role_group)}
+                          {m.location && <> · 📍 {m.location}</>}
+                        </div>
+                        <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
+                          {m.source === "code" ? t("pool.source_code") : t("pool.source_engagement")}
+                          {m.pit_code && <> · {m.pit_code}</>}
+                        </div>
+                        <div className="mt-3 grid gap-1 border border-sky-400/30 bg-sky-400/5 p-2 font-mono text-[11px]">
+                          {m.contact_email ? (
+                            <a href={`mailto:${m.contact_email}`} className="flex min-w-0 items-center gap-2 text-racing-red hover:underline">
+                              <Mail className="size-3 shrink-0" /> <span className="truncate">{m.contact_email}</span>
+                            </a>
+                          ) : (
+                            <div className="text-muted-foreground">{t("pool.no_email")}</div>
+                          )}
+                          {m.phone_number ? (
+                            <a href={`tel:${telHref}`} className="flex items-center gap-2 text-racing-red hover:underline">
+                              <Phone className="size-3 shrink-0" /> {phoneLabel || m.phone_number}
+                            </a>
+                          ) : (
+                            <div className="text-muted-foreground">{t("pool.no_phone")}</div>
+                          )}
+                        </div>
                       </div>
-                      <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
-                        {m.source === "code" ? t("pool.source_code") : t("pool.source_engagement")}
-                        {m.pit_code && <> · {m.pit_code}</>}
-                      </div>
+                      <PoolBadge />
                     </div>
-                    <PoolBadge />
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

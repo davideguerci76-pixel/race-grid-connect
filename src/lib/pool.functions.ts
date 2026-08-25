@@ -28,19 +28,34 @@ export const getMyPool = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (rows ?? []).map((r: any) => r.freelancer_id);
     if (!ids.length) return [] as any[];
-    const [{ data: profiles }, { data: fps }] = await Promise.all([
-      supabase.from("profiles").select("id, display_name, first_name, last_name, avatar_url").in("id", ids),
-      supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: profiles }, { data: fps }, { data: contacts }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id, display_name, first_name, last_name, avatar_url").in("id", ids),
+      supabaseAdmin
         .from("freelancer_profiles")
         .select("user_id, headline, role_group, sub_roles, location, day_rate, currency, pit_code")
         .in("user_id", ids),
+      supabaseAdmin
+        .from("freelancer_contacts")
+        .select("user_id, phone_dial_code, phone_number")
+        .in("user_id", ids),
     ]);
+    const emailMap = new Map<string, string | null>();
+    await Promise.all(
+      ids.map(async (id: string) => {
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(id);
+        emailMap.set(id, userData?.user?.email ?? null);
+      }),
+    );
+
     const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
     const fMap = new Map((fps ?? []).map((f: any) => [f.user_id, f]));
+    const contactMap = new Map((contacts ?? []).map((c: any) => [c.user_id, c]));
     return (rows ?? []).map((r: any) => {
       const p = pMap.get(r.freelancer_id);
       const f = fMap.get(r.freelancer_id);
       const legal = [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim();
+      const contact = contactMap.get(r.freelancer_id);
       return {
         id: r.id,
         freelancer_id: r.freelancer_id,
@@ -55,6 +70,9 @@ export const getMyPool = createServerFn({ method: "GET" })
         day_rate: f?.day_rate ?? null,
         currency: f?.currency ?? "EUR",
         pit_code: f?.pit_code ?? null,
+        contact_email: emailMap.get(r.freelancer_id) ?? null,
+        phone_dial_code: contact?.phone_dial_code ?? null,
+        phone_number: contact?.phone_number ?? null,
       };
     });
   });

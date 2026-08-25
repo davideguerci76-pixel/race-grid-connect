@@ -25,6 +25,8 @@
     "column_full": "Volle Matches",
     "column_partial": "Teilweise Matches",
     "no_results": "Kein Pool-Freelancer passt zu diesem Pit Call.",
+    "no_email": "E-Mail nicht verfügbar",
+    "no_phone": "Telefon nicht verfügbar",
     "missing_days": "{{count}} fehlende Tag(e)",
     "missing_dates_many": "Fehlende Tage:",
     "missing_dates_one": "Fehlender Tag:",
