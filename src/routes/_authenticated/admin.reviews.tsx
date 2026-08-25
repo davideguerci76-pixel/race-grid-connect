@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Flag, Snowflake, Trash2, Check } from "lucide-react";
+import { Flag, Snowflake, Trash2, Check, X } from "lucide-react";
 import { adminListRatings, adminModerateRating } from "@/lib/admin.functions";
 import { RatingIcons } from "@/components/rating-icons";
 import { useDateFormat } from "@/lib/date-locale";
@@ -22,6 +22,7 @@ function AdminReviews() {
   const modFn = useServerFn(adminModerateRating);
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Filter>("flagged");
+  const [detail, setDetail] = useState<any | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-ratings", filter],
@@ -180,6 +181,51 @@ function AdminReviews() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+      {detail && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 p-4" onClick={() => setDetail(null)}>
+          <div className="mt-10 w-full max-w-2xl border border-border bg-card p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red">[REVIEW DETAIL]</div>
+                <h2 className="text-xl font-black uppercase italic tracking-tighter">
+                  {detail.from_profile?.display_name ?? "—"} → {detail.to_profile?.display_name ?? "—"}
+                </h2>
+                <p className="font-mono text-[11px] text-muted-foreground">{formatDate(detail.created_at)}</p>
+              </div>
+              <button onClick={() => setDetail(null)} className="border border-border p-1 hover:bg-secondary"><X className="size-4" /></button>
+            </div>
+            <div className="mb-4 flex items-center gap-3">
+              <RatingIcons value={Number(detail.overall ?? detail.stars ?? 0)} variant={detail.to_profile?.user_type === "team" ? "headset" : "wrench"} size={18} />
+              <span className="font-mono text-sm font-bold">{Number(detail.overall ?? detail.stars ?? 0).toFixed(2)}</span>
+              <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{detail.moderation_status}</span>
+            </div>
+            {detail.sub_scores && Object.keys(detail.sub_scores).length > 0 && (
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                {Object.entries(detail.sub_scores as Record<string, any>).map(([k, v]) => (
+                  <div key={k} className="border border-border p-2">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{k}</div>
+                    <div className="font-mono text-lg font-black">{String(v)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mb-4 border border-border bg-secondary/30 p-3 text-sm leading-relaxed whitespace-pre-wrap">
+              {detail.comment || "—"}
+            </div>
+            {detail.flag_reason && (
+              <div className="mb-4 border-l-2 border-racing-red bg-racing-red/5 p-3 text-sm italic text-racing-red">
+                {detail.flag_reason}
+              </div>
+            )}
+            <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+              <div>Pit Call: <span className="text-foreground">{detail.engagement?.request?.title ?? "—"}</span></div>
+              <div>Engagement: <span className="font-mono">{detail.engagement_id ?? "—"}</span></div>
+              <div>Unlocked at: <span className="font-mono">{detail.unlocked_at ? formatDate(detail.unlocked_at) : "—"}</span></div>
+              <div>Auto suspicious: <span className="font-mono">{detail.auto_suspicious ? "yes" : "no"}</span></div>
+            </div>
+          </div>
         </div>
       )}
     </div>
