@@ -320,6 +320,36 @@ export type Database = {
           },
         ]
       }
+      match_history: {
+        Row: {
+          best_score: number
+          created_at: string
+          first_matched_at: string
+          freelancer_id: string
+          id: string
+          request_id: string
+          team_id: string
+        }
+        Insert: {
+          best_score?: number
+          created_at?: string
+          first_matched_at?: string
+          freelancer_id: string
+          id?: string
+          request_id: string
+          team_id: string
+        }
+        Update: {
+          best_score?: number
+          created_at?: string
+          first_matched_at?: string
+          freelancer_id?: string
+          id?: string
+          request_id?: string
+          team_id?: string
+        }
+        Relationships: []
+      }
       match_unlocks: {
         Row: {
           free_preview: boolean
