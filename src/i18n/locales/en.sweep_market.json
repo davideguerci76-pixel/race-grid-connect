@@ -27,7 +27,16 @@
     "top_disciplines": "Demand by discipline",
     "top_roles": "Demand by role group",
     "no_data": "No data yet",
-    "updated": "Updated"
+    "updated": "Updated",
+    "geo_label": "GEO DATA",
+    "geo_title": "Market by country",
+    "geo_sub": "Aggregated demand and supply by country. No region or city detail.",
+    "geo_demand": "Pit Calls",
+    "geo_supply": "Available specialists",
+    "geo_legend_demand": "Demand-heavy country",
+    "geo_legend_supply": "Supply-heavy country",
+    "geo_demand_by_country": "Demand by country",
+    "geo_supply_by_country": "Supply by country"
   },
   "nav": {
     "market": "Market data"
