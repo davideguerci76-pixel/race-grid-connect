@@ -236,8 +236,22 @@ function PoolColumn({ title, items, partial = false }: { title: string; items: a
                     <div className="font-mono text-[11px] uppercase text-muted-foreground">📍 {m.profile.location}</div>
                   )}
                   {partial && (
-                    <div className="mt-2 inline-flex items-center gap-2 border border-racing-yellow/60 bg-racing-yellow/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                      <Clock className="size-3" /> {t("pool.missing_days", { count: m.missing_days })}
+                    <div className="mt-2 space-y-2">
+                      <div className="inline-flex items-center gap-2 border border-racing-yellow/60 bg-racing-yellow/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+                        <Clock className="size-3" /> {t("pool.missing_days", { count: m.missing_days })}
+                      </div>
+                      {Array.isArray(m.missing_dates) && m.missing_dates.length > 0 && (
+                        <div className="border border-racing-yellow/50 bg-background/60 p-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
+                          <div className="mb-1">{t(m.missing_dates.length === 1 ? "pool.missing_dates_one" : "pool.missing_dates_many")}</div>
+                          <div className="flex flex-wrap gap-1">
+                            {m.missing_dates.map((day: string) => (
+                              <time key={day} dateTime={day} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5">
+                                {day}
+                              </time>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   {m.rating?.count > 0 && (
