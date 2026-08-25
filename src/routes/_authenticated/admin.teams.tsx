@@ -280,7 +280,7 @@ function PoolModal({ teamId, teamName, onClose }: { teamId: string; teamName: st
                   <tr key={m.id} className="border-t border-border/60">
                     <td className="px-2 py-2 font-mono font-bold text-racing-yellow">{m.pit_code ?? "—"}</td>
                     <td className="px-2 py-2">{m.first_name ?? (m.display_name ?? "").split(" ")[0] ?? "—"}</td>
-                    <td className="px-2 py-2">{m.last_name ?? (m.display_name ?? "").split(" ").slice(1).join(" ") || "—"}</td>
+                    <td className="px-2 py-2">{m.last_name ?? ((m.display_name ?? "").split(" ").slice(1).join(" ") || "—")}</td>
                     <td className="px-2 py-2 font-mono">{m.phone ?? "—"}</td>
                     <td className="px-2 py-2 text-muted-foreground">{m.email ?? "—"}</td>
                     <td className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground">{m.source}</td>
