@@ -1,0 +1,38 @@
+{
+  "market": {
+    "label": "MARKTDATEN",
+    "highlights_title": "Markt-Highlights",
+    "page_title": "Motorsport-Marktdaten",
+    "page_sub": "Aggregierte, anonyme Daten zu Match-Volumen, Pit-Call-Nachfrage und Verfügbarkeit der Freelancer.",
+    "see_all": "Vollständige Statistik",
+    "total_matches": "Erzeugte Matches",
+    "confirmed_engagements": "Bestätigte Einsätze",
+    "completed_engagements": "Abgeschlossene Einsätze",
+    "open_pitcalls": "Offene Pit Calls",
+    "specialists": "Spezialisten",
+    "teams": "Teams",
+    "available_specialists": "Verfügbare Spezialisten",
+    "open_sos": "Offene SOS-Calls",
+    "avg_day_rate": "Durchschnittlicher Tagessatz",
+    "hot_days_demand": "Hot Days — Nachfragespitze",
+    "hot_days_demand_hint": "Tage mit mehr Pit Calls als verfügbaren Spezialisten.",
+    "hot_days_supply": "Hot Days — Angebotsspitze",
+    "hot_days_supply_hint": "Tage mit vielen verfügbaren Spezialisten und wenigen Pit Calls.",
+    "demand_short": "Pit Calls",
+    "supply_short": "Verfügbar",
+    "trend_title": "Letzte 6 Monate",
+    "trend_requests": "Pit Calls",
+    "trend_matches": "Matches",
+    "trend_engagements": "Einsätze",
+    "top_disciplines": "Nachfrage nach Disziplin",
+    "top_roles": "Nachfrage nach Rollengruppe",
+    "no_data": "Noch keine Daten",
+    "updated": "Aktualisiert"
+  },
+  "nav": {
+    "market": "Marktdaten"
+  },
+  "footer": {
+    "market": "Marktdaten"
+  }
+}

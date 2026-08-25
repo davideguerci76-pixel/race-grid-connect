@@ -1582,6 +1582,7 @@ export type Database = {
       }
       legacy_role_group: { Args: { _role: string }; Returns: string }
       legacy_sub_role: { Args: { _role: string }; Returns: string }
+      market_stats: { Args: never; Returns: Json }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }
         Returns: boolean

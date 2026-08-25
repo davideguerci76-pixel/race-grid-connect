@@ -15,8 +15,8 @@ export function SiteFooter() {
           <div className="label-mono mb-3">{t("footer.network")}</div>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/jobs" className="text-muted-foreground transition-colors hover:text-racing-red">
-                {t("nav.jobs")}
+              <Link to="/market" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("nav.market")}
               </Link>
             </li>
           </ul>
