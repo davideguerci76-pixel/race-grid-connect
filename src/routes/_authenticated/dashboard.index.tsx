@@ -85,10 +85,25 @@ function DashboardHome() {
     enabled: !!user && !!profile,
     queryFn: async () => {
       const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
+      const { count } = await supabase
+        .from("match_history" as never)
+        .select("*", { count: "exact", head: true })
+        .eq(col, user!.id);
+      return count ?? 0;
+    },
+  });
+
+  const { data: activeMatchesCount = 0 } = useQuery({
+    queryKey: ["active-matches-count", user?.id],
+    enabled: !!user && !!profile,
+    queryFn: async () => {
+      const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
       const { count } = await supabase.from("matches").select("*", { count: "exact", head: true }).eq(col, user!.id);
       return count ?? 0;
     },
   });
+
+
 
 
   const isFreelancer = profile?.user_type === "freelancer";
@@ -116,13 +131,13 @@ function DashboardHome() {
         <div className="label-mono">[DASHBOARD]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("dashboard.welcome", { name: (profile?.user_type === "freelancer" ? [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") : profile?.display_name) || "" })}</h1>
 
-        {matchesCount > 0 && (
+        {activeMatchesCount > 0 && (
           <Link to="/dashboard/matches" className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
             <div>
               <div className="font-mono text-xs uppercase tracking-widest text-racing-red">[NEW MATCHES]</div>
-              <div className="mt-1 text-xl font-bold">{t("matches.counts_banner", { count: matchesCount, who: profile?.user_type === "freelancer" ? t("nav.teams") : t("nav.freelancers") })}</div>
+              <div className="mt-1 text-xl font-bold">{t("matches.counts_banner", { count: activeMatchesCount, who: profile?.user_type === "freelancer" ? t("nav.teams") : t("nav.freelancers") })}</div>
             </div>
-            <span className="font-mono text-xs text-racing-red">{t("dashboard.new_matches_pill", { count: matchesCount })} →</span>
+            <span className="font-mono text-xs text-racing-red">{t("dashboard.new_matches_pill", { count: activeMatchesCount })} →</span>
           </Link>
         )}
 
