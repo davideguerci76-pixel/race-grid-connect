@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useServerFn } from "@tanstack/react-start";
-import { searchPlaces, type GeoResult } from "@/lib/geocode.functions";
+import { searchPlaces, type GeoResult } from "@/lib/geocode";
+
 
 export type LocationPick = {
   text: string;
