@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
+import { ConsentGate } from "@/components/consent-gate";
 
 const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
