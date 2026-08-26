@@ -33,7 +33,7 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const reqIds = (requests ?? []).map((r: any) => r.id);
-    const teamIds = Array.from(new Set((requests ?? []).map((r: any) => r.team_id)));
+    const teamIds: string[] = Array.from(new Set((requests ?? []).map((r: any) => r.team_id as string)));
 
     const [{ data: engs }, { data: matches }, { data: teamProfiles }] = await Promise.all([
       reqIds.length

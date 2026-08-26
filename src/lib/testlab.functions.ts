@@ -285,7 +285,7 @@ export const purgeTestEnvironment = createServerFn({ method: "POST" })
       .eq("is_test", true);
     if (error) throw new Error(error.message);
 
-    const ids = (profiles ?? []).map((p: any) => p.id as string);
+    const ids: string[] = (profiles ?? []).map((p: any) => String(p.id));
     let deleted = 0;
     await pool(ids, 6, async (id) => {
       const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(id);
