@@ -205,6 +205,16 @@ function RequestMatchesPage() {
         <Link to="/dashboard/requests" className="mb-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-3" /> {t("sweep_engage.request_matches.back_to_pit_calls")}
         </Link>
+        {!isLoading && error && (
+          <div className="border border-destructive/40 bg-destructive/5 p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <AlertTriangle className="size-4" /> {error instanceof Error ? error.message : "Pit Call unavailable"}
+            </div>
+            <Link to="/dashboard/requests" className="mt-3 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="size-3" /> {t("sweep_engage.request_matches.back_to_pit_calls")}
+            </Link>
+          </div>
+        )}
 
         {isLoading && <div className="text-sm text-muted-foreground">{t("sweep_engage.common.loading")}</div>}
 
