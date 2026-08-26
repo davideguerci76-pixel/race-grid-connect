@@ -116,7 +116,8 @@
     "type_team": "Siamo una scuderia",
     "type_team_desc": "Scuderia, factory, garage o team.",
     "which_are_you": "Chi sei?",
-    "signed_in_as": "Accesso come {{email}}"
+    "signed_in_as": "Accesso come {{email}}",
+    "forgot_password": "Password dimenticata?"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -669,5 +670,25 @@
         ]
       }
     ]
+  },
+  "reset_pw": {
+    "tag": "[RESET PASSWORD]",
+    "forgot_title": "Password dimenticata?",
+    "forgot_desc": "Inserisci l'email del tuo account. Ti invieremo un link sicuro a tempo per impostare una nuova password.",
+    "send_link": "Invia link di reset",
+    "back_to_signin": "Torna al login",
+    "sent_title": "Link di reset inviato.",
+    "sent_desc": "Se esiste un account per questo indirizzo, riceverai un'email con un link sicuro a tempo per impostare una nuova password. Controlla anche lo spam.",
+    "request_failed": "Impossibile inviare l'email di reset. Riprova.",
+    "new_title": "Imposta una nuova password",
+    "new_password": "Nuova password",
+    "confirm_password": "Conferma nuova password",
+    "update_password": "Aggiorna password",
+    "mismatch": "Le password non coincidono.",
+    "updated": "Password aggiornata. Hai effettuato l'accesso.",
+    "update_failed": "Impossibile aggiornare la password. Il link potrebbe essere scaduto — richiedine uno nuovo.",
+    "expired_title": "Questo link di reset non è valido o è scaduto.",
+    "expired_desc": "I link di reset sono a tempo e monouso. Richiedine uno nuovo.",
+    "request_new": "Richiedi un nuovo link"
   }
 }
