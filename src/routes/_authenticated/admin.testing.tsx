@@ -4,7 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Database, FlaskConical, Loader2, Trash2 } from "lucide-react";
-import { generateTestDataset, getTestEnvironmentStats, purgeTestEnvironment } from "@/lib/testlab.functions";
+import {
+  assignTestPools,
+  generatePoolPitCalls,
+  generatePoolRatings,
+  generateTestDataset,
+  getTestEnvironmentStats,
+  purgeTestEnvironment,
+} from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
 import { AdminEnvSwitch, useAdminEnv } from "@/components/admin-env-switch";
 
