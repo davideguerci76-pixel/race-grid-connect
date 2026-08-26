@@ -969,6 +969,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const requestMatches = isPoolRequest
       ? (allMatches ?? []).filter((m: any) => poolSet.has(m.freelancer_id))
       : (allMatches ?? []);
+    const outsidePoolCount = isPoolRequest
+      ? (allMatches ?? []).filter((m: any) => !poolSet.has(m.freelancer_id)).length
+      : 0;
+
 
     // Sort by final_score DESC (penalty applied), tiebreak by created_at
     const sortFn = (a: any, b: any) => {
