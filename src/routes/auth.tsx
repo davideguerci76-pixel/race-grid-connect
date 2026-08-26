@@ -29,10 +29,15 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"freelancer" | "team">(type);
   const [loading, setLoading] = useState(false);
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
 
   const isSignup = mode === "signup";
 
   async function handleGoogle() {
+    if (isSignup && !acceptedLegal) {
+      toast.error(t("auth.accept_legal_required", { defaultValue: "Please accept the Terms and the Privacy Policy first." }));
+      return;
+    }
     setLoading(true);
     try {
       if (isSignup && typeof window !== "undefined") {
