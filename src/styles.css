@@ -175,12 +175,12 @@ button.iubenda-cs-preferences-link {
   fill: oklch(0.92 0.01 265) !important;
 }
 
-/* iubenda brand icon inside the widget: monochrome dark treatment */
+/* iubenda brand icon inside the widget: monochrome dark treatment.
+   Note: the floating button keeps its green keyhole (background-image). */
 .iub__us-widget img,
 .iub__us-widget svg,
 .iubenda-tp-btn img,
-.iubenda-tp-btn svg,
-button.iubenda-cs-preferences-link img {
+.iubenda-tp-btn svg {
   filter: grayscale(1) brightness(1.7) contrast(0.9) !important;
   background-color: transparent !important;
 }
