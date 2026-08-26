@@ -11,6 +11,7 @@ import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
+import { PoolBadge } from "@/components/pool-badge";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
@@ -123,6 +124,7 @@ function MatchesPage() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">{r.status}</span>
+                          {(r as any).search_mode === "pool" && <PoolBadge />}
                           <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
                         </div>
                         <div className="mt-1 text-lg font-bold">{r.title}</div>

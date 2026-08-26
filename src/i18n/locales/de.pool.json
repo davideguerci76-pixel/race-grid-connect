@@ -38,6 +38,13 @@
     "mode_standard_desc": "Offen für das gesamte PitCall-Netzwerk. Namen bleiben bis zur Match-Bestätigung verborgen.",
     "mode_pool": "Pit Call in My Pool",
     "mode_pool_desc": "Sucht nur in deinem vertrauten Kreis. Namen sind ab dem ersten Ergebnis im Klartext sichtbar.",
-    "mode_pool_note": "Suche in deinem Pool ({{count}} Freelancer) — Namen im Klartext, Freischaltkosten {{cost}} Token."
+    "mode_pool_note": "Suche in deinem Pool ({{count}} Freelancer) — Namen im Klartext, Freischaltkosten {{cost}} Token.",
+    "upgrade_label": "Außerhalb deines Pools",
+    "upgrade_desc": "{{count}} weitere Freelancer passen außerhalb deines Pools zu diesem Pit Call.",
+    "upgrade_hint": "Wechsle zur Standardsuche, um alle zu sehen — du zahlst nur die Differenz von {{cost}} Token.",
+    "upgrade_button": "Auf Standard upgraden ({{cost}} Token)",
+    "upgrade_confirm": "Diesen Pit Call für {{cost}} Token in eine Standardsuche umwandeln und {{count}} weitere Matches freischalten?",
+    "upgrade_done": "Pit Call aktualisiert — {{cost}} Token ausgegeben",
+    "upgrade_failed": "Upgrade fehlgeschlagen"
   }
 }
