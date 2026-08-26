@@ -57,7 +57,11 @@
       "archived_no_reopening": "Archiviert — keine Wiedereröffnung",
       "reopened_notified": "Pit Call wiedereröffnet · Warteliste benachrichtigt · Wer zuerst bestätigt, erhält den Platz",
       "match_register": "Match-Register (Top {{count}})",
-      "no_candidate": "Kein Kandidat generiert."
+      "no_candidate": "Kein Kandidat generiert.",
+      "created_by": "Erstellt von",
+      "view_team": "Team ansehen",
+      "login_as_user": "Als Benutzer anmelden",
+      "team_blocked": "Gesperrt"
     },
     "heatmap": {
       "title": "Allgemeiner Kalender",
@@ -82,7 +86,15 @@
       "next": "Weiter →",
       "freelancers_match": "{{count}} Freelancer entsprechen den Filtern",
       "refreshing": "aktualisiert…",
-      "weekdays": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+      "weekdays": [
+        "Mo",
+        "Di",
+        "Mi",
+        "Do",
+        "Fr",
+        "Sa",
+        "So"
+      ],
       "available_tooltip": "{{count}} verfügbar: {{names}}",
       "no_availability": "Keine Verfügbarkeit"
     },
