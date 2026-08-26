@@ -352,84 +352,89 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {!isPoolRequest && (data.items ?? []).length === 0 && (data.items_partial ?? []).length === 0 && !(!hasAnyMatches && !requestFilled) && (
-              <div className="mt-6 border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-                {t("sweep_engage.request_matches.no_matches_yet")}
+            {isPoolRequest && outsidePoolCount > 0 && (
+              <div className="mt-6 flex flex-wrap items-start justify-between gap-4 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
+                <div className="min-w-0">
+                  <div className="label-mono text-racing-yellow">[{t("pool.upgrade_label")}]</div>
+                  <p className="mt-1 text-sm">
+                    {t("pool.upgrade_desc", { count: outsidePoolCount })}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("pool.upgrade_hint", { cost: upgradeCost })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
+                      upgradeMut.mutate();
+                    }
+                  }}
+                  disabled={upgradeMut.isPending}
+                  className="bg-racing-yellow px-4 py-3 text-xs font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
+                >
+                  {t("pool.upgrade_button", { cost: upgradeCost })}
+                </button>
               </div>
             )}
 
-            {isPoolRequest ? (
-              <div className="mt-8 grid items-start gap-6 md:grid-cols-2">
-                <section className="border border-border bg-card p-4">
-                  <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-border pb-3">
-                    <div className="min-w-0">
-                      <div className="label-mono truncate">[{t("pool.column_full")}]</div>
-                      <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t("pool.column_full")}</h2>
-                    </div>
-                    <div className="shrink-0 font-mono text-[11px] uppercase text-racing-yellow">{fullItems.length}</div>
+            {/* FOMO banner */}
+            {data.partial_banner && (
+              <div className="mt-8 border-2 border-racing-red bg-racing-red/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Flame className="mt-1 size-5 shrink-0 text-racing-red" />
+                  <div className="flex-1">
+                    <div className="label-mono text-racing-red">[PARTIAL MATCHES AVAILABLE]</div>
+                    <p className="mt-1 text-sm">
+                      {data.partial_banner.case === "A" ? (
+                        <>
+                          {t("sweep_engage.request_matches.partial_banner_case_a_1")} <span className="font-black text-racing-yellow">{data.partial_banner.best_full_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_2")} <span className="font-black text-racing-yellow">{data.partial_banner.best_partial_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_3")}
+                        </>
+                      ) : (
+                        <>{t("sweep_engage.request_matches.partial_banner_case_b")}</>
+                      )}
+                    </p>
+                    <button
+                      onClick={() => partialRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="mt-3 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
+                    >
+                      {t("sweep_engage.request_matches.view_partial_matches_button", { count: data.partial_banner.partial_count })}
+                    </button>
                   </div>
-                  {fullItems.length > 0 ? renderPool(t("pool.column_full"), "full", data.tiers ?? [], fullItems, true) : (
-                    <div className="border border-dashed border-border bg-background/40 p-8 text-center text-xs text-muted-foreground">
-                      {t("pool.no_results")}
-                    </div>
-                  )}
-                </section>
-
-                <section ref={partialRef} className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
-                  <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-racing-yellow/30 pb-3">
-                    <div className="min-w-0">
-                      <div className="label-mono truncate text-racing-yellow">[{t("pool.column_partial")}]</div>
-                      <h2 className="text-2xl font-black uppercase italic tracking-tighter text-racing-yellow">{t("pool.column_partial")}</h2>
-                    </div>
-                    <div className="shrink-0 font-mono text-[11px] uppercase text-racing-yellow">{partialItems.length}</div>
-                  </div>
-                  {partialItems.length > 0 ? renderPool(t("pool.column_partial"), "partial", data.tiers_partial ?? [], partialItems, true) : (
-                    <div className="border border-dashed border-racing-yellow/40 bg-background/40 p-8 text-center text-xs text-muted-foreground">
-                      {t("pool.no_results")}
-                    </div>
-                  )}
-                </section>
+                </div>
               </div>
-            ) : (
-              <>
-                {/* FULL matches */}
-                {renderPool("FULL", "full", data.tiers ?? [], data.items ?? [])}
-
-                {/* FOMO banner */}
-                {data.partial_banner && (
-                  <div className="mt-8 border-2 border-racing-red bg-racing-red/5 p-5">
-                    <div className="flex items-start gap-3">
-                      <Flame className="mt-1 size-5 shrink-0 text-racing-red" />
-                      <div className="flex-1">
-                        <div className="label-mono text-racing-red">[PARTIAL MATCHES AVAILABLE]</div>
-                        <p className="mt-1 text-sm">
-                          {data.partial_banner.case === "A" ? (
-                            <>
-                              {t("sweep_engage.request_matches.partial_banner_case_a_1")} <span className="font-black text-racing-yellow">{data.partial_banner.best_full_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_2")} <span className="font-black text-racing-yellow">{data.partial_banner.best_partial_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_3")}
-                            </>
-                          ) : (
-                            <>{t("sweep_engage.request_matches.partial_banner_case_b")}</>
-                          )}
-                        </p>
-                        <button
-                          onClick={() => partialRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                          className="mt-3 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
-                        >
-                          {t("sweep_engage.request_matches.view_partial_matches_button", { count: data.partial_banner.partial_count })}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* PARTIAL matches */}
-                {(data.items_partial ?? []).length > 0 && (
-                  <div ref={partialRef}>
-                    {renderPool("PARTIAL", "partial", data.tiers_partial ?? [], data.items_partial ?? [])}
-                  </div>
-                )}
-              </>
             )}
+
+            <div className="mt-8 grid items-start gap-6 md:grid-cols-2">
+              <section className="border border-border bg-card p-4">
+                <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-border pb-3">
+                  <div className="min-w-0">
+                    <div className="label-mono truncate">[{t("pool.column_full")}]</div>
+                    <h2 className="text-2xl font-black uppercase italic tracking-tighter">{t("pool.column_full")}</h2>
+                  </div>
+                  <div className="shrink-0 font-mono text-[11px] uppercase text-racing-yellow">{fullItems.length}</div>
+                </div>
+                {fullItems.length > 0 ? renderPool(t("pool.column_full"), "full", data.tiers ?? [], fullItems, true) : (
+                  <div className="border border-dashed border-border bg-background/40 p-8 text-center text-xs text-muted-foreground">
+                    {t("sweep_engage.request_matches.no_matches_yet")}
+                  </div>
+                )}
+              </section>
+
+              <section ref={partialRef} className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
+                <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-racing-yellow/30 pb-3">
+                  <div className="min-w-0">
+                    <div className="label-mono truncate text-racing-yellow">[{t("pool.column_partial")}]</div>
+                    <h2 className="text-2xl font-black uppercase italic tracking-tighter text-racing-yellow">{t("pool.column_partial")}</h2>
+                  </div>
+                  <div className="shrink-0 font-mono text-[11px] uppercase text-racing-yellow">{partialItems.length}</div>
+                </div>
+                {partialItems.length > 0 ? renderPool(t("pool.column_partial"), "partial", data.tiers_partial ?? [], partialItems, true) : (
+                  <div className="border border-dashed border-racing-yellow/40 bg-background/40 p-8 text-center text-xs text-muted-foreground">
+                    {t("sweep_engage.request_matches.no_matches_yet")}
+                  </div>
+                )}
+              </section>
+            </div>
           </>
         )}
       </div>
