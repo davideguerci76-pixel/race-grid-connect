@@ -580,3 +580,190 @@ export const adminGetTeamPool = createServerFn({ method: "POST" })
     }
     return out;
   });
+
+// ============ USER MANAGEMENT SUITE ============
+
+async function logAdminAction(admin_id: string, target_user_id: string | null, action: string, details: any = {}) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("admin_audit_log").insert({ admin_id, target_user_id, action, details } as never);
+}
+
+/** Full profile card (anagraphic + professional data) for a single user. */
+export const adminGetUserDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("*")
+      .eq("id", data.user_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!profile) throw new Error("User not found");
+    const isFreelancer = (profile as any).user_type === "freelancer";
+    const [{ data: fp }, { data: tp }, { data: contact }, { data: roles }] = await Promise.all([
+      isFreelancer
+        ? supabaseAdmin.from("freelancer_profiles").select("*").eq("user_id", data.user_id).maybeSingle()
+        : Promise.resolve({ data: null } as any),
+      !isFreelancer
+        ? supabaseAdmin.from("team_profiles").select("*").eq("user_id", data.user_id).maybeSingle()
+        : Promise.resolve({ data: null } as any),
+      supabaseAdmin.from("freelancer_contacts").select("*").eq("user_id", data.user_id).maybeSingle(),
+      supabaseAdmin.from("user_roles").select("role").eq("user_id", data.user_id),
+    ]);
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    return {
+      profile,
+      freelancer: fp ?? null,
+      team: tp ?? null,
+      contact: contact ?? null,
+      roles: ((roles ?? []) as any[]).map((r) => r.role),
+      auth: authUser?.user
+        ? {
+            email: authUser.user.email ?? null,
+            email_confirmed_at: authUser.user.email_confirmed_at ?? null,
+            last_sign_in_at: authUser.user.last_sign_in_at ?? null,
+            created_at: authUser.user.created_at ?? null,
+            providers: (authUser.user.app_metadata as any)?.providers ?? [],
+            banned_until: (authUser.user as any)?.banned_until ?? null,
+          }
+        : null,
+    };
+  });
+
+/** Availability days + engagements (freelancer) or request date ranges (team). */
+export const adminGetUserCalendar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("user_type, display_name")
+      .eq("id", data.user_id)
+      .maybeSingle();
+    const userType = (profile as any)?.user_type ?? "freelancer";
+    const isFreelancer = userType === "freelancer";
+
+    const { data: availability } = isFreelancer
+      ? await supabaseAdmin.from("availability").select("day").eq("freelancer_id", data.user_id).order("day")
+      : ({ data: [] } as any);
+
+    const { data: engagements } = await supabaseAdmin
+      .from("engagements")
+      .select("id, start_date, end_date, status, freelancer_id, team_id")
+      .or(`freelancer_id.eq.${data.user_id},team_id.eq.${data.user_id}`)
+      .order("start_date");
+
+    const { data: requests } = !isFreelancer
+      ? await supabaseAdmin
+          .from("requests")
+          .select("id, title, start_date, end_date, season_dates, status")
+          .eq("team_id", data.user_id)
+          .order("start_date")
+      : ({ data: [] } as any);
+
+    let freshness: string | null = null;
+    if (isFreelancer) {
+      const { data: fp } = await supabaseAdmin
+        .from("freelancer_profiles")
+        .select("calendar_last_updated_at")
+        .eq("user_id", data.user_id)
+        .maybeSingle();
+      freshness = (fp as any)?.calendar_last_updated_at ?? null;
+    }
+
+    return {
+      user_type: userType,
+      display_name: (profile as any)?.display_name ?? "—",
+      days: ((availability ?? []) as any[]).map((a) => a.day as string),
+      engagements: (engagements ?? []) as any[],
+      requests: (requests ?? []) as any[],
+      calendar_last_updated_at: freshness,
+    };
+  });
+
+/** Trigger the password recovery email (sent through the configured sender domain). */
+export const adminSendPasswordReset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid(), redirect_to: z.string().url() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: u } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const email = u?.user?.email;
+    if (!email) throw new Error("This user has no email address on file.");
+    const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, { redirectTo: data.redirect_to });
+    if (error) throw new Error(error.message);
+    await logAdminAction(context.userId, data.user_id, "password_reset_sent", { email });
+    return { ok: true, email };
+  });
+
+/** Revoke every active session of the user (immediate forced logout). */
+export const adminForceLogout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const url = process.env["SUPABASE_URL"]!;
+    const serviceKey = process.env["SUPABASE_SERVICE_ROLE_KEY"]!;
+    const res = await fetch(`${url}/auth/v1/admin/users/${data.user_id}/logout`, {
+      method: "POST",
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ scope: "global" }),
+    });
+    if (!res.ok && res.status !== 204) {
+      const body = await res.text();
+      throw new Error(`Force logout failed (${res.status}): ${body.slice(0, 200)}`);
+    }
+    await logAdminAction(context.userId, data.user_id, "force_logout", {});
+    return { ok: true };
+  });
+
+/** Generate a one-time sign-in link so the admin can operate as the user (audited). */
+export const adminImpersonateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid(), redirect_to: z.string().url() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    if (data.user_id === context.userId) throw new Error("You are already signed in as this account.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: u } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const email = u?.user?.email;
+    if (!email) throw new Error("This user has no email address on file.");
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+      options: { redirectTo: data.redirect_to },
+    });
+    if (error) throw new Error(error.message);
+    const actionLink = (link as any)?.properties?.action_link;
+    if (!actionLink) throw new Error("Could not generate the impersonation link.");
+    await logAdminAction(context.userId, data.user_id, "impersonate", { email });
+    return { ok: true, url: actionLink as string, email };
+  });
+
+/** Recent admin actions, optionally scoped to one user. */
+export const adminListAuditLog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ user_id: z.string().uuid().optional() }).parse(data ?? {}))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin
+      .from("admin_audit_log")
+      .select("id, admin_id, target_user_id, action, details, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (data.user_id) q = q.eq("target_user_id", data.user_id);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as any[];
+  });
