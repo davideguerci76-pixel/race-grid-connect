@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { IubendaScripts } from "@/components/iubenda-scripts";
 
 function NotFoundComponent() {
   return (
@@ -115,6 +116,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <IubendaScripts />
       <Outlet />
       <Toaster theme="dark" position="top-right" />
     </QueryClientProvider>
