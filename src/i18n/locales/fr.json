@@ -116,7 +116,8 @@
     "type_team": "Nous sommes une écurie",
     "type_team_desc": "Écurie, factory, garage.",
     "which_are_you": "Qui êtes-vous ?",
-    "signed_in_as": "Session : {{email}}"
+    "signed_in_as": "Session : {{email}}",
+    "forgot_password": "Mot de passe oublié ?"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -657,5 +658,25 @@
         ]
       }
     ]
+  },
+  "reset_pw": {
+    "tag": "[RÉINITIALISATION]",
+    "forgot_title": "Mot de passe oublié ?",
+    "forgot_desc": "Saisissez l'email de votre compte. Nous vous enverrons un lien sécurisé à durée limitée pour définir un nouveau mot de passe.",
+    "send_link": "Envoyer le lien de réinitialisation",
+    "back_to_signin": "Retour à la connexion",
+    "sent_title": "Lien de réinitialisation envoyé.",
+    "sent_desc": "Si un compte existe pour cette adresse, vous recevrez un email avec un lien sécurisé à durée limitée pour définir un nouveau mot de passe. Vérifiez aussi les spams.",
+    "request_failed": "Impossible d'envoyer l'email de réinitialisation. Réessayez.",
+    "new_title": "Définir un nouveau mot de passe",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le nouveau mot de passe",
+    "update_password": "Mettre à jour le mot de passe",
+    "mismatch": "Les mots de passe ne correspondent pas.",
+    "updated": "Mot de passe mis à jour. Vous êtes connecté.",
+    "update_failed": "Impossible de mettre à jour le mot de passe. Le lien a peut-être expiré — demandez-en un nouveau.",
+    "expired_title": "Ce lien de réinitialisation est invalide ou expiré.",
+    "expired_desc": "Les liens de réinitialisation sont à durée limitée et à usage unique. Demandez-en un nouveau.",
+    "request_new": "Demander un nouveau lien"
   }
 }

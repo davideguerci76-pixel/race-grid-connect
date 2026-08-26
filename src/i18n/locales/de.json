@@ -116,7 +116,8 @@
     "type_team": "Wir sind ein Team",
     "type_team_desc": "Rennstall, Factory, Garage.",
     "which_are_you": "Was beschreibt dich?",
-    "signed_in_as": "Angemeldet als {{email}}"
+    "signed_in_as": "Angemeldet als {{email}}",
+    "forgot_password": "Passwort vergessen?"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -657,5 +658,25 @@
         ]
       }
     ]
+  },
+  "reset_pw": {
+    "tag": "[PASSWORT-ZURÜCKSETZUNG]",
+    "forgot_title": "Passwort vergessen?",
+    "forgot_desc": "Gib die E-Mail deines Kontos ein. Wir senden dir einen sicheren, zeitlich begrenzten Link zum Festlegen eines neuen Passworts.",
+    "send_link": "Reset-Link senden",
+    "back_to_signin": "Zurück zur Anmeldung",
+    "sent_title": "Reset-Link gesendet.",
+    "sent_desc": "Falls ein Konto mit dieser Adresse existiert, erhältst du eine E-Mail mit einem sicheren, zeitlich begrenzten Link zum Festlegen eines neuen Passworts. Prüfe auch den Spam-Ordner.",
+    "request_failed": "Die Reset-E-Mail konnte nicht gesendet werden. Bitte erneut versuchen.",
+    "new_title": "Neues Passwort festlegen",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Neues Passwort bestätigen",
+    "update_password": "Passwort aktualisieren",
+    "mismatch": "Die Passwörter stimmen nicht überein.",
+    "updated": "Passwort aktualisiert. Du bist angemeldet.",
+    "update_failed": "Das Passwort konnte nicht aktualisiert werden. Der Link ist möglicherweise abgelaufen — fordere einen neuen an.",
+    "expired_title": "Dieser Reset-Link ist ungültig oder abgelaufen.",
+    "expired_desc": "Reset-Links sind zeitlich begrenzt und nur einmal gültig. Fordere einen neuen an.",
+    "request_new": "Neuen Link anfordern"
   }
 }

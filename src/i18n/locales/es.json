@@ -116,7 +116,8 @@
     "type_team": "Somos un equipo",
     "type_team_desc": "Escudería, factoría, garage.",
     "which_are_you": "¿Qué te describe mejor?",
-    "signed_in_as": "Sesión: {{email}}"
+    "signed_in_as": "Sesión: {{email}}",
+    "forgot_password": "¿Olvidaste tu contraseña?"
   },
   "dashboard": {
     "title": "Panel",
@@ -657,5 +658,25 @@
         ]
       }
     ]
+  },
+  "reset_pw": {
+    "tag": "[RESTABLECER CONTRASEÑA]",
+    "forgot_title": "¿Olvidaste tu contraseña?",
+    "forgot_desc": "Introduce el email de tu cuenta. Te enviaremos un enlace seguro y con caducidad para establecer una nueva contraseña.",
+    "send_link": "Enviar enlace de restablecimiento",
+    "back_to_signin": "Volver a iniciar sesión",
+    "sent_title": "Enlace de restablecimiento enviado.",
+    "sent_desc": "Si existe una cuenta con esa dirección, recibirás un email con un enlace seguro y con caducidad para establecer una nueva contraseña. Revisa también el spam.",
+    "request_failed": "No se pudo enviar el email de restablecimiento. Inténtalo de nuevo.",
+    "new_title": "Establece una nueva contraseña",
+    "new_password": "Nueva contraseña",
+    "confirm_password": "Confirma la nueva contraseña",
+    "update_password": "Actualizar contraseña",
+    "mismatch": "Las contraseñas no coinciden.",
+    "updated": "Contraseña actualizada. Has iniciado sesión.",
+    "update_failed": "No se pudo actualizar la contraseña. El enlace puede haber caducado — solicita uno nuevo.",
+    "expired_title": "Este enlace de restablecimiento no es válido o ha caducado.",
+    "expired_desc": "Los enlaces de restablecimiento tienen caducidad y son de un solo uso. Solicita uno nuevo.",
+    "request_new": "Solicitar nuevo enlace"
   }
 }

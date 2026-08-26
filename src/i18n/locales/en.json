@@ -116,7 +116,8 @@
     "type_team": "We're a team",
     "type_team_desc": "Scuderia, factory, garage or racing squad.",
     "which_are_you": "What best describes you?",
-    "signed_in_as": "Signed in as {{email}}"
+    "signed_in_as": "Signed in as {{email}}",
+    "forgot_password": "Forgot password?"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -669,5 +670,25 @@
         ]
       }
     ]
+  },
+  "reset_pw": {
+    "tag": "[PASSWORD RESET]",
+    "forgot_title": "Forgot your password?",
+    "forgot_desc": "Enter your account email. We'll send you a secure, time-limited link to set a new password.",
+    "send_link": "Send reset link",
+    "back_to_signin": "Back to sign in",
+    "sent_title": "Reset link sent.",
+    "sent_desc": "If an account exists for that address, you'll receive an email with a secure, time-limited link to set a new password. Check your spam folder too.",
+    "request_failed": "Could not send the reset email. Try again.",
+    "new_title": "Set a new password",
+    "new_password": "New password",
+    "confirm_password": "Confirm new password",
+    "update_password": "Update password",
+    "mismatch": "Passwords do not match.",
+    "updated": "Password updated. You're signed in.",
+    "update_failed": "Could not update the password. The link may have expired — request a new one.",
+    "expired_title": "This reset link is invalid or expired.",
+    "expired_desc": "Reset links are time-limited and single-use. Request a fresh one.",
+    "request_new": "Request new link"
   }
 }
