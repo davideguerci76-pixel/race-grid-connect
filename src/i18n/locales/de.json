@@ -349,5 +349,313 @@
     "unavailable": "Standortvorschläge werden neu verbunden…",
     "retry": "Erneut versuchen",
     "powered_by": "Powered by Google"
+  },
+  "legal_info": {
+    "title": "Zusätzliche Informationen zu Infrastruktur, Anbietern und Datenverarbeitung",
+    "meta_desc": "Technische Details zu Infrastruktur, Anbietern und Datenverarbeitung von Pit Call. Ergänzt die offizielle iubenda-Datenschutzerklärung.",
+    "index_label": "[INHALT]",
+    "docs_label": "Offizielle Dokumente:",
+    "sections": [
+      {
+        "id": "introduzione",
+        "heading": "Einleitung",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Diese Seite ergänzt die [[privacy]] durch weitere technische Details zur von Pit Call genutzten Infrastruktur, zu externen Anbietern und zur Art der Datenverarbeitung."
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Diese Seite ersetzt nicht die Datenschutzerklärung.",
+              "Die iubenda-Datenschutzerklärung bleibt das offizielle Dokument.",
+              "Diese Seite dient ausschließlich der Information und Transparenz."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "infrastruttura",
+        "heading": "Infrastruktur der Plattform",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Pit Call ist eine SaaS-Plattform für das Matching zwischen Motorsport-Teams und freiberuflichen Fachkräften."
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Die Hauptinfrastruktur wird in der Europäischen Union gehostet.",
+              "Daten werden ausschließlich zur Erbringung des Dienstes verarbeitet.",
+              "Pit Call verkauft keine personenbezogenen Daten.",
+              "Pit Call setzt keine Werbesysteme ein.",
+              "Pit Call führt kein kommerzielles Profiling der Nutzer durch."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "supabase",
+        "heading": "Supabase",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Supabase wird verwendet für:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Datenbank",
+              "Authentifizierung",
+              "Nutzerverwaltung",
+              "Profile",
+              "Verfügbarkeitskalender",
+              "Anfragen (Pit Calls)",
+              "Matching-System",
+              "Bewertungen",
+              "Benachrichtigungen",
+              "Token",
+              "Aktivitätsverlauf"
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Verarbeitet werden können: Vorname, Nachname, E-Mail, berufliche Daten, Fähigkeiten, Sprachen, Erfahrungen, Verfügbarkeiten, Geokoordinaten, Match-bezogene Daten und technische Logs."
+          },
+          {
+            "t": "p",
+            "v": "Projektregion: **EU-Central-1 (Frankfurt, Deutschland)**."
+          }
+        ]
+      },
+      {
+        "id": "cloudflare",
+        "heading": "Cloudflare / Lovable Cloud",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Cloudflare und Lovable Cloud werden verwendet für:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Hosting",
+              "CDN",
+              "Edge Functions",
+              "Schutz der Plattform",
+              "Content-Auslieferung",
+              "Performance-Optimierung",
+              "Sicherheit"
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Technische Daten können verarbeitet werden, z. B.: IP-Adresse, Browser, User Agent, Sicherheitslogs und HTTP-Anfragen."
+          }
+        ]
+      },
+      {
+        "id": "google-oauth",
+        "heading": "Google OAuth",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Die Anmeldung über Google ist vollständig freiwillig."
+          },
+          {
+            "t": "p",
+            "v": "Empfangen werden können: Vorname, Nachname, E-Mail, Profilbild und die für die Authentifizierung erforderliche Google-Kennung."
+          }
+        ]
+      },
+      {
+        "id": "resend",
+        "heading": "Resend",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Resend wird ausschließlich verwendet für:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "E-Mail-Verifizierung",
+              "Passwort-Wiederherstellung",
+              "Systembenachrichtigungen",
+              "Transaktions-E-Mails"
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Es wird nicht für Marketing oder Werbung eingesetzt."
+          }
+        ]
+      },
+      {
+        "id": "zoho-mail",
+        "heading": "Zoho Mail",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Zoho Mail wird zur Verwaltung der offiziellen Adressen der Plattform verwendet:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "info@pitcall.net",
+              "privacy@pitcall.net",
+              "admin@pitcall.net"
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Verarbeitet werden können: E-Mail-Adresse, Nachrichteninhalte und von Nutzern freiwillig gesendete Anhänge."
+          }
+        ]
+      },
+      {
+        "id": "nominatim",
+        "heading": "OpenStreetMap / Nominatim",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Pit Call nutzt Nominatim ausschließlich für die Ortssuche."
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Die Anfrage erfolgt über einen serverseitigen Proxy.",
+              "Der Browser der Nutzer kommuniziert nie direkt mit Nominatim."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "carto",
+        "heading": "CARTO",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "CARTO wird ausschließlich zur Darstellung der Marktkarte verwendet."
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Die Karte wird erst nach der über iubenda erteilten Einwilligung geladen.",
+              "Ohne Einwilligung funktioniert die Plattform normal weiter."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "iubenda",
+        "heading": "iubenda",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "iubenda verwaltet:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "Cookie-Banner",
+              "Cookie-Richtlinie",
+              "Datenschutzerklärung",
+              "Einwilligungsnachweis",
+              "Datenschutzeinstellungen"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "matching",
+        "heading": "Matching-System",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Pit Call verwendet einen eigenen Algorithmus."
+          },
+          {
+            "t": "p",
+            "v": "Berücksichtigt werden Fähigkeiten, Rolle, Verfügbarkeit, Sprachen, Erfahrung, geografische Lage und weitere berufliche Parameter."
+          },
+          {
+            "t": "p",
+            "v": "Das Ergebnis ist ausschließlich ein Kompatibilitätsindex. Die endgültige Entscheidung treffen immer die Nutzer. Pit Call trifft keine automatisierten Entscheidungen mit rechtlicher Wirkung."
+          }
+        ]
+      },
+      {
+        "id": "reputazione",
+        "heading": "Reputationssystem",
+        "blocks": [
+          {
+            "t": "ul",
+            "v": [
+              "Bewertungen sind nur nach echten Zusammenarbeiten möglich.",
+              "Doppelte Bewertung Team/Freelancer.",
+              "Moderation gemeldeter Inhalte.",
+              "Möglichkeit der Anfechtung.",
+              "Verzögerte Veröffentlichung nach Double-Blind-Regeln."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "geolocalizzazione",
+        "heading": "Geolokalisierung",
+        "blocks": [
+          {
+            "t": "ul",
+            "v": [
+              "Koordinaten werden ausschließlich zur Verbesserung des Matchings verwendet.",
+              "Pit Call führt kein kontinuierliches Standort-Tracking durch."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "comunicazione",
+        "heading": "Weitergabe der Daten",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Kontaktdaten werden ausschließlich gemäß der vorgesehenen Funktionsweise der Plattform geteilt."
+          },
+          {
+            "t": "p",
+            "v": "Nach der Weitergabe werden Teams und Freelancer zu eigenständigen Verantwortlichen für die erhaltenen Daten."
+          },
+          {
+            "t": "p",
+            "v": "Die Daten dürfen nicht für Marketingzwecke oder zum Aufbau paralleler Datenbanken verwendet werden."
+          }
+        ]
+      },
+      {
+        "id": "conservazione",
+        "heading": "Speicherdauer",
+        "blocks": [
+          {
+            "t": "ul",
+            "v": [
+              "Daten werden so lange gespeichert, wie es für den Dienst und gesetzliche Pflichten erforderlich ist.",
+              "Steuerdaten werden gemäß den geltenden Vorschriften aufbewahrt.",
+              "Technische Logs werden ausschließlich aus Sicherheitsgründen aufbewahrt."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "aggiornamenti",
+        "heading": "Aktualisierungen",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Diese Seite kann aktualisiert werden, wenn neue Anbieter, neue Dienste oder Änderungen an der Infrastruktur eingeführt werden. Für Anfragen zu personenbezogenen Daten schreiben Sie an [[email]]."
+          }
+        ]
+      }
+    ]
   }
 }
