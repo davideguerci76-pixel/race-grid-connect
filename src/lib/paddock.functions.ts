@@ -861,7 +861,7 @@ export const purchaseTokensDemo = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const packs = { small: 10, medium: 50, large: 200 };
     const amount = packs[data.pack];
-    const { supabase, userId } = context;
+    const { userId } = context;
     // Token balances are never writable from the client: go through the
     // trusted server-side crediting path only.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
