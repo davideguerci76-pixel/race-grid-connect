@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
 
 function RequestsPage() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
