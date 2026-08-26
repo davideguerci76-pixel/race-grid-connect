@@ -221,7 +221,10 @@ function RequestMatchesPage() {
         {data && (
           <>
             <div className="border border-border bg-card p-5">
-              <div className="label-mono">[PIT CALL]</div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="label-mono">[PIT CALL]</div>
+                {isPoolRequest && <PoolBadge />}
+              </div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{data.request.title}</h1>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
                 {data.request.sub_role ? `${subRoleLabel(data.request.sub_role)} (${levelLabel(data.request.sub_role_min_level ?? "junior")}+)` : roleGroupLabel(data.request.role_group)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
