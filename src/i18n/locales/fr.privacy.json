@@ -1,0 +1,30 @@
+{
+  "auth": {
+    "accept_legal_prefix": "J'ai lu et j'accepte les",
+    "accept_legal_required": "Merci d'accepter d'abord les Conditions et la Politique de confidentialité."
+  },
+  "common": {
+    "and": "et la",
+    "cancel": "Annuler"
+  },
+  "consent": {
+    "preferences": "Préférences cookies",
+    "blocked_title": "Contenu externe bloqué",
+    "blocked_desc": "Ce contenu est chargé depuis {{provider}}. Activez-le pour voir la carte.",
+    "blocked_cta": "Charger le contenu"
+  },
+  "privacy": {
+    "section_title": "Confidentialité et données",
+    "section_desc": "Vous contrôlez vos données. Téléchargez tout ce que Pit Call conserve sur vous, gérez vos préférences cookies ou supprimez définitivement votre compte.",
+    "export": "Exporter mes données",
+    "export_done": "Export de données téléchargé.",
+    "danger_zone": "Zone dangereuse",
+    "delete_account": "Supprimer mon compte",
+    "delete_desc": "La suppression retire votre profil, vos contacts, vos disponibilités et vos calendriers. Les évaluations que vous avez rédigées restent sans votre texte libre. Les tokens non utilisés sont perdus. Action irréversible.",
+    "delete_confirm_label": "Tapez DELETE pour confirmer",
+    "delete_confirm": "Supprimer définitivement",
+    "delete_done": "Compte supprimé.",
+    "delete_blocked": "Vous avez encore des engagements actifs. Clôturez-les ou annulez-les avant de supprimer votre compte.",
+    "contact": "Demandes relatives aux données"
+  }
+}
