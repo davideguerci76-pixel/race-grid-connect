@@ -11,6 +11,7 @@ import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
+import { PoolBadge } from "@/components/pool-badge";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
