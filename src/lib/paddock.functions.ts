@@ -945,6 +945,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       "tier2_size",
       "tier3_size",
       "hard_cap_matches",
+      "cost_request_race_weekend",
+      "cost_request_full_season",
+      "cost_pool_search",
     ];
     const { data: settingsRows } = await supabase
       .from("platform_settings")
