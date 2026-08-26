@@ -75,6 +75,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        try { await recordLegalAcceptance(); } catch { /* proof recorded on next login */ }
         toast.success(t("sweep_public.auth.welcome_toast"));
         navigate({ to: "/dashboard" });
       } else {
