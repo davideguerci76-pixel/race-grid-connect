@@ -366,27 +366,29 @@ function RequestMatchesPage() {
             )}
 
             {isPoolRequest && outsidePoolCount > 0 && (
-              <div className="mt-6 flex flex-wrap items-start justify-between gap-4 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
-                <div className="min-w-0">
-                  <div className="label-mono text-racing-yellow">[{t("pool.upgrade_label")}]</div>
-                  <p className="mt-1 text-sm">
-                    {t("pool.upgrade_desc", { count: outsidePoolCount })}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t("pool.upgrade_hint", { cost: upgradeCost })}
-                  </p>
+              <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <div className="label-mono text-racing-yellow">{t("pool.upgrade_label")}</div>
+                    <p className="mt-2 text-sm">
+                      {t("pool.upgrade_desc", { count: outsidePoolCount })}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t("pool.upgrade_hint", { cost: upgradeCost })}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
+                        upgradeMut.mutate();
+                      }
+                    }}
+                    disabled={upgradeMut.isPending}
+                    className="shrink-0 bg-racing-yellow px-5 py-3 text-xs font-black uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
+                  >
+                    {t("pool.upgrade_button", { cost: upgradeCost })}
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    if (confirm(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
-                      upgradeMut.mutate();
-                    }
-                  }}
-                  disabled={upgradeMut.isPending}
-                  className="bg-racing-yellow px-4 py-3 text-xs font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
-                >
-                  {t("pool.upgrade_button", { cost: upgradeCost })}
-                </button>
               </div>
             )}
 

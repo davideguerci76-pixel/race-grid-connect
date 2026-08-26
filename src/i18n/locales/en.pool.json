@@ -39,12 +39,12 @@
     "mode_pool": "My Pool pit call",
     "mode_pool_desc": "Search only inside your trusted circle. Names are shown in clear from the first result.",
     "mode_pool_note": "Searching inside your pool ({{count}} freelancers) — names in clear, unlock cost {{cost}} tokens.",
-    "upgrade_label": "Outside your pool",
-    "upgrade_desc": "{{count}} more freelancer(s) match this Pit Call outside your pool.",
-    "upgrade_hint": "Upgrade to a standard search to see them all — you only pay the {{cost}}-token difference.",
-    "upgrade_button": "Upgrade to standard ({{cost}} tokens)",
-    "upgrade_confirm": "Upgrade this Pit Call to a standard search for {{cost}} tokens and unlock {{count}} more match(es)?",
-    "upgrade_done": "Pit Call upgraded — {{cost}} tokens spent",
+    "upgrade_label": "UPGRADE TO STANDARD PITCALL",
+    "upgrade_desc": "There are {{count}} more freelancer(s) available outside your pool for this Pit Call.",
+    "upgrade_hint": "Upgrade this Pit Call to standard to unlock them all. Cost: {{cost}} token(s) (the difference between a standard Pit Call and a My Pool Pit Call).",
+    "upgrade_button": "UPGRADE TO STANDARD PITCALL ({{cost}} tokens)",
+    "upgrade_confirm": "Upgrade this Pit Call to standard for {{cost}} tokens and unlock {{count}} more freelancer(s)?",
+    "upgrade_done": "Pit Call upgraded to standard — {{cost}} tokens spent",
     "upgrade_failed": "Upgrade failed"
   }
 }
