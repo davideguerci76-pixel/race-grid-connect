@@ -171,6 +171,7 @@
       "large": "Season"
     },
     "buy": "Comprar",
+    "buy_soon": "La compra de tokens estará disponible en el lanzamiento oficial.",
     "reasons": {
       "signup_bonus": "Bonus registro",
       "purchase": "Compra",
