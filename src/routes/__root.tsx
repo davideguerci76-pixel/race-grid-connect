@@ -121,7 +121,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <IubendaScripts />
+      
       <Outlet />
       <Toaster theme="dark" position="top-right" />
     </QueryClientProvider>
