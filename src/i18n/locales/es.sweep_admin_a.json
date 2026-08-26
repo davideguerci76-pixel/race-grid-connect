@@ -12,7 +12,8 @@
       "tokens": "Tokens",
       "reviews": "Reseñas",
       "calendars": "Calendarios",
-      "wiki": "Wiki de la Plataforma"
+      "wiki": "Wiki de la Plataforma",
+      "launch": "Lanzamiento"
     },
     "time_machine": {
       "title": "Máquina del Tiempo (Debug Admin)",
@@ -91,6 +92,22 @@
       "primary_admin": "Admin principal",
       "revoke_admin": "Revocar admin",
       "grant_admin": "Conceder admin"
-    }
+    },
+    "launch": {
+      "title": "Control de Prelanzamiento y Mantenimiento",
+      "blurb": "Interruptores globales aplicados al instante en todo el sitio.",
+      "saved": "Guardado",
+      "coming_soon_title": "Modo landing \"Coming Soon\"",
+      "coming_soon_body": "Sustituye la home pública por una landing de espera (solo logos y claim, sin datos públicos).",
+      "home_stats_title": "Mostrar estadísticas en la home",
+      "home_stats_body": "Muestra u oculta los destacados de mercado y contadores en la home.",
+      "pitcall_off_title": "Desactivar creación de Pit Call",
+      "pitcall_off_body": "Congela la creación de nuevas Pit Call. Registros y calendarios siguen activos."
+    },
+    "home_coming_soon": {
+      "coming_soon_title": "Llegamos muy pronto",
+      "coming_soon_claim": "Construyendo el futuro de Pitcall."
+    },
+    "pitcall_creation_disabled": "La creación de Pit Call está temporalmente desactivada."
   }
 }
