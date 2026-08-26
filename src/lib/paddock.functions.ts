@@ -1287,6 +1287,17 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       per_profile_cost: perProfileCost,
       total_matches: allFull.length,
       total_partial_matches: allPartial.length,
+      outside_pool_count: outsidePoolCount,
+      upgrade_cost: isPoolRequest
+        ? Math.max(
+            0,
+            Math.round(
+              ((req as any).duration === "full_season"
+                ? settings.get("cost_request_full_season") ?? 20
+                : settings.get("cost_request_race_weekend") ?? 10) - (settings.get("cost_pool_search") ?? 5),
+            ),
+          )
+        : 0,
       hard_cap: hardCap,
       partial_banner: partialBanner,
       refund_quote: {
