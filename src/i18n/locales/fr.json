@@ -171,6 +171,7 @@
       "large": "Season"
     },
     "buy": "Acheter",
+    "buy_soon": "L'achat de jetons sera disponible au lancement officiel.",
     "reasons": {
       "signup_bonus": "Bonus inscription",
       "purchase": "Achat",
