@@ -862,20 +862,17 @@ export const purchaseTokensDemo = createServerFn({ method: "POST" })
     const packs = { small: 10, medium: 50, large: 200 };
     const amount = packs[data.pack];
     const { supabase, userId } = context;
-    await supabase.from("token_transactions").insert({
-      user_id: userId,
-      delta: amount,
-      reason: "purchase",
-      note: `Demo pack: ${data.pack}`,
-    });
-    const { data: current } = await supabase.rpc("my_token_balance");
-    const nextBalance = ((current as number | null) ?? 0) + amount;
-    const { error } = await supabase
-      .from("profiles")
-      .update({ token_balance: nextBalance })
-      .eq("id", userId);
+    // Token balances are never writable from the client: go through the
+    // trusted server-side crediting path only.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: nextBalance, error } = await supabaseAdmin.rpc("credit_tokens", {
+      _user_id: userId,
+      _delta: amount,
+      _reason: "purchase",
+      _note: `Demo pack: ${data.pack}`,
+    } as never);
     if (error) throw new Error(error.message);
-    return { balance: nextBalance, added: amount };
+    return { balance: (nextBalance as number | null) ?? 0, added: amount };
   });
 
 export const getTokenHistory = createServerFn({ method: "GET" })
