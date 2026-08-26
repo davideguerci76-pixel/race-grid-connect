@@ -135,6 +135,67 @@
   color: var(--color-muted-foreground);
 }
 
+/* ------------------------------------------------------------------ */
+/* iubenda widgets — dark theme integration                           */
+/* "Notice at collection" / "Your Privacy Choices" tabs, embeds and   */
+/* the floating preferences button ship with light styling; we invert */
+/* and recolor them so they blend into the dark footer.               */
+/* ------------------------------------------------------------------ */
+/* US privacy widget: "Notice at collection" + "Your Privacy Choices" tabs */
+.iub__us-widget .iub__us-widget__link,
+.iub__us-widget__link,
+a.iubenda-cs-uspr-link,
+button.iubenda-cs-preferences-link {
+  background-color: oklch(0.19 0.008 265) !important;
+  background: oklch(0.19 0.008 265) !important;
+  border: 1px solid oklch(1 0 0 / 20%) !important;
+  color: oklch(0.92 0.01 265) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 10px 30px -18px oklch(0 0 0 / 80%) !important;
+}
+
+.iub__us-widget .iub__us-widget__link:hover,
+.iub__us-widget__link:hover {
+  background-color: oklch(0.24 0.008 265) !important;
+  color: oklch(0.98 0 0) !important;
+}
+
+.iub__us-widget .iub__us-widget__link *,
+.iub__us-widget__link * {
+  color: oklch(0.92 0.01 265) !important;
+  fill: oklch(0.92 0.01 265) !important;
+}
+
+/* iubenda brand icon inside the widget: monochrome dark treatment */
+.iub__us-widget img,
+.iub__us-widget svg,
+.iubenda-tp-btn img,
+.iubenda-tp-btn svg,
+button.iubenda-cs-preferences-link img {
+  filter: grayscale(1) brightness(1.7) contrast(0.9) !important;
+  background-color: transparent !important;
+}
+
+/* Floating preferences button (bottom-right) */
+.iubenda-tp-btn {
+  background-color: oklch(0.19 0.008 265) !important;
+  background: oklch(0.19 0.008 265) !important;
+  border: 1px solid oklch(1 0 0 / 20%) !important;
+  color: oklch(0.92 0.01 265) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 10px 30px -18px oklch(0 0 0 / 80%) !important;
+}
+
+.iubenda-tp-btn:hover {
+  background-color: oklch(0.24 0.008 265) !important;
+}
+
+/* Inline embedded policy bodies on dark surfaces */
+.iubenda-embed.iubenda-white,
+.iubenda-white {
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
 @utility card-surface {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
