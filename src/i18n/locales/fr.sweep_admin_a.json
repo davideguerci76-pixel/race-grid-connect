@@ -13,7 +13,8 @@
       "reviews": "Avis",
       "calendars": "Calendriers",
       "wiki": "Wiki de la Plateforme",
-      "launch": "Lancement"
+      "launch": "Lancement",
+      "testing": "Testing Lab"
     },
     "time_machine": {
       "title": "Machine à Remonter le Temps (Debug Admin)",

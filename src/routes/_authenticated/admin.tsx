@@ -9,6 +9,7 @@ import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotificatio
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
+import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,

@@ -13,7 +13,8 @@
       "reviews": "Reviews",
       "calendars": "Calendars",
       "wiki": "Platform Wiki",
-      "launch": "Launch"
+      "launch": "Launch",
+      "testing": "Testing Lab"
     },
     "time_machine": {
       "title": "Time Machine (Admin debug)",
