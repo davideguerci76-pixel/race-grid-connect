@@ -10,19 +10,44 @@ import { useAuth } from "@/hooks/use-auth";
 import { MarketHighlights } from "@/components/market-highlights";
 
 export const Route = createFileRoute("/")({
+  loader: () => getPublicFlags(),
   component: Home,
 });
+
+function ComingSoon() {
+  const { t } = useTranslation();
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center text-foreground">
+      <img src={logoFull.url} alt="Pit Call — Box. Now!" width={1089} height={424} className="w-full max-w-md object-contain mix-blend-screen" />
+      <h1 className="mt-10 text-4xl font-black uppercase italic tracking-tighter md:text-6xl">
+        {t("sweep_admin_a.home_coming_soon.coming_soon_title")}
+      </h1>
+      <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+        {t("sweep_admin_a.home_coming_soon.coming_soon_claim")}
+      </p>
+      <div className="mt-10 inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">PITCALL</span>
+      </div>
+    </div>
+  );
+}
 
 function Home() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const flags = Route.useLoaderData();
 
   useEffect(() => {
     if (!loading && user) {
       navigate({ to: "/dashboard", replace: true });
     }
   }, [loading, user, navigate]);
+
+  if (flags?.comingSoon && !user) return <ComingSoon />;
+
+
 
 
   return (
