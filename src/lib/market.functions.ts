@@ -52,12 +52,12 @@ export const getMarketStats = createServerFn({ method: "GET" }).handler(async ()
     .select("key, value_num")
     .eq("key", "flag_home_stats")
     .maybeSingle();
-  if (flagRows && Number(flagRows.value_num) <= 0) return null;
+  if (flagRows && Number(flagRows.value_num) <= 0) return { stats: null };
   const { data, error } = await client.rpc("market_stats" as never);
   if (error) throw new Error(error.message);
-  if (!data) return null;
+  if (!data) return { stats: null };
   const stats = data as unknown as MarketStats & { totals: Record<string, unknown> };
   // Average day rate is admin-only: never expose it on public market pages.
   if (stats?.totals) delete stats.totals["avg_day_rate"];
-  return stats;
+  return { stats };
 });
