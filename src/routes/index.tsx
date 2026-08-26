@@ -164,12 +164,11 @@ function Home() {
 
       {flags?.homeStats && (
       <section className="border-b border-border bg-pit">
-        <div className="container-page grid grid-cols-2 divide-x divide-border md:grid-cols-4">
+        <div className="container-page grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {[
-            ["2.4k+", t("home.stats.specialists")],
-            ["124", t("home.stats.teams")],
-            ["18", t("home.stats.countries")],
-            ["€ 620", t("home.stats.rate")],
+            [stats ? String(stats.totals.freelancers) : "—", t("home.stats.specialists")],
+            [stats ? String(stats.totals.teams) : "—", t("home.stats.teams")],
+            [stats ? String(new Set((stats.by_country ?? []).map((c) => c.country).filter(Boolean)).size) : "—", t("home.stats.countries")],
           ].map(([n, l]) => (
             <div key={l} className="px-4 py-8 first:pl-0 md:px-8">
               <div className="font-mono text-3xl font-black tracking-tighter text-racing-red md:text-4xl">{n}</div>
