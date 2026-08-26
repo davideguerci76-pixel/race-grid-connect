@@ -169,7 +169,14 @@ function AuthPage() {
               />
             </div>
             <div>
-              <label className="label-mono">{t("auth.password")}</label>
+              <div className="flex items-center justify-between">
+                <label className="label-mono">{t("auth.password")}</label>
+                {!isSignup && (
+                  <Link to="/forgot-password" className="text-[11px] font-bold text-racing-red hover:underline">
+                    {t("auth.forgot_password", { defaultValue: "Forgot password?" })}
+                  </Link>
+                )}
+              </div>
               <input
                 type="password"
                 required
