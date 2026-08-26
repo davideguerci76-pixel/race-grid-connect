@@ -58,6 +58,39 @@ function TestingLab() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Purge failed"),
   });
 
+  const poolFn = useServerFn(assignTestPools);
+  const poolRatingsFn = useServerFn(generatePoolRatings);
+  const poolCallsFn = useServerFn(generatePoolPitCalls);
+
+  const poolMut = useMutation({
+    mutationFn: () => poolFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.links} pool links created across ${r.teams} teams (${r.pool_total} total)`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool assignment failed"),
+  });
+
+  const ratingsMut = useMutation({
+    mutationFn: () => poolRatingsFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.ratings} ratings on ${r.engagements} new completed engagements`);
+      if (r.errors?.length) toast.warning(r.errors[0]);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Rating generation failed"),
+  });
+
+  const poolCallsMut = useMutation({
+    mutationFn: () => poolCallsFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.created} My Pool Pit Calls created (target ${r.target})`);
+      if (r.errors?.length) toast.warning(r.errors[0]);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool Pit Call generation failed"),
+  });
+
   const size = PRESET_SIZES[preset];
 
   return (
