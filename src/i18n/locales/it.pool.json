@@ -39,12 +39,12 @@
     "mode_pool": "Pit call in My Pool",
     "mode_pool_desc": "Ricerca solo nella tua cerchia di fiducia. I nomi sono in chiaro fin dal primo risultato.",
     "mode_pool_note": "Ricerca nel tuo pool ({{count}} freelance) — nomi in chiaro, costo di sblocco {{cost}} token.",
-    "upgrade_label": "Fuori dal tuo pool",
-    "upgrade_desc": "Ci sono altri {{count}} freelance compatibili con questa Pit Call fuori dal tuo pool.",
-    "upgrade_hint": "Passa alla ricerca standard per vederli tutti — paghi solo la differenza di {{cost}} token.",
-    "upgrade_button": "Passa a standard ({{cost}} token)",
-    "upgrade_confirm": "Vuoi convertire questa Pit Call in ricerca standard per {{cost}} token e sbloccare altri {{count}} match?",
-    "upgrade_done": "Pit Call aggiornata — {{cost}} token spesi",
+    "upgrade_label": "PASSA A STANDARD PITCALL",
+    "upgrade_desc": "Ci sono {{count}} freelance disponibili fuori dal tuo pool per questa Pit Call.",
+    "upgrade_hint": "Passa questa Pit Call a standard per sbloccarli tutti. Costo: {{cost}} token (la differenza tra una Pit Call standard e una Pit Call in My Pool).",
+    "upgrade_button": "PASSA A STANDARD PITCALL ({{cost}} token)",
+    "upgrade_confirm": "Vuoi passare questa Pit Call a standard per {{cost}} token e sbloccare altri {{count}} freelance?",
+    "upgrade_done": "Pit Call passata a standard — {{cost}} token spesi",
     "upgrade_failed": "Upgrade non riuscito"
   }
 }
