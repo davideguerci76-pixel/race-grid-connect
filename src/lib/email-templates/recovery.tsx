@@ -59,10 +59,10 @@ const text = {
   margin: '0 0 25px',
 }
 const button = {
-  backgroundColor: '#000000',
+  backgroundColor: '#E10600',
   color: '#ffffff',
   fontSize: '14px',
-  borderRadius: '8px',
+  borderRadius: '0px', letterSpacing: '1.5px', textTransform: 'uppercase' as const, fontWeight: 700 as const,
   padding: '12px 20px',
   textDecoration: 'none',
 }
