@@ -653,7 +653,10 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          legal_version: string | null
           preferred_language: string
+          privacy_accepted_at: string | null
+          terms_accepted_at: string | null
           token_balance: number
           updated_at: string
           user_type: Database["public"]["Enums"]["user_type"]
@@ -666,7 +669,10 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          legal_version?: string | null
           preferred_language?: string
+          privacy_accepted_at?: string | null
+          terms_accepted_at?: string | null
           token_balance?: number
           updated_at?: string
           user_type: Database["public"]["Enums"]["user_type"]
@@ -679,7 +685,10 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          legal_version?: string | null
           preferred_language?: string
+          privacy_accepted_at?: string | null
+          terms_accepted_at?: string | null
           token_balance?: number
           updated_at?: string
           user_type?: Database["public"]["Enums"]["user_type"]
