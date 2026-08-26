@@ -105,6 +105,19 @@ function RequestMatchesPage() {
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
   const hasAnyMatches = fullItems.length + partialItems.length > 0 || Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0;
+  const outsidePoolCount = Number((data as any)?.outside_pool_count ?? 0);
+  const upgradeCost = Number((data as any)?.upgrade_cost ?? 0);
+  const upgradeFn = useServerFn(upgradeRequestToStandard);
+  const upgradeMut = useMutation({
+    mutationFn: () => upgradeFn({ data: { request_id: id } }),
+    onSuccess: (r: any) => {
+      toast.success(t("pool.upgrade_done", { cost: r?.tokens_spent ?? upgradeCost }));
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["my-requests"] });
+      qc.invalidateQueries({ queryKey: ["token-balance"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("pool.upgrade_failed")),
+  });
 
   const renderPool = (
     label: string,
