@@ -40,8 +40,11 @@ function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
 
 export function MarketHighlights({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   const { data, isLoading } = useMarketStats();
   const totals = data?.totals;
+
+  if (!flags.homeStats) return null;
 
   return (
     <section className={compact ? "mt-12" : ""}>
