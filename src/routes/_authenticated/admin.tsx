@@ -9,6 +9,7 @@ import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotificatio
 import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
+import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -40,6 +41,8 @@ function AdminLayout() {
     { to: "/admin/calendars", label: t("sweep_admin_a.tabs.calendars") },
     { to: "/admin/wiki", label: t("sweep_admin_a.tabs.wiki") },
     { to: "/admin/launch", label: t("sweep_admin_a.tabs.launch") },
+    { to: "/admin/testing", label: t("sweep_admin_a.tabs.testing") },
+
   ];
 
 
@@ -49,12 +52,15 @@ function AdminLayout() {
     <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
     <div className="container-page py-8">
-      <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
+      <AdminEnvBanner />
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{t("sweep_admin_a.admin_label")}</div>
           <h1 className="text-2xl font-black italic tracking-tighter">{t("sweep_admin_a.control_panel")}</h1>
         </div>
+        <AdminEnvSwitch />
       </div>
+
       <div className="mb-6 flex flex-wrap gap-2">
         {tabs.map((t) => {
           const active = path === t.to || (t.to === "/admin" && path === "/admin/");

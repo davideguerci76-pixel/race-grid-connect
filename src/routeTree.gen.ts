@@ -38,6 +38,7 @@ import { Route as AuthenticatedDashboardCalendarsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedAdminWikiRouteImport } from './routes/_authenticated/admin.wiki'
 import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
+import { Route as AuthenticatedAdminTestingRouteImport } from './routes/_authenticated/admin.testing'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminPitcallsRouteImport } from './routes/_authenticated/admin.pitcalls'
@@ -207,6 +208,12 @@ const AuthenticatedAdminTokensRoute =
     path: '/tokens',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminTestingRoute =
+  AuthenticatedAdminTestingRouteImport.update({
+    id: '/testing',
+    path: '/testing',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
@@ -306,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -347,6 +355,7 @@ export interface FileRoutesByTo {
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -392,6 +401,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
+  '/_authenticated/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
   '/_authenticated/admin/wiki': typeof AuthenticatedAdminWikiRoute
   '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
@@ -437,6 +447,7 @@ export interface FileRouteTypes {
     | '/admin/pitcalls'
     | '/admin/reviews'
     | '/admin/teams'
+    | '/admin/testing'
     | '/admin/tokens'
     | '/admin/wiki'
     | '/dashboard/calendar'
@@ -478,6 +489,7 @@ export interface FileRouteTypes {
     | '/admin/pitcalls'
     | '/admin/reviews'
     | '/admin/teams'
+    | '/admin/testing'
     | '/admin/tokens'
     | '/admin/wiki'
     | '/dashboard/calendar'
@@ -522,6 +534,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pitcalls'
     | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/teams'
+    | '/_authenticated/admin/testing'
     | '/_authenticated/admin/tokens'
     | '/_authenticated/admin/wiki'
     | '/_authenticated/dashboard/calendar'
@@ -769,6 +782,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTokensRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/testing': {
+      id: '/_authenticated/admin/testing'
+      path: '/testing'
+      fullPath: '/admin/testing'
+      preLoaderRoute: typeof AuthenticatedAdminTestingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/teams': {
       id: '/_authenticated/admin/teams'
       path: '/teams'
@@ -871,6 +891,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPitcallsRoute: typeof AuthenticatedAdminPitcallsRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
+  AuthenticatedAdminTestingRoute: typeof AuthenticatedAdminTestingRoute
   AuthenticatedAdminTokensRoute: typeof AuthenticatedAdminTokensRoute
   AuthenticatedAdminWikiRoute: typeof AuthenticatedAdminWikiRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -884,6 +905,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminPitcallsRoute: AuthenticatedAdminPitcallsRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
+  AuthenticatedAdminTestingRoute: AuthenticatedAdminTestingRoute,
   AuthenticatedAdminTokensRoute: AuthenticatedAdminTokensRoute,
   AuthenticatedAdminWikiRoute: AuthenticatedAdminWikiRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

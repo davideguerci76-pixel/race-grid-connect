@@ -13,7 +13,8 @@
       "reviews": "Bewertungen",
       "calendars": "Kalender",
       "wiki": "Plattform-Wiki",
-      "launch": "Start"
+      "launch": "Start",
+      "testing": "Testing Lab"
     },
     "time_machine": {
       "title": "Zeitmaschine (Admin-Debug)",

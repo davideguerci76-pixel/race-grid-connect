@@ -13,7 +13,8 @@
       "reviews": "Reseñas",
       "calendars": "Calendarios",
       "wiki": "Wiki de la Plataforma",
-      "launch": "Lanzamiento"
+      "launch": "Lanzamiento",
+      "testing": "Testing Lab"
     },
     "time_machine": {
       "title": "Máquina del Tiempo (Debug Admin)",

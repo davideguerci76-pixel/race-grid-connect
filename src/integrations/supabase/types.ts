@@ -56,6 +56,24 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_env_state: {
+        Row: {
+          admin_id: string
+          is_test: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          is_test?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          is_test?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_time_settings: {
         Row: {
           id: boolean
@@ -83,18 +101,21 @@ export type Database = {
           day: string
           freelancer_id: string
           id: string
+          is_test: boolean
         }
         Insert: {
           created_at?: string
           day: string
           freelancer_id: string
           id?: string
+          is_test?: boolean
         }
         Update: {
           created_at?: string
           day?: string
           freelancer_id?: string
           id?: string
+          is_test?: boolean
         }
         Relationships: [
           {
@@ -142,6 +163,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -174,6 +196,7 @@ export type Database = {
           freelancer_marked_complete?: boolean
           ghosting_released_at?: string | null
           id?: string
+          is_test?: boolean
           match_id?: string | null
           no_show?: boolean
           notes?: string | null
@@ -206,6 +229,7 @@ export type Database = {
           freelancer_marked_complete?: boolean
           ghosting_released_at?: string | null
           id?: string
+          is_test?: boolean
           match_id?: string | null
           no_show?: boolean
           notes?: string | null
@@ -286,6 +310,7 @@ export type Database = {
           education: string | null
           experiences: Json
           headline: string | null
+          is_test: boolean
           languages: Json
           location: string | null
           location_city: string | null
@@ -313,6 +338,7 @@ export type Database = {
           education?: string | null
           experiences?: Json
           headline?: string | null
+          is_test?: boolean
           languages?: Json
           location?: string | null
           location_city?: string | null
@@ -340,6 +366,7 @@ export type Database = {
           education?: string | null
           experiences?: Json
           headline?: string | null
+          is_test?: boolean
           languages?: Json
           location?: string | null
           location_city?: string | null
@@ -375,6 +402,7 @@ export type Database = {
           first_matched_at: string
           freelancer_id: string
           id: string
+          is_test: boolean
           request_id: string
           team_id: string
         }
@@ -384,6 +412,7 @@ export type Database = {
           first_matched_at?: string
           freelancer_id: string
           id?: string
+          is_test?: boolean
           request_id: string
           team_id: string
         }
@@ -393,6 +422,7 @@ export type Database = {
           first_matched_at?: string
           freelancer_id?: string
           id?: string
+          is_test?: boolean
           request_id?: string
           team_id?: string
         }
@@ -452,6 +482,7 @@ export type Database = {
           id: string
           is_partial: boolean
           is_perfect: boolean
+          is_test: boolean
           match_score: number
           missing_criteria: Json
           missing_days: number
@@ -472,6 +503,7 @@ export type Database = {
           id?: string
           is_partial?: boolean
           is_perfect?: boolean
+          is_test?: boolean
           match_score?: number
           missing_criteria?: Json
           missing_days?: number
@@ -492,6 +524,7 @@ export type Database = {
           id?: string
           is_partial?: boolean
           is_perfect?: boolean
+          is_test?: boolean
           match_score?: number
           missing_criteria?: Json
           missing_days?: number
@@ -584,6 +617,7 @@ export type Database = {
           created_at: string
           emailed_at: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["notif_kind"]
           payload: Json
           read_at: string | null
@@ -593,6 +627,7 @@ export type Database = {
           created_at?: string
           emailed_at?: string | null
           id?: string
+          is_test?: boolean
           kind: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
           read_at?: string | null
@@ -602,6 +637,7 @@ export type Database = {
           created_at?: string
           emailed_at?: string | null
           id?: string
+          is_test?: boolean
           kind?: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
           read_at?: string | null
@@ -700,6 +736,7 @@ export type Database = {
           display_name: string
           first_name: string | null
           id: string
+          is_test: boolean
           last_name: string | null
           legal_version: string | null
           preferred_language: string
@@ -716,6 +753,7 @@ export type Database = {
           display_name: string
           first_name?: string | null
           id: string
+          is_test?: boolean
           last_name?: string | null
           legal_version?: string | null
           preferred_language?: string
@@ -732,6 +770,7 @@ export type Database = {
           display_name?: string
           first_name?: string | null
           id?: string
+          is_test?: boolean
           last_name?: string | null
           legal_version?: string | null
           preferred_language?: string
@@ -786,6 +825,7 @@ export type Database = {
           flagged_by: string | null
           from_user_id: string
           id: string
+          is_test: boolean
           moderated_at: string | null
           moderated_by: string | null
           moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
@@ -807,6 +847,7 @@ export type Database = {
           flagged_by?: string | null
           from_user_id: string
           id?: string
+          is_test?: boolean
           moderated_at?: string | null
           moderated_by?: string | null
           moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
@@ -828,6 +869,7 @@ export type Database = {
           flagged_by?: string | null
           from_user_id?: string
           id?: string
+          is_test?: boolean
           moderated_at?: string | null
           moderated_by?: string | null
           moderation_status?: Database["public"]["Enums"]["rating_moderation_status"]
@@ -945,6 +987,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          is_test: boolean
           languages: Json
           location: string | null
           location_anchor: string
@@ -992,6 +1035,7 @@ export type Database = {
           experience_requirements?: Json
           id?: string
           is_active?: boolean
+          is_test?: boolean
           languages?: Json
           location?: string | null
           location_anchor?: string
@@ -1039,6 +1083,7 @@ export type Database = {
           experience_requirements?: Json
           id?: string
           is_active?: boolean
+          is_test?: boolean
           languages?: Json
           location?: string | null
           location_anchor?: string
@@ -1145,6 +1190,7 @@ export type Database = {
         Row: {
           auto_triggered: boolean
           id: string
+          is_test: boolean
           min_pct: number
           radius_km: number | null
           request_id: string
@@ -1158,6 +1204,7 @@ export type Database = {
         Insert: {
           auto_triggered?: boolean
           id?: string
+          is_test?: boolean
           min_pct: number
           radius_km?: number | null
           request_id: string
@@ -1171,6 +1218,7 @@ export type Database = {
         Update: {
           auto_triggered?: boolean
           id?: string
+          is_test?: boolean
           min_pct?: number
           radius_km?: number | null
           request_id?: string
@@ -1204,6 +1252,7 @@ export type Database = {
           engagement_id: string | null
           freelancer_id: string
           id: string
+          is_test: boolean
           source: string
           team_id: string
         }
@@ -1212,6 +1261,7 @@ export type Database = {
           engagement_id?: string | null
           freelancer_id: string
           id?: string
+          is_test?: boolean
           source?: string
           team_id: string
         }
@@ -1220,6 +1270,7 @@ export type Database = {
           engagement_id?: string | null
           freelancer_id?: string
           id?: string
+          is_test?: boolean
           source?: string
           team_id?: string
         }
@@ -1245,6 +1296,7 @@ export type Database = {
           bio: string | null
           founded_year: number | null
           initials: string | null
+          is_test: boolean
           location: string | null
           location_city: string | null
           location_country: string | null
@@ -1265,6 +1317,7 @@ export type Database = {
           bio?: string | null
           founded_year?: number | null
           initials?: string | null
+          is_test?: boolean
           location?: string | null
           location_city?: string | null
           location_country?: string | null
@@ -1285,6 +1338,7 @@ export type Database = {
           bio?: string | null
           founded_year?: number | null
           initials?: string | null
+          is_test?: boolean
           location?: string | null
           location_city?: string | null
           location_country?: string | null
@@ -1337,6 +1391,7 @@ export type Database = {
           created_at: string
           delta: number
           id: string
+          is_test: boolean
           note: string | null
           reason: Database["public"]["Enums"]["token_reason"]
           ref_id: string | null
@@ -1346,6 +1401,7 @@ export type Database = {
           created_at?: string
           delta: number
           id?: string
+          is_test?: boolean
           note?: string | null
           reason: Database["public"]["Enums"]["token_reason"]
           ref_id?: string | null
@@ -1355,6 +1411,7 @@ export type Database = {
           created_at?: string
           delta?: number
           id?: string
+          is_test?: boolean
           note?: string | null
           reason?: Database["public"]["Enums"]["token_reason"]
           ref_id?: string | null
@@ -1377,6 +1434,7 @@ export type Database = {
           discipline: string | null
           events: Json
           id: string
+          is_test: boolean
           name: string
           owner_id: string
           review_note: string | null
@@ -1394,6 +1452,7 @@ export type Database = {
           discipline?: string | null
           events?: Json
           id?: string
+          is_test?: boolean
           name: string
           owner_id: string
           review_note?: string | null
@@ -1411,6 +1470,7 @@ export type Database = {
           discipline?: string | null
           events?: Json
           id?: string
+          is_test?: boolean
           name?: string
           owner_id?: string
           review_note?: string | null
@@ -1466,6 +1526,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -1507,6 +1568,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -1536,6 +1598,7 @@ export type Database = {
           engagement_id: string | null
           freelancer_id: string
           id: string
+          is_test: boolean
           source: string
           team_id: string
         }
@@ -1546,6 +1609,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_env: { Args: { _is_test: boolean }; Returns: boolean }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
         Returns: {
@@ -1558,6 +1622,7 @@ export type Database = {
           flagged_by: string | null
           from_user_id: string
           id: string
+          is_test: boolean
           moderated_at: string | null
           moderated_by: string | null
           moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
@@ -1596,6 +1661,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -1636,6 +1702,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          is_test: boolean
           languages: Json
           location: string | null
           location_anchor: string
@@ -1691,6 +1758,7 @@ export type Database = {
       emit_contact_checks: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }
       emit_team_ghosting_reminders: { Args: never; Returns: number }
+      env_is_test: { Args: never; Returns: boolean }
       flag_rating: {
         Args: { _rating_id: string; _reason: string }
         Returns: undefined
@@ -1714,6 +1782,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -1789,6 +1858,12 @@ export type Database = {
         }[]
       }
       my_token_balance: { Args: never; Returns: number }
+      purge_test_environment: {
+        Args: never
+        Returns: {
+          user_id: string
+        }[]
+      }
       rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
@@ -1823,6 +1898,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -1875,6 +1951,7 @@ export type Database = {
           experience_requirements: Json
           id: string
           is_active: boolean
+          is_test: boolean
           languages: Json
           location: string | null
           location_anchor: string
@@ -1933,6 +2010,7 @@ export type Database = {
           flagged_by: string | null
           from_user_id: string
           id: string
+          is_test: boolean
           moderated_at: string | null
           moderated_by: string | null
           moderation_status: Database["public"]["Enums"]["rating_moderation_status"]
@@ -1977,6 +2055,7 @@ export type Database = {
           freelancer_marked_complete: boolean
           ghosting_released_at: string | null
           id: string
+          is_test: boolean
           match_id: string | null
           no_show: boolean
           notes: string | null
@@ -2004,6 +2083,7 @@ export type Database = {
         Returns: {
           auto_triggered: boolean
           id: string
+          is_test: boolean
           min_pct: number
           radius_km: number | null
           request_id: string
