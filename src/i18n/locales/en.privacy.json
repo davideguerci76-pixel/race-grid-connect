@@ -1,0 +1,30 @@
+{
+  "auth": {
+    "accept_legal_prefix": "I have read and accept the",
+    "accept_legal_required": "Please accept the Terms and the Privacy Policy first."
+  },
+  "common": {
+    "and": "and the",
+    "cancel": "Cancel"
+  },
+  "consent": {
+    "preferences": "Cookie preferences",
+    "blocked_title": "External content blocked",
+    "blocked_desc": "This content is loaded from {{provider}}. Enable it to view the map.",
+    "blocked_cta": "Load content"
+  },
+  "privacy": {
+    "section_title": "Privacy and data",
+    "section_desc": "You control your data. Download everything Pit Call stores about you, manage your cookie preferences, or permanently delete your account.",
+    "export": "Export my data",
+    "export_done": "Your data export has been downloaded.",
+    "danger_zone": "Danger zone",
+    "delete_account": "Delete my account",
+    "delete_desc": "Deleting your account removes your profile, contacts, availability and calendars. Ratings you wrote about others stay on the platform without your free text. Unused tokens are forfeited. This cannot be undone.",
+    "delete_confirm_label": "Type DELETE to confirm",
+    "delete_confirm": "Permanently delete",
+    "delete_done": "Your account has been deleted.",
+    "delete_blocked": "You still have active engagements. Close or cancel them before deleting your account.",
+    "contact": "Data requests"
+  }
+}

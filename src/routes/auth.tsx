@@ -9,6 +9,7 @@ import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site-header";
 import logoClean from "@/assets/pitcall-logo-clean.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
+import { recordLegalAcceptance } from "@/lib/privacy.functions";
 
 const searchSchema = z.object({
   mode: fallback(z.enum(["signin", "signup"]), "signin").default("signin"),
@@ -29,15 +30,21 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"freelancer" | "team">(type);
   const [loading, setLoading] = useState(false);
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
 
   const isSignup = mode === "signup";
 
   async function handleGoogle() {
+    if (isSignup && !acceptedLegal) {
+      toast.error(t("auth.accept_legal_required", { defaultValue: "Please accept the Terms and the Privacy Policy first." }));
+      return;
+    }
     setLoading(true);
     try {
       if (isSignup && typeof window !== "undefined") {
         window.sessionStorage.setItem("pendingUserType", userType);
         window.sessionStorage.setItem("pendingUserTypeAt", String(Date.now()));
+        window.sessionStorage.setItem("pendingLegalAccept", "1");
       } else if (typeof window !== "undefined") {
         window.sessionStorage.removeItem("pendingUserType");
         window.sessionStorage.removeItem("pendingUserTypeAt");
@@ -70,6 +77,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        try { await recordLegalAcceptance(); } catch { /* proof recorded on next login */ }
         toast.success(t("sweep_public.auth.welcome_toast"));
         navigate({ to: "/dashboard" });
       } else {
@@ -163,9 +171,31 @@ function AuthPage() {
                 className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
               />
             </div>
+            {isSignup && (
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  required
+                  checked={acceptedLegal}
+                  onChange={(e) => setAcceptedLegal(e.target.checked)}
+                  className="mt-0.5 accent-racing-red"
+                />
+                <span>
+                  {t("auth.accept_legal_prefix", { defaultValue: "I have read and accept the" })}{" "}
+                  <Link to="/legal/$doc" params={{ doc: "terms" }} className="font-bold text-racing-red">
+                    {t("footer.terms")}
+                  </Link>{" "}
+                  {t("common.and", { defaultValue: "and the" })}{" "}
+                  <Link to="/legal/$doc" params={{ doc: "privacy" }} className="font-bold text-racing-red">
+                    {t("footer.privacy")}
+                  </Link>
+                  .
+                </span>
+              </label>
+            )}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (isSignup && !acceptedLegal)}
               className="w-full bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:brightness-110 disabled:opacity-60"
             >
               {isSignup ? t("auth.create_account") : t("auth.continue_email")}

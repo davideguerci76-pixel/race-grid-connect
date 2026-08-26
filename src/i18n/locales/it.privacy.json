@@ -1,0 +1,30 @@
+{
+  "auth": {
+    "accept_legal_prefix": "Ho letto e accetto i",
+    "accept_legal_required": "Accetta prima i Termini e la Privacy Policy."
+  },
+  "common": {
+    "and": "e la",
+    "cancel": "Annulla"
+  },
+  "consent": {
+    "preferences": "Preferenze cookie",
+    "blocked_title": "Contenuto esterno bloccato",
+    "blocked_desc": "Questo contenuto viene caricato da {{provider}}. Abilitalo per vedere la mappa.",
+    "blocked_cta": "Carica contenuto"
+  },
+  "privacy": {
+    "section_title": "Privacy e dati",
+    "section_desc": "I tuoi dati sono tuoi. Scarica tutto ciò che Pit Call conserva su di te, gestisci le preferenze cookie oppure elimina definitivamente l'account.",
+    "export": "Esporta i miei dati",
+    "export_done": "Esportazione dati scaricata.",
+    "danger_zone": "Zona pericolosa",
+    "delete_account": "Elimina il mio account",
+    "delete_desc": "L'eliminazione rimuove profilo, contatti, disponibilità e calendari. Le valutazioni che hai scritto restano sulla piattaforma senza il tuo testo libero. I token non utilizzati vengono persi. Operazione irreversibile.",
+    "delete_confirm_label": "Scrivi DELETE per confermare",
+    "delete_confirm": "Elimina definitivamente",
+    "delete_done": "Account eliminato.",
+    "delete_blocked": "Hai ancora ingaggi attivi. Chiudili o annullali prima di eliminare l'account.",
+    "contact": "Richieste sui dati"
+  }
+}

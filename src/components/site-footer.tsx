@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
+import { openCookiePreferences } from "@/lib/iubenda";
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -42,6 +43,15 @@ export function SiteFooter() {
               <Link to="/legal/$doc" params={{ doc: "cookie" }} className="text-muted-foreground transition-colors hover:text-racing-red">
                 {t("footer.cookie")}
               </Link>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={openCookiePreferences}
+                className="text-left text-muted-foreground transition-colors hover:text-racing-red"
+              >
+                {t("consent.preferences", { defaultValue: "Cookie preferences" })}
+              </button>
             </li>
           </ul>
         </div>

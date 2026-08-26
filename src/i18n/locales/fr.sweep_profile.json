@@ -90,7 +90,6 @@
     "tokens": {
       "credited_demo": "+{{count}} tokens crédités (démo)",
       "purchase_failed": "Échec de l'achat",
-      "demo_mode_notice": "MODE DÉMO : le paiement Stripe remplacera le crédit instantané une fois votre pays vendeur confirmé.",
       "current_price": "Prix actuel du token : € {{price}} / token",
       "tokens_label": "tokens"
     },

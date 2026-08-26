@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
+import { ConsentGate } from "@/components/consent-gate";
 
 const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
@@ -164,12 +165,14 @@ function MarketPage() {
 
           <div className="mt-4">
             <ClientOnly fallback={<div className="h-[420px] w-full border border-border bg-card" />}>
-              <Suspense fallback={<div className="h-[420px] w-full border border-border bg-card" />}>
-                <MarketWorldMap
-                  countries={countries}
-                  labels={{ demand: t("market.geo_demand"), supply: t("market.geo_supply"), teams: t("market.teams") }}
-                />
-              </Suspense>
+              <ConsentGate provider="CARTO / OpenStreetMap">
+                <Suspense fallback={<div className="h-[420px] w-full border border-border bg-card" />}>
+                  <MarketWorldMap
+                    countries={countries}
+                    labels={{ demand: t("market.geo_demand"), supply: t("market.geo_supply"), teams: t("market.teams") }}
+                  />
+                </Suspense>
+              </ConsentGate>
             </ClientOnly>
             <div className="mt-2 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               <span><span className="mr-1 inline-block size-2 bg-racing-red align-middle" />{t("market.geo_legend_demand")}</span>
