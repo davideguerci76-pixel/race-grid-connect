@@ -38,10 +38,12 @@ function RequestMatchesPage() {
   const unlockTierFn = useServerFn(unlockRequestTier);
   const partialRef = useRef<HTMLDivElement | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["request-matches", id],
     queryFn: () => fetchMatches({ data: { request_id: id } }),
+    retry: false,
   });
+
 
   const unlockMut = useMutation({
     mutationFn: (match_id: string) => unlockFn({ data: { match_id } }),
