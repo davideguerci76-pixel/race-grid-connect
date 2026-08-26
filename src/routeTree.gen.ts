@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -49,6 +50,11 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
 import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './routes/_authenticated/dashboard.requests.$id.matches'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/admin'
     | '/dashboard'
     | '/freelancers/$id'
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/freelancers/$id'
     | '/legal/$doc'
     | '/legal/info'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/freelancers/$id'
@@ -513,6 +525,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   MarketRoute: typeof MarketRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   FreelancersIdRoute: typeof FreelancersIdRoute
   LegalDocRoute: typeof LegalDocRoute
   LegalInfoRoute: typeof LegalInfoRoute
@@ -527,6 +540,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -892,6 +912,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   MarketRoute: MarketRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   FreelancersIdRoute: FreelancersIdRoute,
   LegalDocRoute: LegalDocRoute,
   LegalInfoRoute: LegalInfoRoute,
