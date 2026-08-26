@@ -127,6 +127,8 @@
     "your_matches": "Vos matches",
     "new_matches_pill": "{{count}} nouveaux matches",
     "manage_calendar": "Gérer le calendrier",
+    "my_availability_label": "[MA DISPONIBILITÉ]",
+    "manage_availability_calendar": "Gérer le calendrier de disponibilité",
     "post_request": "Publier une Pit Call",
     "requests_active": "Pit Calls actives",
     "engagements": "Engagements",

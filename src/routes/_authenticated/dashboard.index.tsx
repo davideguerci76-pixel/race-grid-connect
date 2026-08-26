@@ -182,7 +182,7 @@ function DashboardHome() {
           {isTeam ? (
             <DashCard to="/dashboard/requests" icon={Briefcase} label={t("requests.title")} value={t("requests.new")} />
           ) : (
-            <DashCard to="/dashboard/calendar" icon={Calendar} label={t("nav.calendar")} value={t("dashboard.manage_calendar")} />
+            <DashCard to="/dashboard/calendar" icon={Calendar} label={t("dashboard.my_availability_label")} value={t("dashboard.manage_availability_calendar")} />
           )}
           <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
           <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />
