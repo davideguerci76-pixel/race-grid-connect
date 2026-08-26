@@ -12,6 +12,7 @@ import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Pause, Play, CheckCircle2, XCircle, Copy, RotateCcw } from "lucide-react";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
@@ -67,6 +68,11 @@ function RequestsPage() {
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("requests.subtitle")}</p>
           </div>
+          {flags.pitcallCreationDisabled ? (
+            <div className="shrink-0 border border-border bg-secondary px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              {t("sweep_admin_a.pitcall_creation_disabled")}
+            </div>
+          ) : (
           <Link
             to="/dashboard/requests/new"
             title={t("requests.helper")}
@@ -75,6 +81,7 @@ function RequestsPage() {
             <Plus className="size-4" /> {t("requests.new")}
 
           </Link>
+          )}
         </div>
 
         <div className="mt-8 grid gap-3">
@@ -82,9 +89,11 @@ function RequestsPage() {
           {!isLoading && requests.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
               <p className="text-sm text-muted-foreground">{t("requests.empty")}</p>
+              {!flags.pitcallCreationDisabled && (
               <Link to="/dashboard/requests/new" className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white">
                 {t("requests.new")}
               </Link>
+              )}
             </div>
           )}
           {requests.map((r) => (
@@ -162,7 +171,7 @@ function RequestsPage() {
                     </button>
                   </>
                 )}
-                {(r.status === "completed" || r.status === "closed" || r.status === "filled") && (
+                {(r.status === "completed" || r.status === "closed" || r.status === "filled") && !flags.pitcallCreationDisabled && (
                   <>
                     <Link
                       to="/dashboard/requests/new"
