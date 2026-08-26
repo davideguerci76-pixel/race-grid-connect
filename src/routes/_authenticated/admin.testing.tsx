@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, Database, FlaskConical, Loader2, Trash2 } from "lucide-react";
+import { AlertTriangle, Database, FlaskConical, Loader2, Star, Trash2, Users } from "lucide-react";
 import {
   assignTestPools,
   generatePoolPitCalls,
@@ -262,5 +262,36 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     >
       {children}
     </button>
+  );
+}
+
+function SimCard({
+  title,
+  desc,
+  pending,
+  onClick,
+  icon,
+}: {
+  title: string;
+  desc: string;
+  pending: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col justify-between border border-border p-3">
+      <div>
+        <div className="text-[11px] font-bold uppercase tracking-widest">{title}</div>
+        <p className="mt-1 text-[11px] text-muted-foreground">{desc}</p>
+      </div>
+      <button
+        onClick={onClick}
+        disabled={pending}
+        className="mt-3 inline-flex items-center justify-center gap-2 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-50"
+      >
+        {pending ? <Loader2 className="size-3 animate-spin" /> : icon}
+        Run
+      </button>
+    </div>
   );
 }
