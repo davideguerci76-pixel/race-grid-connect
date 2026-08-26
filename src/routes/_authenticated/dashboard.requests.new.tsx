@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -54,6 +55,7 @@ function fmt(d: Date): string {
 
 function NewRequestPage() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -76,6 +78,10 @@ function NewRequestPage() {
   useEffect(() => {
     if (profile && profile.user_type !== "team") navigate({ to: "/dashboard/calendar" });
   }, [profile, navigate]);
+
+  useEffect(() => {
+    if (flags.pitcallCreationDisabled) navigate({ to: "/dashboard/requests" });
+  }, [flags.pitcallCreationDisabled, navigate]);
 
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);

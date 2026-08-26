@@ -12,7 +12,8 @@
       "tokens": "Tokens",
       "reviews": "Bewertungen",
       "calendars": "Kalender",
-      "wiki": "Plattform-Wiki"
+      "wiki": "Plattform-Wiki",
+      "launch": "Start"
     },
     "time_machine": {
       "title": "Zeitmaschine (Admin-Debug)",
@@ -91,6 +92,22 @@
       "primary_admin": "Primärer Admin",
       "revoke_admin": "Admin widerrufen",
       "grant_admin": "Admin gewähren"
-    }
+    },
+    "launch": {
+      "title": "Pre-Launch- und Wartungssteuerung",
+      "blurb": "Globale Schalter, die sofort auf der gesamten Seite wirken.",
+      "saved": "Gespeichert",
+      "coming_soon_title": "„Coming Soon“-Landing-Modus",
+      "coming_soon_body": "Ersetzt die öffentliche Startseite durch eine Warteseite (nur Logos und Claim, keine Daten).",
+      "home_stats_title": "Statistiken auf der Startseite",
+      "home_stats_body": "Markt-Highlights und Zähler auf der Startseite ein- oder ausblenden.",
+      "pitcall_off_title": "Pit-Call-Erstellung deaktivieren",
+      "pitcall_off_body": "Friert die Erstellung neuer Pit Calls ein. Registrierung und Kalender bleiben aktiv."
+    },
+    "home_coming_soon": {
+      "coming_soon_title": "Wir sind bald da",
+      "coming_soon_claim": "Wir bauen die Zukunft von Pitcall."
+    },
+    "pitcall_creation_disabled": "Die Erstellung von Pit Calls ist vorübergehend deaktiviert."
   }
 }

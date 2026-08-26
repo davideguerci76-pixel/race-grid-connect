@@ -39,6 +39,7 @@ function AdminLayout() {
     { to: "/admin/reviews", label: t("sweep_admin_a.tabs.reviews") },
     { to: "/admin/calendars", label: t("sweep_admin_a.tabs.calendars") },
     { to: "/admin/wiki", label: t("sweep_admin_a.tabs.wiki") },
+    { to: "/admin/launch", label: t("sweep_admin_a.tabs.launch") },
   ];
 
 

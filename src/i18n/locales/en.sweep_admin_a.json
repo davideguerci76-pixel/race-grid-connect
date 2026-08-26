@@ -12,7 +12,8 @@
       "tokens": "Tokens",
       "reviews": "Reviews",
       "calendars": "Calendars",
-      "wiki": "Platform Wiki"
+      "wiki": "Platform Wiki",
+      "launch": "Launch"
     },
     "time_machine": {
       "title": "Time Machine (Admin debug)",
@@ -91,6 +92,22 @@
       "primary_admin": "Primary admin",
       "revoke_admin": "Revoke admin",
       "grant_admin": "Grant admin"
-    }
+    },
+    "launch": {
+      "title": "Pre-Launch & Maintenance Control",
+      "blurb": "Global switches applied instantly across the site.",
+      "saved": "Saved",
+      "coming_soon_title": "\"Coming Soon\" landing mode",
+      "coming_soon_body": "Replaces the public home page with a waiting landing page (logos + claim only, no public data).",
+      "home_stats_title": "Show stats on home page",
+      "home_stats_body": "Show or hide market highlights and counters on the home page.",
+      "pitcall_off_title": "Disable Pit Call creation",
+      "pitcall_off_body": "Freezes new Pit Call creation for teams. Sign-ups and calendars stay active."
+    },
+    "home_coming_soon": {
+      "coming_soon_title": "We're coming soon",
+      "coming_soon_claim": "Building the future of Pitcall."
+    },
+    "pitcall_creation_disabled": "Pit Call creation is temporarily disabled."
   }
 }

@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminPitcallsRouteImport } from './routes/_authenticated/admin.pitcalls'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin.permissions'
 import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authenticated/admin.matching'
+import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin.launch'
 import { Route as AuthenticatedAdminCalendarsRouteImport } from './routes/_authenticated/admin.calendars'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
@@ -201,6 +202,12 @@ const AuthenticatedAdminMatchingRoute =
     path: '/matching',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLaunchRoute =
+  AuthenticatedAdminLaunchRouteImport.update({
+    id: '/launch',
+    path: '/launch',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCalendarsRoute =
   AuthenticatedAdminCalendarsRouteImport.update({
     id: '/calendars',
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
+  '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/freelancers': typeof FreelancersIndexRoute
   '/teams': typeof TeamsIndexRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
+  '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
@@ -307,6 +316,7 @@ export interface FileRoutesById {
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
   '/_authenticated/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
+  '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
   '/_authenticated/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/freelancers/'
     | '/teams/'
     | '/admin/calendars'
+    | '/admin/launch'
     | '/admin/matching'
     | '/admin/permissions'
     | '/admin/pitcalls'
@@ -375,6 +386,7 @@ export interface FileRouteTypes {
     | '/freelancers'
     | '/teams'
     | '/admin/calendars'
+    | '/admin/launch'
     | '/admin/matching'
     | '/admin/permissions'
     | '/admin/pitcalls'
@@ -410,6 +422,7 @@ export interface FileRouteTypes {
     | '/freelancers/'
     | '/teams/'
     | '/_authenticated/admin/calendars'
+    | '/_authenticated/admin/launch'
     | '/_authenticated/admin/matching'
     | '/_authenticated/admin/permissions'
     | '/_authenticated/admin/pitcalls'
@@ -650,6 +663,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMatchingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/launch': {
+      id: '/_authenticated/admin/launch'
+      path: '/launch'
+      fullPath: '/admin/launch'
+      preLoaderRoute: typeof AuthenticatedAdminLaunchRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/calendars': {
       id: '/_authenticated/admin/calendars'
       path: '/calendars'
@@ -683,6 +703,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCalendarsRoute: typeof AuthenticatedAdminCalendarsRoute
+  AuthenticatedAdminLaunchRoute: typeof AuthenticatedAdminLaunchRoute
   AuthenticatedAdminMatchingRoute: typeof AuthenticatedAdminMatchingRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
   AuthenticatedAdminPitcallsRoute: typeof AuthenticatedAdminPitcallsRoute
@@ -695,6 +716,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCalendarsRoute: AuthenticatedAdminCalendarsRoute,
+  AuthenticatedAdminLaunchRoute: AuthenticatedAdminLaunchRoute,
   AuthenticatedAdminMatchingRoute: AuthenticatedAdminMatchingRoute,
   AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
   AuthenticatedAdminPitcallsRoute: AuthenticatedAdminPitcallsRoute,
