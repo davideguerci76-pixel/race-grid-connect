@@ -24,6 +24,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardPoolRouteImport } from './routes/_authenticated/dashboard.pool'
@@ -123,6 +124,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicNotificationEmailRoute =
+  ApiPublicNotificationEmailRouteImport.update({
+    id: '/api/public/notification-email',
+    path: '/api/public/notification-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
@@ -325,6 +333,7 @@ export interface FileRoutesByTo {
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
@@ -366,6 +375,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/admin/'
     | '/dashboard/'
     | '/dashboard/requests/new'
@@ -444,6 +455,7 @@ export interface FileRouteTypes {
     | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/admin'
     | '/dashboard'
     | '/dashboard/requests/new'
@@ -484,6 +496,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/pool'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/_authenticated/admin/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/requests/new'
@@ -506,6 +519,7 @@ export interface RootRouteChildren {
   TeamsIdRoute: typeof TeamsIdRoute
   FreelancersIndexRoute: typeof FreelancersIndexRoute
   TeamsIndexRoute: typeof TeamsIndexRoute
+  ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -617,6 +631,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/notification-email': {
+      id: '/api/public/notification-email'
+      path: '/api/public/notification-email'
+      fullPath: '/api/public/notification-email'
+      preLoaderRoute: typeof ApiPublicNotificationEmailRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/tokens': {
       id: '/_authenticated/dashboard/tokens'
@@ -877,6 +898,7 @@ const rootRouteChildren: RootRouteChildren = {
   TeamsIdRoute: TeamsIdRoute,
   FreelancersIndexRoute: FreelancersIndexRoute,
   TeamsIndexRoute: TeamsIndexRoute,
+  ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
