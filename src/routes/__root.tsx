@@ -14,7 +14,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { IubendaScripts } from "@/components/iubenda-scripts";
+import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
+
 
 function NotFoundComponent() {
   return (
