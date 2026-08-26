@@ -50,13 +50,6 @@ function TokensPage() {
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("tokens.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("tokens.sub")}</p>
 
-        <div className="mt-4 rounded-none border border-racing-yellow/40 bg-racing-yellow/5 p-3 font-mono text-xs text-racing-yellow">
-          {t("sweep_profile.tokens.demo_mode_notice")}
-        </div>
-        <div className="mt-2 font-mono text-[11px] text-muted-foreground">
-          {t("sweep_profile.tokens.current_price", { price: priceEur.toFixed(2) })}
-        </div>
-
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {PACKS.map((p) => (
             <div key={p.key} className="border border-border bg-card p-6">
@@ -64,9 +57,12 @@ function TokensPage() {
               <div className="mt-3 font-mono text-4xl font-black text-racing-red">{p.tokens}</div>
               <div className="mt-1 text-xs text-muted-foreground">{t("sweep_profile.tokens.tokens_label")}</div>
               <div className="mt-4 font-mono text-2xl font-bold text-racing-yellow">€ {(priceEur * p.tokens).toFixed(2)}</div>
-              <button onClick={() => mut.mutate(p.key)} disabled={mut.isPending} className="mt-4 w-full bg-racing-red py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60">
+              <button disabled className="mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60">
                 {t("tokens.buy")}
               </button>
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                {t("tokens.buy_soon")}
+              </p>
             </div>
           ))}
         </div>
