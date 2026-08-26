@@ -74,6 +74,33 @@ function PitCallManagement() {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"recent" | "matches" | "start">("recent");
   const [open, setOpen] = useState<string | null>(null);
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+  const impersonateFn = useServerFn(adminImpersonateUser);
+
+  async function onImpersonate(teamId: string, teamName: string) {
+    if (
+      !confirm(
+        t("sweep_admin_b.pitcalls.confirm_impersonate", {
+          defaultValue:
+            "Sign in as {{name}}? This action is recorded in the audit log and opens their dashboard in a new tab.",
+          name: teamName,
+        }),
+      )
+    )
+      return;
+    setImpersonating(teamId);
+    try {
+      const res: any = await impersonateFn({
+        data: { user_id: teamId, redirect_to: `${window.location.origin}/dashboard` },
+      });
+      window.open(res.url, "_blank", "noopener");
+    } catch (e: any) {
+      toast.error(e?.message ?? t("sweep_admin_b.common.failed"));
+    } finally {
+      setImpersonating(null);
+    }
+  }
+
 
   const statusMut = useMutation({
     mutationFn: (v: { request_id: string; status: any }) => statusFn({ data: v }),
