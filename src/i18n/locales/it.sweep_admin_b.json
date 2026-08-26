@@ -219,5 +219,8 @@
       "reject": "Rifiuta",
       "edit_dates": "Modifica date"
     }
+  },
+  "pitcalls": {
+    "in_my_pool": "Nel mio pool"
   }
 }
