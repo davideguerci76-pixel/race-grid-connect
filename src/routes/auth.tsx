@@ -9,6 +9,7 @@ import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site-header";
 import logoClean from "@/assets/pitcall-logo-clean.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
+import { recordLegalAcceptance } from "@/lib/privacy.functions";
 
 const searchSchema = z.object({
   mode: fallback(z.enum(["signin", "signup"]), "signin").default("signin"),
@@ -43,6 +44,7 @@ function AuthPage() {
       if (isSignup && typeof window !== "undefined") {
         window.sessionStorage.setItem("pendingUserType", userType);
         window.sessionStorage.setItem("pendingUserTypeAt", String(Date.now()));
+        window.sessionStorage.setItem("pendingLegalAccept", "1");
       } else if (typeof window !== "undefined") {
         window.sessionStorage.removeItem("pendingUserType");
         window.sessionStorage.removeItem("pendingUserTypeAt");
