@@ -115,8 +115,12 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
 
       return {
         ...r,
-        team_name: teamMap.get(r.team_id)?.team_name ?? "Team",
+        team_name:
+          teamMap.get(r.team_id)?.team_name ?? teamOwnerMap.get(r.team_id)?.display_name ?? "Team",
         team_location: teamMap.get(r.team_id)?.location ?? null,
+        team_display_name: teamOwnerMap.get(r.team_id)?.display_name ?? null,
+        team_email: teamEmails[r.team_id] ?? null,
+        team_blocked: !!teamOwnerMap.get(r.team_id)?.blocked_at,
         matches_count: ml.length,
         candidates: ml.slice(0, 20),
         engagements: el,
