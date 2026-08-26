@@ -79,6 +79,24 @@ export type Database = {
           },
         ]
       }
+      email_hook_config: {
+        Row: {
+          endpoint: string
+          id: boolean
+          secret: string
+        }
+        Insert: {
+          endpoint: string
+          id?: boolean
+          secret: string
+        }
+        Update: {
+          endpoint?: string
+          id?: boolean
+          secret?: string
+        }
+        Relationships: []
+      }
       engagements: {
         Row: {
           cancellation_kind: string | null
@@ -537,6 +555,7 @@ export type Database = {
       notifications: {
         Row: {
           created_at: string
+          emailed_at: string | null
           id: string
           kind: Database["public"]["Enums"]["notif_kind"]
           payload: Json
@@ -545,6 +564,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          emailed_at?: string | null
           id?: string
           kind: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
@@ -553,6 +573,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          emailed_at?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
@@ -1638,6 +1659,7 @@ export type Database = {
         }
         Returns: number
       }
+      dispatch_notification_emails: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_contact_checks: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }
