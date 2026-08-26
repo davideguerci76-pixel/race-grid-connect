@@ -692,5 +692,27 @@
     "expired_title": "This reset link is invalid or expired.",
     "expired_desc": "Reset links are time-limited and single-use. Request a fresh one.",
     "request_new": "Request new link"
+  },
+  "admin_user_actions": {
+    "manage": "Manage",
+    "view_profile": "View profile",
+    "view_calendar": "View calendar",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "delete": "Delete",
+    "send_reset": "Send password reset",
+    "force_logout": "Force logout",
+    "impersonate": "Login as user",
+    "audit": "Admin action log",
+    "suspended": "Account suspended",
+    "reactivated": "Account reactivated",
+    "deleted": "User deleted",
+    "reset_sent": "Password reset email sent",
+    "logged_out": "All sessions revoked",
+    "impersonating": "Impersonation session opened in a new tab",
+    "confirm_suspend": "Suspend {{name}}? The account will not be able to sign in.",
+    "confirm_delete": "Permanently delete {{name}} and all related data? This cannot be undone.",
+    "confirm_logout": "Revoke all active sessions for {{name}}?",
+    "confirm_impersonate": "Sign in as {{name}}? This action is recorded in the audit log and will replace your current session in the new tab."
   }
 }

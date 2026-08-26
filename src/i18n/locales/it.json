@@ -692,5 +692,27 @@
     "expired_title": "Questo link di reset non è valido o è scaduto.",
     "expired_desc": "I link di reset sono a tempo e monouso. Richiedine uno nuovo.",
     "request_new": "Richiedi un nuovo link"
+  },
+  "admin_user_actions": {
+    "manage": "Gestisci",
+    "view_profile": "Visualizza profilo",
+    "view_calendar": "Visualizza calendario",
+    "suspend": "Sospendi",
+    "reactivate": "Riattiva",
+    "delete": "Elimina",
+    "send_reset": "Invia reset password",
+    "force_logout": "Force logout",
+    "impersonate": "Login come utente",
+    "audit": "Registro azioni admin",
+    "suspended": "Account sospeso",
+    "reactivated": "Account riattivato",
+    "deleted": "Utente eliminato",
+    "reset_sent": "Email di reset password inviata",
+    "logged_out": "Tutte le sessioni sono state revocate",
+    "impersonating": "Sessione di impersonificazione aperta in una nuova scheda",
+    "confirm_suspend": "Sospendere {{name}}? L'account non potrà più accedere.",
+    "confirm_delete": "Eliminare definitivamente {{name}} e tutti i dati correlati? L'azione è irreversibile.",
+    "confirm_logout": "Revocare tutte le sessioni attive di {{name}}?",
+    "confirm_impersonate": "Accedere come {{name}}? L'azione viene registrata nel log e sostituirà la tua sessione nella nuova scheda."
   }
 }
