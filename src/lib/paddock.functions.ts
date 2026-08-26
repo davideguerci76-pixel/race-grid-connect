@@ -452,21 +452,29 @@ export const getMyRequests = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (data ?? []).map((r) => r.id);
     let counts: Record<string, number> = {};
+    let outsideCounts: Record<string, number> = {};
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
-      const [{ data: matches }, { data: engs }] = await Promise.all([
-        supabase.from("matches").select("request_id").in("request_id", ids),
+      const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
+        supabase.from("matches").select("request_id, freelancer_id").in("request_id", ids),
         supabase
           .from("engagements")
           .select("id, request_id, status")
           .in("request_id", ids)
           .eq("status", "confirmed"),
+        supabase.from("team_pool").select("freelancer_id").eq("team_id", userId),
       ]);
-      counts = (matches ?? []).reduce<Record<string, number>>((acc, m) => {
-        const rid = (m as { request_id: string }).request_id;
-        acc[rid] = (acc[rid] ?? 0) + 1;
-        return acc;
-      }, {});
+      const poolSet = new Set(((poolRows ?? []) as any[]).map((p) => p.freelancer_id));
+      const modeById = new Map((data ?? []).map((r: any) => [r.id, r.search_mode]));
+      for (const m of ((matches ?? []) as any[])) {
+        const rid = m.request_id as string;
+        const isPool = modeById.get(rid) === "pool";
+        if (isPool && !poolSet.has(m.freelancer_id)) {
+          outsideCounts[rid] = (outsideCounts[rid] ?? 0) + 1;
+        } else {
+          counts[rid] = (counts[rid] ?? 0) + 1;
+        }
+      }
       confirmedMap = (engs ?? []).reduce<Record<string, string>>((acc, e: any) => {
         if (e.request_id) acc[e.request_id] = e.id;
         return acc;
@@ -475,8 +483,10 @@ export const getMyRequests = createServerFn({ method: "GET" })
     return (data ?? []).map((r) => ({
       ...r,
       matches_count: counts[r.id] ?? 0,
+      outside_pool_count: outsideCounts[r.id] ?? 0,
       confirmed_engagement_id: confirmedMap[r.id] ?? null,
     }));
+
 
   });
 
