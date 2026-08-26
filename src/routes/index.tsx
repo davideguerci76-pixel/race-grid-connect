@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { MarketHighlights } from "@/components/market-highlights";
+import { getPublicFlags } from "@/lib/flags.functions";
 
 export const Route = createFileRoute("/")({
   loader: () => getPublicFlags(),
@@ -133,14 +134,17 @@ function Home() {
       </section>
 
       {/* MARKET HIGHLIGHTS */}
+      {flags?.homeStats && (
       <section className="border-b border-border">
         <div className="container-page py-20">
           <MarketHighlights />
         </div>
       </section>
+      )}
 
       {/* STATS */}
 
+      {flags?.homeStats && (
       <section className="border-b border-border bg-pit">
         <div className="container-page grid grid-cols-2 divide-x divide-border md:grid-cols-4">
           {[
@@ -156,6 +160,7 @@ function Home() {
           ))}
         </div>
       </section>
+      )}
 
       {/* CTA */}
       <section className="bg-racing-red">
