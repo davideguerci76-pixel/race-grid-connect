@@ -17,6 +17,7 @@ import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 export function SiteHeader() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

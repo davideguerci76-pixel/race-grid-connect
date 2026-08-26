@@ -5,6 +5,7 @@ import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 export function SiteFooter() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   return (
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">

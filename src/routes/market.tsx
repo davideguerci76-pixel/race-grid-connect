@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 
 const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
@@ -38,7 +39,9 @@ function Bar({ value, max, label, sub }: { value: number; max: number; label: st
 
 function MarketPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useMarketStats();
+  const flags = usePlatformFlags();
+  const { data: rawStats, isLoading } = useMarketStats();
+  const data = flags.homeStats ? rawStats : undefined;
   const totals = data?.totals;
   const trend = data?.trend ?? [];
   const maxTrend = Math.max(1, ...trend.map((m) => Math.max(m.requests, m.matches, m.engagements)));
@@ -47,6 +50,20 @@ function MarketPage() {
   const countries = data?.by_country ?? [];
   const maxCountryDemand = Math.max(1, ...countries.map((c) => c.demand));
   const maxCountrySupply = Math.max(1, ...countries.map((c) => c.supply));
+
+  if (!flags.homeStats) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page flex flex-1 flex-col items-center justify-center py-24 text-center">
+          <div className="label-mono">[{t("market.label")}]</div>
+          <h1 className="mt-2 text-4xl font-black uppercase italic tracking-tighter">{t("market.page_title")}</h1>
+          <p className="mt-4 max-w-md text-muted-foreground">{t("market.no_data")}</p>
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
