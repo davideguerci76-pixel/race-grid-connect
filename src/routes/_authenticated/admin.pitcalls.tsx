@@ -210,9 +210,26 @@ function PitCallManagement() {
                       </div>
                       <div className="mt-1 truncate text-base font-bold">{r.title}</div>
                       <div className="mt-0.5 text-[11px] text-muted-foreground">
-                        {r.team_name} · {r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group)} ·{" "}
+                        {r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group)} ·{" "}
                         {disciplineLabel(r.discipline)} · {r.start_date} → {r.end_date}
                       </div>
+                      <div className="mt-1.5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-border/70 bg-secondary/40 px-2 py-1 text-[10px]">
+                        <span className="font-bold uppercase tracking-widest text-racing-yellow">
+                          {t("sweep_admin_b.pitcalls.created_by", { defaultValue: "Created by" })}
+                        </span>
+                        <span className="font-bold">{r.team_name}</span>
+                        {r.team_display_name && r.team_display_name !== r.team_name && (
+                          <span className="text-muted-foreground">({r.team_display_name})</span>
+                        )}
+                        {r.team_email && <span className="font-mono text-muted-foreground">{r.team_email}</span>}
+                        <span className="font-mono text-muted-foreground/70">{String(r.team_id).slice(0, 8)}</span>
+                        {r.team_blocked && (
+                          <span className="font-bold uppercase tracking-widest text-racing-red">
+                            {t("sweep_admin_b.pitcalls.team_blocked", { defaultValue: "Blocked" })}
+                          </span>
+                        )}
+                      </div>
+
                     </div>
                   </button>
                   <div className="flex flex-col items-end gap-2">
