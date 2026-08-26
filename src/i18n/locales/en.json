@@ -127,6 +127,8 @@
     "your_matches": "Your matches",
     "new_matches_pill": "{{count}} new matches waiting",
     "manage_calendar": "Manage calendar",
+    "my_availability_label": "[MY AVAILABILITY]",
+    "manage_availability_calendar": "Manage availability calendar",
     "post_request": "Post a Pit Call",
     "requests_active": "Active Pit Calls",
     "engagements": "Engagements",
