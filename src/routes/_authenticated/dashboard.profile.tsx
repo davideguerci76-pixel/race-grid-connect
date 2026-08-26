@@ -19,6 +19,7 @@ import { RatingIcons } from "@/components/rating-icons";
 import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BackButton } from "@/components/back-button";
+import { PrivacyDataSection } from "@/components/privacy-data-section";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -103,6 +104,10 @@ function ProfilePage() {
               <TeamSection profile={profile?.teamProfile} />
             )}
           </div>
+        </div>
+
+        <div className="mt-8">
+          <PrivacyDataSection />
         </div>
       </div>
       <SiteFooter />
