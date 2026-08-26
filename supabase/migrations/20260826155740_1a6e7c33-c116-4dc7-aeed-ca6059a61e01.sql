@@ -1,0 +1,1 @@
+GRANT UPDATE (user_type) ON public.profiles TO authenticated;
