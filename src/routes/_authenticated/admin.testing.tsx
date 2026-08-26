@@ -179,6 +179,41 @@ function TestingLab() {
         )}
       </div>
 
+      <div className="border border-border p-4">
+        <div className="mb-1 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest">
+          <Users className="size-4" /> Pool simulation
+        </div>
+        <p className="mb-4 text-[11px] text-muted-foreground">
+          Advanced simulation on the TEST dataset: build trusted pools, seed bidirectional ratings and fire My Pool Pit
+          Calls so the matching engine returns real, targeted results to debug. Each step can also be done manually by
+          impersonating a user with “Login as user”.
+        </p>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <SimCard
+            title="Add to pool"
+            desc="Assigns test freelancers to the pools of the test teams, creating the pool membership links."
+            pending={poolMut.isPending}
+            onClick={() => poolMut.mutate()}
+            icon={<Users className="size-3" />}
+          />
+          <SimCard
+            title="Generate pool ratings"
+            desc="Creates completed engagements for every pool pair and bidirectional ratings (team → freelancer and back)."
+            pending={ratingsMut.isPending}
+            onClick={() => ratingsMut.mutate()}
+            icon={<Star className="size-3" />}
+          />
+          <SimCard
+            title="Generate My Pool Pit Calls"
+            desc="Creates Pit Calls in pool mode (≈ half of the generated teams) aligned to pool members' availability."
+            pending={poolCallsMut.isPending}
+            onClick={() => poolCallsMut.mutate()}
+            icon={<FlaskConical className="size-3" />}
+          />
+        </div>
+      </div>
+
       <div className="border border-racing-red/50 bg-racing-red/5 p-4">
         <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-racing-red">
           <AlertTriangle className="size-4" /> Danger zone — purge test environment
