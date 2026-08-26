@@ -51,12 +51,15 @@ function AdminLayout() {
     <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
     <div className="container-page py-8">
-      <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
+      <AdminEnvBanner />
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">{t("sweep_admin_a.admin_label")}</div>
           <h1 className="text-2xl font-black italic tracking-tighter">{t("sweep_admin_a.control_panel")}</h1>
         </div>
+        <AdminEnvSwitch />
       </div>
+
       <div className="mb-6 flex flex-wrap gap-2">
         {tabs.map((t) => {
           const active = path === t.to || (t.to === "/admin" && path === "/admin/");
