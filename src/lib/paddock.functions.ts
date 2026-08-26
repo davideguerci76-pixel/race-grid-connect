@@ -416,6 +416,14 @@ export const createRequest = createServerFn({ method: "POST" })
       location_radius_km: data.location_radius_km ?? null,
       search_mode: data.search_mode ?? "standard",
     };
+    const { data: flag } = await context.supabase
+      .from("platform_settings")
+      .select("value_num")
+      .eq("key", "flag_pitcall_creation_disabled")
+      .maybeSingle();
+    if (flag && Number(flag.value_num) > 0) {
+      throw new Error("Pit Call creation is temporarily disabled by the platform administrator.");
+    }
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
     if (error) throw new Error(error.message);
     return row;
