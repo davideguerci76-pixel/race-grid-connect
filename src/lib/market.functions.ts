@@ -25,7 +25,9 @@ export type MarketStats = {
   by_country: MarketCountry[];
 };
 
-export const getMarketStats = createServerFn({ method: "GET" }).handler(async (): Promise<MarketStats | null> => {
+// NOTE: always return an object wrapper — a bare `null` from a server fn
+// produces an empty response and a 500 in the Start handler.
+export const getMarketStats = createServerFn({ method: "GET" }).handler(async (): Promise<{ stats: MarketStats | null }> => {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const url = process.env["SUPABASE_URL"]!;
   const client = createClient<Database>(url, key, {
