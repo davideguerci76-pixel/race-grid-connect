@@ -44,6 +44,13 @@ export const getMarketStats = createServerFn({ method: "GET" }).handler(async ()
       },
     },
   });
+  // Global admin kill-switch: no metrics leave the server when stats are off.
+  const { data: flagRows } = await client
+    .from("platform_settings")
+    .select("key, value_num")
+    .eq("key", "flag_home_stats")
+    .maybeSingle();
+  if (flagRows && Number(flagRows.value_num) <= 0) return null;
   const { data, error } = await client.rpc("market_stats" as never);
   if (error) throw new Error(error.message);
   if (!data) return null;

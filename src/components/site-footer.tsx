@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 export function SiteFooter() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   return (
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
@@ -11,6 +13,7 @@ export function SiteFooter() {
           <img src={logoCompact.url} alt="Pit Call" width={1933} height={274} className="h-10 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
+        {flags.homeStats && (
         <div>
           <div className="label-mono mb-3">{t("footer.network")}</div>
           <ul className="space-y-2 text-sm">
@@ -21,6 +24,7 @@ export function SiteFooter() {
             </li>
           </ul>
         </div>
+        )}
         <div>
           <div className="label-mono mb-3">{t("footer.legal")}</div>
           <ul className="space-y-2 text-sm">
