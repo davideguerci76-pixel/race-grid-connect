@@ -83,7 +83,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Fonts are self-hosted (see src/styles.css) — no Google Fonts request.
       { rel: "preload", href: "/fonts/outfit-latin.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
     ],
+    // iubenda unified embed: cookie banner + auto-blocking of consent-bound
+    // scripts. Loaded in <head> so blocking is active before anything else runs.
+    scripts: IUBENDA_ENABLED ? [{ type: "text/javascript", src: IUBENDA_SCRIPT_URL }] : [],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
