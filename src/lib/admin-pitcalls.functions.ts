@@ -20,11 +20,14 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: requests, error } = await supabaseAdmin
-      .from("requests")
+    const { currentAdminEnv } = await import("@/lib/admin-env.server");
+    const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
+    const { data: requests, error } = await (supabaseAdmin
+      .from("requests") as any)
       .select(
         "id, team_id, title, status, is_active, discipline, role_group, sub_role, duration, start_date, end_date, season_dates, location, circuit, created_at, updated_at",
       )
+      .eq("is_test", envIsTest)
       .order("created_at", { ascending: false })
       .limit(400);
     if (error) throw new Error(error.message);

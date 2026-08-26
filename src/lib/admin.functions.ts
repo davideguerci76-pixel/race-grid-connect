@@ -31,13 +31,16 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profiles, error } = await supabaseAdmin
-      .from("profiles")
+    const { currentAdminEnv } = await import("@/lib/admin-env.server");
+    const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
+    const { data: profiles, error } = await (supabaseAdmin
+      .from("profiles") as any)
       .select("id, display_name, user_type, token_balance, blocked_at, created_at, preferred_language")
+      .eq("is_test", envIsTest)
       .eq("user_type", "freelancer")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    const ids = (profiles ?? []).map((p) => p.id);
+    const ids = (profiles ?? []).map((p: any) => p.id);
     const [{ data: fps }, { data: roles }, { data: contacts }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select("*").in("user_id", ids),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids),
@@ -71,7 +74,7 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
       const c = cur.count + 1;
       ratingMap.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
     }
-    return (profiles ?? []).map((p) => ({
+    return (profiles ?? []).map((p: any) => ({
       ...p,
       email: emails[p.id] ?? null,
       roles: roleMap.get(p.id) ?? [],
@@ -86,13 +89,16 @@ export const adminListTeams = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profiles, error } = await supabaseAdmin
-      .from("profiles")
+    const { currentAdminEnv } = await import("@/lib/admin-env.server");
+    const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
+    const { data: profiles, error } = await (supabaseAdmin
+      .from("profiles") as any)
       .select("id, display_name, user_type, token_balance, blocked_at, created_at, preferred_language")
+      .eq("is_test", envIsTest)
       .eq("user_type", "team")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    const ids = (profiles ?? []).map((p) => p.id);
+    const ids = (profiles ?? []).map((p: any) => p.id);
     const [{ data: tps }, { data: roles }] = await Promise.all([
       supabaseAdmin.from("team_profiles").select("*").in("user_id", ids),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids),
@@ -122,7 +128,7 @@ export const adminListTeams = createServerFn({ method: "GET" })
       const c = cur.count + 1;
       ratingMap.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
     }
-    return (profiles ?? []).map((p) => ({
+    return (profiles ?? []).map((p: any) => ({
       ...p,
       email: emails[p.id] ?? null,
       roles: roleMap.get(p.id) ?? [],
