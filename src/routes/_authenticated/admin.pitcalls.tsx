@@ -237,7 +237,28 @@ function PitCallManagement() {
                       <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_admin_b.pitcalls.matches")}</div>
                       <div className="text-2xl font-black text-racing-red">{r.matches_count}</div>
                     </div>
+                    <div className="flex flex-wrap justify-end gap-1">
+                      <a
+                        href={`/teams/${r.team_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      >
+                        <Users className="size-3" /> {t("sweep_admin_b.pitcalls.view_team", { defaultValue: "View team" })}
+                      </a>
+                      <button
+                        onClick={() => onImpersonate(r.team_id, r.team_name)}
+                        disabled={impersonating === r.team_id}
+                        className="inline-flex items-center gap-1 rounded-lg border border-racing-red px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-50"
+                      >
+                        <LogIn className="size-3" />{" "}
+                        {impersonating === r.team_id
+                          ? "…"
+                          : t("sweep_admin_b.pitcalls.login_as_user", { defaultValue: "Login as user" })}
+                      </button>
+                    </div>
                     <div className="flex flex-wrap gap-1">
+
                       <button
                         onClick={() => statusMut.mutate({ request_id: r.id, status: "active" })}
                         className="inline-flex items-center gap-1 rounded-lg border border-racing-yellow px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
