@@ -234,7 +234,8 @@
     "legal": "Legal",
     "privacy": "Privacy",
     "terms": "Terms",
-    "cookie": "Cookie"
+    "cookie": "Cookie",
+    "dataInfo": "Data processing info"
   },
   "requests": {
     "title": "My Pit Calls",
