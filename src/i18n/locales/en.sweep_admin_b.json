@@ -57,7 +57,11 @@
       "archived_no_reopening": "Archived — no reopening",
       "reopened_notified": "Pit Call reopened · queue notified · first to confirm takes the slot",
       "match_register": "Match register (top {{count}})",
-      "no_candidate": "No candidate generated."
+      "no_candidate": "No candidate generated.",
+      "created_by": "Created by",
+      "view_team": "View team",
+      "login_as_user": "Login as user",
+      "team_blocked": "Blocked"
     },
     "heatmap": {
       "title": "General calendar",
@@ -82,7 +86,15 @@
       "next": "Next →",
       "freelancers_match": "{{count}} freelancers match the filters",
       "refreshing": "refreshing…",
-      "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "weekdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
       "available_tooltip": "{{count}} available: {{names}}",
       "no_availability": "No availability"
     },

@@ -65,8 +65,26 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
       ? await supabaseAdmin.from("profiles").select("id, display_name").in("id", freelancerIds)
       : { data: [] as any[] };
 
+    // Author (team) identity: display name, block status and login email.
+    const { data: teamOwners } = teamIds.length
+      ? await supabaseAdmin.from("profiles").select("id, display_name, blocked_at").in("id", teamIds)
+      : { data: [] as any[] };
+    const teamEmails: Record<string, string | null> = {};
+    await Promise.all(
+      teamIds.map(async (id) => {
+        try {
+          const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
+          teamEmails[id] = u?.user?.email ?? null;
+        } catch {
+          teamEmails[id] = null;
+        }
+      }),
+    );
+    const teamOwnerMap = new Map(((teamOwners as any[]) ?? []).map((p) => [p.id, p]));
+
     const nameMap = new Map(((profs as any[]) ?? []).map((p) => [p.id, p.display_name]));
     const teamMap = new Map(((teamProfiles as any[]) ?? []).map((t) => [t.user_id, t]));
+
 
     const engsByReq = new Map<string, any[]>();
     for (const e of ((engs as any[]) ?? [])) {
@@ -97,8 +115,12 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
 
       return {
         ...r,
-        team_name: teamMap.get(r.team_id)?.team_name ?? "Team",
+        team_name:
+          teamMap.get(r.team_id)?.team_name ?? teamOwnerMap.get(r.team_id)?.display_name ?? "Team",
         team_location: teamMap.get(r.team_id)?.location ?? null,
+        team_display_name: teamOwnerMap.get(r.team_id)?.display_name ?? null,
+        team_email: teamEmails[r.team_id] ?? null,
+        team_blocked: !!teamOwnerMap.get(r.team_id)?.blocked_at,
         matches_count: ml.length,
         candidates: ml.slice(0, 20),
         engagements: el,

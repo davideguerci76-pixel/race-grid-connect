@@ -10,6 +10,7 @@ import {
   adminDeletePitCall,
   adminAvailabilityCalendar,
 } from "@/lib/admin-pitcalls.functions";
+import { adminImpersonateUser } from "@/lib/admin.functions";
 import { roleGroupLabel, subRoleLabel, ROLE_GROUPS, subRolesForGroup, SUB_ROLE_LEVELS } from "@/lib/roles";
 import { disciplineLabel, DISCIPLINE_OPTIONS, SKILL_OPTIONS, EDUCATION_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/paddock";
 import { useDateFormat } from "@/lib/date-locale";
@@ -26,6 +27,8 @@ import {
   Search,
   Trash2,
   Users,
+  LogIn,
+
   XCircle,
 } from "lucide-react";
 
@@ -72,6 +75,33 @@ function PitCallManagement() {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"recent" | "matches" | "start">("recent");
   const [open, setOpen] = useState<string | null>(null);
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+  const impersonateFn = useServerFn(adminImpersonateUser);
+
+  async function onImpersonate(teamId: string, teamName: string) {
+    if (
+      !confirm(
+        t("sweep_admin_b.pitcalls.confirm_impersonate", {
+          defaultValue:
+            "Sign in as {{name}}? This action is recorded in the audit log and opens their dashboard in a new tab.",
+          name: teamName,
+        }),
+      )
+    )
+      return;
+    setImpersonating(teamId);
+    try {
+      const res: any = await impersonateFn({
+        data: { user_id: teamId, redirect_to: `${window.location.origin}/dashboard` },
+      });
+      window.open(res.url, "_blank", "noopener");
+    } catch (e: any) {
+      toast.error(e?.message ?? t("sweep_admin_b.common.failed"));
+    } finally {
+      setImpersonating(null);
+    }
+  }
+
 
   const statusMut = useMutation({
     mutationFn: (v: { request_id: string; status: any }) => statusFn({ data: v }),
@@ -101,6 +131,7 @@ function PitCallManagement() {
         (r) =>
           String(r.title ?? "").toLowerCase().includes(s) ||
           String(r.team_name ?? "").toLowerCase().includes(s) ||
+          String(r.team_email ?? "").toLowerCase().includes(s) ||
           String(r.location ?? "").toLowerCase().includes(s),
       );
     }
@@ -210,9 +241,26 @@ function PitCallManagement() {
                       </div>
                       <div className="mt-1 truncate text-base font-bold">{r.title}</div>
                       <div className="mt-0.5 text-[11px] text-muted-foreground">
-                        {r.team_name} · {r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group)} ·{" "}
+                        {r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group)} ·{" "}
                         {disciplineLabel(r.discipline)} · {r.start_date} → {r.end_date}
                       </div>
+                      <div className="mt-1.5 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-border/70 bg-secondary/40 px-2 py-1 text-[10px]">
+                        <span className="font-bold uppercase tracking-widest text-racing-yellow">
+                          {t("sweep_admin_b.pitcalls.created_by", { defaultValue: "Created by" })}
+                        </span>
+                        <span className="font-bold">{r.team_name}</span>
+                        {r.team_display_name && r.team_display_name !== r.team_name && (
+                          <span className="text-muted-foreground">({r.team_display_name})</span>
+                        )}
+                        {r.team_email && <span className="font-mono text-muted-foreground">{r.team_email}</span>}
+                        <span className="font-mono text-muted-foreground/70">{String(r.team_id).slice(0, 8)}</span>
+                        {r.team_blocked && (
+                          <span className="font-bold uppercase tracking-widest text-racing-red">
+                            {t("sweep_admin_b.pitcalls.team_blocked", { defaultValue: "Blocked" })}
+                          </span>
+                        )}
+                      </div>
+
                     </div>
                   </button>
                   <div className="flex flex-col items-end gap-2">
@@ -220,7 +268,28 @@ function PitCallManagement() {
                       <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_admin_b.pitcalls.matches")}</div>
                       <div className="text-2xl font-black text-racing-red">{r.matches_count}</div>
                     </div>
+                    <div className="flex flex-wrap justify-end gap-1">
+                      <a
+                        href={`/teams/${r.team_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      >
+                        <Users className="size-3" /> {t("sweep_admin_b.pitcalls.view_team", { defaultValue: "View team" })}
+                      </a>
+                      <button
+                        onClick={() => onImpersonate(r.team_id, r.team_name)}
+                        disabled={impersonating === r.team_id}
+                        className="inline-flex items-center gap-1 rounded-lg border border-racing-red px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-50"
+                      >
+                        <LogIn className="size-3" />{" "}
+                        {impersonating === r.team_id
+                          ? "…"
+                          : t("sweep_admin_b.pitcalls.login_as_user", { defaultValue: "Login as user" })}
+                      </button>
+                    </div>
                     <div className="flex flex-wrap gap-1">
+
                       <button
                         onClick={() => statusMut.mutate({ request_id: r.id, status: "active" })}
                         className="inline-flex items-center gap-1 rounded-lg border border-racing-yellow px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
