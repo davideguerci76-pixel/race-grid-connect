@@ -11,6 +11,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 import { MarketHighlights } from "@/components/market-highlights";
+import { recordLegalAcceptance } from "@/lib/privacy.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -31,6 +32,15 @@ function DashboardHome() {
       return p ? { ...p, token_balance: (balance as number | null) ?? 0 } : null;
     },
   });
+
+  // Record proof of Terms / Privacy acceptance for accounts created via OAuth.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!user?.id) return;
+    if (window.sessionStorage.getItem("pendingLegalAccept") !== "1") return;
+    window.sessionStorage.removeItem("pendingLegalAccept");
+    void recordLegalAcceptance().catch(() => undefined);
+  }, [user?.id]);
 
   // Sync pending user_type saved before OAuth (Google sign-up doesn't pass metadata)
   useEffect(() => {
