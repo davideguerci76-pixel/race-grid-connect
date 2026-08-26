@@ -1,17 +1,14 @@
-export type GeoResult = {
-  id: string;
-  text: string;
-  lat: number | null;
-  lng: number | null;
-  city: string | null;
-  region: string | null;
-  country: string | null;
-};
+import { searchPlacesServer, type GeoResult } from "./geocode.functions";
+
+export type { GeoResult };
+
+const cache = new Map<string, { at: number; results: GeoResult[] }>();
+const TTL_MS = 5 * 60 * 1000;
 
 /**
- * Open-source geocoding via Nominatim (OpenStreetMap). No API key, no billing.
- * Called directly from the browser (Nominatim allows CORS), so it does not
- * depend on any server function endpoint.
+ * Address autocomplete. The actual OpenStreetMap/Nominatim call happens on our
+ * own server (see geocode.functions.ts), so the user's IP and search text are
+ * never sent to a third party from the browser.
  */
 export async function searchPlaces(opts: {
   q: string;
@@ -22,34 +19,15 @@ export async function searchPlaces(opts: {
   const q = opts.q.trim();
   if (q.length < 2) return [];
 
-  const params = new URLSearchParams({
-    q,
-    format: "jsonv2",
-    addressdetails: "1",
-    limit: "8",
-    "accept-language": (opts.lang || "en").slice(0, 8),
-  });
-  if (opts.citiesOnly) params.set("featureType", "settlement");
+  const key = `${opts.citiesOnly ? "c" : "a"}|${(opts.lang || "en").slice(0, 8)}|${q.toLowerCase()}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < TTL_MS) return hit.results;
 
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-    headers: { Accept: "application/json" },
-    signal: opts.signal,
+  const results = await searchPlacesServer({
+    data: { q, lang: opts.lang, citiesOnly: opts.citiesOnly },
   });
-  if (!res.ok) throw new Error(`nominatim ${res.status}`);
 
-  const json = (await res.json()) as unknown;
-  if (!Array.isArray(json)) return [];
-
-  return (json as any[]).map((r) => {
-    const a = r?.address ?? {};
-    return {
-      id: String(r?.place_id ?? `${r?.lat},${r?.lon}`),
-      text: String(r?.display_name ?? ""),
-      lat: r?.lat != null ? Number(r.lat) : null,
-      lng: r?.lon != null ? Number(r.lon) : null,
-      city: a.city ?? a.town ?? a.village ?? a.municipality ?? a.hamlet ?? null,
-      region: a.state ?? a.region ?? a.county ?? null,
-      country: a.country ?? null,
-    };
-  });
+  if (cache.size > 200) cache.clear();
+  cache.set(key, { at: Date.now(), results });
+  return results;
 }
