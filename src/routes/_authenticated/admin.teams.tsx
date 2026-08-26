@@ -15,6 +15,7 @@ import {
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
 import { RatingIcons } from "@/components/rating-icons";
+import { AdminUserActions } from "@/components/admin-user-actions";
 
 export const Route = createFileRoute("/_authenticated/admin/teams")({
   component: AdminTeams,
@@ -224,6 +225,13 @@ function AdminTeams() {
                             <button onClick={() => onDelete(r.id, r.team?.team_name ?? r.display_name)} className="border border-racing-red px-2 py-1 text-[10px] font-bold uppercase text-racing-red hover:bg-racing-red/10">{t("sweep_admin_a.actions.delete")}</button>
                           </>
                         )}
+                        <AdminUserActions
+                          userId={r.id}
+                          name={r.team?.team_name ?? r.display_name}
+                          blocked={!!r.blocked_at}
+                          protectedAccount={(r.email ?? "").toLowerCase() === "davideguerci76@gmail.com"}
+                          invalidateKey="admin-teams"
+                        />
                       </div>
                     </td>
                   </tr>

@@ -680,5 +680,27 @@
     "expired_title": "Dieser Reset-Link ist ungültig oder abgelaufen.",
     "expired_desc": "Reset-Links sind zeitlich begrenzt und nur einmal gültig. Fordere einen neuen an.",
     "request_new": "Neuen Link anfordern"
+  },
+  "admin_user_actions": {
+    "manage": "Verwalten",
+    "view_profile": "Profil ansehen",
+    "view_calendar": "Kalender ansehen",
+    "suspend": "Sperren",
+    "reactivate": "Reaktivieren",
+    "delete": "Löschen",
+    "send_reset": "Passwort-Reset senden",
+    "force_logout": "Abmeldung erzwingen",
+    "impersonate": "Als Benutzer anmelden",
+    "audit": "Admin-Aktionsprotokoll",
+    "suspended": "Konto gesperrt",
+    "reactivated": "Konto reaktiviert",
+    "deleted": "Benutzer gelöscht",
+    "reset_sent": "Passwort-Reset-E-Mail gesendet",
+    "logged_out": "Alle Sitzungen widerrufen",
+    "impersonating": "Impersonierungs-Sitzung in neuem Tab geöffnet",
+    "confirm_suspend": "{{name}} sperren? Das Konto kann sich nicht mehr anmelden.",
+    "confirm_delete": "{{name}} und alle zugehörigen Daten endgültig löschen? Nicht rückgängig zu machen.",
+    "confirm_logout": "Alle aktiven Sitzungen von {{name}} widerrufen?",
+    "confirm_impersonate": "Als {{name}} anmelden? Die Aktion wird protokolliert und ersetzt Ihre Sitzung im neuen Tab."
   }
 }

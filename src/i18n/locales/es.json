@@ -680,5 +680,27 @@
     "expired_title": "Este enlace de restablecimiento no es válido o ha caducado.",
     "expired_desc": "Los enlaces de restablecimiento tienen caducidad y son de un solo uso. Solicita uno nuevo.",
     "request_new": "Solicitar nuevo enlace"
+  },
+  "admin_user_actions": {
+    "manage": "Gestionar",
+    "view_profile": "Ver perfil",
+    "view_calendar": "Ver calendario",
+    "suspend": "Suspender",
+    "reactivate": "Reactivar",
+    "delete": "Eliminar",
+    "send_reset": "Enviar restablecimiento de contraseña",
+    "force_logout": "Forzar cierre de sesión",
+    "impersonate": "Entrar como usuario",
+    "audit": "Registro de acciones de admin",
+    "suspended": "Cuenta suspendida",
+    "reactivated": "Cuenta reactivada",
+    "deleted": "Usuario eliminado",
+    "reset_sent": "Correo de restablecimiento enviado",
+    "logged_out": "Todas las sesiones revocadas",
+    "impersonating": "Sesión de suplantación abierta en una pestaña nueva",
+    "confirm_suspend": "¿Suspender a {{name}}? La cuenta no podrá iniciar sesión.",
+    "confirm_delete": "¿Eliminar definitivamente a {{name}} y todos sus datos? No se puede deshacer.",
+    "confirm_logout": "¿Revocar todas las sesiones activas de {{name}}?",
+    "confirm_impersonate": "¿Iniciar sesión como {{name}}? La acción queda registrada y sustituirá tu sesión en la nueva pestaña."
   }
 }

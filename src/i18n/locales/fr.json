@@ -680,5 +680,27 @@
     "expired_title": "Ce lien de réinitialisation est invalide ou expiré.",
     "expired_desc": "Les liens de réinitialisation sont à durée limitée et à usage unique. Demandez-en un nouveau.",
     "request_new": "Demander un nouveau lien"
+  },
+  "admin_user_actions": {
+    "manage": "Gérer",
+    "view_profile": "Voir le profil",
+    "view_calendar": "Voir le calendrier",
+    "suspend": "Suspendre",
+    "reactivate": "Réactiver",
+    "delete": "Supprimer",
+    "send_reset": "Envoyer la réinitialisation du mot de passe",
+    "force_logout": "Déconnexion forcée",
+    "impersonate": "Se connecter en tant qu'utilisateur",
+    "audit": "Journal des actions admin",
+    "suspended": "Compte suspendu",
+    "reactivated": "Compte réactivé",
+    "deleted": "Utilisateur supprimé",
+    "reset_sent": "E-mail de réinitialisation envoyé",
+    "logged_out": "Toutes les sessions révoquées",
+    "impersonating": "Session d'usurpation ouverte dans un nouvel onglet",
+    "confirm_suspend": "Suspendre {{name}} ? Le compte ne pourra plus se connecter.",
+    "confirm_delete": "Supprimer définitivement {{name}} et toutes les données associées ? Action irréversible.",
+    "confirm_logout": "Révoquer toutes les sessions actives de {{name}} ?",
+    "confirm_impersonate": "Se connecter en tant que {{name}} ? L'action est enregistrée et remplacera votre session dans le nouvel onglet."
   }
 }
