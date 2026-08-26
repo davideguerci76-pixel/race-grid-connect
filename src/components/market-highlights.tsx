@@ -10,7 +10,10 @@ export function useMarketStats() {
   const fetchStats = useServerFn(getMarketStats);
   return useQuery({
     queryKey: ["market-stats"],
-    queryFn: () => fetchStats() as Promise<MarketStats | null>,
+    queryFn: async () => {
+      const res = (await fetchStats()) as { stats: MarketStats | null } | null;
+      return res?.stats ?? null;
+    },
     staleTime: 5 * 60_000,
   });
 }
