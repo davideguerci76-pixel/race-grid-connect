@@ -103,6 +103,7 @@ function RequestsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
+                    {(r as any).search_mode === "pool" && <PoolBadge />}
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       <Wrench className="size-3.5" />
                       {(r as any).sub_role ? subRoleLabel((r as any).sub_role) : roleGroupLabel((r as any).role_group)} · {disciplineLabel(r.discipline)}
