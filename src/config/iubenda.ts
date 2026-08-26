@@ -1,21 +1,20 @@
 /**
  * iubenda configuration.
  *
- * Fill these three values with the IDs from your iubenda dashboard:
- *  - siteId:          Cookie Solution → site ID
- *  - cookiePolicyId:  ID of the Privacy/Cookie Policy document
- *  - privacyPolicyId: usually identical to cookiePolicyId (same document set)
- *
- * While they are empty the banner and the embedded policies stay disabled and
- * the app shows a local fallback text, so nothing breaks before go-live.
+ * The unified embedding script below is generated in the iubenda dashboard and
+ * carries the whole configuration (cookie banner, per-purpose consent,
+ * auto-blocking of consent-bound scripts and the policy widgets), so no manual
+ * `_iub.csConfiguration` object is needed here.
  */
 export const IUBENDA = {
-  siteId: "",
-  cookiePolicyId: "",
-  privacyPolicyId: "",
+  /** Unified embedding script id (embeds.iubenda.com/widgets/<id>.js). */
+  embedId: "bac3589f-39ab-40b3-b5f4-c4d821e319b1",
+  privacyPolicyId: "93285044",
 } as const;
 
-export const IUBENDA_ENABLED = Boolean(IUBENDA.siteId && IUBENDA.cookiePolicyId);
+export const IUBENDA_SCRIPT_URL = `https://embeds.iubenda.com/widgets/${IUBENDA.embedId}.js`;
+
+export const IUBENDA_ENABLED = Boolean(IUBENDA.embedId && IUBENDA.privacyPolicyId);
 
 /** Privacy contact address used across legal copy. */
 export const PRIVACY_EMAIL = "privacy@pitcall.net";
