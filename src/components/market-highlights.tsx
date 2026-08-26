@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Activity, CalendarClock, Flame, Users } from "lucide-react";
 import { getMarketStats, type MarketDay, type MarketStats } from "@/lib/market.functions";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 
 export function useMarketStats() {
   const fetchStats = useServerFn(getMarketStats);
