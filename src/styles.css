@@ -135,6 +135,50 @@
   color: var(--color-muted-foreground);
 }
 
+/* ------------------------------------------------------------------ */
+/* iubenda widgets — dark theme integration                           */
+/* "Notice at collection" / "Your Privacy Choices" tabs, embeds and   */
+/* the floating preferences button ship with light styling; we invert */
+/* and recolor them so they blend into the dark footer.               */
+/* ------------------------------------------------------------------ */
+#iubenda-usp-btn,
+.iubenda-tp-btn,
+.iubenda-cs-preferences-link,
+[class*="iubenda"][class*="-btn"],
+#iubenda-embed.iubenda-fixed-bottom-left,
+#iubenda-embed.iubenda-fixed-bottom-right {
+  background-color: oklch(0.24 0.008 265) !important;
+  border-color: oklch(1 0 0 / 20%) !important;
+  color: oklch(0.98 0 0) !important;
+  border-radius: var(--radius) !important;
+}
+
+#iubenda-usp-btn *,
+.iubenda-tp-btn * {
+  color: oklch(0.98 0 0) !important;
+}
+
+/* Inline embedded widgets (policy bodies) on dark surfaces */
+.iubenda-embed.iubenda-white,
+.iubenda-white {
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
+/* iubenda brand icon: monochrome dark treatment */
+.iubenda-tp-btn .iubenda-brand,
+#iubenda-usp-btn img,
+.iubenda-tp-btn img {
+  filter: grayscale(1) brightness(1.6);
+}
+
+/* iubenda floating privacy-choices tab pair (bottom center/right) */
+.iubenda-tp-top-fix,
+.iubenda-tp-top-fix * {
+  background-color: oklch(0.19 0.008 265) !important;
+  color: oklch(0.98 0 0) !important;
+  border-color: oklch(1 0 0 / 20%) !important;
+}
+
 @utility card-surface {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
