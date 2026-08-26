@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeamsIndexRouteImport } from './routes/teams.index'
 import { Route as FreelancersIndexRouteImport } from './routes/freelancers.index'
 import { Route as TeamsIdRouteImport } from './routes/teams.$id'
+import { Route as LegalInfoRouteImport } from './routes/legal.info'
 import { Route as LegalDocRouteImport } from './routes/legal.$doc'
 import { Route as FreelancersIdRouteImport } from './routes/freelancers.$id'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -81,6 +82,11 @@ const FreelancersIndexRoute = FreelancersIndexRouteImport.update({
 const TeamsIdRoute = TeamsIdRouteImport.update({
   id: '/teams/$id',
   path: '/teams/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalInfoRoute = LegalInfoRouteImport.update({
+  id: '/legal/info',
+  path: '/legal/info',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalDocRoute = LegalDocRouteImport.update({
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
+  '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
+  '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers': typeof FreelancersIndexRoute
   '/teams': typeof TeamsIndexRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
+  '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
   '/freelancers/': typeof FreelancersIndexRoute
   '/teams/': typeof TeamsIndexRoute
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/freelancers/$id'
     | '/legal/$doc'
+    | '/legal/info'
     | '/teams/$id'
     | '/freelancers/'
     | '/teams/'
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/freelancers/$id'
     | '/legal/$doc'
+    | '/legal/info'
     | '/teams/$id'
     | '/freelancers'
     | '/teams'
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/freelancers/$id'
     | '/legal/$doc'
+    | '/legal/info'
     | '/teams/$id'
     | '/freelancers/'
     | '/teams/'
@@ -453,6 +465,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FreelancersIdRoute: typeof FreelancersIdRoute
   LegalDocRoute: typeof LegalDocRoute
+  LegalInfoRoute: typeof LegalInfoRoute
   TeamsIdRoute: typeof TeamsIdRoute
   FreelancersIndexRoute: typeof FreelancersIndexRoute
   TeamsIndexRoute: typeof TeamsIndexRoute
@@ -514,6 +527,13 @@ declare module '@tanstack/react-router' {
       path: '/teams/$id'
       fullPath: '/teams/$id'
       preLoaderRoute: typeof TeamsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/info': {
+      id: '/legal/info'
+      path: '/legal/info'
+      fullPath: '/legal/info'
+      preLoaderRoute: typeof LegalInfoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/$doc': {
@@ -792,6 +812,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FreelancersIdRoute: FreelancersIdRoute,
   LegalDocRoute: LegalDocRoute,
+  LegalInfoRoute: LegalInfoRoute,
   TeamsIdRoute: TeamsIdRoute,
   FreelancersIndexRoute: FreelancersIndexRoute,
   TeamsIndexRoute: TeamsIndexRoute,

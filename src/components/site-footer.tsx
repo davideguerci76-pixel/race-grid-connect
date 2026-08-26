@@ -55,6 +55,11 @@ export function SiteFooter() {
                 {t("footer.cookie")}
               </a>
             </li>
+            <li>
+              <Link to="/legal/info" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("footer.dataInfo")}
+              </Link>
+            </li>
 
             <li>
               <button

@@ -234,7 +234,8 @@
     "legal": "Legale",
     "privacy": "Privacy",
     "terms": "Termini",
-    "cookie": "Cookie"
+    "cookie": "Cookie",
+    "dataInfo": "Informazioni aggiuntive sul trattamento dei dati"
   },
   "requests": {
     "title": "Le mie Pit Calls",
