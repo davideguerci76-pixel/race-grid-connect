@@ -1312,6 +1312,66 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     };
   });
 
+/** Convert a "My Pool" Pit Call into a standard one by paying the token difference. */
+export const upgradeRequestToStandard = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: req, error: reqErr } = await supabase
+      .from("requests")
+      .select("id, team_id, duration, search_mode")
+      .eq("id", data.request_id)
+      .maybeSingle();
+    if (reqErr) throw new Error(reqErr.message);
+    if (!req) throw new Error("Request not found");
+    if (req.team_id !== userId) throw new Error("Not owner of this request");
+    if ((req as any).search_mode !== "pool") throw new Error("This Pit Call is already a standard search");
+
+    const { data: settingsRows } = await supabase
+      .from("platform_settings")
+      .select("key, value_num")
+      .in("key", ["cost_request_race_weekend", "cost_request_full_season", "cost_pool_search"]);
+    const settings = new Map((settingsRows ?? []).map((r: any) => [r.key, Number(r.value_num)]));
+    const standardCost =
+      (req as any).duration === "full_season"
+        ? settings.get("cost_request_full_season") ?? 20
+        : settings.get("cost_request_race_weekend") ?? 10;
+    const cost = Math.max(0, Math.round(standardCost - (settings.get("cost_pool_search") ?? 5)));
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (cost > 0) {
+      const { data: prof } = await supabaseAdmin
+        .from("profiles")
+        .select("token_balance")
+        .eq("id", userId)
+        .maybeSingle();
+      const balance = Number((prof as any)?.token_balance ?? 0);
+      if (balance < cost) throw new Error(`Insufficient tokens: need ${cost} but balance is ${balance}`);
+      const { error: credErr } = await supabaseAdmin.rpc("credit_tokens", {
+        _user_id: userId,
+        _delta: -cost,
+        _reason: "request_post",
+        _ref: data.request_id,
+        _note: "Upgrade My Pool Pit Call to standard search",
+      } as never);
+      if (credErr) throw new Error(credErr.message);
+    }
+
+    const { error: updErr } = await supabaseAdmin
+      .from("requests")
+      .update({ search_mode: "standard", updated_at: new Date().toISOString() } as never)
+      .eq("id", data.request_id);
+    if (updErr) throw new Error(updErr.message);
+
+    await supabaseAdmin.rpc("recompute_matches", {
+      _freelancer_id: null,
+      _request_id: data.request_id,
+    } as never);
+
+    return { ok: true, tokens_spent: cost };
+  });
+
 export const refundAndCloseRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { request_id: string; mode: "full" | "partial" }) =>
