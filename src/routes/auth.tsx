@@ -163,9 +163,31 @@ function AuthPage() {
                 className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
               />
             </div>
+            {isSignup && (
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  required
+                  checked={acceptedLegal}
+                  onChange={(e) => setAcceptedLegal(e.target.checked)}
+                  className="mt-0.5 accent-racing-red"
+                />
+                <span>
+                  {t("auth.accept_legal_prefix", { defaultValue: "I have read and accept the" })}{" "}
+                  <Link to="/legal/$doc" params={{ doc: "terms" }} className="font-bold text-racing-red">
+                    {t("footer.terms")}
+                  </Link>{" "}
+                  {t("common.and", { defaultValue: "and the" })}{" "}
+                  <Link to="/legal/$doc" params={{ doc: "privacy" }} className="font-bold text-racing-red">
+                    {t("footer.privacy")}
+                  </Link>
+                  .
+                </span>
+              </label>
+            )}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (isSignup && !acceptedLegal)}
               className="w-full bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:brightness-110 disabled:opacity-60"
             >
               {isSignup ? t("auth.create_account") : t("auth.continue_email")}
