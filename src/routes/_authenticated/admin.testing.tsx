@@ -3,8 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, Database, FlaskConical, Loader2, Trash2 } from "lucide-react";
-import { generateTestDataset, getTestEnvironmentStats, purgeTestEnvironment } from "@/lib/testlab.functions";
+import { AlertTriangle, Database, FlaskConical, Loader2, Star, Trash2, Users } from "lucide-react";
+import {
+  assignTestPools,
+  generatePoolPitCalls,
+  generatePoolRatings,
+  generateTestDataset,
+  getTestEnvironmentStats,
+  purgeTestEnvironment,
+} from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
 import { AdminEnvSwitch, useAdminEnv } from "@/components/admin-env-switch";
 
@@ -49,6 +56,39 @@ function TestingLab() {
       qc.invalidateQueries();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Purge failed"),
+  });
+
+  const poolFn = useServerFn(assignTestPools);
+  const poolRatingsFn = useServerFn(generatePoolRatings);
+  const poolCallsFn = useServerFn(generatePoolPitCalls);
+
+  const poolMut = useMutation({
+    mutationFn: () => poolFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.links} pool links created across ${r.teams} teams (${r.pool_total} total)`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool assignment failed"),
+  });
+
+  const ratingsMut = useMutation({
+    mutationFn: () => poolRatingsFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.ratings} ratings on ${r.engagements} new completed engagements`);
+      if (r.errors?.length) toast.warning(r.errors[0]);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Rating generation failed"),
+  });
+
+  const poolCallsMut = useMutation({
+    mutationFn: () => poolCallsFn(),
+    onSuccess: (r: any) => {
+      toast.success(`${r.created} My Pool Pit Calls created (target ${r.target})`);
+      if (r.errors?.length) toast.warning(r.errors[0]);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool Pit Call generation failed"),
   });
 
   const size = PRESET_SIZES[preset];
@@ -139,6 +179,41 @@ function TestingLab() {
         )}
       </div>
 
+      <div className="border border-border p-4">
+        <div className="mb-1 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest">
+          <Users className="size-4" /> Pool simulation
+        </div>
+        <p className="mb-4 text-[11px] text-muted-foreground">
+          Advanced simulation on the TEST dataset: build trusted pools, seed bidirectional ratings and fire My Pool Pit
+          Calls so the matching engine returns real, targeted results to debug. Each step can also be done manually by
+          impersonating a user with “Login as user”.
+        </p>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <SimCard
+            title="Add to pool"
+            desc="Assigns test freelancers to the pools of the test teams, creating the pool membership links."
+            pending={poolMut.isPending}
+            onClick={() => poolMut.mutate()}
+            icon={<Users className="size-3" />}
+          />
+          <SimCard
+            title="Generate pool ratings"
+            desc="Creates completed engagements for every pool pair and bidirectional ratings (team → freelancer and back)."
+            pending={ratingsMut.isPending}
+            onClick={() => ratingsMut.mutate()}
+            icon={<Star className="size-3" />}
+          />
+          <SimCard
+            title="Generate My Pool Pit Calls"
+            desc="Creates Pit Calls in pool mode (≈ half of the generated teams) aligned to pool members' availability."
+            pending={poolCallsMut.isPending}
+            onClick={() => poolCallsMut.mutate()}
+            icon={<FlaskConical className="size-3" />}
+          />
+        </div>
+      </div>
+
       <div className="border border-racing-red/50 bg-racing-red/5 p-4">
         <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-racing-red">
           <AlertTriangle className="size-4" /> Danger zone — purge test environment
@@ -187,5 +262,36 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     >
       {children}
     </button>
+  );
+}
+
+function SimCard({
+  title,
+  desc,
+  pending,
+  onClick,
+  icon,
+}: {
+  title: string;
+  desc: string;
+  pending: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col justify-between border border-border p-3">
+      <div>
+        <div className="text-[11px] font-bold uppercase tracking-widest">{title}</div>
+        <p className="mt-1 text-[11px] text-muted-foreground">{desc}</p>
+      </div>
+      <button
+        onClick={onClick}
+        disabled={pending}
+        className="mt-3 inline-flex items-center justify-center gap-2 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-50"
+      >
+        {pending ? <Loader2 className="size-3 animate-spin" /> : icon}
+        Run
+      </button>
+    </div>
   );
 }
