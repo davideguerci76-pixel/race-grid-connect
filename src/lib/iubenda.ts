@@ -68,35 +68,8 @@ export function grantPurpose(purpose: number) {
   }
 }
 
-export function iubendaConfig(lang: string) {
-  return {
-    siteId: Number(IUBENDA.siteId),
-    cookiePolicyId: Number(IUBENDA.cookiePolicyId),
-    lang,
-    storage: { useSiteId: true },
-    perPurposeConsent: true,
-    consentOnContinuedBrowsing: false,
-    invalidateConsentWithoutLog: true,
-    banner: {
-      acceptButtonDisplay: true,
-      customizeButtonDisplay: true,
-      rejectButtonDisplay: true,
-      closeButtonRejects: true,
-      explicitWithdrawal: true,
-      listPurposes: true,
-      position: "float-bottom-center",
-      backgroundOverlay: true,
-      acceptButtonCaptionColor: "#ffffff",
-      acceptButtonColor: "#e10600",
-      customizeButtonCaptionColor: "#ffffff",
-      customizeButtonColor: "#2a2d35",
-      rejectButtonCaptionColor: "#ffffff",
-      rejectButtonColor: "#2a2d35",
-      backgroundColor: "#12141a",
-      textColor: "#ffffff",
-      fontSize: "13px",
-    },
-  };
-}
+/* Banner configuration lives in the iubenda dashboard and ships with the
+   unified embedding script — no local csConfiguration object. */
+
 
 export { IUB_PURPOSE };

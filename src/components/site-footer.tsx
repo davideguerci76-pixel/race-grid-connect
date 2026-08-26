@@ -3,6 +3,7 @@ import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 import { openCookiePreferences } from "@/lib/iubenda";
+import { policyUrl } from "@/config/iubenda";
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -30,9 +31,14 @@ export function SiteFooter() {
           <div className="label-mono mb-3">{t("footer.legal")}</div>
           <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/legal/$doc" params={{ doc: "privacy" }} className="text-muted-foreground transition-colors hover:text-racing-red">
+              <a
+                href={policyUrl("privacy")}
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+                className="text-muted-foreground transition-colors hover:text-racing-red"
+              >
                 {t("footer.privacy")}
-              </Link>
+              </a>
             </li>
             <li>
               <Link to="/legal/$doc" params={{ doc: "terms" }} className="text-muted-foreground transition-colors hover:text-racing-red">
@@ -40,10 +46,16 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/legal/$doc" params={{ doc: "cookie" }} className="text-muted-foreground transition-colors hover:text-racing-red">
+              <a
+                href={policyUrl("cookie")}
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+                className="text-muted-foreground transition-colors hover:text-racing-red"
+              >
                 {t("footer.cookie")}
-              </Link>
+              </a>
             </li>
+
             <li>
               <button
                 type="button"
