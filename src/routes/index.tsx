@@ -26,6 +26,24 @@ function ComingSoon() {
       <p className="mt-4 max-w-xl text-lg text-muted-foreground">
         {t("sweep_admin_a.home_coming_soon.coming_soon_claim")}
       </p>
+
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Link
+          to="/auth"
+          search={{ mode: "signin" as const }}
+          className="border border-border bg-card px-8 py-4 text-sm font-black uppercase tracking-widest transition-colors hover:bg-secondary"
+        >
+          {t("nav.signin")}
+        </Link>
+        <Link
+          to="/auth"
+          search={{ mode: "signup" as const }}
+          className="bg-racing-red px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-[filter] hover:brightness-110"
+        >
+          {t("nav.signup")}
+        </Link>
+      </div>
+
       <div className="mt-10 inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
         <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">PITCALL</span>
