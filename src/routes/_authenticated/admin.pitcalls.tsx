@@ -131,6 +131,7 @@ function PitCallManagement() {
         (r) =>
           String(r.title ?? "").toLowerCase().includes(s) ||
           String(r.team_name ?? "").toLowerCase().includes(s) ||
+          String(r.team_email ?? "").toLowerCase().includes(s) ||
           String(r.location ?? "").toLowerCase().includes(s),
       );
     }
