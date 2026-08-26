@@ -223,6 +223,11 @@ function PitCallManagement() {
                         >
                           {r.status}
                         </span>
+                        {r.search_mode === "pool" && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                            <Users className="size-3" /> {t("sweep_admin_b.pitcalls.in_my_pool", { defaultValue: "In my pool" })}
+                          </span>
+                        )}
                         {r.slots_locked && (
                           <span className="inline-flex items-center gap-1 rounded-full border border-racing-red px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-racing-red">
                             <Lock className="size-3" /> {t("sweep_admin_b.pitcalls.slots_closed")}
