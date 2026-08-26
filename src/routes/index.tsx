@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { MarketHighlights } from "@/components/market-highlights";
+import { MarketHighlights, useMarketStats } from "@/components/market-highlights";
 import { getPublicFlags } from "@/lib/flags.functions";
 
 export const Route = createFileRoute("/")({
@@ -26,6 +26,24 @@ function ComingSoon() {
       <p className="mt-4 max-w-xl text-lg text-muted-foreground">
         {t("sweep_admin_a.home_coming_soon.coming_soon_claim")}
       </p>
+
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+        <Link
+          to="/auth"
+          search={{ mode: "signin" as const }}
+          className="border border-border bg-card px-8 py-4 text-sm font-black uppercase tracking-widest transition-colors hover:bg-secondary"
+        >
+          {t("nav.signin")}
+        </Link>
+        <Link
+          to="/auth"
+          search={{ mode: "signup" as const }}
+          className="bg-racing-red px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition-[filter] hover:brightness-110"
+        >
+          {t("nav.signup")}
+        </Link>
+      </div>
+
       <div className="mt-10 inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
         <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">PITCALL</span>
@@ -39,6 +57,7 @@ function Home() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const flags = Route.useLoaderData();
+  const { data: stats } = useMarketStats();
 
   useEffect(() => {
     if (!loading && user) {
@@ -146,12 +165,11 @@ function Home() {
 
       {flags?.homeStats && (
       <section className="border-b border-border bg-pit">
-        <div className="container-page grid grid-cols-2 divide-x divide-border md:grid-cols-4">
+        <div className="container-page grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {[
-            ["2.4k+", t("home.stats.specialists")],
-            ["124", t("home.stats.teams")],
-            ["18", t("home.stats.countries")],
-            ["€ 620", t("home.stats.rate")],
+            [stats ? String(stats.totals.freelancers) : "—", t("home.stats.specialists")],
+            [stats ? String(stats.totals.teams) : "—", t("home.stats.teams")],
+            [stats ? String(new Set((stats.by_country ?? []).map((c) => c.country).filter(Boolean)).size) : "—", t("home.stats.countries")],
           ].map(([n, l]) => (
             <div key={l} className="px-4 py-8 first:pl-0 md:px-8">
               <div className="font-mono text-3xl font-black tracking-tighter text-racing-red md:text-4xl">{n}</div>
