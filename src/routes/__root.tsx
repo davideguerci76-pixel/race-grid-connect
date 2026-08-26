@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
+import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
 
@@ -106,6 +107,9 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  // Restore the user's saved language after hydration (SSR always renders 'en').
+  useEffect(() => applySavedLanguage(), []);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
