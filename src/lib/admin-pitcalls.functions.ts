@@ -25,7 +25,7 @@ export const adminListPitCalls = createServerFn({ method: "GET" })
     const { data: requests, error } = await (supabaseAdmin
       .from("requests") as any)
       .select(
-        "id, team_id, title, status, is_active, discipline, role_group, sub_role, duration, start_date, end_date, season_dates, location, circuit, created_at, updated_at",
+        "id, team_id, title, status, is_active, discipline, role_group, sub_role, duration, start_date, end_date, season_dates, location, circuit, search_mode, created_at, updated_at",
       )
       .eq("is_test", envIsTest)
       .order("created_at", { ascending: false })

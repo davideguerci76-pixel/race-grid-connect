@@ -219,5 +219,8 @@
       "reject": "Rejeter",
       "edit_dates": "Modifier les dates"
     }
+  },
+  "pitcalls": {
+    "in_my_pool": "Dans mon pool"
   }
 }

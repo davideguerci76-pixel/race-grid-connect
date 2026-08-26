@@ -219,5 +219,8 @@
       "reject": "Ablehnen",
       "edit_dates": "Daten bearbeiten"
     }
+  },
+  "pitcalls": {
+    "in_my_pool": "In meinem Pool"
   }
 }
