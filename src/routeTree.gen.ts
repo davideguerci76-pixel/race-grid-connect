@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MarketRouteImport } from './routes/market'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +25,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardPoolRouteImport } from './routes/_authenticated/dashboard.pool'
@@ -42,9 +44,17 @@ import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin.launch'
 import { Route as AuthenticatedAdminCalendarsRouteImport } from './routes/_authenticated/admin.calendars'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
 import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './routes/_authenticated/dashboard.requests.$id.matches'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -120,6 +130,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicNotificationEmailRoute =
+  ApiPublicNotificationEmailRouteImport.update({
+    id: '/api/public/notification-email',
+    path: '/api/public/notification-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
@@ -226,6 +242,22 @@ const AuthenticatedDashboardRequestsIndexRoute =
     path: '/requests/',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRequestsNewRoute =
   AuthenticatedDashboardRequestsNewRouteImport.update({
     id: '/requests/new',
@@ -244,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
@@ -269,9 +302,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
   '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
@@ -280,6 +317,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/freelancers/$id': typeof FreelancersIdRoute
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
@@ -303,9 +341,13 @@ export interface FileRoutesByTo {
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/dashboard/requests': typeof AuthenticatedDashboardRequestsIndexRoute
   '/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
@@ -316,6 +358,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/market': typeof MarketRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/freelancers/$id': typeof FreelancersIdRoute
@@ -341,9 +384,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/dashboard/requests/': typeof AuthenticatedDashboardRequestsIndexRoute
   '/_authenticated/dashboard/requests/$id/matches': typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
@@ -354,6 +401,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/admin'
     | '/dashboard'
     | '/freelancers/$id'
@@ -379,9 +427,13 @@ export interface FileRouteTypes {
     | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/admin/'
     | '/dashboard/'
     | '/dashboard/requests/new'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/dashboard/requests/'
     | '/dashboard/requests/$id/matches'
   fileRoutesByTo: FileRoutesByTo
@@ -390,6 +442,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/freelancers/$id'
     | '/legal/$doc'
     | '/legal/info'
@@ -413,9 +466,13 @@ export interface FileRouteTypes {
     | '/dashboard/pool'
     | '/dashboard/profile'
     | '/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/admin'
     | '/dashboard'
     | '/dashboard/requests/new'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/dashboard/requests'
     | '/dashboard/requests/$id/matches'
   id:
@@ -425,6 +482,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/market'
     | '/sitemap.xml'
+    | '/verify-email'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/freelancers/$id'
@@ -450,9 +508,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/pool'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/tokens'
+    | '/api/public/notification-email'
     | '/_authenticated/admin/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/requests/new'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
     | '/_authenticated/dashboard/requests/'
     | '/_authenticated/dashboard/requests/$id/matches'
   fileRoutesById: FileRoutesById
@@ -463,16 +525,28 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   MarketRoute: typeof MarketRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   FreelancersIdRoute: typeof FreelancersIdRoute
   LegalDocRoute: typeof LegalDocRoute
   LegalInfoRoute: typeof LegalInfoRoute
   TeamsIdRoute: typeof TeamsIdRoute
   FreelancersIndexRoute: typeof FreelancersIndexRoute
   TeamsIndexRoute: typeof TeamsIndexRoute
+  ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -577,6 +651,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/notification-email': {
+      id: '/api/public/notification-email'
+      path: '/api/public/notification-email'
+      fullPath: '/api/public/notification-email'
+      preLoaderRoute: typeof ApiPublicNotificationEmailRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/tokens': {
       id: '/_authenticated/dashboard/tokens'
@@ -704,6 +785,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRequestsIndexRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/requests/new': {
       id: '/_authenticated/dashboard/requests/new'
       path: '/requests/new'
@@ -810,12 +912,17 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   MarketRoute: MarketRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   FreelancersIdRoute: FreelancersIdRoute,
   LegalDocRoute: LegalDocRoute,
   LegalInfoRoute: LegalInfoRoute,
   TeamsIdRoute: TeamsIdRoute,
   FreelancersIndexRoute: FreelancersIndexRoute,
   TeamsIndexRoute: TeamsIndexRoute,
+  ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -68,18 +68,26 @@ function AuthPage() {
     setLoading(true);
     try {
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
             data: { user_type: userType, display_name: displayName || email.split("@")[0] },
           },
         });
         if (error) throw error;
         try { await recordLegalAcceptance(); } catch { /* proof recorded on next login */ }
+        if (!data.session || !data.user?.email_confirmed_at) {
+          toast.success(
+            t("verify_email.check_inbox", { defaultValue: "Check your inbox to confirm your email address." }),
+          );
+          navigate({ to: "/verify-email" });
+          return;
+        }
         toast.success(t("sweep_public.auth.welcome_toast"));
         navigate({ to: "/dashboard" });
+
       } else {
         if (typeof window !== "undefined") {
           window.sessionStorage.removeItem("pendingUserType");
