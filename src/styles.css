@@ -188,7 +188,7 @@ button.iubenda-cs-preferences-link {
 /* Floating preferences button (bottom-right) — black tile, keep the green
    keyhole icon which ships as a background-image (never wipe it with the
    background shorthand) */
-button.iubenda-tp-btn[data-tp-icon],
+button.iubenda-tp-btn:not(.iubenda-floatable-tb-btn):not([data-tp-nostyle], .iubenda-floatable-default-btn)[data-tp-icon],
 .iubenda-tp-btn {
   background-color: oklch(0.13 0.008 265) !important;
   border: 1px solid oklch(1 0 0 / 20%) !important;
