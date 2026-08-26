@@ -14,6 +14,7 @@ import {
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
 import { RatingIcons } from "@/components/rating-icons";
+import { AdminUserActions } from "@/components/admin-user-actions";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminFreelancers,
