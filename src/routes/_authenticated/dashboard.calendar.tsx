@@ -176,6 +176,7 @@ function CalendarPage() {
           <AvailabilityCalendar
             selected={selectedDates}
             blocked={blockedDates}
+            unconfirmed={unconfirmedDates}
             onSelect={(d) => mutation.mutate(d)}
             min={new Date()}
             legend={t("sweep_public.dashboard_calendar.calendar_legend")}
