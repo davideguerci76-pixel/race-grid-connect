@@ -9,6 +9,7 @@ import { purchaseTokensDemo, getTokenHistory } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError } from "@/lib/errors";
 
 const PACKS = [
   { key: "small" as const, tokens: 10 },
@@ -38,7 +39,7 @@ function TokensPage() {
   const mut = useMutation({
     mutationFn: (pack: "small" | "medium" | "large") => purchase({ data: { pack } }),
     onSuccess: (r) => { toast.success(t("sweep_profile.tokens.credited_demo", { count: r.added })); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.tokens.purchase_failed")),
+    onError: (e) => toastError(e, "sweep_profile.tokens.purchase_failed"),
   });
 
   return (

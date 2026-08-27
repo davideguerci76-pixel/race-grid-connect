@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Clock, Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -101,7 +102,7 @@ function TimeMachine() {
       toast.success(t("sweep_admin_a.time_machine.simulated_clock", { count: r.offset_days }));
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_a.failed")),
+    onError: (e) => toastError(e, "sweep_admin_a.failed"),
   });
   const triggerMut = useMutation({
     mutationFn: () => triggerFn(),
@@ -110,7 +111,7 @@ function TimeMachine() {
   const triggerCalMut = useMutation({
     mutationFn: () => triggerCalFn(),
     onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_calendar", { count: r.inserted })),
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_a.failed")),
+    onError: (e) => toastError(e, "sweep_admin_a.failed"),
   });
 
   return (

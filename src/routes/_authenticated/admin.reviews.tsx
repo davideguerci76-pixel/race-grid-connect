@@ -8,6 +8,7 @@ import { adminListRatings, adminModerateRating } from "@/lib/admin.functions";
 import { RatingIcons } from "@/components/rating-icons";
 import { useDateFormat } from "@/lib/date-locale";
 import { useTranslation } from "react-i18next";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/reviews")({
   component: AdminReviews,
@@ -43,7 +44,7 @@ function AdminReviews() {
       qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     },
-    onError: (e: any) => toast.error(e?.message ?? t("sweep_admin_b.common.failed")),
+    onError: (e: any) => toastError(e, "sweep_admin_b.common.failed"),
   });
 
   const filters: { key: Filter; label: string }[] = [

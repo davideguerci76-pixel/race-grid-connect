@@ -14,6 +14,7 @@ import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { deleteCalendar, listMyCalendars, saveCalendar, submitCalendarForReview, type UserCalendar } from "@/lib/calendars.functions";
 import { buildIcsFromEvents, daysToEvents, dateOf, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendars")({
   component: ManageCalendarsPage,
@@ -56,7 +57,7 @@ function ManageCalendarsPage() {
       setEditing(null);
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.save_failed")),
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendars.toast.save_failed"),
   });
 
   const delMut = useMutation({
@@ -65,7 +66,7 @@ function ManageCalendarsPage() {
       toast.success(t("sweep_public.dashboard_calendars.toast.calendar_deleted"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.delete_failed")),
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendars.toast.delete_failed"),
   });
 
   const submitMut = useMutation({
@@ -74,7 +75,7 @@ function ManageCalendarsPage() {
       toast.success(t("sweep_public.dashboard_calendars.toast.submitted_for_review"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendars.toast.submit_failed")),
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendars.toast.submit_failed"),
   });
 
   const importIcs = async (file: File) => {

@@ -20,6 +20,7 @@ import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BackButton } from "@/components/back-button";
 import { PrivacyDataSection } from "@/components/privacy-data-section";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -225,7 +226,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       toast.success(t("sweep_profile.common.updated"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
+    onError: (e) => toastError(e, "sweep_profile.common.failed"),
   });
 
   const phoneMutation = useMutation({
@@ -452,7 +453,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       toast.success(t("sweep_profile.freelancer.saved"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
+    onError: (e) => toastError(e, "sweep_profile.common.failed"),
   });
 
   if (editing) {
@@ -691,7 +692,7 @@ function TeamSection({ profile }: { profile: any }) {
       toast.success(t("sweep_profile.team.saved"));
       setEditing(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.common.failed")),
+    onError: (e) => toastError(e, "sweep_profile.common.failed"),
   });
 
   if (editing) {

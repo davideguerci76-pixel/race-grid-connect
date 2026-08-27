@@ -14,6 +14,7 @@ import {
 } from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
 import { AdminEnvSwitch, useAdminEnv } from "@/components/admin-env-switch";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/testing")({
   ssr: false,
@@ -45,7 +46,7 @@ function TestingLab() {
       if (r.errors?.length) toast.warning(r.errors[0]);
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Generation failed"),
+    onError: (e) => toastError(e),
   });
 
   const purgeMut = useMutation({
@@ -55,7 +56,7 @@ function TestingLab() {
       setConfirmText("");
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Purge failed"),
+    onError: (e) => toastError(e),
   });
 
   const poolFn = useServerFn(assignTestPools);
@@ -68,7 +69,7 @@ function TestingLab() {
       toast.success(`${r.links} pool links created across ${r.teams} teams (${r.pool_total} total)`);
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool assignment failed"),
+    onError: (e) => toastError(e),
   });
 
   const ratingsMut = useMutation({
@@ -78,7 +79,7 @@ function TestingLab() {
       if (r.errors?.length) toast.warning(r.errors[0]);
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Rating generation failed"),
+    onError: (e) => toastError(e),
   });
 
   const poolCallsMut = useMutation({
@@ -88,7 +89,7 @@ function TestingLab() {
       if (r.errors?.length) toast.warning(r.errors[0]);
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Pool Pit Call generation failed"),
+    onError: (e) => toastError(e),
   });
 
   const size = PRESET_SIZES[preset];

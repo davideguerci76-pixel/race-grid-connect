@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { FlaskConical, Radio } from "lucide-react";
 import { getAdminEnvironment, setAdminEnvironment } from "@/lib/testlab.functions";
+import { toastError } from "@/lib/errors";
 
 export function useAdminEnv() {
   const fn = useServerFn(getAdminEnvironment);
@@ -21,7 +22,7 @@ export function AdminEnvSwitch() {
       toast.success(r.is_test ? "Switched to TEST environment" : "Switched to LIVE environment");
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toastError(e),
   });
 
   return (

@@ -15,6 +15,7 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Pause, Play, CheckCircle2, XCircle, Copy, RotateCcw } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -55,7 +56,7 @@ function RequestsPage() {
       qc.invalidateQueries({ queryKey: ["my-requests"] });
       toast.success(t("requests.status_updated"));
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
 
   return (

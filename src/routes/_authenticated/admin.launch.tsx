@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Switch } from "@/components/ui/switch";
 import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
 import { FLAG_KEYS } from "@/lib/flags.functions";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/launch")({
   component: AdminLaunchPage,
@@ -26,7 +27,7 @@ function AdminLaunchPage() {
       toast.success(t("sweep_admin_a.launch.saved"));
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_a.failed")),
+    onError: (e) => toastError(e, "sweep_admin_a.failed"),
   });
 
   const value = (key: string, fallback: boolean) => {

@@ -14,6 +14,7 @@ import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/r
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   head: () => ({
@@ -52,7 +53,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.unlock_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.unlock_failed"),
   });
 
   const tierMut = useMutation({
@@ -63,7 +64,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.tier_unlock_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.tier_unlock_failed"),
   });
 
   const confirmFn = useServerFn(requestMatchConfirmation);
@@ -74,7 +75,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
 
   const sosFn = useServerFn(triggerSosCall);
@@ -84,7 +85,7 @@ function RequestMatchesPage() {
       toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 75 }));
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.sos_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.sos_failed"),
   });
 
   const refundFn = useServerFn(refundAndCloseRequest);
@@ -95,7 +96,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.refund_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.refund_failed"),
   });
 
   const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
@@ -116,7 +117,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["my-requests"] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e: any) => toast.error(e?.message ?? t("pool.upgrade_failed")),
+    onError: (e: any) => toastError(e, "pool.upgrade_failed"),
   });
 
   const renderPool = (

@@ -21,6 +21,7 @@ import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTI
 import { BackButton } from "@/components/back-button";
 import { CalendarSourcePicker } from "@/components/calendar-source-picker";
 import { dateOf } from "@/lib/ics";
+import { toastError } from "@/lib/errors";
 
 type LocRelevance = "not_relevant" | "relevant" | "mandatory";
 type LocAnchor = "this" | "team";
@@ -244,7 +245,7 @@ function NewRequestPage() {
       qc.invalidateQueries();
       navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toastError(e),
   });
 
   return (

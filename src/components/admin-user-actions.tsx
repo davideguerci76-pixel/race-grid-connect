@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import {
+import { toastError } from "@/lib/errors";
   adminDeleteUser,
   adminForceLogout,
   adminGetUserCalendar,
@@ -73,7 +74,7 @@ export function AdminUserActions({
       toast.success(successMsg);
       qc.invalidateQueries({ queryKey: [invalidateKey] });
     } catch (e: any) {
-      toast.error(e?.message ?? "Action failed");
+      toastError(e);
     } finally {
       setBusy(null);
     }
@@ -118,7 +119,7 @@ export function AdminUserActions({
       window.open(res.url, "_blank", "noopener");
       toast.success(t("admin_user_actions.impersonating", { defaultValue: "Impersonation session opened in a new tab" }));
     } catch (e: any) {
-      toast.error(e?.message ?? "Action failed");
+      toastError(e);
     } finally {
       setBusy(null);
     }

@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -102,7 +103,7 @@ function EngagementsPage() {
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
     onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.engagements.confirm_failed")),
+    onError: (e) => toastError(e, "sweep_engage.engagements.confirm_failed"),
   });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const cancelFn = useServerFn(cancelEngagement);
@@ -116,7 +117,7 @@ function EngagementsPage() {
       else toast.success(t("sweep_engage.common.cancelled"));
       qc.invalidateQueries();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.engagements.cancel_failed")),
+    onError: (e) => toastError(e, "sweep_engage.engagements.cancel_failed"),
   });
 
   const answerContactFn = useServerFn(freelancerAnswerContact);
@@ -126,13 +127,13 @@ function EngagementsPage() {
       toast.success(v.contacted ? t("sweep_engage.engagements.contact_logged_thanks") : t("sweep_engage.engagements.contact_logged_remind"));
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const teamConfirmFn = useServerFn(teamConfirmContact);
   const teamConfirmMut = useMutation({
     mutationFn: (id: string) => teamConfirmFn({ data: { engagement_id: id } }),
     onSuccess: () => { toast.success(t("sweep_engage.engagements.contact_confirmed_toast")); qc.invalidateQueries({ queryKey: ["engagements"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const rateMut = useMutation({
     mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
@@ -158,7 +159,7 @@ function EngagementsPage() {
       qc.refetchQueries({ queryKey: ["engagements-ratable"] });
       qc.refetchQueries({ queryKey: ["my-rated-engagement-ids"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
 
 

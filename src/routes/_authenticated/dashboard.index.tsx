@@ -13,6 +13,7 @@ import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 import { MarketHighlights } from "@/components/market-highlights";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -129,7 +130,7 @@ function DashboardHome() {
   const sosMut = useMutation({
     mutationFn: (sos_id: string) => acceptSos({ data: { sos_id } }),
     onSuccess: () => { toast.success(t("sweep_profile.dashboard.match_locked")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.dashboard.sos_accept_failed")),
+    onError: (e) => toastError(e, "sweep_profile.dashboard.sos_accept_failed"),
   });
 
   const isTeam = profile?.user_type === "team";

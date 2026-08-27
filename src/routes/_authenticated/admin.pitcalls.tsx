@@ -15,6 +15,7 @@ import { roleGroupLabel, subRoleLabel, ROLE_GROUPS, subRolesForGroup, SUB_ROLE_L
 import { disciplineLabel, DISCIPLINE_OPTIONS, SKILL_OPTIONS, EDUCATION_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/paddock";
 import { useDateFormat } from "@/lib/date-locale";
 import {
+import { toastError } from "@/lib/errors";
   AlertTriangle,
   CalendarDays,
   ChevronDown,
@@ -96,7 +97,7 @@ function PitCallManagement() {
       });
       window.open(res.url, "_blank", "noopener");
     } catch (e: any) {
-      toast.error(e?.message ?? t("sweep_admin_b.common.failed"));
+      toastError(e, "sweep_admin_b.common.failed");
     } finally {
       setImpersonating(null);
     }
@@ -109,7 +110,7 @@ function PitCallManagement() {
       toast.success(t("sweep_admin_b.pitcalls.updated"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.failed"),
   });
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { request_id: id } }),
@@ -117,7 +118,7 @@ function PitCallManagement() {
       toast.success(t("sweep_admin_b.pitcalls.deleted"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.failed"),
   });
 
   const rows = useMemo(() => {

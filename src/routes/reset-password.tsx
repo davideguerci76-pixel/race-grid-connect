@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -57,7 +58,7 @@ function ResetPasswordPage() {
       toast.success(t("reset_pw.updated", { defaultValue: "Password updated. You're signed in." }));
       navigate({ to: "/dashboard" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("reset_pw.update_failed", { defaultValue: "Could not update the password. The link may have expired — request a new one." }));
+      toastError(err, "reset_pw.update_failed");
     } finally {
       setLoading(false);
     }

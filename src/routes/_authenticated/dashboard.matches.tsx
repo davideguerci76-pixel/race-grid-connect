@@ -12,6 +12,7 @@ import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
@@ -83,13 +84,13 @@ function MatchesPage() {
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
     onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("matches.insufficient_tokens")),
+    onError: (e) => toastError(e, "matches.insufficient_tokens"),
   });
 
   const acceptMut = useMutation({
     mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
     onSuccess: () => { toast.success(t("sweep_engage.matches.confirmed_contacts_unlocked")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
 
   });
 

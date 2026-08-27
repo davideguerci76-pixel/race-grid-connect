@@ -17,6 +17,7 @@ import {
 import { buildIcsFromEvents, daysToEvents, dateOf, isoOf, parseIcs, expandRange, type CalendarEventItem } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { useTranslation } from "react-i18next";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/calendars")({
   component: AdminCalendarsPage,
@@ -45,7 +46,7 @@ function AdminCalendarsPage() {
   const rejected = rows.filter((r) => r.review_status === "rejected");
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin-calendars"] });
-  const fail = (e: unknown) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.calendars.action_failed"));
+  const fail = (e: unknown) => toastError(e, "sweep_admin_b.calendars.action_failed");
 
   const approveMut = useMutation({
     mutationFn: (v: { id: string; name?: string }) => approve({ data: v }),
