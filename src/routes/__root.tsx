@@ -7,11 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -147,10 +146,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      
-      <Outlet />
-      <AppSplash />
-      <Toaster theme="dark" position="top-right" />
+      <ConfirmProvider>
+        <OfflineBanner />
+        <Outlet />
+        <AppSplash />
+        <Toaster theme="dark" position="top-right" />
+      </ConfirmProvider>
     </QueryClientProvider>
   );
 }
