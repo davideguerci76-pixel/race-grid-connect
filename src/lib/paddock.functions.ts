@@ -977,19 +977,41 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const tName = nameMap.get(r.team_id);
       const contact = contactsMap.get(r.freelancer_id) ?? null;
       // The freelancer's legal name is only disclosed to the team once the match is confirmed.
-      const disclosed = r.status === "confirmed" || r.status === "completed" || r.freelancer_id === userId;
+      const engagementSealed = r.status === "confirmed" || r.status === "completed";
+      const disclosed = engagementSealed || r.freelancer_id === userId;
+      // Team identity stays anonymous for the freelancer until the engagement is
+      // confirmed: a "Request confirmation" (status = proposed) must never leak it.
+      const teamDisclosed = engagementSealed || r.team_id === userId;
+      const rawTp = tpMap.get(r.team_id) ?? null;
+      const teamProfile = rawTp
+        ? teamDisclosed
+          ? rawTp
+          : {
+              user_id: null,
+              team_name: null,
+              website: null,
+              bio: null,
+              team_type: rawTp.team_type ?? null,
+              location: rawTp.location ?? null,
+              primary_discipline: rawTp.primary_discipline ?? null,
+            }
+        : null;
       return {
         ...r,
         freelancer: {
           display_name: disclosed ? (fName?.display_name ?? null) : null,
           avatar_url: disclosed ? (fName?.avatar_url ?? null) : null,
         },
-        team: { display_name: tName?.display_name ?? null, avatar_url: tName?.avatar_url ?? null },
-        team_profile: tpMap.get(r.team_id) ?? null,
+        team: {
+          display_name: teamDisclosed ? (tName?.display_name ?? null) : null,
+          avatar_url: teamDisclosed ? (tName?.avatar_url ?? null) : null,
+        },
+        team_profile: teamProfile,
         freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
         freelancer_contact: contact,
       };
     });
+
 
   });
 
