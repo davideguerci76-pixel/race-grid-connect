@@ -623,6 +623,7 @@ export type Database = {
           is_test: boolean
           kind: Database["public"]["Enums"]["notif_kind"]
           payload: Json
+          pushed_at: string | null
           read_at: string | null
           user_id: string
         }
@@ -633,6 +634,7 @@ export type Database = {
           is_test?: boolean
           kind: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
+          pushed_at?: string | null
           read_at?: string | null
           user_id: string
         }
@@ -643,6 +645,7 @@ export type Database = {
           is_test?: boolean
           kind?: Database["public"]["Enums"]["notif_kind"]
           payload?: Json
+          pushed_at?: string | null
           read_at?: string | null
           user_id?: string
         }
@@ -784,6 +787,107 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
+      }
+      push_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          is_test: boolean
+          last_attempt_at: string | null
+          last_error: string | null
+          notification_id: string
+          status: string
+          subscription_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          last_attempt_at?: string | null
+          last_error?: string | null
+          notification_id: string
+          status?: string
+          subscription_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          last_attempt_at?: string | null
+          last_error?: string | null
+          notification_id?: string
+          status?: string
+          subscription_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "push_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "push_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          is_test: boolean
+          last_seen_at: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          is_test?: boolean
+          last_seen_at?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          is_test?: boolean
+          last_seen_at?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rating_flags: {
         Row: {
@@ -1691,6 +1795,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
       confirm_calendar: { Args: never; Returns: string }
       create_request: {
@@ -1765,6 +1870,7 @@ export type Database = {
         Returns: boolean
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
+      dispatch_notification_push: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_contact_checks: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }

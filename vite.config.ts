@@ -6,6 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import path from "node:path";
 import { loadEnv } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 const fallbackBackendUrl = "https://vhxbhdryexeowlgbuwng.supabase.co";
@@ -23,6 +24,39 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    plugins: [
+      VitePWA({
+        // The generated Workbox worker owns caching; push handlers are imported
+        // from public/push-sw.js so we never hand-write the app shell worker.
+        strategies: "generateSW",
+        registerType: "autoUpdate",
+        injectRegister: null,
+        devOptions: { enabled: false },
+        filename: "sw.js",
+        manifest: false,
+        manifestFilename: "manifest.webmanifest",
+        workbox: {
+          importScripts: ["/push-sw.js"],
+          globPatterns: ["**/*.{js,css,woff2,png,svg,ico}"],
+          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/_serverFn\//, /^\/lovable\//],
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.mode === "navigate",
+              handler: "NetworkFirst",
+              options: { cacheName: "pitcall-html", networkTimeoutSeconds: 5 },
+            },
+            {
+              urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/assets/"),
+              handler: "CacheFirst",
+              options: { cacheName: "pitcall-assets", expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+            },
+          ],
+        },
+      }),
+    ],
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(process.cwd(), "node_modules/entities/lib/decode.js"),
@@ -30,6 +64,7 @@ export default defineConfig({
         entities: path.resolve(process.cwd(), "node_modules/entities"),
       },
     },
+
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
         process.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL ?? fallbackBackendUrl,

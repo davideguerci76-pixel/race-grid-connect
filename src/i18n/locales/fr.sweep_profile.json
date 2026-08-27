@@ -103,6 +103,18 @@
       "update_calendar": "Vérifier les disponibilités",
       "view_engagement": "Voir l'engagement",
       "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver."
+    },
+    "push": {
+      "title": "Notifications push",
+      "desc": "Recevez des alertes instantanées sur cet appareil dès qu'un nouveau match Pit Call, une mise à jour d'engagement ou un rappel arrive.",
+      "enable": "Activer les notifications push",
+      "disable": "Désactiver sur cet appareil",
+      "enabled": "Les push sont actives sur cet appareil",
+      "denied": "Les notifications sont bloquées dans les réglages du navigateur. Autorisez-les pour Pit Call, puis réessayez.",
+      "unsupported": "Ce navigateur ne prend pas en charge les notifications push.",
+      "install_title": "Installez d'abord Pit Call",
+      "install_ios": "Sur iPhone et iPad, ouvrez le menu Partager et touchez « Sur l'écran d'accueil », puis ouvrez Pit Call depuis l'icône pour activer les push.",
+      "failed": "Impossible d'activer les notifications push. Réessayez."
     }
   }
 }

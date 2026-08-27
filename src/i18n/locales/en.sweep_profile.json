@@ -103,6 +103,18 @@
       "update_calendar": "Review availability",
       "view_engagement": "View engagement",
       "calendar_stale_unconfirmed_message": "We've temporarily stopped using some of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again."
+    },
+    "push": {
+      "title": "Push notifications",
+      "desc": "Get instant alerts on this device when a new Pit Call match, engagement update or reminder arrives.",
+      "enable": "Enable push notifications",
+      "disable": "Turn off on this device",
+      "enabled": "Push is active on this device",
+      "denied": "Notifications are blocked in your browser settings. Allow them for Pit Call, then try again.",
+      "unsupported": "This browser does not support push notifications.",
+      "install_title": "Install Pit Call first",
+      "install_ios": "On iPhone and iPad, open the Share menu and tap \"Add to Home Screen\", then open Pit Call from the icon to enable push notifications.",
+      "failed": "Could not enable push notifications. Please try again."
     }
   }
 }
