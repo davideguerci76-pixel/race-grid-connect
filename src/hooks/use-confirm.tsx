@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -13,75 +13,90 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export type ConfirmOptions = {
-  titleKey?: string;
-  descriptionKey?: string;
-  /** Raw (already localized) strings win over keys when provided. */
+  /** Already localized title; falls back to the branded default. */
   title?: string;
+  /** Already localized body copy. */
   description?: string;
-  confirmKey?: string;
-  cancelKey?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
   destructive?: boolean;
 };
 
-type ConfirmFn = (options?: ConfirmOptions) => Promise<boolean>;
+type Request = ConfirmOptions & { resolve: (value: boolean) => void };
 
-const ConfirmContext = createContext<ConfirmFn | null>(null);
+let openRequest: ((request: Request) => void) | null = null;
+const pending: Request[] = [];
 
-/** Branded async replacement for window.confirm(). */
-export function useConfirm(): ConfirmFn {
-  const ctx = useContext(ConfirmContext);
-  if (!ctx) throw new Error("useConfirm must be used inside <ConfirmProvider>");
-  return ctx;
+/**
+ * Branded async replacement for window.confirm().
+ * Usable from anywhere (event handlers, mutations) — no hook required.
+ */
+export function confirmDialog(
+  description: string,
+  options: ConfirmOptions = {},
+): Promise<boolean> {
+  if (typeof window === "undefined") return Promise.resolve(false);
+  return new Promise<boolean>((resolve) => {
+    const request: Request = { description, ...options, resolve };
+    if (openRequest) openRequest(request);
+    else pending.push(request);
+  });
 }
 
-export function ConfirmProvider({ children }: { children: ReactNode }) {
+/** Hook form for components that prefer an injected function. */
+export function useConfirm() {
+  return useCallback(confirmDialog, []);
+}
+
+/** Mounted once in the root: renders every confirmDialog() request. */
+export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<ConfirmOptions>({});
-  const resolver = useRef<((value: boolean) => void) | null>(null);
+  const [request, setRequest] = useState<Request | null>(null);
+  const active = useRef<Request | null>(null);
 
-  const confirm = useCallback<ConfirmFn>((next = {}) => {
-    setOptions(next);
-    setOpen(true);
-    return new Promise<boolean>((resolve) => {
-      resolver.current = resolve;
-    });
+  useEffect(() => {
+    openRequest = (next) => {
+      active.current = next;
+      setRequest(next);
+    };
+    while (pending.length) openRequest(pending.shift()!);
+    return () => {
+      openRequest = null;
+    };
   }, []);
 
-  const settle = useCallback((value: boolean) => {
-    setOpen(false);
-    resolver.current?.(value);
-    resolver.current = null;
-  }, []);
-
-  const value = useMemo(() => confirm, [confirm]);
+  const settle = (value: boolean) => {
+    active.current?.resolve(value);
+    active.current = null;
+    setRequest(null);
+  };
 
   return (
-    <ConfirmContext.Provider value={value}>
+    <>
       {children}
-      <AlertDialog open={open} onOpenChange={(next) => { if (!next) settle(false); }}>
+      <AlertDialog open={request !== null} onOpenChange={(next) => { if (!next) settle(false); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="uppercase tracking-tight">
-              {options.title ?? t(options.titleKey ?? "confirm.defaultTitle")}
+              {request?.title ?? t("confirm.defaultTitle")}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {options.description ?? t(options.descriptionKey ?? "confirm.defaultDescription")}
+            <AlertDialogDescription className="whitespace-pre-line">
+              {request?.description ?? t("confirm.defaultDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => settle(false)}>
-              {t(options.cancelKey ?? "confirm.cancel")}
+              {request?.cancelLabel ?? t("confirm.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => settle(true)}
-              className={options.destructive ? "bg-racing-red text-white hover:brightness-110" : undefined}
+              className={request?.destructive ? "bg-racing-red text-white hover:brightness-110" : undefined}
             >
-              {t(options.confirmKey ?? "confirm.confirm")}
+              {request?.confirmLabel ?? t("confirm.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </ConfirmContext.Provider>
+    </>
   );
 }
