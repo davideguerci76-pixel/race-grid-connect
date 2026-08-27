@@ -1,3 +1,4 @@
+import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -40,7 +41,7 @@ function AdminPermissions() {
       qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     } catch (e: any) {
-      toast.error(e.message);
+      toastError(e);
     }
   }
 

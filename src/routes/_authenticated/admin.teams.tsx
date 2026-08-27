@@ -1,3 +1,4 @@
+import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -80,7 +81,7 @@ function AdminTeams() {
       });
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     } catch (e: any) {
-      toast.error(e.message);
+      toastError(e);
     } finally {
       setSaving(null);
     }
@@ -93,7 +94,7 @@ function AdminTeams() {
       toast.success(blocked ? t("sweep_admin_a.unblocked") : t("sweep_admin_a.blocked"));
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     } catch (e: any) {
-      toast.error(e.message);
+      toastError(e);
     }
   }
 
@@ -104,7 +105,7 @@ function AdminTeams() {
       toast.success(t("sweep_admin_a.user_deleted"));
       qc.invalidateQueries({ queryKey: ["admin-teams"] });
     } catch (e: any) {
-      toast.error(e.message);
+      toastError(e);
     }
   }
 

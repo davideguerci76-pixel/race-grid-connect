@@ -52,7 +52,7 @@ function AuthPage() {
       }
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if (result.error) {
-        toast.error(result.error.message ?? t("sweep_public.auth.google_signin_failed"));
+        toastError(result.error, "sweep_public.auth.google_signin_failed");
         setLoading(false);
         return;
       }
