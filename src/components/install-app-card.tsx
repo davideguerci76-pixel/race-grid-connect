@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Share } from "lucide-react";
 import { useInstallApp } from "@/hooks/use-install-app";
@@ -9,8 +9,13 @@ import { useInstallApp } from "@/hooks/use-install-app";
  */
 export function InstallAppCard() {
   const { t } = useTranslation();
-  const { mode, busy, install } = useInstallApp();
+  const { mode, busy, failed, install } = useInstallApp();
   const [open, setOpen] = useState(false);
+
+  // When the native prompt can't be shown, fall back to manual instructions.
+  useEffect(() => {
+    if (failed) setOpen(true);
+  }, [failed]);
 
   if (mode === "hidden") return null;
 
@@ -27,6 +32,8 @@ export function InstallAppCard() {
           <div className="font-black uppercase italic tracking-tight">{title}</div>
           <p className="mt-1 text-sm text-muted-foreground">{t("sweep_profile.pwa.desc")}</p>
 
+          {failed && <p className="mt-2 text-sm font-bold text-racing-red">{t("sweep_profile.pwa.failed")}</p>}
+
           {open && (
             <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
               {(mode === "ios"
@@ -42,6 +49,7 @@ export function InstallAppCard() {
         <button
           disabled={busy}
           onClick={() => {
+            // Called synchronously from the click so prompt() keeps user activation.
             if (isNative) void install();
             else setOpen((v) => !v);
           }}
