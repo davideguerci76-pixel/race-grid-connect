@@ -10,6 +10,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { PushSetupCard } from "@/components/push-setup-card";
+import { useAppBadge } from "@/hooks/use-push-notifications";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
   head: () => ({
@@ -40,6 +43,10 @@ function NotificationsPage() {
   });
 
   const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
+
+  // Keep the installed-app icon badge in sync with the unread count.
+  useAppBadge(unreadCount);
+
 
   useEffect(() => {
     if (!user?.id) return;
