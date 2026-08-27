@@ -78,7 +78,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        try { await recordLegalAcceptance(); } catch { /* proof recorded on next login */ }
+        try { await recordLegalAcceptance({ data: { source: "signup" } }); } catch { /* proof recorded on next login */ }
         if (!data.session || !data.user?.email_confirmed_at) {
           toast.success(
             t("verify_email.check_inbox", { defaultValue: "Check your inbox to confirm your email address." }),

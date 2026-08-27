@@ -442,6 +442,47 @@ export type Database = {
           },
         ]
       }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          created_at: string
+          doc_type: string
+          id: string
+          is_test: boolean
+          source: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string
+          created_at?: string
+          doc_type: string
+          id?: string
+          is_test?: boolean
+          source: string
+          user_id: string
+          version: string
+        }
+        Update: {
+          accepted_at?: string
+          created_at?: string
+          doc_type?: string
+          id?: string
+          is_test?: boolean
+          source?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_acceptances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_history: {
         Row: {
           best_score: number
@@ -2031,6 +2072,10 @@ export type Database = {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
       }
+      record_legal_acceptance: {
+        Args: { _source?: string; _version: string }
+        Returns: string
+      }
       refund_and_close_request: {
         Args: { _mode: string; _request_id: string }
         Returns: {
@@ -2240,6 +2285,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      touch_push_subscription: { Args: { _endpoint: string }; Returns: boolean }
       trigger_sos_call: {
         Args: { _request_id: string }
         Returns: {
