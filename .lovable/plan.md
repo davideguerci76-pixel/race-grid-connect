@@ -95,7 +95,8 @@ Vincolo strutturale, non stilistico: `normalize()` restituisce **solo** `{ code,
 
 ## 5. Piano di esecuzione
 1. Namespace i18n `errors` (5 lingue) + registrazione.
-2. `normalize.ts`, `report.ts`, `toast.ts`.
+2. `normalize.ts`, `report.ts` (sink recintati + modalità DEV/LIVE + reference id + ring buffer), `toast.ts`.
+2bis. (se approvato) tabella `client_error_log` + ricerca per reference id in Admin.
 3. `PitcallErrorScreen`, `ConfirmDialog`/`useConfirm`, `OfflineBanner`.
 4. Riscrittura `error-page.ts` + router defaults + `__root.tsx`.
 5. Sweep dei ~40 `toast.error` e dei 22 `confirm`.
