@@ -13,7 +13,7 @@ import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { PoolBadge } from "@/components/pool-badge";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
-import { Plus, Calendar, MapPin, Wrench, Eye, Pause, Play, CheckCircle2, XCircle, Copy, RotateCcw } from "lucide-react";
+import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
 import { toastError } from "@/lib/errors";
