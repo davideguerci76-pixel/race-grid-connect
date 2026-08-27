@@ -1242,6 +1242,16 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    // One confirmation request per (pit call, freelancer): persisted state for the CTA
+    const { data: reqEngagements } = await supabase
+      .from("engagements")
+      .select("id, freelancer_id, status")
+      .eq("request_id", data.request_id)
+      .eq("team_id", userId)
+      .in("status", ["proposed", "confirmed", "completed"]);
+    const confirmationRequested = new Map<string, string>(
+      ((reqEngagements ?? []) as any[]).map((e) => [e.freelancer_id, e.id]),
+    );
     const poolFreelancerIds = freelancerIds.filter((id: string) => poolSet.has(id));
     const poolProfileMap = new Map<string, any>();
     const poolContactMap = new Map<string, any>();
@@ -1306,6 +1316,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         free_preview: poolVisible || topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
+        confirmation_requested: confirmationRequested.has(m.freelancer_id),
+        engagement_id: confirmationRequested.get(m.freelancer_id) ?? null,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
           count: ratingAvg.get(m.freelancer_id)?.count ?? 0,

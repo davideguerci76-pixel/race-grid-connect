@@ -22,6 +22,7 @@
     "criteria": "Missing criteria",
     "contact": "Contact",
     "criteria_all_ok": "All criteria satisfied",
-    "years_short": "yrs"
+    "years_short": "yrs",
+    "confirmation_requested": "Confirmation requested"
   }
 }
