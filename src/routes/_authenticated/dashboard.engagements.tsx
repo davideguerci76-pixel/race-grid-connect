@@ -246,9 +246,26 @@ function EngagementsPage() {
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
                       {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
-                      {(req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
+                      {detailsUnlocked && (req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
-                    {(skillsHard.length > 0 || skillsSoft.length > 0) && (
+                    {/* 1-token reveal: unlocks the anonymous Pit Call details. Team identity stays hidden. */}
+                    {isFreelancer && !detailsUnlocked && e.match?.id && (
+                      <div className="mt-3 flex flex-wrap items-center gap-3 border border-dashed border-border bg-background/40 p-3">
+                        <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                          {t("matches.hidden_name")}
+                        </span>
+                        <button
+                          onClick={async () => {
+                            if (await confirmDialog(t("matches.reveal_confirm", { who: t("nav.teams") }))) revealMut.mutate(e.match.id);
+                          }}
+                          disabled={revealMut.isPending}
+                          className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                        >
+                          {t("matches.reveal_1_token")}
+                        </button>
+                      </div>
+                    )}
+                    {detailsUnlocked && (skillsHard.length > 0 || skillsSoft.length > 0) && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[SKILLS]</div>
                         <div className="flex flex-wrap gap-1">
