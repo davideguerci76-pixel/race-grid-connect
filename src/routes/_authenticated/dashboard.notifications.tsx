@@ -132,11 +132,15 @@ function NotificationsPage() {
                         <span className="font-mono text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</span>
                       </div>
                       <div className="mt-1 text-sm">
-                        {isStale
-                          ? n.payload?.state === "unconfirmed"
+                        {isStale ? (
+                          n.payload?.state === "unconfirmed"
                             ? t("sweep_profile.notifications.calendar_stale_unconfirmed_message")
                             : t("sweep_profile.notifications.calendar_stale_message")
-                          : (n.payload?.message ?? n.kind)}
+                        ) : info ? (
+                          <InformationalMessage payload={n.payload} kind={n.kind} />
+                        ) : (
+                          n.payload?.message ?? n.kind
+                        )}
                       </div>
                     </div>
                     {isStale ? (
