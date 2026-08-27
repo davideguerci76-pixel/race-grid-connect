@@ -203,7 +203,7 @@ function EngagementsPage() {
                           {pct}% <span className="font-mono text-[10px] uppercase tracking-widest">{perfect ? t("sweep_engage.matches.perfect_match") : t("sweep_engage.matches.match_label")}</span>
                         </div>
                       )}
-                      <div className="font-bold">{isFreelancer ? (tp?.team_name ?? other?.display_name) : (fp?.headline ? `${other?.display_name}` : other?.display_name)}</div>
+                      <div className="font-bold">{isFreelancer ? (tp?.team_name ?? other?.display_name ?? t("sweep_engage.matches.team_fallback")) : (fp?.headline ? `${other?.display_name}` : other?.display_name)}</div>
                     </div>
                     {isFreelancer && tp && (
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
