@@ -128,7 +128,8 @@
       "ios_3": "Wähle „Zum Home-Bildschirm“ und tippe auf Hinzufügen.",
       "manual_1": "Öffne das Browser-Menü.",
       "manual_2": "Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“.",
-      "manual_3": "Bestätige, um Pit Call hinzuzufügen."
+      "manual_3": "Bestätige, um Pit Call hinzuzufügen.",
+      "failed": "Der Browser hat den Installationsdialog nicht geöffnet. Füge Pit Call manuell hinzu:"
     }
   }
 }

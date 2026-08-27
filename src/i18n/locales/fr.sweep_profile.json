@@ -128,7 +128,8 @@
       "ios_3": "Choisissez « Sur l'écran d'accueil », puis Ajouter.",
       "manual_1": "Ouvrez le menu du navigateur.",
       "manual_2": "Choisissez « Installer l'application » ou « Ajouter à l'écran d'accueil ».",
-      "manual_3": "Confirmez pour ajouter Pit Call à votre appareil."
+      "manual_3": "Confirmez pour ajouter Pit Call à votre appareil.",
+      "failed": "Le navigateur n'a pas ouvert la fenêtre d'installation. Ajoutez Pit Call manuellement :"
     }
   }
 }
