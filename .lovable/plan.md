@@ -1,195 +1,141 @@
-# Audit di fattibilità: PITCALL su iOS + Android con Capacitor
+# PITCALL — Audit tecnico: PWA installabile + Web Push
 
-Nessuna modifica effettuata. Solo analisi del progetto reale.
+Analisi sul progetto reale. Nessuna modifica applicata.
 
-## 1. Compatibilità dello stack attuale
+## Stato attuale verificato
 
-| Componente reale | Stato | Note |
+- `public/` contiene solo `favicon.png`, `fonts/`, `robots.txt`: nessun manifest, nessun service worker, nessuna icona 192/512, nessun apple-touch-icon.
+- Nessun riferimento a manifest/serviceWorker/vite-plugin-pwa nel codice o in `package.json`.
+- `notifications` esiste già con `user_id`, `kind` (enum `notif_kind`), `payload` jsonb, `read_at`, `emailed_at`, **`is_test`**.
+- Il dispatcher email è un endpoint pubblico (`/api/public/notification-email`) che cicla le notifiche con `emailed_at IS NULL` e mappa `kind → titolo + path` (`KIND_META`): la stessa mappa serve identica per le push.
+- `getUnreadNotificationCount` / `getMyNotifications` / `markAllNotificationsRead` esistono già e sono la sorgente naturale del badge.
+- Realtime su `notifications` già usato nella pagina notifiche.
+- Hosting Lovable = HTTPS + dominio `pitcall.net` (requisito PWA soddisfatto).
+
+## 1. Compatibilità PWA — voce per voce
+
+| Punto | Stato | Nota |
 |---|---|---|
-| React 19 + TanStack Router (`src/routes/*`) | A | Il routing file-based funziona identico dentro una WebView |
-| **TanStack Start con SSR + Nitro/Cloudflare** (`src/server.ts`, `vite.config.ts`) | **C** | Capacitor serve file statici da `capacitor://localhost`: non c'è SSR. Serve una build client-only e un origin remoto per il server |
-| **~124 `createServerFn`** in `src/lib/*.functions.ts` | **C** | Sono RPC su URL relativi. Dentro l'app l'origin è locale: va configurato un base URL assoluto (`https://pitcall.net`) e CORS lato server |
-| Supabase JS (`src/integrations/supabase/client.ts`) | A | Chiamate REST/RPC, funzionano ovunque |
-| Auth Supabase (email/password + Google via `lovable.auth.signInWithOAuth`) | B/C | Vedi §3: OAuth e redirect richiedono deep link |
-| Sessione: `brokeredPreviewStorage` → localStorage | B | In WebView persiste, ma può essere ripulita dall'OS: consigliato storage nativo (Preferences) |
-| Notifiche: tabella `notifications` + `/api/public/notification-email` + pg_cron | B | Architettura server-side già corretta, estendibile a push senza duplicare logica |
-| Email (`notify.pitcall.net`, template React Email) | A | Interamente server-side |
-| Matching engine (Postgres: `recompute_matches`, RPC, trigger) | A | Già tutto nel DB, zero logica nel browser |
-| PWA / service worker | — | **Assenti** oggi: nessun conflitto da rimuovere |
-| Leaflet + tile CARTO (`market-world-map.tsx`) | B | Ok, ma richiede rete e passa dal `ConsentGate` |
-| iubenda script in `__root.tsx` | **C/D** | Un cookie banner web dentro l'app è inappropriato e va disattivato su piattaforma nativa (serve consenso in-app) |
-| `xlsx` export, `window.open`, download file (admin) | B | In app va usato Filesystem/Share o si esclude l'admin |
-| i18n (5 lingue, `i18next-browser-languagedetector`) | B | Va agganciato alla lingua di sistema del device |
+| HTTPS | A | pitcall.net già HTTPS |
+| Routing TanStack | A | nessun conflitto |
+| Supabase Auth | A | localStorage funziona in standalone |
+| Server functions / SSR / Nitro / Cloudflare | A | il SW intercetta solo navigazioni e asset hashati |
+| Manifest | B | da creare |
+| Icone (192/512/maskable/apple-touch) | B | da generare |
+| display standalone / start_url / scope / theme+background color | B | campi del manifest |
+| Service worker | C | generato con `vite-plugin-pwa` (`generateSW`), registrazione con guard anti-preview |
+| Caching + auto-update | C | NetworkFirst su HTML, CacheFirst solo asset hashati, `registerType: autoUpdate` |
+| iubenda | B | banner resta valido; push da dichiarare in policy |
+| Notification architecture | C | estensione, non riscrittura |
+| Blocker | — | **nessuno** |
 
-**Verdetto §1:** sì, WEB + iOS + Android con un solo codebase è realistico. Il vero lavoro strutturale è uno solo: separare il "client bundle" dal "server" e puntare le server functions a un origin remoto.
+## 2. Android
 
-## 2. Capacitor è la scelta giusta?
+Fattibile al 100%: `beforeinstallprompt` permette un CTA reale "Installa PITCALL" in dashboard che:
+- rileva Android, intercetta e memorizza l'evento, mostra il prompt nativo al click;
+- rileva installazione già avvenuta (`display-mode: standalone` o evento `appinstalled`) e nasconde il CTA;
+- apre in standalone con l'icona PITCALL.
 
-- **Capacitor** — sì, consigliato. Riusa il 100% di UI e logica, aggiunge push/deep link/lifecycle nativi, e non impone un rewrite.
-- **PWA** — non basta: niente push affidabili su iOS in scenari reali, niente presenza sugli store (che è parte dell'obiettivo).
-- **React Native / Expo** — richiederebbe di riscrivere l'intera UI: due prodotti da mantenere. Escluso.
-- **Nativo separato** — triplica il lavoro. Escluso.
+Supportato: Chrome, Edge, Samsung Internet, Brave, Opera. Firefox Android non espone `beforeinstallprompt` → fallback con istruzioni testuali "Menu → Installa app".
 
-**Consiglio: Capacitor**, con backend, matching, DB e auth condivisi al 100%.
+## 3. iOS / iPadOS
 
-## 3. Authentication
+Nessun prompt programmatico. Serve un CTA "Aggiungi PITCALL alla Home" che apre una scheda con istruzioni visive (Condividi → Aggiungi alla schermata Home → Aggiungi), rileva Safari iOS/iPadOS e si auto-nasconde quando `navigator.standalone` o `display-mode: standalone` è vero.
 
-Presente oggi: signup email/password con `emailRedirectTo`, Google OAuth con `redirect_uri: window.location.origin`, verifica email obbligatoria (`/verify-email`), reset password (`/forgot-password`, `/reset-password`), gate `_authenticated/route.tsx`, refresh token automatico.
+## 4. Web Push — fattibilità (priorità assoluta)
 
-Punti che dipendono dal browser e vanno adattati:
-- `window.location.origin` come redirect: dentro l'app diventa `capacitor://localhost` → **non valido**. Serve deep link (`pitcall://auth/callback` o Universal Link su `pitcall.net`) registrato nei Redirect URL di backend.
-- Google OAuth: va aperto in browser di sistema (SFSafariViewController / Custom Tabs) e non in WebView, altrimenti Google rifiuta il login.
-- Link di conferma email e reset password: oggi puntano a URL web; devono diventare Universal Links che aprono l'app se installata.
-- Persistenza sessione: consigliato storage nativo per evitare logout inattesi.
-- **Requisito Apple**: se resta il solo Google come login social, Apple richiede anche **Sign in with Apple**. Da mettere in conto.
+Realisticamente ottenibile su **Android (Chrome/Edge/Samsung/Firefox), iOS/iPadOS 16.4+ solo se installata sulla Home, desktop (Chrome/Edge/Firefox/Safari macOS 16+)**. Le push arrivano con app chiusa: le consegna il push service del sistema operativo, non il browser aperto.
 
-## 4. Push notifications
+Nessuna duplicazione di business logic: la sorgente resta il record `notifications`. Serve:
+- tabella `push_subscriptions` (user_id, endpoint unique, p256dh, auth, user_agent, is_test, last_seen_at, created_at) con RLS owner-scoped + grant;
+- colonna `pushed_at` su `notifications` (stesso pattern di `emailed_at`);
+- coppia di chiavi VAPID (pubblica in env client, privata come secret server);
+- endpoint `/api/public/notification-push` gemello di quello email, con lo stesso `KIND_META` estratto in modulo condiviso, chiamato dallo stesso pg_cron;
+- firma VAPID Web Push compatibile Cloudflare Workers (Web Crypto, no librerie Node-only);
+- cleanup automatico: endpoint che risponde 404/410 → subscription eliminata;
+- multi-device nativo (una riga per endpoint);
+- unsubscribe da UI preferenze + `pushManager.unsubscribe()`;
+- preferenze notifiche estese con un canale `push` per kind.
 
-Oggi la logica di notifica vive nel DB (righe in `notifications`) e un worker cron manda le email leggendo le righe non ancora inviate. È **l'architettura giusta** per aggiungere push senza duplicare business logic.
+## 5. iOS — specifiche
 
-Cosa servirebbe (non ora):
-- tabella `device_tokens` (user_id, token, platform, is_test, last_seen) con RLS;
-- estensione del dispatcher esistente: stessa riga `notifications` → in-app + email + push;
-- FCM per Android, APNs (via FCM) per iOS + certificati/chiavi Apple;
-- multi-device: un utente = N token; cleanup dei token invalidi restituiti dal provider;
-- logout → revoca del token del device;
-- badge: contatore già disponibile (`getUnreadNotificationCount`);
-- payload push con `deeplink` per aprire la destinazione corretta.
+- iOS/iPadOS **16.4+**;
+- **obbligatorio** aver aggiunto la PWA alla Home: in Safari normale `Notification.requestPermission` non è disponibile;
+- il permesso va richiesto **dentro un gesto utente** (click su "Attiva notifiche"), mai all'avvio;
+- funziona con app chiusa e Safari chiuso;
+- si integra con Focus, Riepiloghi programmati e impostazioni notifiche di sistema;
+- limiti rispetto al nativo: niente notifiche silenziose affidabili, niente background fetch, badge solo tramite Badging API, permesso negato = non ri-richiedibile in-app.
 
-**Isolamento Testing Lab:** l'attuale flag `is_test` va replicato sui device token e il dispatcher deve rifiutare l'invio incrociato test↔live. È una regola in più nel dispatcher, non un redesign.
+UX iOS corretta: STEP 1 "Aggiungi alla Home" → STEP 2 apri dalla Home → STEP 3 banner "Attiva notifiche" con beneficio esplicito. Il passo 3 viene mostrato solo in standalone.
 
-**Invasività: bassa/media.** Nessuna modifica al matching o alle notifiche esistenti.
+## 6. Badge numerico
 
-## 5. Deep linking
+`navigator.setAppBadge(n)` / `clearAppBadge()`. Supportato su Android (Chrome installata) e iOS 16.4+ Home Screen Web Apps, oltre a desktop Chrome/Edge/macOS. Aggiornabile sia in-app (dal risultato di `getUnreadNotificationCount`, già esistente, più il canale realtime già attivo) sia dentro il service worker durante una push in background. Alla lettura delle notifiche il badge viene azzerato. Dove non supportato, chiamata dentro try/catch: miglioramento progressivo, nessun impatto.
 
-Riutilizzabile quasi tutto: i path esistono già (`/dashboard/requests/$id/matches`, `/dashboard/engagements`, `/dashboard/notifications`, `/reset-password`). Serve:
-- `apple-app-site-association` e `assetlinks.json` su pitcall.net;
-- custom scheme `pitcall://` come fallback per auth;
-- un handler `appUrlOpen` che traduce l'URL in `router.navigate`.
+## 7. Tap sulla push → deep link
 
-## 6. Calendario freelance
+Il payload push includerà `url` derivato da `KIND_META` (già mappato: engagements, calendar, notifiche) più gli id specifici per arrivare alla singola Pit Call/match. Nel `notificationclick` del SW: cerca un client PITCALL già aperto → `focus()` + `postMessage` con la rotta (il router TanStack naviga senza reload); se nessun client → `clients.openWindow(url)`. Se la sessione è scaduta, il gate `_authenticated` reindirizza a `/auth`; il path desiderato va conservato e ripristinato dopo il login (meccanismo di redirect da aggiungere, oggi non presente).
 
-`src/components/availability-calendar.tsx` usa react-day-picker con click su celle e azioni bulk. Compatibile con il touch, ma da verificare/adattare:
-- dimensione dei tap target sulle celle su schermi piccoli (IMPORTANT);
-- evitare selezione-testo e doppio-tap zoom durante il drag/selezione;
-- safe area in basso per la barra azioni "conferma disponibilità";
-- performance su range lunghi (stagione intera) — già un tema web, non introdotto da Capacitor.
+## 8. Aggiornamenti del sito
 
-**Non richiede riscrittura**, solo rifiniture mobile.
+Con `registerType: "autoUpdate"`, HTML in NetworkFirst e cache solo sugli asset hashati: alla pubblicazione di una nuova versione l'utente riceve la build aggiornata al successivo avvio (o al massimo al secondo), senza reinstallare nulla. **Mai reinstallazione.** Nessun asset stale perché gli asset vecchi vengono rimossi dal precache al cambio versione. Opzionale un CTA discreto "Aggiornamento disponibile".
 
-## 7. Pit Call e matching
+## 9. Autenticazione in PWA
 
-Il motore vive interamente in Postgres (`recompute_matches`, trigger, RPC) e i client leggono i risultati. **Nessuna business logic critica nel browser.** Le app sarebbero semplicemente altri client. Unico punto da spostare/riconfigurare: le server functions TanStack (formattazione, gating token, geocode proxy) restano server-side ma vanno raggiunte via origin remoto.
+Email/password, verifica email, reset password e persistenza sessione funzionano invariati in standalone. Il punto delicato è **Google OAuth su iOS standalone**: il flusso apre una view di sistema e il ritorno alla PWA va verificato in test reale; su Android il ritorno è affidabile. Il service worker non tocca le chiamate auth e non invalida la sessione (localStorage non è toccato dal SW).
 
-## 8. Admin Control Panel e Testing Lab
+## 10. Testing Lab TEST/LIVE
 
-**Consiglio: Admin → solo Web.** Le rotte `_authenticated/admin.*` (Testing Lab, wiki, export xlsx, impersonation) andrebbero escluse dal bundle mobile: riduce peso, rischio e superficie di review Apple (impersonation e strumenti interni sono spesso mal visti).
+`notifications.is_test` esiste già. La tabella `push_subscriptions` avrà lo stesso flag, valorizzato con `env_is_test()` al momento della sottoscrizione. Il dispatcher push filtrerà `notifications.is_test = subscription.is_test`, e le notifiche TEST verranno soppresse esattamente come le email TEST: nessuna push TEST può raggiungere un device LIVE.
 
-Testing Lab: l'architettura `is_test` esistente regge, a condizione di estenderla a device token e push, e di mantenere le email di test non realmente inviate. I deep link test devono restare nello stesso scope dell'ambiente.
+## 11. Privacy / iubenda
 
-## 9. Token e pagamenti (solo compliance, nessuna implementazione)
+Il banner iubenda resta appropriato e invariato. Le Web Push non sono cookie ma un trattamento da dichiarare: privacy/cookie policy da aggiornare in iubenda (finalità "notifiche push", dati trattati = endpoint push + chiavi + user agent, conservazione fino a revoca). Il consenso push è il permesso di sistema del browser, non il banner: nessuna modifica a `ConsentGate`. Da prevedere la cancellazione delle subscription nel flusso di cancellazione account già esistente.
 
-- **Apple**: se i token servono a sbloccare funzionalità *dentro l'app*, Apple può classificarli come contenuto digitale → obbligo di In-App Purchase (30%/15%) e divieto di link diretti al checkout esterno (salvo eccezioni per regione).
-- **Google Play**: posizione analoga con Play Billing, con più tolleranza in UE.
-- Argomento a favore dell'esenzione: PITCALL è un servizio B2B tra aziende e professionisti (categoria "reader"/B2B marketplace), ma non è garantito.
+## 12. UX di attivazione
 
-**Decisioni da prendere PRIMA della submission:** se i Team acquistano token solo via web (app mobile "read-only" sui token, nessun riferimento al prezzo né link al checkout) oppure se si implementa IAP su iOS. Questa scelta condiziona la UI della pagina token nelle app.
-
-## 10. Foto profilo e logo Team (futuro)
-
-Tecnicamente semplice: Supabase Storage + bucket privato + URL firmati funziona identico su web e Capacitor; la camera/photo picker è un plugin standard.
-
-**Decisione architetturale da prendere già ora:** le immagini devono stare in un bucket **privato**, servite solo tramite URL firmato generato server-side dopo che l'identità è stata rivelata secondo il flusso PITCALL. Se si usasse un bucket pubblico, l'anonimato del matching sarebbe aggirabile. Questo va deciso al momento della creazione del bucket, non dopo.
-
-## 11. Funzioni native realmente utili
-
-- **NECESSARIA**: Push Notifications, Deep Links / Universal Links, App lifecycle (resume → refetch), Status/Splash + safe area, Preferences (sessione).
-- **UTILE**: Badge, Network status, Browser in-app per OAuth e link esterni, Share (export/vCard).
-- **SUPERFLUA PER V1**: Camera/Photos, Geolocation (oggi la location è testuale via Nominatim), Haptics, Biometria, calendario nativo.
-
-## 12. UX mobile — problemi da verificare
-
-- **BLOCKER**: redirect auth basati su `window.location.origin`; banner iubenda dentro l'app; back button Android non gestito; assenza di safe-area/notch handling; admin/export file inutilizzabili in app.
-- **IMPORTANT**: tabelle admin/liste orizzontali molto desktop-centriche; dropdown e modali Radix con tastiera aperta; form lunghi (profilo, nuova Pit Call) e scroll dell'input a fuoco; tap target del calendario; `window.open` per link esterni; hover-only states.
-- **NICE TO HAVE**: landscape, pull-to-refresh, transizioni di navigazione, mappa Leaflet su schermi piccoli.
+Dashboard → card discreta "Installa PITCALL — ricevi subito le nuove Pit Call sul telefono" → installazione → alla prima apertura standalone, banner singolo "Attiva le notifiche" → permesso richiesto solo al tap. Nessun popup automatico, nessun linguaggio tecnico, dismissibile e ricomparsa solo dopo lungo intervallo.
 
 ## 13. Performance
 
-**Introdotto da Capacitor:** avvio della WebView (cold start ~0.5–1.5s), nessun SSR quindi first paint interamente client-side, assenza di cache HTTP del browser.
+La PWA migliora lo startup a freddo (shell precachata) e non tocca le query Supabase, che restano sempre di rete. Nessun impatto su calendario, dashboard e matching. Il bundle cresce di pochi KB. I tempi di caricamento dati attuali non dipendono dalla PWA e restano tali.
 
-**Già presente nella webapp:** bundle pesante (recharts, leaflet, xlsx, 5 locali caricati, tutta la suite Radix), liste admin senza virtualizzazione, polling notifiche ogni 15s, molte query Supabase in sequenza sulle dashboard.
+## 14. Offline
 
-Il passaggio a client-only rende questi problemi **più visibili**, non li crea. Rimedi: code splitting per route, escludere admin/xlsx/leaflet dal bundle mobile, locali caricati on-demand.
+Strategia minimale: shell disponibile, pagina/banner "Nessuna connessione", nessuna scrittura offline su calendario o Pit Call, retry alla riconnessione tramite React Query. Niente coda offline.
 
-## 14. Offline (comportamento minimo)
+## 15. Costi
 
-Rilevare l'assenza di rete e mostrare un banner chiaro; retry manuale sulle query; cache in memoria di React Query per non svuotare le schermate; **il calendario resta read-only offline** — nessuna scrittura in coda, per non generare conflitti con la logica di freshness ed engagement.
+**Zero costi ricorrenti.** Web Push standard con VAPID parla direttamente con FCM/APNs/Mozilla senza provider a pagamento e senza infrastruttura aggiuntiva. Nessun Apple Developer Program, nessun account Google Play, nessun costo per volume.
 
-## 15. Checklist store (cosa manca oggi)
+## 16. PWA vs Capacitor
 
-Manca tutto il livello nativo, perché non esiste ancora:
-- bundle ID (`net.pitcall.app`) e application ID; signing iOS (Apple Developer, certificati, provisioning) e Android (keystore);
-- icone (tutte le dimensioni) e splash screen — oggi esiste solo `favicon.png`;
-- privacy manifest Apple + Data Safety Google; descrizioni dei permessi (notifiche);
-- **cancellazione account in-app** (obbligatoria Apple e Google) — oggi non presente lato utente;
-- **Sign in with Apple** se resta Google — BLOCKER Apple;
-- consenso privacy nativo al posto del banner iubenda — BLOCKER;
-- account di test per i reviewer (freelancer + team, dati realistici, non ambiente test contaminante);
-- posizione definita su token/IAP (§9) — potenziale BLOCKER Apple;
-- privacy policy raggiungibile (già presente su pitcall.net).
+| Criterio | PWA + Web Push | Capacitor |
+|---|---|---|
+| Tempo sviluppo | giorni | settimane |
+| Complessità | bassa | alta (2 progetti nativi) |
+| Costi | 0 | 99 $/anno Apple + 25 $ Google + Mac |
+| Manutenzione | una codebase | codebase + build nativi |
+| Aggiornamenti | istantanei | review store |
+| Push | sì (iOS 16.4+ se installata) | sì, più affidabili |
+| Badge | sì dove supportato | sì |
+| Installazione | Home Screen | store |
+| Auth | invariata | deep link da riprogettare |
+| Limiti iOS | richiede Home Screen, no push senza installazione | nessuno |
 
-## 16. Rischio "website wrapper"
+La PWA copre oggi la quasi totalità dei motivi che spingevano verso il nativo. Capacitor resta rilevante solo se serviranno pagamenti in-app, presenza negli store come canale di acquisizione o affidabilità push massima su iOS.
 
-Rischio **reale ma gestibile**. Il minimo sensato per essere valutata come vera app: push native funzionanti, deep link che aprono la destinazione giusta, badge, gestione lifecycle/back button, safe area e UI adattata, splash/icone curate, niente banner cookie web, niente sezioni admin. Con questo set PITCALL non è un wrapper: è un client nativo di un servizio con valore proprio.
+## 17. Stima: MODERATE
 
-## 17. Manutenzione dopo la pubblicazione
+- Fase 1 — Manifest, icone, installabilità
+- Fase 2 — Service worker (vite-plugin-pwa, guard preview, auto-update)
+- Fase 3 — Tabella push_subscriptions + VAPID + subscribe/unsubscribe
+- Fase 4 — Dispatcher push accanto al dispatcher email (KIND_META condivisa, `pushed_at`, cleanup 410, isolamento is_test)
+- Fase 5 — Badging API sincronizzata con le notifiche non lette
+- Fase 6 — UX di installazione Android + iOS e banner "Attiva notifiche"
+- Fase 7 — Deep link da notificationclick + redirect post-login
+- Fase 8 — Test su device reali (Android, iPhone 16.4+, desktop) e localizzazione 5 lingue
 
-- **Automatico su tutti i client**: migrazioni DB, RPC, matching, RLS, `platform_settings`, costi token, email, contenuti.
-- **Richiede rebuild + nuova submission**: qualsiasi modifica al frontend, perché il bundle web è impacchettato nell'app (a meno di adottare un meccanismo di live update, che va valutato a parte e ha vincoli Apple).
-- **Richiede rebuild senza submission urgente**: nulla di significativo.
-- **Compatibilità**: mantenere le RPC retro-compatibili (aggiungere campi, mai rimuoverli); una tabella `app_min_version` con schermata "aggiorna l'app" per forzare l'upgrade quando il backend rompe la compatibilità.
+## 18. Verdetto
 
-Il lavoro non triplica: raddoppia solo nella fase di release (build + store), non nello sviluppo.
-
-## 18. Costi
-
-- Capacitor e plugin ufficiali, FCM: gratuiti.
-- Apple Developer Program: ~99 USD/anno. Google Play: 25 USD una tantum.
-- Mac necessario per build iOS (o servizio CI cloud a pagamento).
-- APNs/FCM: nessun costo per i volumi previsti.
-- Ricorrenti: solo account developer + eventuale CI.
-- Opzionali: servizio di live update, crash reporting.
-
-## 19. Stima del lavoro
-
-**MODERATE** (non SIMPLE per via del passaggio SSR → client-only e dei deep link auth; non COMPLEX perché backend e matching non si toccano).
-
-- Phase 1 — Fondazione Capacitor: build client-only, origin remoto per le server functions, shell iOS/Android.
-- Phase 2 — Auth & deep links: redirect nativi, OAuth in browser di sistema, Universal/App Links, Sign in with Apple.
-- Phase 3 — Push: device token, estensione del dispatcher, isolamento test/live, badge.
-- Phase 4 — Adattamenti mobile: safe area, back button, calendario, form, esclusione admin.
-- Phase 5 — Compliance: consenso nativo, cancellazione account, privacy manifest, decisione token/IAP.
-- Phase 6 — Testing su device reali con account TEST.
-- Phase 7 — Submission.
-
-## 20. Verdetto finale
-
-1. **Sì**, PITCALL è tecnicamente adatta a Capacitor.
-2. Riutilizzo stimato: **~90–95%** del codebase (100% di DB/matching, quasi tutta la UI).
-3. **Sì**, un solo codebase Web/iOS/Android è realistico.
-4. **Backend: modifiche minime** — CORS/origin, redirect URL, tabella device token, estensione dispatcher push. Matching e RLS intatti.
-5. **Frontend: modifiche contenute ma non nulle** — build client-only, base URL delle server functions, deep link handler, safe area, back button, esclusione admin, consenso nativo.
-6. Blocker principali: SSR → client-only, redirect auth basati su `window.location.origin`, banner iubenda in app, Sign in with Apple, cancellazione account, posizione su token/IAP.
-7. **Sì**, l'architettura notifiche attuale (righe in DB + dispatcher) è già il modello corretto per aggiungere le push.
-8. Auth compatibile **con adattamenti** (deep link + browser di sistema + storage nativo).
-9. **Sì**: va deciso prima della submission se i token si comprano solo via web o via IAP.
-10. Testing Lab compatibile, estendendo `is_test` a device token e push.
-11. Attenzione a: calendario, form lunghi, tabelle/liste admin, modali e dropdown con tastiera, safe area, back button Android.
-12. Complessivamente **MODERATE**.
-13. **Sì, consiglio Capacitor** per questo progetto.
-14. Nella V1 mobile **non** farei: admin panel e Testing Lab, foto/logo, camera, geolocalizzazione, offline reale, live update, IAP.
-15. Percorso minimo e robusto: build client-only puntata al backend esistente → auth con deep link e Sign in with Apple → push native con isolamento test → rifiniture mobile e cancellazione account → decisione token/IAP → submission.
-
----
-
-Nessuna implementazione eseguita. In attesa della tua approvazione per decidere se e come procedere.
+1. Sì, senza grandi modifiche. 2. Sì. 3. Sì, iOS 16.4+ e solo se aggiunta alla Home. 4. Sì, anche con app chiusa. 5. Sì. 6. Sì, dal conteggio non letti già esistente. 7. Sì. 8. No, mai reinstallazione. 9. MODERATE. 10. Nessun blocker tecnico; unico vincolo reale è l'obbligo iOS di installare la PWA prima delle push. 11. Zero costi ricorrenti. 12. No. 13. No. 14. Sì, per la V1. 15. Sì, è la soluzione mobile iniziale consigliata per PITCALL.
