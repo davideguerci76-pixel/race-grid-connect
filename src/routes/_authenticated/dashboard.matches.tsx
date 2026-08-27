@@ -13,6 +13,8 @@ import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
+import { PitCallRevealDetail, PitCallRevealTeaser } from "@/components/pitcall-reveal-detail";
+
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
@@ -238,6 +240,8 @@ function MatchesPage() {
                         {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {t(`discipline.${m.request?.discipline}`)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">{t("sweep_engage.matches.overlap", { count: m.overlap_days })}</div>
+                      {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser />)}
+
                       {isConfirmed && m.request?.start_date && m.request?.end_date && (
                         <div className="mt-3 border-t border-racing-yellow/30 pt-3">
                           <div className="label-mono mb-2 text-racing-yellow">[ADD TO CALENDAR]</div>

@@ -658,7 +658,98 @@ export const getMyMatches = createServerFn({ method: "GET" })
       } catch { /* ignore */ }
     }
 
+    // ---- Reveal payload (freelancer side) ----
+    // A single 1-token reveal unlocks every anonymous detail of the Pit Call.
+    // The team identity (name, logo, contacts) stays hidden until confirmation.
+    let myDayRate: number | null = null;
+    const candidateStats = new Map<string, { total: number; rank: number }>();
+    if (isFreelancer) {
+      const { data: myFp } = await supabase.from("freelancer_profiles").select("day_rate").eq("user_id", userId).maybeSingle();
+      myDayRate = (myFp as any)?.day_rate ?? null;
+      const revealedReqIds = Array.from(new Set(
+        rawMatches.filter((m: any) => m.revealed_by_freelancer).map((m: any) => m.request?.id).filter(Boolean),
+      ));
+      if (revealedReqIds.length) {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: peers } = await supabaseAdmin
+            .from("matches")
+            .select("request_id, freelancer_id, match_score")
+            .in("request_id", revealedReqIds as string[]);
+          const byReq = new Map<string, any[]>();
+          for (const p of (peers ?? []) as any[]) {
+            const list = byReq.get(p.request_id) ?? [];
+            list.push(p);
+            byReq.set(p.request_id, list);
+          }
+          for (const [reqId, list] of byReq) {
+            const sorted = list.slice().sort((a, b) => Number(b.match_score ?? 0) - Number(a.match_score ?? 0));
+            const idx = sorted.findIndex((p) => p.freelancer_id === userId);
+            if (idx >= 0) candidateStats.set(reqId, { total: sorted.length, rank: idx + 1 });
+          }
+        } catch { /* anonymous ranking is best-effort */ }
+      }
+    }
+
+    const buildRequestDetail = (r: any) => {
+      if (!r) return null;
+      const stats = r.id ? candidateStats.get(r.id) ?? null : null;
+      const langs = Array.isArray(r.languages) ? r.languages : [];
+      const exp = Array.isArray(r.experience_requirements) ? r.experience_requirements : [];
+      return {
+        logistics: {
+          travel_required: r.travel_required ?? null,
+          location: r.location ?? null,
+          location_city: r.location_city ?? null,
+          location_region: r.location_region ?? null,
+          location_country: r.location_country ?? null,
+          location_radius_km: r.location_radius_km ?? null,
+          location_anchor: r.location_anchor ?? null,
+          circuit: r.circuit ?? null,
+          duration: r.duration ?? null,
+          start_date: r.start_date ?? null,
+          end_date: r.end_date ?? null,
+          season_dates: Array.isArray(r.season_dates) ? r.season_dates : null,
+        },
+        requirements: {
+          role_hard: r.role_hard ?? null,
+          sub_role_hard: r.sub_role_hard ?? null,
+          sub_role_min_level: r.sub_role_min_level ?? null,
+          skills_hard: Array.isArray(r.skills_hard) ? r.skills_hard : [],
+          skills: Array.isArray(r.skills) ? r.skills : [],
+          education: Array.isArray(r.education) ? r.education : [],
+          languages: langs,
+          experience_requirements: exp,
+          notes: r.notes ?? null,
+        },
+        economics: {
+          budget_min: r.budget_min ?? null,
+          budget_max: r.budget_max ?? null,
+          budget_unit: r.budget_unit ?? null,
+          currency: r.currency ?? null,
+          my_day_rate: myDayRate,
+          // Only meaningful when the Pit Call budget is expressed per day.
+          rate_fit:
+            myDayRate != null && r.budget_unit === "day" && (r.budget_min != null || r.budget_max != null)
+              ? (r.budget_max != null && myDayRate > Number(r.budget_max)
+                  ? "above"
+                  : r.budget_min != null && myDayRate < Number(r.budget_min)
+                    ? "below"
+                    : "inside")
+              : null,
+        },
+        candidates: stats,
+      };
+    };
+
+    // Fields of the Pit Call visible before paying the reveal.
+    const publicRequestFields = [
+      "id", "title", "role", "role_group", "sub_role", "discipline", "start_date", "end_date",
+      "duration", "status", "is_active", "created_at", "search_mode", "team_id",
+    ];
+
     const redacted = rawMatches.map((m: any) => {
+
 
       const revealedByMe = isFreelancer ? m.revealed_by_freelancer : m.revealed_by_team;
       const isConfirmed = confirmedMatchIds.has(m.id);
@@ -715,10 +806,24 @@ export const getMyMatches = createServerFn({ method: "GET" })
         }
       }
 
+      // Freelancers only receive the full Pit Call payload once the reveal is paid.
+      let requestDetail: any = null;
+      if (isFreelancer && m.request) {
+        if (revealedByMe) {
+          requestDetail = buildRequestDetail(m.request);
+        } else {
+          const slim: any = {};
+          for (const k of publicRequestFields) slim[k] = m.request[k];
+          m.request = slim;
+        }
+      }
+
       return {
         ...m,
         revealedByMe,
+        requestDetail,
         counterparty,
+
         isConfirmed,
         matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
         pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
