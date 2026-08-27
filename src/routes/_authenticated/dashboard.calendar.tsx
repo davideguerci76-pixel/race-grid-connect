@@ -69,15 +69,18 @@ function CalendarPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
   });
 
-  const lastUpdated = freshness?.calendar_last_updated_at ? new Date(freshness.calendar_last_updated_at) : null;
-  const daysSince = lastUpdated ? Math.floor((Date.now() - lastUpdated.getTime()) / 86400000) : null;
-  const freshTone = daysSince == null ? "text-muted-foreground" : daysSince < 30 ? "text-[#16a34a]" : daysSince < 90 ? "text-racing-yellow" : "text-racing-red";
+  const lastConfirmed = freshness?.calendar_last_confirmed_at ? new Date(freshness.calendar_last_confirmed_at) : null;
+  const daysSince = lastConfirmed ? Math.floor((Date.now() - lastConfirmed.getTime()) / 86400000) : null;
+  const state = freshness?.state ?? "fresh";
+  const freshTone =
+    state === "unconfirmed" ? "text-racing-yellow" : state === "needs_review" ? "text-racing-yellow" : "text-[#16a34a]";
 
   const blockedSet = new Set(blockedDays);
   const selectedDates = myDays
     .filter((d: string) => !blockedSet.has(d))
     .map((d: string) => new Date(d + "T00:00:00"));
   const blockedDates = blockedDays.map((d: string) => new Date(d + "T00:00:00"));
+  const unconfirmedDates = (freshness?.unconfirmed_days ?? []).map((d: string) => new Date(d + "T00:00:00"));
 
   const mutation = useMutation({
     mutationFn: async (dates: Date[] | undefined) => {

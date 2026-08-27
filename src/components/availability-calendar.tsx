@@ -19,6 +19,7 @@ export function AvailabilityCalendar({
   showBulkActions = true,
   bulkMonths = 6,
   blocked,
+  unconfirmed,
 }: {
   selected: Date[];
   onSelect: (dates: Date[] | undefined) => void;
@@ -28,11 +29,15 @@ export function AvailabilityCalendar({
   showBulkActions?: boolean;
   bulkMonths?: number;
   blocked?: Date[];
+  /** Declared days whose availability hasn't been reviewed recently — shown paused, still editable. */
+  unconfirmed?: Date[];
 }) {
   const { t } = useTranslation();
   const { formatMonthYear, dateFnsLocale } = useDateFormat();
   const blockedSet = new Set((blocked ?? []).map((d) => ymd(d)));
+  const unconfirmedSet = new Set((unconfirmed ?? []).map((d) => ymd(d)));
   const isBlocked = (d: Date) => blockedSet.has(ymd(d));
+  const isUnconfirmed = (d: Date) => unconfirmedSet.has(ymd(d));
   const isDisabled = (d: Date) => {
     if (isBlocked(d)) return true;
     if (disabled) return disabled(d);
@@ -141,8 +146,8 @@ export function AvailabilityCalendar({
         selected={selected}
         onSelect={onSelect}
         disabled={(d) => isDisabled(d)}
-        modifiers={{ blocked: (d) => isBlocked(d) }}
-        modifiersClassNames={{ blocked: "rdp-blocked" }}
+        modifiers={{ blocked: (d) => isBlocked(d), unconfirmed: (d) => isUnconfirmed(d) }}
+        modifiersClassNames={{ blocked: "rdp-blocked", unconfirmed: "rdp-unconfirmed" }}
         locale={dateFnsLocale}
         weekStartsOn={1}
         showOutsideDays={false}
@@ -182,6 +187,12 @@ export function AvailabilityCalendar({
         .paddock-calendar .rdp-selected .rdp-day_button {
           background: #16a34a !important;
           color: white;
+        }
+        .paddock-calendar .rdp-unconfirmed .rdp-day_button,
+        .paddock-calendar .rdp-selected.rdp-unconfirmed .rdp-day_button {
+          background: color-mix(in oklab, #16a34a 25%, #0a0a0a) !important;
+          color: #e5e5e5 !important;
+          border: 1px dashed #16a34a;
         }
         .paddock-calendar .rdp-blocked .rdp-day_button {
           background: var(--racing-red) !important;

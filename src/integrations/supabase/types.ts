@@ -303,6 +303,7 @@ export type Database = {
       freelancer_profiles: {
         Row: {
           bio: string | null
+          calendar_last_confirmed_at: string | null
           calendar_last_updated_at: string
           currency: string
           day_rate: number | null
@@ -331,6 +332,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          calendar_last_confirmed_at?: string | null
           calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
@@ -359,6 +361,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          calendar_last_confirmed_at?: string | null
           calendar_last_updated_at?: string
           currency?: string
           day_rate?: number | null
@@ -1642,6 +1645,10 @@ export type Database = {
         }
       }
       admin_set_time_offset: { Args: { _days: number }; Returns: number }
+      availability_day_active: {
+        Args: { _day: string; _freelancer: string }
+        Returns: boolean
+      }
       cancel_engagement: {
         Args: { _engagement_id: string; _reason?: string }
         Returns: {
@@ -1752,6 +1759,10 @@ export type Database = {
           _user_id: string
         }
         Returns: number
+      }
+      day_blocked_by_engagement: {
+        Args: { _day: string; _freelancer: string }
+        Returns: boolean
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
