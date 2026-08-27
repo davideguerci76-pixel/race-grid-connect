@@ -367,6 +367,11 @@ function NewRequestPage() {
               toast.error(t("sweep_engage.new_request.select_working_day"));
               return;
             }
+            if (datesInvalid) {
+              toast.error(startDateError ?? endDateError ?? "");
+              return;
+            }
+
             mut.mutate();
           }}
           className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
