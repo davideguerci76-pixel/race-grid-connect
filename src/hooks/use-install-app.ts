@@ -21,6 +21,23 @@ function isIosLike(): boolean {
   return /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && (navigator as Navigator).maxTouchPoints > 1);
 }
 
+/**
+ * True only for real mobile/tablet devices. Never viewport-width based: a
+ * resized desktop browser must NOT be treated as a smartphone. Combines
+ * User-Agent Client Hints, UA string and the primary pointer type.
+ */
+export function isMobileOrTabletDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const uaData = (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData;
+  if (typeof uaData?.mobile === "boolean") return uaData.mobile || isIosLike();
+  const ua = navigator.userAgent;
+  if (isIosLike()) return true; // iPhone/iPad/iPod (+ iPadOS "Macintosh" spoof)
+  if (/android/i.test(ua)) return true; // Android phones & tablets
+  if (/mobile|tablet|kindle|silk|playbook|windows phone/i.test(ua)) return true;
+  // Touch-capable laptop (Windows/macOS/Linux) is still a desktop: exclude it.
+  return false;
+}
+
 /** Drives the "Install Pit Call" CTA on the dashboard. */
 export function useInstallApp() {
   const [mode, setMode] = useState<InstallMode>("hidden");
