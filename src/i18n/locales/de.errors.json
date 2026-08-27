@@ -17,7 +17,11 @@
     "auth": {
       "session": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
       "invalidCredentials": "E-Mail oder Passwort ist falsch.",
-      "emailNotConfirmed": "Bestätige deine E-Mail-Adresse, um fortzufahren."
+      "emailNotConfirmed": "Bestätige deine E-Mail-Adresse, um fortzufahren.",
+      "weakPassword": "Dieses Passwort ist zu leicht zu erraten (es taucht in bekannten Datenlecks auf). Wähle ein stärkeres.",
+      "passwordTooShort": "Das Passwort erfüllt die Mindestanforderungen nicht. Verwende mindestens 8 Zeichen.",
+      "emailTaken": "Mit dieser E-Mail existiert bereits ein Konto. Melde dich an.",
+      "invalidEmail": "Diese E-Mail-Adresse ist ungültig."
     },
     "tokens": {
       "insufficient": "Du hast nicht genügend Tokens für diese Aktion."

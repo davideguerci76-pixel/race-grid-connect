@@ -17,7 +17,11 @@
     "auth": {
       "session": "Votre session a expiré. Reconnectez-vous.",
       "invalidCredentials": "E-mail ou mot de passe incorrect.",
-      "emailNotConfirmed": "Confirmez votre adresse e-mail pour continuer."
+      "emailNotConfirmed": "Confirmez votre adresse e-mail pour continuer.",
+      "weakPassword": "Ce mot de passe est trop facile à deviner (il figure dans des fuites connues). Choisissez-en un plus solide.",
+      "passwordTooShort": "Le mot de passe ne respecte pas les exigences minimales. Utilisez au moins 8 caractères.",
+      "emailTaken": "Un compte existe déjà avec cet e-mail. Connectez-vous.",
+      "invalidEmail": "Cette adresse e-mail n'est pas valide."
     },
     "tokens": {
       "insufficient": "Vous n'avez pas assez de tokens pour cette action."

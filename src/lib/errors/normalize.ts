@@ -120,8 +120,25 @@ export function normalizeError(error: unknown, fallbackKey = "errors.generic"): 
   ) {
     return make("errors.network", "network", "error", "net.fetch");
   }
+  // Sign-up / password problems the user can fix themselves.
+  if (msg.includes("weak and easy to guess") || msg.includes("weak_password") || msg.includes("pwned")) {
+    return make("errors.auth.weakPassword", "validation", "warning", "auth.weak_password");
+  }
+  if (msg.includes("password should be at least") || msg.includes("password should contain")) {
+    return make("errors.auth.passwordTooShort", "validation", "warning", "auth.password_rules");
+  }
+  if (msg.includes("user already registered") || msg.includes("already been registered")) {
+    return make("errors.auth.emailTaken", "validation", "warning", "auth.email_taken");
+  }
+  if (msg.includes("unable to validate email address") || msg.includes("invalid email")) {
+    return make("errors.auth.invalidEmail", "validation", "warning", "auth.invalid_email");
+  }
+  if (msg.includes("email rate limit") || msg.includes("over_email_send_rate_limit")) {
+    return make("errors.rateLimited", "operation_failure", "warning", "http.429");
+  }
 
   // Auth / session
+
   if (
     msg.includes("jwt") ||
     msg.includes("refresh token") ||

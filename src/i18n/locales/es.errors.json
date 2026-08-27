@@ -17,7 +17,11 @@
     "auth": {
       "session": "Tu sesión ha caducado. Inicia sesión de nuevo.",
       "invalidCredentials": "El email o la contraseña no son correctos.",
-      "emailNotConfirmed": "Confirma tu dirección de email para continuar."
+      "emailNotConfirmed": "Confirma tu dirección de email para continuar.",
+      "weakPassword": "Esa contraseña es demasiado fácil de adivinar (aparece en filtraciones conocidas). Elige una más segura.",
+      "passwordTooShort": "La contraseña no cumple los requisitos mínimos. Usa al menos 8 caracteres.",
+      "emailTaken": "Ya existe una cuenta con este correo. Inicia sesión.",
+      "invalidEmail": "Ese correo electrónico no es válido."
     },
     "tokens": {
       "insufficient": "No tienes tokens suficientes para esta acción."
