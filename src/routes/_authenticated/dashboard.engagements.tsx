@@ -290,7 +290,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {education.length > 0 && (
+                    {detailsUnlocked && education.length > 0 && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[EDUCATION]</div>
                         <div className="flex flex-wrap gap-1">
