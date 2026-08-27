@@ -1316,6 +1316,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         free_preview: poolVisible || topThree || unlockMap.get(m.id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
+        confirmation_requested: confirmationRequested.has(m.freelancer_id),
+        engagement_id: confirmationRequested.get(m.freelancer_id) ?? null,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
           count: ratingAvg.get(m.freelancer_id)?.count ?? 0,
