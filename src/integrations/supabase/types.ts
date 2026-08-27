@@ -1870,6 +1870,7 @@ export type Database = {
         Returns: boolean
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
+      dispatch_notification_push: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_contact_checks: { Args: never; Returns: number }
       emit_rating_available_notifications: { Args: never; Returns: number }
