@@ -40,20 +40,20 @@ export function toastError(error: unknown, fallbackKey = "errors.generic", optio
 
 /** Localized success feedback — never logged. */
 export function toastSuccess(key: string, values?: Record<string, unknown>) {
-  toast.success(i18n.t(key, values as never) as string);
+  toast.success(String(i18n.t(key, values as never)));
 }
 
 /** Localized warning feedback (expected, non-technical) — never logged. */
 export function toastWarning(key: string, values?: Record<string, unknown>) {
-  toast.warning(i18n.t(key, values as never) as string);
+  toast.warning(String(i18n.t(key, values as never)));
 }
 
 /** Localized informational feedback — never logged. */
 export function toastInfo(key: string, values?: Record<string, unknown>) {
-  toast(i18n.t(key, values as never) as string);
+  toast(String(i18n.t(key, values as never)));
 }
 
 /** Form validation feedback: user-fixable, never persisted. */
 export function toastValidation(key = "errors.validation.generic", values?: Record<string, unknown>) {
-  toast.warning(i18n.t(key, values as never) as string);
+  toast.warning(String(i18n.t(key, values as never)));
 }
