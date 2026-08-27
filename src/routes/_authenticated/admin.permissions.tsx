@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -34,7 +35,7 @@ function AdminPermissions() {
   const { sorted, toggle, indicator } = useSort<any>(rows);
 
   async function onToggle(user_id: string, isAdmin: boolean, name: string) {
-    if (!confirm(isAdmin ? t("sweep_admin_a.permissions.confirm_revoke", { name }) : t("sweep_admin_a.permissions.confirm_grant", { name }))) return;
+    if (!await confirmDialog(isAdmin ? t("sweep_admin_a.permissions.confirm_revoke", { name }) : t("sweep_admin_a.permissions.confirm_grant", { name }))) return;
     try {
       await setAdmin({ data: { user_id, is_admin: !isAdmin } });
       toast.success(t("sweep_admin_a.permissions.role_updated"));

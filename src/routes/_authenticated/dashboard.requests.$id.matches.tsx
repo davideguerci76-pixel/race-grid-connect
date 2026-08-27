@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -168,7 +169,7 @@ function RequestMatchesPage() {
                         const msg = tierInfo.proportional
                           ? t("sweep_engage.request_matches.unlock_tier_confirm_reduced", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, full: tierInfo.entry_cost_full ?? 0, count: tierInfo.real_count ?? 0 })
                           : t("sweep_engage.request_matches.unlock_tier_confirm", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, count: tierInfo.real_count ?? 0 });
-                        if (confirm(msg)) tierMut.mutate({ tier: tierInfo.tier, scope });
+                        if (await confirmDialog(msg)) tierMut.mutate({ tier: tierInfo.tier, scope });
                       }}
                       disabled={tierMut.isPending}
                       className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
@@ -195,7 +196,7 @@ function RequestMatchesPage() {
                       requestFilled={!!requestFilled}
                       onUnlock={() => unlockMut.mutate(m.match_id)}
                       onConfirm={() => {
-                        if (confirm(t("sweep_engage.request_matches.confirm_match_prompt"))) {
+                        if (await confirmDialog(t("sweep_engage.request_matches.confirm_match_prompt"))) {
                           confirmMut.mutate(m.match_id);
                         }
                       }}
@@ -259,7 +260,7 @@ function RequestMatchesPage() {
                   </div>
                   <button
                     onClick={() => {
-                      if (confirm(t("sweep_engage.request_matches.sos_confirm"))) {
+                      if (await confirmDialog(t("sweep_engage.request_matches.sos_confirm"))) {
                         sosMut.mutate();
                       }
                     }}
@@ -345,13 +346,13 @@ function RequestMatchesPage() {
                 onWait={() => toast.info(t("sweep_engage.request_matches.search_stays_active"))}
                 onRefund={() => {
                   const q = (data as any).refund_quote;
-                  if (confirm(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
+                  if (await confirmDialog(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
                     refundMut.mutate("full");
                   }
                 }}
                 onPartial={() => {
                   const q = (data as any).refund_quote;
-                  if (confirm(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
+                  if (await confirmDialog(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
                     refundMut.mutate("partial");
                   }
                 }}
@@ -380,7 +381,7 @@ function RequestMatchesPage() {
                   </div>
                   <button
                     onClick={() => {
-                      if (confirm(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
+                      if (await confirmDialog(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
                         upgradeMut.mutate();
                       }
                     }}

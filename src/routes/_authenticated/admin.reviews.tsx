@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -166,7 +167,7 @@ function AdminReviews() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm(t("sweep_admin_b.reviews.confirm_delete"))) {
+                            if (await confirmDialog(t("sweep_admin_b.reviews.confirm_delete"))) {
                               mut.mutate({ rating_id: r.id, action: "delete" });
                             }
                           }}

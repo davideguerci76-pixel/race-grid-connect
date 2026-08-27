@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -103,7 +104,7 @@ function AdminFreelancers() {
   }
 
   async function onToggleBlock(user_id: string, blocked: boolean) {
-    if (!confirm(blocked ? t("sweep_admin_a.confirm_unblock") : t("sweep_admin_a.confirm_block"))) return;
+    if (!await confirmDialog(blocked ? t("sweep_admin_a.confirm_unblock") : t("sweep_admin_a.confirm_block"))) return;
     try {
       await setBlocked({ data: { user_id, blocked: !blocked } });
       toast.success(blocked ? t("sweep_admin_a.unblocked") : t("sweep_admin_a.blocked"));
@@ -114,7 +115,7 @@ function AdminFreelancers() {
   }
 
   async function onDelete(user_id: string, name: string) {
-    if (!confirm(t("sweep_admin_a.confirm_delete", { name }))) return;
+    if (!await confirmDialog(t("sweep_admin_a.confirm_delete", { name }))) return;
     try {
       await delUser({ data: { user_id } });
       toast.success(t("sweep_admin_a.user_deleted"));

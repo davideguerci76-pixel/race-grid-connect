@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
@@ -424,7 +425,7 @@ function EngagementsPage() {
                     return (
                       <button
                         onClick={() => {
-                          if (!confirm(warn)) return;
+                          if (!await confirmDialog(warn)) return;
                           const reason = window.prompt(t("sweep_engage.engagements.reason_prompt"), "") ?? "";
                           cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
                         }}

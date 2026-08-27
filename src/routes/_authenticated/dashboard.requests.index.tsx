@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -167,7 +168,7 @@ function RequestsPage() {
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
+                        if (await confirmDialog(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
                       }}
                       className="inline-flex items-center gap-2 rounded-2xl border border-racing-red/60 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                     >

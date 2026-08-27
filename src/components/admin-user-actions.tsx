@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { toastError } from "@/lib/errors";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -81,14 +82,14 @@ export function AdminUserActions({
   }
 
   const onSuspend = () =>
-    confirm(t("admin_user_actions.confirm_suspend", { defaultValue: "Suspend {{name}}? The account will not be able to sign in.", name })) &&
+    await confirmDialog(t("admin_user_actions.confirm_suspend", { defaultValue: "Suspend {{name}}? The account will not be able to sign in.", name })) &&
     run("suspend", () => setBlockedFn({ data: { user_id: userId, blocked: true } }), t("admin_user_actions.suspended", { defaultValue: "Account suspended" }));
 
   const onReactivate = () =>
     run("reactivate", () => setBlockedFn({ data: { user_id: userId, blocked: false } }), t("admin_user_actions.reactivated", { defaultValue: "Account reactivated" }));
 
   const onDelete = () =>
-    confirm(t("admin_user_actions.confirm_delete", { defaultValue: "Permanently delete {{name}} and all related data? This cannot be undone.", name })) &&
+    await confirmDialog(t("admin_user_actions.confirm_delete", { defaultValue: "Permanently delete {{name}} and all related data? This cannot be undone.", name })) &&
     run("delete", () => deleteFn({ data: { user_id: userId } }), t("admin_user_actions.deleted", { defaultValue: "User deleted" }));
 
   const onReset = () =>
@@ -99,12 +100,12 @@ export function AdminUserActions({
     );
 
   const onForceLogout = () =>
-    confirm(t("admin_user_actions.confirm_logout", { defaultValue: "Revoke all active sessions for {{name}}?", name })) &&
+    await confirmDialog(t("admin_user_actions.confirm_logout", { defaultValue: "Revoke all active sessions for {{name}}?", name })) &&
     run("logout", () => logoutFn({ data: { user_id: userId } }), t("admin_user_actions.logged_out", { defaultValue: "All sessions revoked" }));
 
   async function onImpersonate() {
     if (
-      !confirm(
+      !await confirmDialog(
         t("admin_user_actions.confirm_impersonate", {
           defaultValue:
             "Sign in as {{name}}? This action is recorded in the audit log and will replace your current session in the new tab.",

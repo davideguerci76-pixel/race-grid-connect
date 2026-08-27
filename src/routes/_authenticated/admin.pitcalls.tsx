@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -81,7 +82,7 @@ function PitCallManagement() {
 
   async function onImpersonate(teamId: string, teamName: string) {
     if (
-      !confirm(
+      !await confirmDialog(
         t("sweep_admin_b.pitcalls.confirm_impersonate", {
           defaultValue:
             "Sign in as {{name}}? This action is recorded in the audit log and opens their dashboard in a new tab.",
@@ -316,7 +317,7 @@ function PitCallManagement() {
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm(t("sweep_admin_b.pitcalls.confirm_delete"))) {
+                          if (await confirmDialog(t("sweep_admin_b.pitcalls.confirm_delete"))) {
                             deleteMut.mutate(r.id);
                           }
                         }}
