@@ -212,6 +212,12 @@ function EngagementsPage() {
                         {tp.primary_discipline && <span> · {t(`discipline.${tp.primary_discipline}`, { defaultValue: tp.primary_discipline })}</span>}
                       </div>
                     )}
+                    {isFreelancer && !tp?.team_name && (
+                      <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                        {t("sweep_engage.matches.team_name_hidden")}
+                      </div>
+                    )}
+
                     {!isFreelancer && fp && (
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
                         {fp.role_group && <span>{roleGroupLabel(fp.role_group)}</span>}
