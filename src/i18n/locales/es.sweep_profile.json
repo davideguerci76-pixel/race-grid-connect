@@ -99,9 +99,10 @@
       "mark_all_read": "Marcar todas como leídas",
       "unread": "NO LEÍDAS",
       "no_notifications": "Aún no hay notificaciones.",
-      "calendar_stale_message": "Tu calendario de disponibilidad no se ha actualizado en un tiempo. Mantenlo al día para posicionarte mejor en las búsquedas de los teams.",
-      "update_calendar": "Actualizar calendario",
-      "view_engagement": "Ver engagement"
+      "calendar_stale_message": "Algunas de tus fechas disponibles no se han revisado recientemente. Una comprobación rápida mantiene tu disponibilidad precisa.",
+      "update_calendar": "Revisar disponibilidad",
+      "view_engagement": "Ver engagement",
+      "calendar_stale_unconfirmed_message": "Hemos dejado de usar temporalmente algunas de tus fechas para el matching porque no podemos asegurar que sigan vigentes. Revísalas cuando quieras para reactivarlas."
     }
   }
 }

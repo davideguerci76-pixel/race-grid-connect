@@ -99,9 +99,10 @@
       "mark_all_read": "Mark all as read",
       "unread": "UNREAD",
       "no_notifications": "No notifications yet.",
-      "calendar_stale_message": "Your availability calendar hasn't been updated in a while. Keep it fresh to rank higher in team searches.",
-      "update_calendar": "Update calendar",
-      "view_engagement": "View engagement"
+      "calendar_stale_message": "Some of your available dates haven't been reviewed recently. A quick check keeps your availability accurate.",
+      "update_calendar": "Review availability",
+      "view_engagement": "View engagement",
+      "calendar_stale_unconfirmed_message": "We've temporarily stopped using some of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again."
     }
   }
 }
