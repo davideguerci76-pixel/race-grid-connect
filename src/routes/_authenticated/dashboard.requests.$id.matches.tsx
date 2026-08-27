@@ -747,43 +747,17 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-expanded={open}
-              className="mt-3.5 inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-racing-red hover:text-foreground"
-            >
-              {open ? t("mcard.hide_details") : t("mcard.view_details")}
-              <span className="text-racing-red">{open ? "↑" : "↓"}</span>
-            </button>
-          </div>
-
-          {/* CTA */}
-          <div className="flex shrink-0 flex-col gap-2.5 @lg:w-[210px]">
-            {blurred && (
+            <div className="mt-4 flex justify-center">
               <button
-                onClick={onUnlock}
-                disabled={loading}
-                className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-[14px] font-bold text-foreground transition-colors hover:border-racing-red disabled:opacity-60"
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-expanded={open}
+                className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-racing-red hover:text-foreground"
               >
-                <Unlock className="size-3.5" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
+                {open ? t("mcard.hide_details") : t("mcard.view_details")}
+                <span className="text-racing-red">{open ? "↑" : "↓"}</span>
               </button>
-            )}
-            {match?.unlocked && !requestFilled && (
-              <button
-                onClick={onConfirm}
-                disabled={loading}
-                className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
-              >
-                {t("sweep_engage.request_matches.request_confirmation_button")}
-              </button>
-            )}
-            {requestFilled && (
-              <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-3 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                {t("sweep_engage.request_matches.match_already_assigned")}
-              </span>
-            )}
-          </div>
+            </div>
         </div>
       </div>
     </div>
