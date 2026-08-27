@@ -171,7 +171,7 @@ export const Route = createFileRoute("/api/public/notification-push")({
         }
 
         // 3) Retention: keep the ledger small.
-        await supabaseAdmin.rpc("cleanup_push_deliveries").catch(() => undefined);
+        await Promise.resolve(supabaseAdmin.rpc("cleanup_push_deliveries")).catch(() => undefined);
 
         return new Response(JSON.stringify({ sent, failed, gone }), {
           headers: { "content-type": "application/json" },
