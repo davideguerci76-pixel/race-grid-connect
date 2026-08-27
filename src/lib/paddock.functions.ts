@@ -1242,6 +1242,16 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    // One confirmation request per (pit call, freelancer): persisted state for the CTA
+    const { data: reqEngagements } = await supabase
+      .from("engagements")
+      .select("id, freelancer_id, status")
+      .eq("request_id", data.request_id)
+      .eq("team_id", userId)
+      .in("status", ["proposed", "confirmed", "completed"]);
+    const confirmationRequested = new Map<string, string>(
+      ((reqEngagements ?? []) as any[]).map((e) => [e.freelancer_id, e.id]),
+    );
     const poolFreelancerIds = freelancerIds.filter((id: string) => poolSet.has(id));
     const poolProfileMap = new Map<string, any>();
     const poolContactMap = new Map<string, any>();
