@@ -39,7 +39,7 @@ function ProfilePage() {
         supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.rpc("my_freelancer_phone"),
-        supabase.rpc("my_team_vat"),
+        (supabase.rpc as any)("my_team_vat"),
       ]);
       if (pError) throw new Error(pError.message);
       if (fpError) throw new Error(fpError.message);
