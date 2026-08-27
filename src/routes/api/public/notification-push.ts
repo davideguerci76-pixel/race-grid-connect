@@ -48,30 +48,33 @@ export const Route = createFileRoute("/api/public/notification-push")({
         const since = new Date(Date.now() - WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
         // 1) Fan out: create one delivery row per (notification, subscription).
-        const { data: fresh } = await supabaseAdmin
-          .from("notifications")
-          .select("id, user_id, kind, payload, is_test, created_at")
-          .is("pushed_at", null)
-          .gte("created_at", since)
-          .order("created_at", { ascending: true })
-          .limit(100);
+        // Subscriptions are loaded FIRST and the notification scan is restricted to
+        // their owners. Without that filter, a backlog of undeliverable rows (test
+        // notifications for users with no device keep pushed_at NULL forever) filled
+        // the 100-row batch and starved every real notification, and the per-row
+        // subscription lookups pushed the request past the dispatcher timeout.
+        const { data: allSubs } = await supabaseAdmin
+          .from("push_subscriptions")
+          .select("id, user_id, is_test");
 
-        // Subscriptions are loaded once for the whole batch: a per-notification
-        // query made every run cost one round trip per undeliverable backlog row
-        // (test notifications with no device keep pushed_at NULL forever), which
-        // pushed the whole request past the pg_net timeout and stalled all pushes.
-        const userIds = [...new Set((fresh ?? []).map((n) => n.user_id as string))];
         const subsByKey = new Map<string, string[]>();
-        if (userIds.length) {
-          const { data: allSubs } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("id, user_id, is_test")
-            .in("user_id", userIds);
-          for (const s of allSubs ?? []) {
-            const key = `${s.user_id as string}:${s.is_test as boolean}`;
-            subsByKey.set(key, [...(subsByKey.get(key) ?? []), s.id as string]);
-          }
+        for (const s of allSubs ?? []) {
+          const key = `${s.user_id as string}:${s.is_test as boolean}`;
+          subsByKey.set(key, [...(subsByKey.get(key) ?? []), s.id as string]);
         }
+        const subUserIds = [...new Set((allSubs ?? []).map((s) => s.user_id as string))];
+
+        const { data: fresh } = subUserIds.length
+          ? await supabaseAdmin
+              .from("notifications")
+              .select("id, user_id, is_test")
+              .is("pushed_at", null)
+              .gte("created_at", since)
+              .in("user_id", subUserIds)
+              .order("created_at", { ascending: true })
+              .limit(100)
+          : { data: [] as Array<{ id: string; user_id: string; is_test: boolean }> };
+
 
         const deliveryRows: Array<{ notification_id: string; subscription_id: string; is_test: boolean; status: string }> = [];
         const pushedIds: string[] = [];
