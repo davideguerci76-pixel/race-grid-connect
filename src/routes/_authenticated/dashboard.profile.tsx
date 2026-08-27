@@ -34,11 +34,12 @@ function ProfilePage() {
     queryKey: ["profile-detail", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }, phoneRes] = await Promise.all([
+      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }, phoneRes, vatRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
         supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
         supabase.rpc("my_freelancer_phone"),
+        (supabase.rpc as any)("my_team_vat"),
       ]);
       if (pError) throw new Error(pError.message);
       if (fpError) throw new Error(fpError.message);
@@ -46,7 +47,9 @@ function ProfilePage() {
       // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
       const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
       const fpWithPhone = fp ? { ...fp, phone_dial_code: phoneRow?.phone_dial_code ?? null, phone_number: phoneRow?.phone_number ?? null } : fp;
-      return { ...p, freelancerProfile: fpWithPhone, teamProfile: tp };
+      // VAT number is owner-only (column not readable via the broad team_profiles policy); merge it in here.
+      const tpWithVat = tp ? { ...tp, vat_number: (vatRes?.data as string | null) ?? null } : tp;
+      return { ...p, freelancerProfile: fpWithPhone, teamProfile: tpWithVat };
     },
   });
 

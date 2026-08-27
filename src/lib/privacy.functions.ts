@@ -16,11 +16,12 @@ export const exportMyData = createServerFn({ method: "POST" })
       return data ?? [];
     };
 
-    const [profile, freelancerProfile, teamProfile, contacts, availability, calendars, notifications, tokens] =
+    const [profile, freelancerProfile, teamProfile, teamVat, contacts, availability, calendars, notifications, tokens] =
       await Promise.all([
         (supabase as any).from("profiles").select("*").eq("id", userId).maybeSingle(),
         (supabase as any).from("freelancer_profiles").select("*").eq("user_id", userId).maybeSingle(),
-        (supabase as any).from("team_profiles").select("*").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").eq("user_id", userId).maybeSingle(),
+        (supabase as any).rpc("my_team_vat"),
         (supabase as any).from("freelancer_contacts").select("*").eq("user_id", userId).maybeSingle(),
         pick("availability", "freelancer_id"),
         pick("user_calendars", "owner_id"),
@@ -34,7 +35,7 @@ export const exportMyData = createServerFn({ method: "POST" })
       exported_at: new Date().toISOString(),
       account: profile?.data ?? null,
       freelancer_profile: freelancerProfile?.data ?? null,
-      team_profile: teamProfile?.data ?? null,
+      team_profile: teamProfile?.data ? { ...teamProfile.data, vat_number: (teamVat?.data as string | null) ?? null } : null,
       contacts: contacts?.data ?? null,
       availability,
       calendars,

@@ -575,7 +575,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const emailsById = new Map<string, string | null>();
     if (otherIds.length) {
       if (isFreelancer) {
-        const { data: tps } = await supabase.from("team_profiles").select("*").in("user_id", otherIds);
+        const { data: tps } = await supabase.from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").in("user_id", otherIds);
         (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
       } else {
         const { data: fps } = await supabase.from("freelancer_profiles").select("*").in("user_id", otherIds);

@@ -2060,6 +2060,7 @@ export type Database = {
           phone_number: string
         }[]
       }
+      my_team_vat: { Args: never; Returns: string }
       my_token_balance: { Args: never; Returns: number }
       purge_test_environment: {
         Args: never
