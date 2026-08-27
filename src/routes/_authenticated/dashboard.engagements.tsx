@@ -193,6 +193,8 @@ function EngagementsPage() {
             const languages: any[] = req?.languages ?? [];
             const education: string[] = req?.education ?? [];
             const missing: any[] = match?.missing_criteria ?? [];
+            // Teams always see their own Pit Call; freelancers must pay the 1-token reveal.
+            const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
             return (
               <div key={e.id} className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
