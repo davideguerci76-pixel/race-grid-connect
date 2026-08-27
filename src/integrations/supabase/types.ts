@@ -1176,6 +1176,8 @@ export type Database = {
           duration: Database["public"]["Enums"]["duration_type"]
           education: string[]
           end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
           experience_requirements: Json
           id: string
           is_active: boolean
@@ -1224,6 +1226,8 @@ export type Database = {
           duration?: Database["public"]["Enums"]["duration_type"]
           education?: string[]
           end_date: string
+          ever_full_matched?: boolean
+          ever_partial_matched?: boolean
           experience_requirements?: Json
           id?: string
           is_active?: boolean
@@ -1272,6 +1276,8 @@ export type Database = {
           duration?: Database["public"]["Enums"]["duration_type"]
           education?: string[]
           end_date?: string
+          ever_full_matched?: boolean
+          ever_partial_matched?: boolean
           experience_requirements?: Json
           id?: string
           is_active?: boolean
@@ -1897,6 +1903,8 @@ export type Database = {
           duration: Database["public"]["Enums"]["duration_type"]
           education: string[]
           end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
           experience_requirements: Json
           id: string
           is_active: boolean
@@ -2172,6 +2180,8 @@ export type Database = {
           duration: Database["public"]["Enums"]["duration_type"]
           education: string[]
           end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
           experience_requirements: Json
           id: string
           is_active: boolean
