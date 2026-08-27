@@ -17,7 +17,11 @@
     "auth": {
       "session": "La sessione è scaduta. Accedi di nuovo.",
       "invalidCredentials": "Email o password non corretti.",
-      "emailNotConfirmed": "Conferma il tuo indirizzo email per continuare."
+      "emailNotConfirmed": "Conferma il tuo indirizzo email per continuare.",
+      "weakPassword": "Password troppo facile da indovinare (compare in violazioni note). Scegline una più robusta.",
+      "passwordTooShort": "La password non rispetta i requisiti minimi. Usa almeno 8 caratteri.",
+      "emailTaken": "Esiste già un account con questa email. Accedi invece di registrarti.",
+      "invalidEmail": "Indirizzo email non valido."
     },
     "tokens": {
       "insufficient": "Non hai abbastanza token per questa azione."

@@ -17,7 +17,11 @@
     "auth": {
       "session": "Your session expired. Please sign in again.",
       "invalidCredentials": "Email or password is incorrect.",
-      "emailNotConfirmed": "Confirm your email address to continue."
+      "emailNotConfirmed": "Confirm your email address to continue.",
+      "weakPassword": "That password is too easy to guess (it appears in known data breaches). Choose a stronger one.",
+      "passwordTooShort": "Your password does not meet the minimum requirements. Use at least 8 characters.",
+      "emailTaken": "An account already exists with this email. Sign in instead.",
+      "invalidEmail": "That email address is not valid."
     },
     "tokens": {
       "insufficient": "You don't have enough tokens for this action."
