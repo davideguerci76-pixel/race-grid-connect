@@ -192,11 +192,15 @@ function MatchesPage() {
                       <div className={`text-2xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
                         {pct}% <span className="font-mono text-[11px] uppercase tracking-widest">{perfect ? t("sweep_engage.matches.perfect_match") : t("sweep_engage.matches.match_label")}</span>
                       </div>
-                      <div className="mt-1 text-lg font-bold">
-                        {showName
-                          ? (isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : (cp?.legal_name ?? t("sweep_engage.matches.freelancer_fallback")))
-                          : t("matches.hidden_name")}
-                      </div>
+                      {showName ? (
+                        <div className="mt-1 text-lg font-bold">
+                          {isFreelancer ? (cp?.team_name ?? t("sweep_engage.matches.team_fallback")) : (cp?.legal_name ?? t("sweep_engage.matches.freelancer_fallback"))}
+                        </div>
+                      ) : !m.revealedByMe ? (
+                        <div className="mt-1 text-lg font-bold">
+                          {t("matches.hidden_name")}
+                        </div>
+                      ) : null}
 
                       {m.revealedByMe && cp && (
                         <div className="mt-2 grid gap-1 text-xs">

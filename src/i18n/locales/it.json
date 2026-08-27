@@ -165,7 +165,7 @@
     "title": "Match",
     "empty": "Nessun match. Aggiungi disponibilità per iniziare.",
     "empty_team": "Nessun match. Pubblica una Pit Call per trovare freelance.",
-    "hidden_name": "Rivela per vedere il nome",
+    "hidden_name": "Rivela per vedere più info",
     "reveal_1_token": "Rivela (1 token)",
     "reveal_confirm": "Spendere 1 token per rivelare {{who}}?",
     "already_revealed": "Rivelato",
