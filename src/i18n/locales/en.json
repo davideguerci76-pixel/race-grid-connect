@@ -165,7 +165,7 @@
     "title": "Matches",
     "empty": "No matches yet. Add availability to see teams that need you.",
     "empty_team": "No matches yet. Post a Pit Call to find freelancers.",
-    "hidden_name": "Reveal to see name",
+    "hidden_name": "Reveal to see more info",
     "reveal_1_token": "Reveal (1 token)",
     "reveal_confirm": "Spend 1 token to reveal {{who}}?",
     "already_revealed": "Revealed",

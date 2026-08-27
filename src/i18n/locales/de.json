@@ -165,7 +165,7 @@
     "title": "Matches",
     "empty": "Noch keine Matches.",
     "empty_team": "Keine Matches. Pit Call posten.",
-    "hidden_name": "Enthüllen für Name",
+    "hidden_name": "Enthüllen für mehr Infos",
     "reveal_1_token": "Enthüllen (1 Token)",
     "reveal_confirm": "1 Token ausgeben um {{who}} zu enthüllen?",
     "already_revealed": "Enthüllt",
