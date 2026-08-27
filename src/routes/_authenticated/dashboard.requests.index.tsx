@@ -142,14 +142,6 @@ function RequestsPage() {
                     : `${t("requests.view_matches")} (${r.matches_count ?? 0})`}
                 </Link>
 
-                {r.status === "active" && (
-                  <button
-                    onClick={() => statusMut.mutate({ id: r.id, status: "paused" })}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
-                  >
-                    <Pause className="size-4" /> {t("requests.pause")}
-                  </button>
-                )}
                 {r.status === "paused" && (
                   <button
                     onClick={() => statusMut.mutate({ id: r.id, status: "active" })}
@@ -159,22 +151,14 @@ function RequestsPage() {
                   </button>
                 )}
                 {(r.status === "active" || r.status === "paused") && (
-                  <>
-                    <button
-                      onClick={() => statusMut.mutate({ id: r.id, status: "completed" })}
-                      className="inline-flex items-center gap-2 rounded-2xl border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
-                    >
-                      <CheckCircle2 className="size-4" /> {t("requests.complete")}
-                    </button>
-                    <button
-                      onClick={async () => {
-                        if (await confirmDialog(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
-                      }}
-                      className="inline-flex items-center gap-2 rounded-2xl border border-racing-red/60 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-                    >
-                      <XCircle className="size-4" /> {t("requests.close")}
-                    </button>
-                  </>
+                  <button
+                    onClick={async () => {
+                      if (await confirmDialog(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
+                    }}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-racing-red/60 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
+                  >
+                    <XCircle className="size-4" /> {t("requests.close")}
+                  </button>
                 )}
                 {!flags.pitcallCreationDisabled && (
                   <>
