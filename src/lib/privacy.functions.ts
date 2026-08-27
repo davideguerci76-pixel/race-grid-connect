@@ -97,15 +97,27 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** Stores proof that the user accepted Terms and Privacy Policy. */
+/** Current published version of Terms + Privacy Policy. */
+export const LEGAL_VERSION = "2026-08";
+
+/**
+ * Stores proof that the user accepted Terms and Privacy Policy.
+ * Writes the append-only history row and the current state on `profiles`
+ * atomically inside a single database function.
+ */
 export const recordLegalAcceptance = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const now = new Date().toISOString();
-    const { error } = await (context.supabase as any)
-      .from("profiles")
-      .update({ terms_accepted_at: now, privacy_accepted_at: now, legal_version: "2026-08" })
-      .eq("id", context.userId);
+  .inputValidator((data: unknown) =>
+    z
+      .object({ source: z.enum(["signup", "reacceptance", "profile"]).optional() })
+      .optional()
+      .parse(data ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase as any).rpc("record_legal_acceptance", {
+      _version: LEGAL_VERSION,
+      _source: data?.source ?? "signup",
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
