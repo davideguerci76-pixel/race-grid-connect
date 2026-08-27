@@ -9,6 +9,8 @@ export type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+export type InstallResult = "accepted" | "dismissed" | "unavailable";
+
 let deferred: BeforeInstallPromptEvent | null = null;
 let installed = false;
 const listeners = new Set<() => void>();
@@ -45,20 +47,75 @@ export function wasInstalled() {
 
 export function subscribeInstallPrompt(cb: () => void) {
   listeners.add(cb);
-  return () => listeners.delete(cb);
+  return () => {
+    listeners.delete(cb);
+  };
 }
 
-/** Triggers the native install dialog. Returns true when the user accepted. */
-export async function promptInstall(): Promise<boolean> {
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | "__timeout__"> {
+  return new Promise((resolve) => {
+    let done = false;
+    const t = setTimeout(() => {
+      if (!done) {
+        done = true;
+        resolve("__timeout__");
+      }
+    }, ms);
+    p.then(
+      (v) => {
+        if (!done) {
+          done = true;
+          clearTimeout(t);
+          resolve(v);
+        }
+      },
+      () => {
+        if (!done) {
+          done = true;
+          clearTimeout(t);
+          resolve("__timeout__");
+        }
+      },
+    );
+  });
+}
+
+/**
+ * Triggers the native install dialog.
+ *
+ * `prompt()` is invoked synchronously inside the user gesture (no awaited work
+ * before it) so Chrome keeps the user-activation requirement satisfied.
+ * Both `prompt()` and `userChoice` are guarded by timeouts: some Chrome states
+ * never settle those promises, which previously left the UI stuck in loading.
+ */
+export async function promptInstall(): Promise<InstallResult> {
   const evt = deferred;
-  if (!evt) return false;
+  if (!evt) return "unavailable";
+
+  let promptCall: Promise<void> | undefined;
   try {
-    await evt.prompt();
-    const { outcome } = await evt.userChoice;
+    // Must run in the same task as the click — do not await anything before it.
+    promptCall = evt.prompt();
+  } catch {
     deferred = null;
     emit();
-    return outcome === "accepted";
-  } catch {
-    return false;
+    return "unavailable";
   }
+
+  // If the dialog cannot be shown, prompt() never settles: bail out after 3s.
+  if (promptCall && typeof promptCall.then === "function") {
+    const shown = await withTimeout(promptCall, 3000);
+    if (shown === "__timeout__") {
+      deferred = null;
+      emit();
+      return "unavailable";
+    }
+  }
+
+  // The dialog is open: wait for the choice, but never forever.
+  const choice = await withTimeout(evt.userChoice, 120_000);
+  deferred = null;
+  emit();
+  if (choice === "__timeout__") return "unavailable";
+  return choice.outcome === "accepted" ? "accepted" : "dismissed";
 }

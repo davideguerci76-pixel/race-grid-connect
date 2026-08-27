@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { isStandalone } from "@/lib/pwa/register-sw";
 import {
   getDeferredPrompt,
@@ -6,6 +6,7 @@ import {
   promptInstall,
   subscribeInstallPrompt,
   wasInstalled,
+  type InstallResult,
 } from "@/lib/pwa/install-prompt";
 
 export type InstallMode =
@@ -24,6 +25,8 @@ function isIosLike(): boolean {
 export function useInstallApp() {
   const [mode, setMode] = useState<InstallMode>("hidden");
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const safety = useRef<number | null>(null);
 
   const compute = useCallback(() => {
     if (typeof window === "undefined") return setMode("hidden");
@@ -39,22 +42,44 @@ export function useInstallApp() {
     const unsub = subscribeInstallPrompt(compute);
     // Chromium can fire the event a beat after hydration.
     const t = window.setTimeout(compute, 1500);
+    const mq = window.matchMedia?.("(display-mode: standalone)");
+    mq?.addEventListener?.("change", compute);
+    window.addEventListener("appinstalled", compute);
     return () => {
       unsub();
       window.clearTimeout(t);
+      mq?.removeEventListener?.("change", compute);
+      window.removeEventListener("appinstalled", compute);
+      if (safety.current) window.clearTimeout(safety.current);
     };
   }, [compute]);
 
-  const install = useCallback(async () => {
+  const install = useCallback(async (): Promise<InstallResult> => {
     setBusy(true);
+    setFailed(false);
+    // Hard safety net: the button can never stay in loading state.
+    if (safety.current) window.clearTimeout(safety.current);
+    safety.current = window.setTimeout(() => setBusy(false), 5000);
+
     try {
-      const ok = await promptInstall();
-      compute();
-      return ok;
+      const result = await promptInstall();
+      if (result === "unavailable") {
+        setFailed(true);
+        setMode("manual");
+      } else {
+        compute();
+      }
+      return result;
+    } catch {
+      setFailed(true);
+      setMode("manual");
+      return "unavailable";
     } finally {
+      if (safety.current) window.clearTimeout(safety.current);
+      safety.current = null;
       setBusy(false);
     }
   }, [compute]);
 
-  return { mode, busy, install };
+  return { mode, busy, failed, install };
 }
