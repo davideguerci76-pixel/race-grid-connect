@@ -120,6 +120,14 @@ function RootComponent() {
   // Restore the user's saved language after hydration (SSR always renders 'en').
   useEffect(() => applySavedLanguage(), []);
 
+  // Service worker: registered only in the published app (guarded wrapper).
+  // Taps on a push notification arrive here as an in-app navigation.
+  useEffect(() => {
+    registerServiceWorker((url) => router.navigate({ to: url }).catch(() => undefined));
+  }, [router]);
+
+
+
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
