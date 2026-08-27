@@ -163,6 +163,7 @@ function CalendarPage() {
           <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> {t("sweep_public.dashboard_calendar.legend_unavailable")}</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> {t("sweep_public.dashboard_calendar.legend_available")}</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> {t("sweep_public.dashboard_calendar.legend_engaged")}</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-dashed border-[#16a34a] bg-[#16a34a]/25" /> {t("calendar.legend_unconfirmed", { defaultValue: "Needs confirmation" })}</span>
         </div>
 
         <div className="mt-6">
