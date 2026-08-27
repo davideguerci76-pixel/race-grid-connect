@@ -11,6 +11,7 @@ import { Clock, Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
 import { toastError } from "@/lib/errors";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -20,13 +21,22 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const { t } = useTranslation();
   const check = useServerFn(checkAmIAdmin);
+  const { session, loading: authLoading } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ["am-i-admin"],
-    queryFn: () => check(),
+    queryKey: ["am-i-admin", session?.user.id],
+    enabled: !!session?.access_token,
+    retry: false,
+    queryFn: async () => {
+      try {
+        return await check();
+      } catch {
+        return { isAdmin: false };
+      }
+    },
   });
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  if (isLoading) return <div className="container-page py-10 text-sm text-muted-foreground">{t("sweep_admin_a.checking_access")}</div>;
+  if (authLoading || (session && isLoading)) return <div className="container-page py-10 text-sm text-muted-foreground">{t("sweep_admin_a.checking_access")}</div>;
   if (!data?.isAdmin) {
     throw redirect({ to: "/" });
   }
