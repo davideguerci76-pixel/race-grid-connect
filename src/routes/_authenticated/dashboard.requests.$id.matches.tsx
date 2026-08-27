@@ -15,6 +15,8 @@ import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/r
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
+import { PitCallSummary } from "@/components/pitcall-summary";
+
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
@@ -235,21 +237,16 @@ function RequestMatchesPage() {
 
         {data && (
           <>
+            <PitCallSummary request={data.request as never} />
+
             <div className="border border-border bg-card p-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="label-mono">[PIT CALL]</div>
-                {isPoolRequest && <PoolBadge />}
-              </div>
-              <h1 className="text-3xl font-black uppercase italic tracking-tighter">{data.request.title}</h1>
-              <p className="mt-1 font-mono text-xs text-muted-foreground">
-                {data.request.sub_role ? `${subRoleLabel(data.request.sub_role)} (${levelLabel(data.request.sub_role_min_level ?? "junior")}+)` : roleGroupLabel(data.request.role_group)} · {disciplineLabel(data.request.discipline)} · {data.request.start_date} → {data.request.end_date}
-              </p>
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {t("sweep_engage.request_matches.matches_intro_1")} <span className="font-bold text-racing-yellow">{t("sweep_engage.request_matches.top3")}</span> {t("sweep_engage.request_matches.matches_intro_2", { cost: data.per_profile_cost, hardCap: data.hard_cap })}
               </p>
               <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 {t("sweep_engage.request_matches.total_matches_summary", { full: data.total_matches, partial: data.total_partial_matches, cap: data.hard_cap })}
               </div>
+
               {sosEligible && (
                 <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
                   <div className="min-w-0">
