@@ -12,6 +12,7 @@ import { TokenBadge } from "./token-badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
 import { getUnreadNotificationCount } from "@/lib/paddock.functions";
+import { useAppBadge } from "@/hooks/use-push-notifications";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
 
@@ -57,6 +58,9 @@ export function SiteHeader() {
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
+
+  // Mirror the unread count onto the installed app icon (PWA Badging API).
+  useAppBadge(unread);
 
   // Realtime: bump the badge the instant a notification is inserted for this user,
   // even when the freelancer is not on the engagements page.
