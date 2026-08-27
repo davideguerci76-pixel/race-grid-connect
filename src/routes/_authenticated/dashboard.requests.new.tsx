@@ -533,12 +533,37 @@ function NewRequestPage() {
             <>
               <div>
                 <label className="label-mono">{t("sweep_engage.new_request.start_date")}</label>
-                <input type="date" required={!isSeason} value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+                <input
+                  type="date"
+                  required={!isSeason}
+                  min={DATE_MIN_ISO}
+                  max={DATE_MAX_ISO}
+                  value={form.start_date}
+                  onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+                  aria-invalid={!!startDateError}
+                  className={`mt-1 w-full border bg-background px-3 py-2 ${startDateError ? "border-racing-red" : "border-border"}`}
+                />
+                {startDateError && (
+                  <p className="mt-1 text-[11px] font-semibold text-racing-red">{startDateError}</p>
+                )}
               </div>
               <div>
                 <label className="label-mono">{t("sweep_engage.new_request.end_date")}</label>
-                <input type="date" required={!isSeason} value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+                <input
+                  type="date"
+                  required={!isSeason}
+                  min={form.start_date && !startDateError ? form.start_date : DATE_MIN_ISO}
+                  max={DATE_MAX_ISO}
+                  value={form.end_date}
+                  onChange={(e) => setForm({ ...form, end_date: e.target.value })}
+                  aria-invalid={!!endDateError}
+                  className={`mt-1 w-full border bg-background px-3 py-2 ${endDateError ? "border-racing-red" : "border-border"}`}
+                />
+                {endDateError && (
+                  <p className="mt-1 text-[11px] font-semibold text-racing-red">{endDateError}</p>
+                )}
               </div>
+
             </>
           )}
 
