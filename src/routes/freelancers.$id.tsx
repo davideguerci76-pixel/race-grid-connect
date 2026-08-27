@@ -73,11 +73,11 @@ function FreelancerProfile() {
               )}
               <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" isOwner={isOwner} /></div>
               {(() => {
-                const ts = (fp as any).calendar_last_updated_at;
+                const ts = (fp as any).calendar_last_confirmed_at ?? (fp as any).calendar_last_updated_at;
                 if (!ts) return null;
                 const d = new Date(ts);
                 const days = Math.floor((Date.now() - d.getTime()) / 86400000);
-                const tone = days < 30 ? "text-[#16a34a]" : days < 90 ? "text-racing-yellow" : "text-racing-red";
+                const tone = days < 45 ? "text-[#16a34a]" : days < 90 ? "text-racing-yellow" : "text-muted-foreground";
                 return (
                   <div className={`mt-2 font-mono text-[11px] uppercase tracking-widest ${tone}`}>
                     Calendar confirmed {days}d ago · {formatDate(d)}
