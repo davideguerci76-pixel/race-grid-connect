@@ -1,0 +1,52 @@
+{
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "crash": "The app hit a red flag and stopped this screen.",
+    "server": "Our systems didn't respond correctly. Please try again shortly.",
+    "network": "Connection problem. Check your network and try again.",
+    "offline": "You're offline. Reconnect to continue.",
+    "offlineBanner": "No connection — PITCALL is offline",
+    "forbidden": "You don't have access to this area.",
+    "notFound": "We couldn't find what you were looking for.",
+    "rateLimited": "Too many attempts. Please wait a moment and retry.",
+    "duplicate": "This entry already exists.",
+    "conflict": "This action conflicts with existing data.",
+    "invalidData": "Some data isn't valid. Please review the fields.",
+    "cancelled": "Action cancelled.",
+    "reference": "Reference",
+    "auth": {
+      "session": "Your session expired. Please sign in again.",
+      "invalidCredentials": "Email or password is incorrect.",
+      "emailNotConfirmed": "Confirm your email address to continue."
+    },
+    "tokens": {
+      "insufficient": "You don't have enough tokens for this action."
+    },
+    "validation": {
+      "generic": "Please check the highlighted fields.",
+      "required": "This field is required."
+    },
+    "pwa": {
+      "install": "Installation couldn't be completed on this device.",
+      "push": "Push notifications couldn't be enabled."
+    },
+    "screens": {
+      "crashTitle": "Red flag",
+      "crashBody": "This screen stopped unexpectedly. Try again or return to the grid.",
+      "notFoundTitle": "Off the track",
+      "notFoundBody": "This page doesn't exist or has left the paddock.",
+      "forbiddenTitle": "Restricted area",
+      "forbiddenBody": "You don't have permission to enter this part of the paddock."
+    },
+    "actions": {
+      "retry": "Try again",
+      "home": "Back to grid"
+    }
+  },
+  "confirm": {
+    "defaultTitle": "Confirm action",
+    "defaultDescription": "Do you want to continue?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}
