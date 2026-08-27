@@ -38,6 +38,11 @@ export default defineConfig({
         workbox: {
           importScripts: ["/push-sw.js"],
           globPatterns: ["**/*.{js,css,woff2,png,svg,ico}"],
+          // The deploy serves client output from the origin root (/assets,
+          // /icons, ...), not from /client. Without this mapping Workbox emits
+          // /client/* precache URLs; every request 404s and the worker cannot
+          // complete its install event, which can stall Android WebAPK setup.
+          modifyURLPrefix: { "client/": "" },
           navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/_serverFn\//, /^\/lovable\//],
           cleanupOutdatedCaches: true,
           clientsClaim: true,
