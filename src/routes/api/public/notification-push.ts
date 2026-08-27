@@ -73,11 +73,14 @@ export const Route = createFileRoute("/api/public/notification-push")({
               })),
               { onConflict: "notification_id,subscription_id", ignoreDuplicates: true },
             );
+            // Only mark as pushed once at least one delivery row exists, so a
+            // notification created while the user had no active subscription
+            // is still delivered when they re-subscribe within the window.
+            await supabaseAdmin
+              .from("notifications")
+              .update({ pushed_at: new Date().toISOString() })
+              .eq("id", n.id as string);
           }
-          await supabaseAdmin
-            .from("notifications")
-            .update({ pushed_at: new Date().toISOString() })
-            .eq("id", n.id as string);
         }
 
         // 2) Deliver everything still pending or retryable.
