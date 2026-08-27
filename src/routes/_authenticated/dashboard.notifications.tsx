@@ -113,7 +113,8 @@ function NotificationsPage() {
               {(notifications as any[]).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
-                const isEngagement = [
+                const info = n.payload?.informational === true;
+                const isEngagement = !info && [
                   "engagement_proposed",
                   "match_taken",
                   "match_reopened",
