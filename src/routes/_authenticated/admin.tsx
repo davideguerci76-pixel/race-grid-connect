@@ -11,6 +11,7 @@ import { Clock, Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
 import { toastError } from "@/lib/errors";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,

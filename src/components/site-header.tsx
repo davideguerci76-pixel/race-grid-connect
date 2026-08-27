@@ -19,7 +19,7 @@ import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 export function SiteHeader() {
   const { t } = useTranslation();
   const flags = usePlatformFlags();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const checkAdmin = useServerFn(checkAmIAdmin);
@@ -45,16 +45,30 @@ export function SiteHeader() {
 
   const { data: isAdmin } = useQuery({
     queryKey: ["is-admin", user?.id],
-    enabled: !!user,
-    queryFn: async () => (await checkAdmin()).isAdmin,
+    enabled: !!session?.access_token,
+    retry: false,
+    queryFn: async () => {
+      try {
+        return (await checkAdmin()).isAdmin;
+      } catch {
+        return false;
+      }
+    },
   });
 
   const getUnread = useServerFn(getUnreadNotificationCount);
   const qc = useQueryClient();
   const { data: unread } = useQuery({
     queryKey: ["unread-notifications", user?.id],
-    enabled: !!user,
-    queryFn: async () => (await getUnread()).count,
+    enabled: !!session?.access_token,
+    retry: false,
+    queryFn: async () => {
+      try {
+        return (await getUnread()).count;
+      } catch {
+        return 0;
+      }
+    },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
