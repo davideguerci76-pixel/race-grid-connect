@@ -196,6 +196,32 @@ function NewRequestPage() {
 
   const seasonDatesIso = useMemo(() => seasonDates.map(fmt).sort(), [seasonDates]);
 
+  // --- Date validation (client-side, immediate) -------------------------------
+  const DATE_MIN_ISO = `${new Date().getFullYear() - 1}-01-01`;
+  const DATE_MAX_ISO = `${new Date().getFullYear() + 5}-12-31`;
+  const parseIso = (v: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+    const d = new Date(`${v}T00:00:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+  const inRange = (v: string) => v >= DATE_MIN_ISO && v <= DATE_MAX_ISO;
+  const startDateError = useMemo(() => {
+    if (isSeason || !form.start_date) return null;
+    if (!parseIso(form.start_date)) return t("sweep_engage.new_request.date_invalid");
+    if (!inRange(form.start_date)) return t("sweep_engage.new_request.date_out_of_range");
+    return null;
+  }, [isSeason, form.start_date, t]);
+  const endDateError = useMemo(() => {
+    if (isSeason || !form.end_date) return null;
+    if (!parseIso(form.end_date)) return t("sweep_engage.new_request.date_invalid");
+    if (!inRange(form.end_date)) return t("sweep_engage.new_request.date_out_of_range");
+    if (form.start_date && !startDateError && form.end_date < form.start_date)
+      return t("sweep_engage.new_request.date_end_before_start");
+    return null;
+  }, [isSeason, form.end_date, form.start_date, startDateError, t]);
+  const datesInvalid = !isSeason && (!!startDateError || !!endDateError);
+
+
   const mut = useMutation({
     mutationFn: () =>
       create({
