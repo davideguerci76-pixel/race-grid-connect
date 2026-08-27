@@ -560,11 +560,11 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
   return (
     <div className="@container">
       <div className={`rounded-2xl border p-5 @lg:p-6 ${cardBorder}`}>
-        <div className="flex flex-col gap-5 @lg:flex-row @lg:gap-6">
-          {/* SCORE */}
-          <div className="flex shrink-0 flex-row items-center gap-4 @lg:w-[132px] @lg:flex-col @lg:items-center @lg:gap-0 @lg:text-center">
+        {/* TOP ROW: score block (left) + CTA (right) */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
             <div className={`text-[46px] font-black leading-none tracking-tighter @lg:text-[54px] ${scoreColor}`}>{pct}%</div>
-            <div className="@lg:mt-2">
+            <div className="mt-1.5">
               <div className={`font-mono text-[11px] font-bold uppercase tracking-[0.16em] ${labelColor}`}>{stateLabel}</div>
               <div className="mt-1.5 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match?.rank ?? "—", tier: match?.tier ?? "—", count: match?.overlap_days ?? 0 })}
@@ -576,8 +576,36 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
             </div>
           </div>
 
-          {/* MAIN */}
-          <div className="min-w-0 flex-1">
+          {/* CTA */}
+          <div className="flex shrink-0 flex-col items-stretch gap-2.5">
+            {blurred && (
+              <button
+                onClick={onUnlock}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-[14px] font-bold text-foreground transition-colors hover:border-racing-red disabled:opacity-60"
+              >
+                <Unlock className="size-3.5" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
+              </button>
+            )}
+            {match?.unlocked && !requestFilled && (
+              <button
+                onClick={onConfirm}
+                disabled={loading}
+                className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
+              >
+                {t("sweep_engage.request_matches.request_confirmation_button")}
+              </button>
+            )}
+            {requestFilled && (
+              <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-3 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                {t("sweep_engage.request_matches.match_already_assigned")}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* MAIN: full width below */}
+        <div className="mt-4 min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               {!match?.unlocked && <Lock className="size-4 shrink-0 text-muted-foreground" />}
               <span className={`text-[19px] font-extrabold ${showIdentity ? "" : "text-muted-foreground"}`}>
