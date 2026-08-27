@@ -588,13 +588,19 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
               </button>
             )}
             {match?.unlocked && !requestFilled && (
-              <button
-                onClick={onConfirm}
-                disabled={loading}
-                className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
-              >
-                {t("sweep_engage.request_matches.request_confirmation_button")}
-              </button>
+              match?.confirmation_requested ? (
+                <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-4 py-3 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                  {t("mcard.confirmation_requested")}
+                </span>
+              ) : (
+                <button
+                  onClick={onConfirm}
+                  disabled={loading}
+                  className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
+                >
+                  {t("sweep_engage.request_matches.request_confirmation_button")}
+                </button>
+              )
             )}
             {requestFilled && (
               <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-3 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
