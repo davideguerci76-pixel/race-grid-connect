@@ -35,7 +35,7 @@ export const exportMyData = createServerFn({ method: "POST" })
       exported_at: new Date().toISOString(),
       account: profile?.data ?? null,
       freelancer_profile: freelancerProfile?.data ?? null,
-      team_profile: teamProfile?.data ?? null,
+      team_profile: teamProfile?.data ? { ...teamProfile.data, vat_number: (teamVat?.data as string | null) ?? null } : null,
       contacts: contacts?.data ?? null,
       availability,
       calendars,
