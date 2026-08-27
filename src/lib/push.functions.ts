@@ -54,6 +54,23 @@ export const deletePushSubscription = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Marks a device as "really used" — the app was opened by an authenticated user
+ * with an active subscription. The database ignores the call when the row was
+ * already touched in the last 24h, so at most one write per device per day.
+ * Never called from the service worker: background push delivery is not usage.
+ */
+export const touchPushSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ endpoint: z.string().url() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: touched, error } = await (context.supabase as any).rpc("touch_push_subscription", {
+      _endpoint: data.endpoint,
+    });
+    if (error) throw new Error(error.message);
+    return { touched: Boolean(touched) };
+  });
+
 /** Devices currently registered for the signed-in user (current environment only). */
 export const listMyPushDevices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
