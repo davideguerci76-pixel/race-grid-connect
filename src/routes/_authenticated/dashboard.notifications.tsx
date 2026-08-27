@@ -92,7 +92,10 @@ function NotificationsPage() {
           </div>
         </div>
 
+        <PushSetupCard />
+
         <div className="mt-6 border border-border bg-card">
+
           <div className="border-b border-border px-4 py-2">
             <span className="label-mono">[INBOX]{unreadCount > 0 ? ` · ${unreadCount} ${t("sweep_profile.notifications.unread")}` : ""}</span>
           </div>
