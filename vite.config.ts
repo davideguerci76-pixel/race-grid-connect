@@ -6,6 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import path from "node:path";
 import { loadEnv } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 const fallbackBackendUrl = "https://vhxbhdryexeowlgbuwng.supabase.co";
