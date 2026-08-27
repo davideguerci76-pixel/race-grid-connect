@@ -107,6 +107,12 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.engagements.confirm_failed"),
   });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  const revealFn = useServerFn(revealMatch);
+  const revealMut = useMutation({
+    mutationFn: (matchId: string) => revealFn({ data: { match_id: matchId } }),
+    onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
+  });
   const cancelFn = useServerFn(cancelEngagement);
   const cancelMut = useMutation({
     mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
