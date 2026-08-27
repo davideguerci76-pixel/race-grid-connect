@@ -47,6 +47,7 @@ export function useInstallApp() {
 
   const compute = useCallback(() => {
     if (typeof window === "undefined") return setMode("hidden");
+    if (!isMobileOrTabletDevice()) return setMode("hidden"); // never promote install on desktop
     if (isStandalone() || wasInstalled()) return setMode("hidden");
     if (getDeferredPrompt()) return setMode("prompt");
     if (isIosLike()) return setMode("ios");
