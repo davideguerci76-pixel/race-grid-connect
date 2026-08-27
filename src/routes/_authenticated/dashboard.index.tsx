@@ -42,7 +42,7 @@ function DashboardHome() {
     if (!user?.id) return;
     if (window.sessionStorage.getItem("pendingLegalAccept") !== "1") return;
     window.sessionStorage.removeItem("pendingLegalAccept");
-    void recordLegalAcceptance().catch(() => undefined);
+    void recordLegalAcceptance({ data: { source: "signup" } }).catch(() => undefined);
   }, [user?.id]);
 
   // Sync pending user_type saved before OAuth (Google sign-up doesn't pass metadata)
