@@ -51,9 +51,42 @@
 
 **Localizzazione**: nuovo namespace `errors` in EN/IT/ES/FR/DE (`src/i18n/locales/{lang}.errors.json`), registrato in `src/i18n/index.ts` come gli altri sweep. Zero stringhe hardcoded residue nei punti toccati.
 
-## 3. Separazione UI / log
+## 3. Verifiche richieste su logging e telemetria
+
+### 3.1 Cosa fa oggi `reportLovableError` (verificato)
+Il file è un wrapper di **8 righe utili**: chiama `window.__lovableEvents?.captureException?.(error, context, options)`.
+- **Endpoint**: nessuno nel nostro codice. Non c'è `fetch`, nessuna URL, nessuna chiave. È una chiamata a un oggetto globale (`window.__lovableEvents`) che viene iniettato dal runtime dell'editor/preview Lovable. Se il global non esiste, la funzione è un **no-op silenzioso** (optional chaining).
+- **Dati inviati oggi**: l'oggetto `Error` (message + stack), `source: "react_error_boundary"`, `route: window.location.pathname`, `boundary`. **Nessun** email, user_id, payload, dato di profilo o di Pit Call — a meno che non siamo noi a passarli nel `context`.
+- **Dove gira**: solo client (`typeof window === "undefined"` → return). È usato in **un solo punto**: l'error boundary root. In produzione sul dominio pitcall.net il global normalmente non è presente, quindi non parte nulla; ma è un **canale opaco**: se domani l'infrastruttura lo iniettasse anche in produzione, gli errori partirebbero senza nostro controllo.
+- **Necessario a PITCALL?** No. È esclusivamente telemetria/debug lato builder. Rimuoverlo non rompe nulla.
+
+**Decisione proposta (non lo rimuovo, lo recinto):** `report.ts` espone dei *sink*. Il sink Lovable viene invocato **solo** quando l'ambiente non è LIVE, cioè `import.meta.env.DEV === true` **oppure** l'hostname è di preview (`*.lovable.app`), **e** solo con un payload minimo già sanitizzato (`{ code, referenceId, route }` + Error originale). Su `pitcall.net` / `www.pitcall.net` il sink Lovable non viene mai chiamato. Nessuna dipendenza opaca nel nuovo sistema: se il file venisse eliminato, `report.ts` continua a funzionare.
+
+### 3.2 Politica di logging DEV/TEST vs LIVE
+`report.ts` avrà due modalità, decise da `isLiveEnv()` (hostname produzione e non `import.meta.env.DEV`):
+
+- **DEV / preview / TEST**: `console.error` con gruppo completo — errore originale, stack, route, reference id, codice normalizzato, e payload **solo** se il call site lo passa esplicitamente come `debugPayload` (parametro che in LIVE viene scartato prima di qualsiasi log).
+- **LIVE**: una sola riga sanitizzata: `PITCALL [PC-A7F3K9] auth/session_expired @ /dashboard/matches`. Niente stack, niente payload applicativo, niente oggetto errore, niente dati personali. Un `sanitize()` centralizzato elimina comunque per chiave qualsiasi campo che matcha `token|password|secret|jwt|apikey|authorization|session|email|phone|vat`, e la route viene ridotta al **pattern** (`/dashboard/requests/:id/matches`) invece che all'URL con id reali.
+
+### 3.3 Nessun testo tecnico può raggiungere la UI
+Vincolo strutturale, non stilistico: `normalize()` restituisce **solo** `{ code, titleKey, messageKey, action, referenceId }` — nessun campo stringa libera. `PitcallErrorScreen`, `toastError` e i toast accettano **esclusivamente chiavi i18n**, quindi `.message`, `.details`, `.hint`, `.code` Postgres, stack e risposte raw non hanno alcun percorso verso il render. `e.message` viene letto solo dentro `normalize()` per fare pattern matching sul codice e poi scartato. Aggiungo una regola ESLint locale (o in mancanza un check testuale nella passata finale) che vieta `toast.error(...message)` per evitare regressioni future.
+
+### 3.4 Error reference: generazione, registrazione, ricerca
+- **Formato**: `PC-` + 6 caratteri base32 Crockford (niente I/L/O/U) da `crypto.getRandomValues` → ~1,07 miliardi di combinazioni. Es. `PC-A7F3K9`.
+- **Generato** in `report.ts`, una volta per errore, prima di qualsiasi log o render.
+- **Registrato in tre posti, in ordine di costo crescente:**
+  1. console (sempre, con la sanitizzazione della 3.2);
+  2. **ring buffer in `sessionStorage`** (`pitcall:errors`, ultimi 20 record: id, code, route pattern, timestamp). Sopravvive al refresh e alla navigazione, si azzera alla chiusura della scheda. Serve al supporto per farsi dettare gli ultimi id;
+  3. **tabella `client_error_log`** (opzionale ma raccomandata, altrimenti in LIVE il codice resta cosmetico): `reference_id`, `code`, `route_pattern`, `user_id` (nullable), `created_at`, `env` (LIVE/TEST). **Nessun** message, stack o payload. Insert consentito a `authenticated` e `anon`, SELECT solo admin via `has_role`. Scrittura best-effort, fire-and-forget, con throttling client (max 5 eventi/minuto) per non creare rumore o vettore di spam.
+- **Ricerca**: campo di ricerca per reference id nell'Admin Control Panel (piccola sezione dentro la pagina admin esistente) che interroga `client_error_log`. Senza il punto 3, la ricerca esiste solo per DEV/TEST via console — te lo segnalo chiaramente perché è la differenza tra un codice utile e uno decorativo.
+- **Sproporzione?** No: una tabella a 6 colonne, una policy, un input di ricerca. Nessun servizio esterno, nessun APM, nessun costo ricorrente.
+
+**Ti chiedo una conferma sul punto 3.4.3** (creazione di `client_error_log`): è l'unico elemento del piano che tocca il database. Se preferisci, parto senza e il reference id resta correlabile solo via console/sessionStorage.
+
+## 3bis. Separazione UI / log (sintesi)
 - UI: solo chiavi i18n del namespace `errors` + reference id.
-- Log: `report.ts` scrive in console (dev e prod) errore reale, stack, route, id; nessun nuovo servizio esterno, nessun overengineering.
+- Log: `report.ts`, con le due modalità sopra. Nessun servizio esterno aggiuntivo.
+
 
 ## 4. Rischi
 - Toccare ~45 file: rischio di regressioni di compilazione più che logiche. Le modifiche sono solo di presentazione; nessuna mutation, query, RPC o flag viene alterata.
@@ -62,7 +95,8 @@
 
 ## 5. Piano di esecuzione
 1. Namespace i18n `errors` (5 lingue) + registrazione.
-2. `normalize.ts`, `report.ts`, `toast.ts`.
+2. `normalize.ts`, `report.ts` (sink recintati + modalità DEV/LIVE + reference id + ring buffer), `toast.ts`.
+2bis. (se approvato) tabella `client_error_log` + ricerca per reference id in Admin.
 3. `PitcallErrorScreen`, `ConfirmDialog`/`useConfirm`, `OfflineBanner`.
 4. Riscrittura `error-page.ts` + router defaults + `__root.tsx`.
 5. Sweep dei ~40 `toast.error` e dei 22 `confirm`.
