@@ -108,7 +108,11 @@ function RequestMatchesPage() {
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
-  const hasAnyMatches = fullItems.length + partialItems.length > 0 || Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0;
+  const hasAnyMatches =
+    fullItems.length + partialItems.length > 0 ||
+    Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0 ||
+    Boolean((data?.request as any)?.ever_full_matched) ||
+    Boolean((data?.request as any)?.ever_partial_matched);
   const outsidePoolCount = Number((data as any)?.outside_pool_count ?? 0);
   const upgradeCost = Number((data as any)?.upgrade_cost ?? 0);
   const upgradeFn = useServerFn(upgradeRequestToStandard);
