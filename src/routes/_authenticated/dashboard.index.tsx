@@ -12,6 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 import { MarketHighlights } from "@/components/market-highlights";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
+import { InstallAppCard } from "@/components/install-app-card";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -140,6 +141,8 @@ function DashboardHome() {
       <div className="container-page py-12">
         <div className="label-mono">[DASHBOARD]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("dashboard.welcome", { name: (profile?.user_type === "freelancer" ? [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") : profile?.display_name) || "" })}</h1>
+
+        <InstallAppCard />
 
         {activeMatchesCount > 0 && (
           <Link to="/dashboard/matches" className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">

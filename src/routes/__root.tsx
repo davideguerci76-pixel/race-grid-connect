@@ -17,6 +17,7 @@ import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
 import { registerServiceWorker } from "@/lib/pwa/register-sw";
+import { initInstallPromptCapture } from "@/lib/pwa/install-prompt";
 
 
 
@@ -121,6 +122,9 @@ function RootComponent() {
 
   // Restore the user's saved language after hydration (SSR always renders 'en').
   useEffect(() => applySavedLanguage(), []);
+
+  // Capture the Android install prompt as early as possible.
+  useEffect(() => initInstallPromptCapture(), []);
 
   // Service worker: registered only in the published app (guarded wrapper).
   // Taps on a push notification arrive here as an in-app navigation.
