@@ -21,6 +21,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { BackButton } from "@/components/back-button";
 import { PrivacyDataSection } from "@/components/privacy-data-section";
 import { toastError } from "@/lib/errors";
+import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
@@ -30,43 +32,67 @@ function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
+  const { data: profile, isLoading: profileLoading, error: profileError, refetch: refetchProfile } = useQuery({
     queryKey: ["profile-detail", user?.id],
     enabled: !!user,
+    retry: false,
     queryFn: async () => {
-      const [{ data: p, error: pError }, { data: fp, error: fpError }, { data: tp, error: tpError }, phoneRes, vatRes] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
-        supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
-        supabase.from("team_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
-        supabase.rpc("my_freelancer_phone"),
-        (supabase.rpc as any)("my_team_vat"),
-      ]);
+      const { data: p, error: pError } = await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle();
       if (pError) throw new Error(pError.message);
+
+      const isTeam = p?.user_type === "team";
+
+      if (isTeam) {
+        // Only the non-sensitive columns are readable; `select("*")` would hit the
+        // owner-only VAT column and fail with a raw permission error.
+        const [{ data: tp, error: tpError }, vatRes] = await Promise.all([
+          supabase
+            .from("team_profiles")
+            .select(
+              "user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test",
+            )
+            .eq("user_id", user!.id)
+            .maybeSingle(),
+          (supabase.rpc as any)("my_team_vat"),
+        ]);
+        if (tpError) throw new Error(tpError.message);
+        const tpWithVat = tp ? { ...tp, vat_number: (vatRes?.data as string | null) ?? null } : tp;
+        return { ...p, freelancerProfile: null as any, teamProfile: tpWithVat };
+      }
+
+      const [{ data: fp, error: fpError }, phoneRes] = await Promise.all([
+        supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+        supabase.rpc("my_freelancer_phone"),
+      ]);
       if (fpError) throw new Error(fpError.message);
-      if (tpError) throw new Error(tpError.message);
       // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
       const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
       const fpWithPhone = fp ? { ...fp, phone_dial_code: phoneRow?.phone_dial_code ?? null, phone_number: phoneRow?.phone_number ?? null } : fp;
-      // VAT number is owner-only (column not readable via the broad team_profiles policy); merge it in here.
-      const tpWithVat = tp ? { ...tp, vat_number: (vatRes?.data as string | null) ?? null } : tp;
-      return { ...p, freelancerProfile: fpWithPhone, teamProfile: tpWithVat };
+      return { ...p, freelancerProfile: fpWithPhone, teamProfile: null as any };
     },
   });
 
   const isFreelancer = profile?.user_type === "freelancer";
 
+  useEffect(() => {
+    if (profileError) toastError(profileError, "errors.server", { route: "/dashboard/profile" });
+  }, [profileError]);
+
   if (profileError) {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />
-      <div className="container-page pt-6"><BackButton /></div>
-        <div className="container-page py-12 text-sm text-racing-red">
-          {profileError instanceof Error ? profileError.message : "Profile could not be loaded."}
-        </div>
+        <PitcallErrorScreen
+          code="500"
+          titleKey="errors.screens.crashTitle"
+          bodyKey="errors.server"
+          onRetry={() => void refetchProfile()}
+        />
         <SiteFooter />
       </div>
     );
   }
+
 
   if (profileLoading || !profile?.user_type) {
     return (
