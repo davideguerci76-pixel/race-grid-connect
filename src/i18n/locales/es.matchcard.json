@@ -1,0 +1,27 @@
+{
+  "mcard": {
+    "view_details": "Ver detalles",
+    "hide_details": "Ocultar detalles",
+    "label_perfect": "Match perfecto",
+    "label_full": "Match completo",
+    "label_partial": "Match parcial",
+    "all_hard_met": "Todos los requisitos obligatorios cumplidos",
+    "hard_missing": "Requisito obligatorio ausente: {{list}}",
+    "missing_preferred": "Preferencias ausentes: {{list}}",
+    "missing_days_line": "Faltan {{count}} día(s): {{dates}}",
+    "days_available": "{{count}} día(s) disponibles",
+    "travels": "Viaja",
+    "yes": "Sí",
+    "no": "No",
+    "rating": "Rating",
+    "headline": "Titular",
+    "disciplines": "Disciplinas",
+    "skills": "Skills",
+    "languages": "Idiomas",
+    "exp_edu": "Experiencia y formación",
+    "criteria": "Verificación de criterios",
+    "contact": "Contacto",
+    "criteria_all_ok": "Todos los criterios cumplidos",
+    "years_short": "años"
+  }
+}

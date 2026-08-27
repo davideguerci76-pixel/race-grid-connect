@@ -1,16 +1,16 @@
 import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Lock, Unlock, Mail, Phone, Star, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
+import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard } from "@/lib/paddock.functions";
-import { disciplineLabel, initialsFor } from "@/lib/paddock";
+import { disciplineLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
@@ -475,8 +475,32 @@ function TierPlaceholder({ rank }: { rank: number }) {
   );
 }
 
+function Chip({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "hard" }) {
+  return (
+    <span
+      className={`rounded-md border px-2.5 py-1 text-[13px] leading-none ${
+        tone === "hard"
+          ? "border-racing-red/70 bg-racing-red/10 font-semibold text-racing-red"
+          : "border-border bg-secondary text-foreground"
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function DetailBlock({ title, children, wide = false }: { title: string; children: React.ReactNode; wide?: boolean }) {
+  return (
+    <div className={wide ? "@xl:col-span-2" : ""}>
+      <h4 className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{title}</h4>
+      {children}
+    </div>
+  );
+}
+
 function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProfileCost }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean; perProfileCost: number }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
   const pct = Math.round(Number(match?.skills_score ?? match?.match_score ?? 0));
   const perfect = !!match?.is_perfect;
   const blurred = !!match?.blurred;
@@ -488,178 +512,256 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
   const subRoles = parseSubRoles(profile?.sub_roles);
   const disciplines = Array.isArray(profile?.disciplines) ? profile.disciplines : [];
   const skills = Array.isArray(profile?.skills) ? profile.skills : [];
+  const languages = Array.isArray(profile?.languages) ? profile.languages : [];
+  const experiences = Array.isArray(profile?.experiences) ? profile.experiences : [];
   const showIdentity = typeof profile?.display_name === "string" && profile.display_name.trim().length > 0;
   const phoneLabel = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join(" ").trim();
   const telHref = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
   const gapLabel = edgeOnly ? t("sweep_engage.request_matches.gap_edge_only") : t("sweep_engage.request_matches.gap_central");
-  const partialBorder = edgeOnly ? "border-racing-yellow/60 bg-racing-yellow/5" : "border-racing-red/60 bg-racing-red/5";
-  const gapBadge = edgeOnly
-    ? "border-racing-yellow/60 bg-racing-yellow/10 text-racing-yellow"
-    : "border-racing-red/60 bg-racing-red/10 text-racing-red";
-  const gapDot = edgeOnly ? "bg-racing-yellow" : "bg-racing-red";
+
+  const hardMissing = missingCriteria.filter((c: any) => c?.hard);
+  const softMissing = missingCriteria.filter((c: any) => !c?.hard);
+
+  const scoreColor = perfect ? "text-racing-yellow" : isPartial ? "text-racing-red" : "text-foreground";
+  const labelColor = perfect ? "text-racing-yellow" : isPartial ? "text-racing-red" : "text-success";
+  const stateLabel = perfect
+    ? t("mcard.label_perfect")
+    : isPartial
+      ? t("mcard.label_partial")
+      : t("mcard.label_full");
+  const cardBorder = perfect
+    ? "border-racing-yellow/55 bg-racing-yellow/5"
+    : isPartial
+      ? (edgeOnly ? "border-racing-yellow/50 bg-racing-yellow/5" : "border-racing-red/55 bg-racing-red/5")
+      : open
+        ? "border-racing-red/50 bg-card"
+        : "border-border bg-card";
+
+  const facts: React.ReactNode[] = [];
+  if (profile?.location) facts.push(<span key="loc">{profile.location}</span>);
+  if (profile?.day_rate != null) facts.push(<span key="rate">{t("sweep_engage.request_matches.day_rate_per_day", { rate: profile.day_rate })}</span>);
+  facts.push(<span key="days">{t("mcard.days_available", { count: match?.overlap_days ?? 0 })}</span>);
+  if (profile) {
+    facts.push(
+      <span key="travel">
+        {t("mcard.travels")}: <b className="font-semibold">{profile.travels ? t("mcard.yes") : t("mcard.no")}</b>
+      </span>,
+    );
+  }
+  if (match?.rating && match.rating.count > 0) {
+    facts.push(
+      <span key="rating" className="inline-flex items-center gap-1.5">
+        <span className="text-muted-foreground">{t("mcard.rating")}</span>
+        <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
+      </span>,
+    );
+  }
 
   return (
-    <div className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : isPartial ? partialBorder : "border-border bg-card"}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {match?.unlocked ? <Unlock className="size-4 text-racing-yellow" /> : <Lock className="size-4 text-muted-foreground" />}
-          <div>
-            <div className={`text-3xl font-black italic tracking-tighter ${perfect ? "text-racing-yellow" : "text-racing-red"}`}>
-              {pct}% <span className="text-sm font-mono uppercase tracking-widest">{perfect ? t("sweep_engage.request_matches.perfect_match_short") : t("sweep_engage.request_matches.skills_affinity")}</span>
+    <div className="@container">
+      <div className={`rounded-2xl border p-5 @lg:p-6 ${cardBorder}`}>
+        <div className="flex flex-col gap-5 @lg:flex-row @lg:gap-6">
+          {/* SCORE */}
+          <div className="flex shrink-0 flex-row items-center gap-4 @lg:w-[132px] @lg:flex-col @lg:items-center @lg:gap-0 @lg:text-center">
+            <div className={`text-[46px] font-black leading-none tracking-tighter @lg:text-[54px] ${scoreColor}`}>{pct}%</div>
+            <div className="@lg:mt-2">
+              <div className={`font-mono text-[11px] font-bold uppercase tracking-[0.16em] ${labelColor}`}>{stateLabel}</div>
+              <div className="mt-1.5 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match?.rank ?? "—", tier: match?.tier ?? "—", count: match?.overlap_days ?? 0 })}
+              </div>
+              {match?.top_three && <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">{t("sweep_engage.request_matches.top3_free")}</div>}
+              {match?.free_preview && !match?.top_three && match?.unlocked && (
+                <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">{t("sweep_engage.request_matches.unlocked_tag")}</div>
+              )}
             </div>
-            {match?.in_pool && <div className="mb-1"><PoolBadge /></div>}
-            <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-              {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match?.rank ?? "—", tier: match?.tier ?? "—", count: match?.overlap_days ?? 0 })}
-              {match?.top_three && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.top3_free")}</span>}
-              {match?.free_preview && !match?.top_three && match?.unlocked && <span className="ml-2 text-racing-yellow">· {t("sweep_engage.request_matches.unlocked_tag")}</span>}
-            </div>
-            {isPartial && (
-              <div className="mt-2 space-y-2">
-                <div className={`inline-flex items-center gap-2 border ${gapBadge} px-2 py-1 font-mono text-[10px] uppercase tracking-widest`} title={gapLabel}>
-                  <span className={`inline-block size-2 rounded-full ${gapDot}`} />
-                  <Clock className="size-3" /> {t("sweep_engage.request_matches.missing_days_badge", { count: match?.missing_days ?? 0 })} · {gapLabel}
-                </div>
-                {missingDates.length > 0 && (
-                  <div className="border border-racing-yellow/50 bg-background/60 p-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                    <div className="mb-1">{t(missingDates.length === 1 ? "sweep_engage.request_matches.missing_dates_one" : "sweep_engage.request_matches.missing_dates_many")}</div>
-                    <div className="flex flex-wrap gap-1">
-                      {missingDates.map((day: string) => (
-                        <time key={day} dateTime={day} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5">
-                          {day}
-                        </time>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {match?.rating && match.rating.count > 0 && (
-              <div className="mt-1">
-                <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {blurred && (
-            <button
-              onClick={onUnlock}
-              disabled={loading}
-              className="flex items-center gap-2 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-            >
-              <Unlock className="size-3" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
-            </button>
-          )}
-          {match?.unlocked && !requestFilled && (
-            <button
-              onClick={onConfirm}
-              disabled={loading}
-              className="flex items-center gap-2 bg-racing-yellow px-4 py-2 text-xs font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
-            >
-              {t("sweep_engage.request_matches.request_confirmation_button")}
-            </button>
-          )}
-          {requestFilled && (
-            <span className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-              {t("sweep_engage.request_matches.match_already_assigned")}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {match?.unlocked && profile ? (
-        <div className="mt-4 grid gap-4 border-t border-border pt-4 md:grid-cols-2">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center border border-border bg-secondary font-black uppercase text-muted-foreground">
-                {showIdentity ? initialsFor(profile.display_name) : <Lock className="size-4" />}
-              </div>
-              <div>
-                <div className={showIdentity ? "text-lg font-bold" : "text-lg font-bold text-muted-foreground"}>
-                  {showIdentity ? profile.display_name : t("sweep_engage.request_matches.hidden_freelancer")}
-                </div>
-                {profile.role_group && <div className="font-mono text-[11px] uppercase text-muted-foreground">{roleGroupLabel(profile.role_group)}{subRoles.length ? ` · ${subRoles.map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""}</div>}
-              </div>
-            </div>
-            {profile.headline && <p className="mt-3 text-sm">{profile.headline}</p>}
-            {profile.bio && <p className="mt-2 text-xs text-muted-foreground">{profile.bio}</p>}
-            <div className="mt-3 space-y-1 font-mono text-[11px] uppercase text-muted-foreground">
-              {profile.location && <div>📍 {profile.location}</div>}
-              {profile.day_rate != null && <div>{t("sweep_engage.request_matches.day_rate_per_day", { rate: profile.day_rate })}</div>}
-              <div>{t("sweep_engage.request_matches.travels_line", { answer: profile.travels ? t("sweep_engage.matches.yes") : t("sweep_engage.matches.no") })}</div>
-            </div>
-          </div>
-          <div>
-            <div className="label-mono mb-1">[CONTACT]</div>
-            {profile.contact_email || profile.phone_number ? (
-              <div className="grid gap-1 border border-racing-yellow/40 bg-racing-yellow/5 p-3 font-mono text-xs">
-                {profile.contact_email && <a href={`mailto:${profile.contact_email}`} className="break-all text-racing-red hover:underline">{profile.contact_email}</a>}
-                {profile.phone_number && <a href={`tel:${telHref}`} className="text-racing-red hover:underline">{phoneLabel || profile.phone_number}</a>}
-              </div>
-            ) : (
-              <div className="rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                {t("sweep_engage.matches.name_contacts_hidden")}
-              </div>
-            )}
-            {disciplines.length > 0 && (
-              <>
-                <div className="label-mono mb-1 mt-3">[DISCIPLINES]</div>
-                <div className="flex flex-wrap gap-1">
-                  {disciplines.map((d: string) => (
-                    <span key={d} className="border border-border bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase">{disciplineLabel(d)}</span>
-                  ))}
-                </div>
-              </>
-            )}
-            {skills.length > 0 && (
-              <>
-                <div className="label-mono mb-1 mt-3">[SKILLS]</div>
-                <div className="flex flex-wrap gap-1">
-                  {skills.map((s: string) => (
-                    <span key={s} className="border border-border bg-secondary px-2 py-0.5 font-mono text-[10px] uppercase">{s}</span>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
 
-          <div className="md:col-span-2 border-t border-border pt-4">
-            <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {missingCriteria.length === 0 ? t("sweep_engage.matches.criteria") : t("sweep_engage.matches.missing_criteria")}</div>
-            {missingCriteria.length === 0 ? (
-              <div className="font-mono text-[11px] text-racing-yellow">{t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {missingCriteria.map((c: any, i: number) => (
-                  <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-                    {formatCriterion(c, t)}
+          {/* MAIN */}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              {!match?.unlocked && <Lock className="size-4 shrink-0 text-muted-foreground" />}
+              <span className={`text-[19px] font-extrabold ${showIdentity ? "" : "text-muted-foreground"}`}>
+                {showIdentity ? profile.display_name : t("sweep_engage.request_matches.hidden_freelancer")}
+              </span>
+              {profile?.role_group && (
+                <span className="text-[17px] font-bold">
+                  {roleGroupLabel(profile.role_group)}
+                  {subRoles.length > 0 && (
+                    <span className="font-semibold text-muted-foreground">
+                      {" · "}{subRoles.map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}
+                    </span>
+                  )}
+                </span>
+              )}
+              {match?.in_pool && <PoolBadge />}
+            </div>
+
+            {facts.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-y-1 text-[15px]">
+                {facts.map((f, i) => (
+                  <span key={i} className="inline-flex items-center">
+                    {i > 0 && <span className="mx-2.5 text-muted-foreground">·</span>}
+                    {f}
                   </span>
                 ))}
               </div>
             )}
-          </div>
-        </div>
-      ) : (
-        <div className="mt-4 border-t border-border pt-4">
-          <div className="label-mono mb-2 flex items-center gap-2"><Star className="size-3 text-racing-yellow" /> {t("sweep_engage.matches.missing_criteria")}</div>
-            {missingCriteria.length === 0 ? (
-            <div className="font-mono text-[11px] text-racing-yellow">{t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
-          ) : (
-            <div className="flex flex-wrap gap-1">
-                {missingCriteria.map((c: any, i: number) => (
-                <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-                  {formatCriterion(c, t)}
+
+            {/* WHY THIS SCORE */}
+            <div className="mt-2.5 flex flex-col gap-1 text-[14.5px] leading-relaxed">
+              {isPartial && (match?.missing_days ?? 0) > 0 && (
+                <span className={edgeOnly ? "text-racing-yellow" : "text-racing-red"}>
+                  <Clock className="mr-1.5 inline size-3.5" />
+                  {t("mcard.missing_days_line", { count: match?.missing_days ?? 0, dates: missingDates.slice(0, 4).join(", ") || gapLabel })}
                 </span>
-              ))}
+              )}
+              {hardMissing.length > 0 && (
+                <span className="text-racing-red">
+                  ✕ {t("mcard.hard_missing", { list: hardMissing.map((c: any) => formatCriterion(c, t)).join(", ") })}
+                </span>
+              )}
+              {softMissing.length > 0 && (
+                <span className="text-racing-yellow">
+                  ◐ {t("mcard.missing_preferred", { list: softMissing.map((c: any) => formatCriterion(c, t)).join(", ") })}
+                </span>
+              )}
+              {hardMissing.length === 0 && softMissing.length === 0 && (
+                <span className="text-success">✓ {t("mcard.all_hard_met")}</span>
+              )}
             </div>
-          )}
-          <div className="mt-3 rounded border border-border bg-background/50 p-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            {t("sweep_engage.request_matches.tech_details_hidden_note", { cost: perProfileCost })}
+
+            {/* EXPANDED */}
+            {open && (
+              <div className="mt-4 border-t border-border pt-4">
+                <div className="grid gap-5 @xl:grid-cols-2">
+                  {match?.unlocked && profile ? (
+                    <>
+                      {(profile.headline || profile.bio) && (
+                        <DetailBlock title={t("mcard.headline")} wide>
+                          {profile.headline && <p className="text-[14.5px] leading-relaxed">{profile.headline}</p>}
+                          {profile.bio && <p className="mt-1 text-[14.5px] leading-relaxed text-muted-foreground">{profile.bio}</p>}
+                        </DetailBlock>
+                      )}
+                      {disciplines.length > 0 && (
+                        <DetailBlock title={t("mcard.disciplines")}>
+                          <div className="flex flex-wrap gap-1.5">
+                            {disciplines.map((d: string) => <Chip key={d}>{disciplineLabel(d)}</Chip>)}
+                          </div>
+                        </DetailBlock>
+                      )}
+                      {skills.length > 0 && (
+                        <DetailBlock title={t("mcard.skills")}>
+                          <div className="flex flex-wrap gap-1.5">
+                            {skills.map((s: string) => <Chip key={s}>{s}</Chip>)}
+                          </div>
+                        </DetailBlock>
+                      )}
+                      {languages.length > 0 && (
+                        <DetailBlock title={t("mcard.languages")}>
+                          <div className="flex flex-wrap gap-1.5">
+                            {languages.map((l: any, i: number) => (
+                              <Chip key={i}>{typeof l === "string" ? l : `${l?.custom || l?.code || ""}${l?.level ? ` · ${l.level}` : ""}`}</Chip>
+                            ))}
+                          </div>
+                        </DetailBlock>
+                      )}
+                      {(experiences.length > 0 || profile.education) && (
+                        <DetailBlock title={t("mcard.exp_edu")}>
+                          <div className="text-[14.5px] leading-relaxed text-muted-foreground">
+                            {experiences.map((e: any, i: number) => (
+                              <span key={i}>
+                                {i > 0 && " · "}
+                                {disciplineLabel(e?.discipline)} · {e?.years ?? 0} {t("mcard.years_short")}
+                              </span>
+                            ))}
+                            {profile.education && <span>{experiences.length > 0 ? " · " : ""}{profile.education}</span>}
+                          </div>
+                        </DetailBlock>
+                      )}
+                      <DetailBlock title={t("mcard.contact")}>
+                        {profile.contact_email || profile.phone_number ? (
+                          <div className="grid gap-1 text-[14.5px]">
+                            {profile.contact_email && <a href={`mailto:${profile.contact_email}`} className="break-all text-racing-red hover:underline">{profile.contact_email}</a>}
+                            {profile.phone_number && <a href={`tel:${telHref}`} className="text-racing-red hover:underline">{phoneLabel || profile.phone_number}</a>}
+                          </div>
+                        ) : (
+                          <div className="text-[14.5px] text-muted-foreground">{t("sweep_engage.matches.name_contacts_hidden")}</div>
+                        )}
+                      </DetailBlock>
+                    </>
+                  ) : (
+                    <DetailBlock title={t("mcard.contact")} wide>
+                      <div className="text-[14.5px] leading-relaxed text-muted-foreground">
+                        {t("sweep_engage.request_matches.tech_details_hidden_note", { cost: perProfileCost })}
+                      </div>
+                    </DetailBlock>
+                  )}
+
+                  <DetailBlock title={t("mcard.criteria")} wide>
+                    <div className="flex flex-col gap-1.5 text-[14.5px]">
+                      {isPartial && (match?.missing_days ?? 0) > 0 && (
+                        <div className={edgeOnly ? "text-racing-yellow" : "text-racing-red"}>
+                          ◐ {t("mcard.missing_days_line", { count: match?.missing_days ?? 0, dates: missingDates.join(", ") || gapLabel })}
+                        </div>
+                      )}
+                      {hardMissing.map((c: any, i: number) => (
+                        <div key={`h${i}`} className="text-racing-red">✕ {formatCriterion(c, t)}</div>
+                      ))}
+                      {softMissing.map((c: any, i: number) => (
+                        <div key={`s${i}`} className="text-racing-yellow">◐ {formatCriterion(c, t)}</div>
+                      ))}
+                      {missingCriteria.length === 0 && (
+                        <div className="text-success">✓ {t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
+                      )}
+                    </div>
+                  </DetailBlock>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              className="mt-3.5 inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-racing-red hover:text-foreground"
+            >
+              {open ? t("mcard.hide_details") : t("mcard.view_details")}
+              <span className="text-racing-red">{open ? "↑" : "↓"}</span>
+            </button>
+          </div>
+
+          {/* CTA */}
+          <div className="flex shrink-0 flex-col gap-2.5 @lg:w-[210px]">
+            {blurred && (
+              <button
+                onClick={onUnlock}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-[14px] font-bold text-foreground transition-colors hover:border-racing-red disabled:opacity-60"
+              >
+                <Unlock className="size-3.5" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
+              </button>
+            )}
+            {match?.unlocked && !requestFilled && (
+              <button
+                onClick={onConfirm}
+                disabled={loading}
+                className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
+              >
+                {t("sweep_engage.request_matches.request_confirmation_button")}
+              </button>
+            )}
+            {requestFilled && (
+              <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-3 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                {t("sweep_engage.request_matches.match_already_assigned")}
+              </span>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
 
 function formatCriterion(c: any, t: (k: string, o?: any) => string): string {
   switch (c.kind) {
