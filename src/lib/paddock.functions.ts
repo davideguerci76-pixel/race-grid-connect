@@ -996,8 +996,14 @@ export const getMyEngagements = createServerFn({ method: "GET" })
               primary_discipline: rawTp.primary_discipline ?? null,
             }
         : null;
+      // Reveal state of the underlying match, from the caller's point of view.
+      // The 1-token reveal is independent from the team identity disclosure.
+      const revealedByMe = r.freelancer_id === userId
+        ? !!r.match?.revealed_by_freelancer
+        : !!r.match?.revealed_by_team;
       return {
         ...r,
+        revealedByMe,
         freelancer: {
           display_name: disclosed ? (fName?.display_name ?? null) : null,
           avatar_url: disclosed ? (fName?.avatar_url ?? null) : null,
