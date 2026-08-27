@@ -151,6 +151,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       
       <Outlet />
+      <AppSplash />
       <Toaster theme="dark" position="top-right" />
     </QueryClientProvider>
   );
