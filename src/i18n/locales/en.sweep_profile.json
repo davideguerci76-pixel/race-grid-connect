@@ -115,6 +115,20 @@
       "install_title": "Install Pit Call first",
       "install_ios": "On iPhone and iPad, open the Share menu and tap \"Add to Home Screen\", then open Pit Call from the icon to enable push notifications.",
       "failed": "Could not enable push notifications. Please try again."
+    },
+    "pwa": {
+      "title": "Install Pit Call",
+      "title_ios": "Add Pit Call to Home Screen",
+      "desc": "Add Pit Call to your Home Screen for faster access and instant notifications.",
+      "install_btn": "Install Pit Call",
+      "ios_btn": "How to add",
+      "how_btn": "How to install",
+      "ios_1": "Open Pit Call in Safari.",
+      "ios_2": "Tap the Share button.",
+      "ios_3": "Choose \"Add to Home Screen\", then tap Add.",
+      "manual_1": "Open your browser menu.",
+      "manual_2": "Choose \"Install app\" or \"Add to Home screen\".",
+      "manual_3": "Confirm to add Pit Call to your device."
     }
   }
 }

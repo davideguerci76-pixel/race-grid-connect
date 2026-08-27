@@ -115,6 +115,20 @@
       "install_title": "Instala Pit Call primero",
       "install_ios": "En iPhone y iPad abre el menú Compartir y toca \"Añadir a pantalla de inicio\", luego abre Pit Call desde el icono para activar las push.",
       "failed": "No se pudieron activar las notificaciones push. Inténtalo de nuevo."
+    },
+    "pwa": {
+      "title": "Instalar Pit Call",
+      "title_ios": "Añadir Pit Call a la pantalla de inicio",
+      "desc": "Añade Pit Call a tu pantalla de inicio para un acceso más rápido y notificaciones instantáneas.",
+      "install_btn": "Instalar Pit Call",
+      "ios_btn": "Cómo añadirla",
+      "how_btn": "Cómo instalarla",
+      "ios_1": "Abre Pit Call en Safari.",
+      "ios_2": "Toca el botón Compartir.",
+      "ios_3": "Elige \"Añadir a pantalla de inicio\" y toca Añadir.",
+      "manual_1": "Abre el menú del navegador.",
+      "manual_2": "Elige \"Instalar aplicación\" o \"Añadir a pantalla de inicio\".",
+      "manual_3": "Confirma para añadir Pit Call a tu dispositivo."
     }
   }
 }

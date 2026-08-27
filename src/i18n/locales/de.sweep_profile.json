@@ -115,6 +115,20 @@
       "install_title": "Installiere zuerst Pit Call",
       "install_ios": "Öffne auf iPhone und iPad das Teilen-Menü und tippe auf „Zum Home-Bildschirm“, öffne Pit Call dann über das Symbol, um Push zu aktivieren.",
       "failed": "Push-Benachrichtigungen konnten nicht aktiviert werden. Bitte erneut versuchen."
+    },
+    "pwa": {
+      "title": "Pit Call installieren",
+      "title_ios": "Pit Call zum Home-Bildschirm hinzufügen",
+      "desc": "Füge Pit Call zum Home-Bildschirm hinzu für schnelleren Zugriff und sofortige Benachrichtigungen.",
+      "install_btn": "Pit Call installieren",
+      "ios_btn": "So geht's",
+      "how_btn": "So installieren",
+      "ios_1": "Öffne Pit Call in Safari.",
+      "ios_2": "Tippe auf die Teilen-Schaltfläche.",
+      "ios_3": "Wähle „Zum Home-Bildschirm“ und tippe auf Hinzufügen.",
+      "manual_1": "Öffne das Browser-Menü.",
+      "manual_2": "Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“.",
+      "manual_3": "Bestätige, um Pit Call hinzuzufügen."
     }
   }
 }
