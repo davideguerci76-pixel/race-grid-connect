@@ -921,7 +921,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("*, request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria)")
+      .select("*, request:requests(id, title, role_group, sub_role, sub_role_min_level, discipline, start_date, end_date, skills, skills_hard, education, languages, budget_min, budget_max, budget_unit, notes, location, circuit, duration), match:matches(id, match_score, is_perfect, overlap_days, missing_criteria, revealed_by_freelancer, revealed_by_team)")
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
@@ -996,8 +996,14 @@ export const getMyEngagements = createServerFn({ method: "GET" })
               primary_discipline: rawTp.primary_discipline ?? null,
             }
         : null;
+      // Reveal state of the underlying match, from the caller's point of view.
+      // The 1-token reveal is independent from the team identity disclosure.
+      const revealedByMe = r.freelancer_id === userId
+        ? !!r.match?.revealed_by_freelancer
+        : !!r.match?.revealed_by_team;
       return {
         ...r,
+        revealedByMe,
         freelancer: {
           display_name: disclosed ? (fName?.display_name ?? null) : null,
           avatar_url: disclosed ? (fName?.avatar_url ?? null) : null,

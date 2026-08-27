@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact } from "@/lib/paddock.functions";
+import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +107,12 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.engagements.confirm_failed"),
   });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  const revealFn = useServerFn(revealMatch);
+  const revealMut = useMutation({
+    mutationFn: (matchId: string) => revealFn({ data: { match_id: matchId } }),
+    onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
+  });
   const cancelFn = useServerFn(cancelEngagement);
   const cancelMut = useMutation({
     mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
@@ -193,6 +199,8 @@ function EngagementsPage() {
             const languages: any[] = req?.languages ?? [];
             const education: string[] = req?.education ?? [];
             const missing: any[] = match?.missing_criteria ?? [];
+            // Teams always see their own Pit Call; freelancers must pay the 1-token reveal.
+            const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
             return (
               <div key={e.id} className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -246,9 +254,26 @@ function EngagementsPage() {
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
                       {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
-                      {(req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
+                      {detailsUnlocked && (req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
-                    {(skillsHard.length > 0 || skillsSoft.length > 0) && (
+                    {/* 1-token reveal: unlocks the anonymous Pit Call details. Team identity stays hidden. */}
+                    {isFreelancer && !detailsUnlocked && e.match?.id && (
+                      <div className="mt-3 flex flex-wrap items-center gap-3 border border-dashed border-border bg-background/40 p-3">
+                        <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                          {t("matches.hidden_name")}
+                        </span>
+                        <button
+                          onClick={async () => {
+                            if (await confirmDialog(t("matches.reveal_confirm", { who: t("nav.teams") }))) revealMut.mutate(e.match.id);
+                          }}
+                          disabled={revealMut.isPending}
+                          className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+                        >
+                          {t("matches.reveal_1_token")}
+                        </button>
+                      </div>
+                    )}
+                    {detailsUnlocked && (skillsHard.length > 0 || skillsSoft.length > 0) && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[SKILLS]</div>
                         <div className="flex flex-wrap gap-1">
@@ -261,7 +286,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {languages.length > 0 && (
+                    {detailsUnlocked && languages.length > 0 && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[LANGUAGES]</div>
                         <div className="flex flex-wrap gap-1">
@@ -273,7 +298,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {education.length > 0 && (
+                    {detailsUnlocked && education.length > 0 && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[EDUCATION]</div>
                         <div className="flex flex-wrap gap-1">
@@ -283,7 +308,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {req.notes && <p className="mt-2 text-xs text-muted-foreground">{req.notes}</p>}
+                    {detailsUnlocked && req.notes && <p className="mt-2 text-xs text-muted-foreground">{req.notes}</p>}
                   </div>
                 )}
 
