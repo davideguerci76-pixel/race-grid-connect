@@ -1,0 +1,52 @@
+{
+  "errors": {
+    "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    "crash": "Die App hat rote Flagge gezeigt und dieser Bildschirm wurde gestoppt.",
+    "server": "Unsere Systeme haben nicht korrekt geantwortet. Bitte in Kürze erneut versuchen.",
+    "network": "Verbindungsproblem. Prüfe dein Netzwerk und versuche es erneut.",
+    "offline": "Du bist offline. Verbinde dich neu, um fortzufahren.",
+    "offlineBanner": "Keine Verbindung — PITCALL ist offline",
+    "forbidden": "Du hast keinen Zugriff auf diesen Bereich.",
+    "notFound": "Wir konnten nicht finden, wonach du gesucht hast.",
+    "rateLimited": "Zu viele Versuche. Bitte kurz warten und erneut versuchen.",
+    "duplicate": "Dieser Eintrag existiert bereits.",
+    "conflict": "Diese Aktion steht im Konflikt mit vorhandenen Daten.",
+    "invalidData": "Einige Daten sind ungültig. Bitte Felder prüfen.",
+    "cancelled": "Aktion abgebrochen.",
+    "reference": "Referenz",
+    "auth": {
+      "session": "Deine Sitzung ist abgelaufen. Bitte erneut anmelden.",
+      "invalidCredentials": "E-Mail oder Passwort ist falsch.",
+      "emailNotConfirmed": "Bestätige deine E-Mail-Adresse, um fortzufahren."
+    },
+    "tokens": {
+      "insufficient": "Du hast nicht genügend Tokens für diese Aktion."
+    },
+    "validation": {
+      "generic": "Bitte markierte Felder prüfen.",
+      "required": "Dieses Feld ist erforderlich."
+    },
+    "pwa": {
+      "install": "Die Installation konnte auf diesem Gerät nicht abgeschlossen werden.",
+      "push": "Push-Benachrichtigungen konnten nicht aktiviert werden."
+    },
+    "screens": {
+      "crashTitle": "Rote Flagge",
+      "crashBody": "Dieser Bildschirm wurde gestoppt. Erneut versuchen oder zurück zur Startaufstellung.",
+      "notFoundTitle": "Abseits der Strecke",
+      "notFoundBody": "Diese Seite existiert nicht oder hat das Fahrerlager verlassen.",
+      "forbiddenTitle": "Gesperrter Bereich",
+      "forbiddenBody": "Du hast keine Berechtigung für diesen Teil des Fahrerlagers."
+    },
+    "actions": {
+      "retry": "Erneut versuchen",
+      "home": "Zurück zur Startaufstellung"
+    }
+  },
+  "confirm": {
+    "defaultTitle": "Aktion bestätigen",
+    "defaultDescription": "Möchtest du fortfahren?",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen"
+  }
+}
