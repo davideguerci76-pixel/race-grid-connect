@@ -1,134 +1,130 @@
-# Analisi tecnica — Calendario freelance & Calendar Freshness
+# Piano tecnico — Availability Eligibility & nuova Calendar Freshness
 
-Nessuna modifica effettuata. Solo lettura di codice e database.
+Obiettivo: la freshness diventa un requisito di **validità della disponibilità**, non un componente dello score professionale. Nessuna cancellazione di dati, nessuna penalità.
 
-## 1. Struttura attuale del calendario
+## 1. Migration DB
 
-Tabella `public.availability`:
-- `id uuid PK`, `freelancer_id uuid` (FK → `profiles.id`, ON DELETE CASCADE), `day date`, `created_at timestamptz DEFAULT now()`, `is_test boolean`.
-- **Un record = un singolo giorno disponibile.** Nessun intervallo, array o JSON.
-- Constraint: `UNIQUE (freelancer_id, day)`. Indici: `availability_day_idx (day)`, indice parziale su `is_test`.
-- Trigger: `availability_bump_freshness` (AFTER INSERT OR DELETE → `tg_bump_calendar_freshness`), `availability_recompute` (AFTER INSERT/UPDATE/DELETE → `tg_recompute_on_availability` → `recompute_matches`), `trg_env_availability` (isolamento LIVE/TEST).
+Una sola migration, non distruttiva:
 
-Stati delle date — **non esiste una colonna di stato**:
-- AVAILABLE = riga presente in `availability`.
-- non disponibile = assenza di riga (default).
-- BOOKED/ENGAGED = **non persistito**: calcolato a runtime in TypeScript da `getMyBlockedDates` (`src/lib/paddock.functions.ts`) espandendo gli `engagements` con status `confirmed`/`completed` (usa `season_dates` della request quando presente).
+- `ALTER TABLE freelancer_profiles ADD COLUMN calendar_last_confirmed_at timestamptz` (nullable).
+- Nuove righe in `platform_settings` (categoria `calendar`):
+  - `availability_fresh_days` = 45
+  - `availability_review_days` = 60
+  - `availability_max_age_days` = 90
+- Indice `availability (freelancer_id, created_at)`.
+- Backfill di transizione (vedi §17).
+- Riscrittura di `recompute_matches`, `confirm_calendar`, `emit_calendar_stale_notifications`.
 
-Incongruenza rilevata: la UI (`dashboard.calendar.tsx`) sottrae i giorni "blocked" dai giorni selezionabili, ma **il motore di matching non conosce gli engagement**: in `recompute_matches` l'overlap è calcolato solo con `EXISTS(... FROM availability ...)`. Se una riga di availability rimane su un giorno già ingaggiato, quel giorno continua a generare match → possibile doppio booking a livello motore. Nessun trigger cancella l'availability alla conferma di un engagement.
+## 2. Cosa succede a `calendar_last_updated_at`
 
-Nessuna distinzione persistita tra "inserito manualmente" e "occupato da engagement". Nessuna gestione conflitti oltre alla UNIQUE.
+Resta **invariata** come semantica (“ultima attività sul calendario”) e resta aggiornata dal trigger `tg_bump_calendar_freshness` su INSERT/DELETE. Continua a servire: admin panel (`admin.functions.ts`, `admin-user-actions.tsx`), profilo pubblico freelance, Testing Lab. Nessuna dipendenza viene rotta. Semplicemente **non viene più usata dal motore di matching**.
 
-Percorso del dato:
+## 3. `calendar_last_confirmed_at`
+
+Nuova colonna, scritta **solo** dalla RPC `confirm_calendar` (azione esplicita dell'utente). Mai dal trigger. È il timestamp che “rinfresca in blocco” tutte le availability esistenti.
+
+## 4. Formula di effective freshness
+
 ```text
-UI calendario (dashboard.calendar.tsx)
- → serverFn setAvailability (upsert onConflict freelancer_id,day | delete .in(day))
- → tabella public.availability
- → trigger availability_bump_freshness  → freelancer_profiles.calendar_last_updated_at = now()
- → trigger availability_recompute       → recompute_matches(freelancer, NULL)
- → tabella public.matches (skills_score / final_score) → letta da getMyMatches / getRequestMatches
+effective_freshness(day_row) = GREATEST(
+   COALESCE(fp.calendar_last_confirmed_at, '-infinity'),
+   day_row.created_at
+)
+age_days = now_ref() - effective_freshness
 ```
+Nessuna scrittura per riga: `created_at` esiste già ed è di fatto “quando quel giorno è stato dichiarato”.
 
-## 2. Tracciamento temporale esistente
+## 5. Pulsante "Confirm Calendar"
 
-- `availability.created_at` — timestamp **per singolo giorno**, valorizzato all'inserimento. Poiché le modifiche sono sempre INSERT o DELETE (mai UPDATE della riga), rappresenta di fatto "quando quel giorno è stato dichiarato disponibile l'ultima volta". Nessun `updated_at` sulla riga.
-- `freelancer_profiles.calendar_last_updated_at` — timestamp **globale del calendario**. Aggiornato da: (a) trigger su INSERT/DELETE di availability, (b) RPC `confirm_calendar`. NB: il trigger non copre UPDATE (irrilevante oggi).
-- `freelancer_profiles.updated_at` — generico profilo, aggiornato anche da `confirm_calendar`.
-- Non esistono `confirmed_at`, `last_confirmed_at`, `availability_updated_at`.
+`confirm_calendar()` aggiornata: imposta `calendar_last_confirmed_at = now_ref()` (oltre a `calendar_last_updated_at` e `updated_at` come oggi) e lancia `recompute_matches`. Effetto: tutte le availability presenti tornano FRESH istantaneamente, zero righe scritte in `availability`. La semplice apertura della pagina non conferma nulla.
 
-Azione "Conferma calendario" (`confirmMyCalendar` → RPC `confirm_calendar`): imposta `calendar_last_updated_at = now()` e `updated_at = now()` sul profilo, poi chiama `recompute_matches(uid, NULL)`. Non tocca `availability`, non registra alcuno storico, **conferma l'intero calendario** (nessun mese/intervallo).
+## 6-8. Soglie proposte (da approvare)
 
-Distinzione attuale: "visualizzato" = nessuna scrittura (l'apertura pagina non modifica nulla); "modificato una data" = bump implicito del timestamp globale (indistinguibile da una conferma esplicita); "confermato" = stessa colonna. **Conferma e modifica sono indistinguibili nel DB.**
+| Stato | Età dell'effective freshness | Comportamento |
+|---|---|---|
+| **FRESH** | 0–44 giorni | usata normalmente nel matching |
+| **NEEDS REVIEW** | 45–89 giorni | ancora usata nel matching; avviso gentile in UI + notifica a 45 e a 75 giorni |
+| **UNCONFIRMED** | ≥ 90 giorni | resta visibile nel calendario, non usata nel matching |
 
-## 3. Calendar Freshness attuale
+Razionale: 45 giorni copre il ritmo tipico di un campionato (conferma ~una volta al mese e mezzo); 90 giorni è già la soglia “gialla/rossa” percepita oggi in UI, quindi non sposta le abitudini. Tutti i valori vivono in `platform_settings`, letti via `get_setting_num()` — nessuna soglia hardcoded, né in SQL né nel client (la UI le riceve da una serverFn).
 
-Unica logica reale: CTE `parts` dentro `public.recompute_matches`, campo `fresh_s`, alimentato da `fp.calendar_last_updated_at` e dal peso `matching_weights.calendar_freshness_weight`. Copertura globale (tutto il calendario, non per data). Nessun meccanismo di esclusione dal matching. Logiche collaterali (non duplicati del calcolo):
-- `emit_calendar_stale_notifications()`: notifica `calendar_stale` se `calendar_last_updated_at < now-30d`, deduplica su 30 giorni, usa `sim_now()`.
-- `missing_criteria` include il chip `calendar_stale` quando `fresh_s < calendar_freshness_weight`.
-- UI di sola lettura: `dashboard.calendar.tsx` e `freelancers.$id.tsx` ricalcolano in TS le soglie 30/90 giorni **solo per il colore** (verde/giallo/rosso) — soglie hardcoded lato client, disallineate rispetto alle tre fasce del motore.
+## 9. Modifica a `recompute_matches`
 
-## 4. Impatto reale sul matching (formula vera)
+Nella CTE che calcola l'overlap, il predicato `EXISTS (... FROM availability a WHERE a.freelancer_id = ... AND a.day = d)` diventa:
 
 ```sql
-CASE
-  WHEN f_cal_updated IS NULL                          THEN 0
-  WHEN f_cal_updated > now() - interval '30 days'     THEN calendar_freshness_weight
-  WHEN f_cal_updated > now() - interval '90 days'     THEN calendar_freshness_weight * 0.5
-  WHEN f_cal_updated > now() - interval '180 days'    THEN calendar_freshness_weight * 0.25
-  ELSE 0
-END AS fresh_s
+EXISTS (
+  SELECT 1 FROM availability a
+  WHERE a.freelancer_id = f.user_id
+    AND a.day = d
+    AND a.day >= now_ref()::date                                  -- §16 date passate
+    AND GREATEST(COALESCE(fp.calendar_last_confirmed_at,'-infinity'), a.created_at)
+        > now_ref() - (max_age_days || ' days')::interval          -- §2 eligibility
+    AND NOT EXISTS (                                               -- §11 double booking
+      SELECT 1 FROM engagements e
+      WHERE e.freelancer_id = f.user_id
+        AND e.status IN ('confirmed','completed')
+        AND blocked_day(e, d)
+    )
+)
 ```
-Con il peso attuale (`matching_weights.calendar_freshness_weight = 4`):
-- < 30 giorni = 100% = **4.00 punti**
-- 30–89 giorni = 50% = **2.00 punti**
-- 90–179 giorni = 25% = **1.00 punto**
-- >= 180 giorni = 0% = **0 punti** (il freelance resta comunque nei match)
+`blocked_day(e, d)`: `d = ANY(r.season_dates)` quando la request collegata ha `season_dates` non nullo, altrimenti `d BETWEEN e.start_date AND e.end_date` — stessa identica regola già usata da `getMyBlockedDates`, estratta in una funzione SQL immutabile-per-riga così che UI e motore condividano una sola definizione.
 
-Composizione: `skills_score = LEAST(100, ROUND(subrole_s + skills_s + disc_s + rate_s + langs_s + edu_s + loc_s + fresh_s, 2))`, poi `final_score = GREATEST(0, skills_score − penalità giorni mancanti)`.
+## 10. Rimozione della freshness dallo score
 
-Risposte puntuali: (1) `calendar_last_updated_at`; (2) "confirmation" = qualunque bump di quel timestamp, quindi anche una semplice aggiunta/rimozione di un giorno; (3)(4)(5) come sopra; (6) sì, oltre 180 giorni resta pienamente incluso; (7) **entra direttamente nella percentuale mostrata al Team** (`match_score` esposto = `skills_score`, `paddock.functions.ts` ~1138) e anche nell'ordinamento via `final_score`; (8) il peso è letto dinamicamente da `matching_weights`, ma le **soglie 30/90/180 e i coefficienti 1/0.5/0.25 sono hardcoded in SQL**, non configurabili da Admin; (9) sì, `adminUpdateMatchingWeights` valida somma = 100 e lancia `recompute_matches(NULL, NULL)`, ricalcolando tutti i match; (10) nessun altro bonus/malus di freshness nello score (solo notifica e chip); (11) sì: a parità di tutto, fino a 4 punti separano due profili, quindi un profilo leggermente più compatibile può finire sotto uno con calendario più fresco; (12) non interagisce con nulla: è un addendo indipendente, sommato prima del cap a 100 (unico effetto indiretto: se lo score supera 100 il contributo viene tagliato).
+- `fresh_s` eliminato dalla CTE `parts` e dalla somma in `computed`; `skills_score` e `final_score` non lo contengono più.
+- La colonna `matching_weights.calendar_freshness_weight` **resta** (nessuna migration distruttiva) ma è ignorata dal motore. Nell'admin UI viene marcata come non più attiva e **esclusa dalla validazione somma = 100** in `adminUpdateMatchingWeights` — unica modifica ai pesi, necessaria per non bloccare il salvataggio. La redistribuzione la fai tu a mano.
+- `missing_criteria`: il chip `calendar_stale` non è più un criterio mancante di *qualità*. Viene rimosso dallo score-side; le date non eleggibili semplicemente non contribuiscono all'overlap, quindi si riflettono già nel conteggio dei giorni mancanti (partial match). Lato Team nessun chip nuovo: non vogliamo esporre lo stato del calendario altrui.
 
-Esempi con la formula reale:
-- Freelance A: componenti professionali 92.0, calendario 12 giorni → coeff 100% → +4.00 → skills_score 96.00; nessun giorno mancante → final_score 96.00.
-- Freelance B: componenti professionali 94.0, calendario 120 giorni → coeff 25% → +1.00 → skills_score 95.00 → **B più compatibile ma sotto A**.
-- Freelance C: componenti professionali 90.0, calendario 400 giorni → +0 → skills_score 90.00; 2 giorni mancanti su richiesta single (penalità 10/giorno) → final_score 70.00.
+## 11-12. Bug engagement / double booking e partial match
 
-Oggi la Calendar Freshness misura **esclusivamente la recenza dell'ultima scrittura sul calendario** (conferma esplicita o modifica di una data): nessun altro comportamento utente vi confluisce.
+Una sola fonte di verità: `availability effettiva = availability dichiarata − giorni bloccati da engagement confirmed/completed`. Non si cancella nessuna riga di `availability` (una cancellazione di engagement deve poter restituire il giorno; e il trigger di bump falserebbe la freshness).
 
-## 5. Calendario abbandonato
+Conseguenze verificate:
+- **Multi-day / season_dates**: gestiti da `blocked_day()` con la stessa logica della UI.
+- **Partial match**: il meccanismo non cambia — i giorni bloccati semplicemente non contano nell'overlap, quindi finiscono nei `missing_days` e nelle soglie `partial_*_max_missing_pct` esistenti. Nessun percorso separato, nessuna rottura.
+- **Cancellazione/chiusura engagement**: lo status esce da confirmed/completed, i giorni tornano automaticamente disponibili. Serve un trigger `AFTER UPDATE OF status ON engagements` che chiami `recompute_matches(freelancer_id, NULL)`; da verificare se ne esiste già uno equivalente e in tal caso riusarlo.
+- Sovrapposizioni parziali: risolte per singolo giorno, non per intervallo — nessun caso ambiguo.
 
-Nessuna scadenza. In tutti i casi le date restano AVAILABLE, il freelance resta nei match, può ricevere Pit Call e comparire ai Team. Varia solo il contributo: 29 gg → 4.00; 31 gg → 2.00; 89 gg → 2.00; 91 gg → 1.00; 179 gg → 1.00; 181 gg → 0; oltre → 0 (con chip `calendar_stale` e notifica ricorrente ogni 30 giorni). **Dichiarazione esplicita: oggi non esiste alcuna expiration dell'availability, nemmeno per date lontanissime nel tempo.**
+## 13. Clock LIVE/TEST
 
-## 6. Compatibilità della nuova filosofia
+Il motore passa da `now()` a `sim_now()`, esattamente come già fanno le notifiche. `sim_now()` è security definer e legge `admin_time_settings` applicando l'offset **solo in ambiente TEST**: in LIVE restituisce `now()` e nessun utente può influenzarlo. Tutte le logiche (freshness, expiration, warning, notifiche, recompute, filtro date passate) useranno lo stesso riferimento, indicato sopra come `now_ref()`.
 
-Compatibile e a basso rischio: il gate può vivere interamente nella CTE `ovl`/`valid` di `recompute_matches`, dove l'overlap è già calcolato con un `EXISTS` su `availability` — basta aggiungere una condizione temporale al predicato. Nessun dato viene cancellato, nessuno stato nuovo deve essere persistito, e il ritorno ad AVAILABLE è immediato perché qualsiasi conferma ri-triggera già `recompute_matches`. Punto di attenzione: essendo un filtro, un freelance "scaduto" sparisce dai match esistenti al primo recompute — serve comunicazione in-app prima della scadenza (l'infrastruttura `notifications`/`calendar_stale` è già pronta).
+## 14. Notifiche
 
-## 7. Availability vs Booked
+`emit_calendar_stale_notifications()` riscritta: non guarda più il solo timestamp globale ma la presenza di availability **future** entrate in NEEDS REVIEW o UNCONFIRMED. Due momenti, deduplicati come oggi:
+- ingresso in NEEDS REVIEW (45 gg) e promemoria a 75 gg → tono gentile;
+- ingresso in UNCONFIRMED (90 gg) → messaggio informativo, non punitivo.
 
-Distinzione attuale: AVAILABLE è persistito, BOOKED è derivato dagli `engagements` a runtime e non esiste nel DB del calendario. Quindi una futura expiration colpirebbe **solo** le righe di `availability` — le date occupate non sono righe di availability e non possono scadere: l'engagement le protegge per costruzione. Edge case da considerare: (a) un giorno può essere sia in `availability` sia coperto da un engagement (il motore oggi non lo esclude — bug preesistente); (b) date passate mai ripulite; (c) `sim_now()` usato dalle notifiche ma **`now()` usato dal motore** → in ambiente TEST con offset temporale le due logiche divergono.
+Riusa il kind `calendar_stale` esistente (nessun nuovo valore enum) con payload arricchito (`state`, `affected_days`) così che UI ed email possano differenziare il copy. `notification-email.ts`: label aggiornata a “Review your availability”.
 
-## 8. Granularità
+## 15. UI
 
-- **A) Globale** — zero modifiche DB, già disponibile; granularità grossolana: una singola modifica ravvicinata "rinfresca" anche disponibilità dichiarate un anno prima. Rischio bug: nullo. UX: mediocre.
-- **B) Per mese** — richiede nuova tabella/colonna di conferme mensili + UI dedicata; complessità media, dati aggiuntivi ~12 righe/anno/freelance; utile ma ridondante rispetto a D.
-- **C) Per intervallo** — massima complessità (overlap, merge, split), nessun beneficio rispetto a D.
-- **D) Per singolo giorno — già possibile a costo zero**: `availability.created_at` è di fatto un timestamp per data, perché le righe vengono solo inserite o cancellate. Non serve alcuna cronologia né storage aggiuntivo; serve solo usarlo nella query di matching (più un indice). Precisione massima, UX migliore, impatto DB nullo.
+Pagina `dashboard/calendar`:
+- il box freshness mostra lo stato calcolato lato server (FRESH / NEEDS REVIEW / UNCONFIRMED) con le soglie provenienti da `platform_settings` — via `getMyCalendarFreshness` esteso; spariscono i 30/90 hardcoded nel client.
+- nuova quarta voce di legenda e colore dedicato per i giorni UNCONFIRMED nel `AvailabilityCalendar` (visibili ma visivamente “in pausa”).
+- CTA invariata come flusso: “Review your availability” → “Everything is still correct — Confirm”.
+- Copy proattivo, mai punitivo, in tutte e 5 le lingue: “Some of your available dates haven't been reviewed recently.”, “We've temporarily stopped using these dates for matching because we can't be sure they're still current. Review them anytime to make them active again.”
+- Profilo pubblico freelance (`freelancers.$id.tsx`): stesse soglie centralizzate al posto di quelle hardcoded.
 
-## 9. Modello ibrido
+## 16. Date passate
 
-`effective_freshness(day) = GREATEST(freelancer_profiles.calendar_last_updated_at, availability.created_at)` è **implementabile subito senza modifiche di schema**. È anche la soluzione più semplice: la conferma globale copre tutto in un colpo, la modifica di un singolo giorno lo tiene fresco da sola. L'unica alternativa più semplice (solo timestamp globale) è meno precisa; qualsiasi struttura per mese/intervallo sarebbe overengineering.
+Nessuna cancellazione. Filtro `a.day >= now_ref()::date` nel motore, nelle notifiche e nei conteggi UI: le date passate diventano semplicemente irrilevanti ovunque. Restano nel DB come storico e non generano warning. Un'eventuale pulizia periodica resta opzionale e fuori scope.
 
-## 10. Impatto DB e performance (soluzione consigliata: ibrida con `created_at`)
+## 17. Transizione dei calendari esistenti
 
-- Nuove colonne: nessuna obbligatoria (eventualmente `availability.confirmed_at` se si vuole confermare senza toccare `created_at`).
-- Nuove tabelle: nessuna. Nuovi trigger: nessuno. Nuove RPC: nessuna (modifica di `recompute_matches`, eventualmente un `confirm_availability_range`).
-- Indice consigliato: `(freelancer_id, day)` esiste già; utile un `(freelancer_id, created_at)` o composito con `day`.
-- Record aggiuntivi: zero.
-- Impatto query: il predicato `EXISTS` diventa `EXISTS ... AND (created_at > cutoff OR profilo confermato di recente)` — stessa complessità di scan.
-- Volumi: 500 freelance ≈ 50–100k righe; 5.000 ≈ 0.5–1M; 50.000 ≈ 5–10M righe di availability. Il costo dominante resta il `recompute_matches` full (cross join richieste × freelance), non la freshness.
-- Verdetto: **TRASCURABILE** su storage e schema, **MODERATO** solo sul recompute globale a 50k freelance (già oggi un punto critico).
+Nella stessa migration, backfill:
 
-## 11. Conseguenze sul peso 4%
+```sql
+UPDATE freelancer_profiles
+SET calendar_last_confirmed_at = GREATEST(calendar_last_updated_at, now() - interval '30 days')
+```
+Effetto: al deploy **nessun** utente è UNCONFIRMED e chi era già inattivo entra in NEEDS REVIEW solo dopo 15 giorni, con almeno 60 giorni di margine prima di diventare UNCONFIRMED. Il pool disponibile non crolla, lo storico reale (`calendar_last_updated_at`) non viene toccato, e ogni utente riceve le notifiche di review prima di qualsiasi effetto sul matching.
 
-- Da modificare: CTE `parts` (`fresh_s`), la somma in `computed`, il chip `calendar_stale` in `missing_criteria`, `adminUpdateMatchingWeights` (`src/lib/admin.functions.ts`, validazione somma 100), la UI `admin.matching.tsx`, e il colore hardcoded nelle pagine calendario/profilo.
-- Sì: l'Admin **impone oggi** somma = 100 (errore altrimenti), quindi il 4% andrebbe redistribuito o la validazione allentata; la colonna `calendar_freshness_weight` può restare a 0 senza migration distruttiva. Nota: `role_weight` (valore 35 in tabella) è già legacy e non viene usato da `recompute_matches`, che usa `sub_role_weight`.
-- Match esistenti: gli score cambierebbero solo dopo un recompute generale — che è già automatico al salvataggio dei pesi.
-- Dipendenze nascoste: nessuna oltre a `missing_criteria.calendar_stale` (letto dalla UI dei match) e alla notifica `calendar_stale`.
-- La separazione STEP 1 eligibility / STEP 2 professional matching è architetturalmente **più pulita** e naturale qui, perché il motore ha già una fase di hard filter (`hard`/`valid`) distinta dalla fase di scoring (`parts`): la freshness andrebbe semplicemente spostata dalla seconda alla prima. Vantaggi: percentuali mostrate ai Team che riflettono solo compatibilità reale, nessuna penalizzazione professionale. Rischi: calo improvviso del numero di match in fase di lancio, necessità di preavviso all'utente, e uno score medio che sale (attenzione al cap a 100).
+## 18. Edge case ancora aperti
 
-## 12. Verdetto finale
-
-1. Un record per giorno in `availability`, nessuna colonna di stato; BOOKED derivato dagli engagements a runtime.
-2. Con l'unico timestamp globale `freelancer_profiles.calendar_last_updated_at`, scritto sia dalla conferma esplicita (`confirm_calendar`) sia dal trigger su ogni insert/delete di un giorno.
-3. Tre fasce hardcoded in `recompute_matches` moltiplicate per il peso da `matching_weights`.
-4. <30 gg = 100%, 30–89 = 50%, 90–179 = 25%, >=180 = 0%.
-5. Fino a 4 punti su 100, sommati nella percentuale mostrata al Team e nell'ordinamento.
-6. Restano validi per sempre: solo −4 punti, chip "calendar stale" e una notifica ogni 30 giorni.
-7. No, nessuna expiration.
-8. Riutilizzabili: `availability.created_at` (timestamp per giorno già esistente), `confirm_calendar`, i trigger di recompute, `emit_calendar_stale_notifications` + kind `calendar_stale`, `platform_settings` per rendere configurabili le soglie.
-9. Ibrida: `GREATEST(conferma globale, created_at del giorno)` — precisione per data a costo zero.
-10. Poco invasiva: nessuna nuova tabella, nessun nuovo trigger; il grosso è una condizione in `recompute_matches` più UI di conferma/avviso.
-11. Rischi: calo brusco di match alla prima attivazione; divergenza `now()` vs `sim_now()` in ambiente TEST; date passate mai ripulite; il bug preesistente per cui i giorni già ingaggiati restano matchabili.
-12. Sì, consigliata la separazione: la freshness è affidabilità del dato, non qualità professionale.
-13. Sì, la filosofia è condivisibile e coerente con l'architettura esistente.
-14. Architettura minima consigliata (da approvare prima di implementare): soglia di scadenza configurabile in `platform_settings` (es. `availability_max_age_days`), predicato di eligibility in `recompute_matches` basato su `GREATEST(calendar_last_updated_at, availability.created_at) > now() - soglia`, azione "conferma" già esistente estesa opzionalmente a un intervallo, avvisi progressivi tramite le notifiche `calendar_stale` esistenti, e rimozione di `fresh_s` dallo score con redistribuzione del 4%.
+- Freelance senza alcuna availability futura: nessuna notifica, nessuno stato — da confermare che è il comportamento voluto.
+- Engagement `proposed` (non ancora confermato): oggi non blocca, e nel piano continua a non bloccare. Confermi?
+- Un giorno reso UNCONFIRMED mentre un match esiste già: al primo recompute il match perde quei giorni e può passare da full a partial o sparire. Mitigato dal backfill e dalle notifiche, ma resta un effetto visibile per i Team.
+- `admin.matching.tsx`: il campo Calendar Freshness resta visibile ma inattivo finché non redistribuisci i pesi.
+- Il Testing Lab imposta oggi `calendar_last_updated_at` alla generazione: dovrà impostare anche `calendar_last_confirmed_at`.
