@@ -69,15 +69,18 @@ function CalendarPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
   });
 
-  const lastUpdated = freshness?.calendar_last_updated_at ? new Date(freshness.calendar_last_updated_at) : null;
-  const daysSince = lastUpdated ? Math.floor((Date.now() - lastUpdated.getTime()) / 86400000) : null;
-  const freshTone = daysSince == null ? "text-muted-foreground" : daysSince < 30 ? "text-[#16a34a]" : daysSince < 90 ? "text-racing-yellow" : "text-racing-red";
+  const lastConfirmed = freshness?.calendar_last_confirmed_at ? new Date(freshness.calendar_last_confirmed_at) : null;
+  const daysSince = lastConfirmed ? Math.floor((Date.now() - lastConfirmed.getTime()) / 86400000) : null;
+  const state = freshness?.state ?? "fresh";
+  const freshTone =
+    state === "unconfirmed" ? "text-racing-yellow" : state === "needs_review" ? "text-racing-yellow" : "text-[#16a34a]";
 
   const blockedSet = new Set(blockedDays);
   const selectedDates = myDays
     .filter((d: string) => !blockedSet.has(d))
     .map((d: string) => new Date(d + "T00:00:00"));
   const blockedDates = blockedDays.map((d: string) => new Date(d + "T00:00:00"));
+  const unconfirmedDates = (freshness?.unconfirmed_days ?? []).map((d: string) => new Date(d + "T00:00:00"));
 
   const mutation = useMutation({
     mutationFn: async (dates: Date[] | undefined) => {
@@ -121,18 +124,28 @@ function CalendarPage() {
             <div className="label-mono">[{t("calendar.freshness_label")}]</div>
 
             <div className={`mt-1 font-mono text-xs ${freshTone}`}>
-              {lastUpdated
+              {lastConfirmed
                 ? t("calendar.last_confirmed", {
                     defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}",
                     days: daysSince,
-                    date: formatDate(lastUpdated),
+                    date: formatDate(lastConfirmed),
                   })
                 : t("calendar.never_confirmed", { defaultValue: "Never confirmed yet" })}
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              {t("calendar.freshness_benefit", {
-                defaultValue: "Confirm regularly to keep top visibility in team matches.",
-              })}
+              {state === "unconfirmed"
+                ? t("calendar.state_unconfirmed", {
+                    defaultValue:
+                      "We've temporarily stopped using {{count}} of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again.",
+                    count: freshness?.unconfirmed_days?.length ?? 0,
+                  })
+                : state === "needs_review"
+                  ? t("calendar.state_needs_review", {
+                      defaultValue: "Some of your available dates haven't been reviewed recently.",
+                    })
+                  : t("calendar.freshness_benefit", {
+                      defaultValue: "Your availability is up to date. Thanks for keeping it accurate.",
+                    })}
             </p>
           </div>
           <button
@@ -142,7 +155,7 @@ function CalendarPage() {
           >
             {confirmMut.isPending
               ? t("common.loading")
-              : t("calendar.confirm_button", { defaultValue: "I confirm my availability" })}
+              : t("calendar.confirm_button", { defaultValue: "Everything is still correct — Confirm" })}
           </button>
         </div>
 
@@ -150,6 +163,7 @@ function CalendarPage() {
           <span className="flex items-center gap-2"><span className="inline-block size-3 border border-border bg-[#0a0a0a]" /> {t("sweep_public.dashboard_calendar.legend_unavailable")}</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-[#16a34a]" /> {t("sweep_public.dashboard_calendar.legend_available")}</span>
           <span className="flex items-center gap-2"><span className="inline-block size-3 bg-racing-red" /> {t("sweep_public.dashboard_calendar.legend_engaged")}</span>
+          <span className="flex items-center gap-2"><span className="inline-block size-3 border border-dashed border-[#16a34a] bg-[#16a34a]/25" /> {t("calendar.legend_unconfirmed", { defaultValue: "Needs confirmation" })}</span>
         </div>
 
         <div className="mt-6">
@@ -162,6 +176,7 @@ function CalendarPage() {
           <AvailabilityCalendar
             selected={selectedDates}
             blocked={blockedDates}
+            unconfirmed={unconfirmedDates}
             onSelect={(d) => mutation.mutate(d)}
             min={new Date()}
             legend={t("sweep_public.dashboard_calendar.calendar_legend")}

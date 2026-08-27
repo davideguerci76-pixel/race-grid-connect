@@ -11,7 +11,7 @@ const KIND_META: Record<string, { title: string; path: string; label: string }> 
   contact_check: { title: "Contact check", path: "/dashboard/engagements", label: "View engagement" },
   rating_available: { title: "Rating available", path: "/dashboard/engagements", label: "Leave your rating" },
   rating_unlocked: { title: "Rating unlocked", path: "/dashboard/engagements", label: "See the rating" },
-  calendar_stale: { title: "Update your calendar", path: "/dashboard/calendar", label: "Update calendar" },
+  calendar_stale: { title: "Quick availability check", path: "/dashboard/calendar", label: "Review availability" },
 };
 
 function timingSafeEqual(a: string, b: string) {

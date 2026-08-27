@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.day_blocked_by_engagement(uuid, date) FROM authenticated, anon, public;
+REVOKE EXECUTE ON FUNCTION public.availability_day_active(uuid, date) FROM authenticated, anon, public;

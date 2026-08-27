@@ -99,9 +99,10 @@
       "mark_all_read": "Tout marquer comme lu",
       "unread": "NON LUES",
       "no_notifications": "Aucune notification pour le moment.",
-      "calendar_stale_message": "Votre calendrier de disponibilité n'a pas été mis à jour depuis un moment. Gardez-le à jour pour mieux vous classer dans les recherches des teams.",
-      "update_calendar": "Mettre à jour le calendrier",
-      "view_engagement": "Voir l'engagement"
+      "calendar_stale_message": "Certaines de vos dates disponibles n'ont pas été vérifiées récemment. Une vérification rapide garde vos disponibilités exactes.",
+      "update_calendar": "Vérifier les disponibilités",
+      "view_engagement": "Voir l'engagement",
+      "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver."
     }
   }
 }

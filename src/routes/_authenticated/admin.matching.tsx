@@ -18,7 +18,6 @@ const FIELD_KEYS = [
   "languages_weight",
   "education_weight",
   "location_weight",
-  "calendar_freshness_weight",
 ] as const;
 
 function AdminMatchingPage() {
@@ -49,7 +48,6 @@ function AdminMatchingPage() {
         languages_weight: Number(d.languages_weight),
         education_weight: Number(d.education_weight),
         location_weight: Number(d.location_weight),
-        calendar_freshness_weight: Number(d.calendar_freshness_weight ?? 0),
       });
       setFactorX(Number(d.level_one_below_pct ?? 50) / 100);
       setFactorY(Number(d.level_two_below_pct ?? 25) / 100);

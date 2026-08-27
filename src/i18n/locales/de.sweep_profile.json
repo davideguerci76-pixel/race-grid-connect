@@ -99,9 +99,10 @@
       "mark_all_read": "Alle als gelesen markieren",
       "unread": "UNGELESEN",
       "no_notifications": "Noch keine Benachrichtigungen.",
-      "calendar_stale_message": "Ihr Verfügbarkeitskalender wurde schon länger nicht aktualisiert. Halten Sie ihn aktuell, um bei Team-Suchen besser platziert zu werden.",
-      "update_calendar": "Kalender aktualisieren",
-      "view_engagement": "Engagement ansehen"
+      "calendar_stale_message": "Einige deiner verfügbaren Tage wurden länger nicht überprüft. Ein kurzer Check hält deine Verfügbarkeit genau.",
+      "update_calendar": "Verfügbarkeit prüfen",
+      "view_engagement": "Engagement ansehen",
+      "calendar_stale_unconfirmed_message": "Wir nutzen einige deiner Tage vorübergehend nicht mehr für das Matching, da wir nicht sicher sein können, ob sie noch aktuell sind. Du kannst sie jederzeit prüfen und wieder aktivieren."
     }
   }
 }

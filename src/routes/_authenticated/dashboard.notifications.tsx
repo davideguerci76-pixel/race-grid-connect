@@ -122,7 +122,9 @@ function NotificationsPage() {
                       </div>
                       <div className="mt-1 text-sm">
                         {isStale
-                          ? t("sweep_profile.notifications.calendar_stale_message")
+                          ? n.payload?.state === "unconfirmed"
+                            ? t("sweep_profile.notifications.calendar_stale_unconfirmed_message")
+                            : t("sweep_profile.notifications.calendar_stale_message")
                           : (n.payload?.message ?? n.kind)}
                       </div>
                     </div>

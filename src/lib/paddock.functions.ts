@@ -32,19 +32,69 @@ export const confirmMyCalendar = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.rpc("confirm_calendar" as any);
     if (error) throw new Error(error.message);
-    return { calendar_last_updated_at: data as unknown as string };
+    return { calendar_last_confirmed_at: data as unknown as string };
   });
 
+/**
+ * Availability validity (not professional quality):
+ * effective_freshness(day) = GREATEST(calendar_last_confirmed_at, availability.created_at)
+ * FRESH -> used normally | NEEDS REVIEW -> still used, gentle reminder | UNCONFIRMED -> not used until reviewed
+ */
 export const getMyCalendarFreshness = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("freelancer_profiles")
-      .select("calendar_last_updated_at")
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    return { calendar_last_updated_at: (data as any)?.calendar_last_updated_at ?? null };
+    const { supabase, userId } = context;
+
+    const [{ data: profile, error: pErr }, { data: settings }, { data: nowSim }] = await Promise.all([
+      supabase
+        .from("freelancer_profiles")
+        .select("calendar_last_confirmed_at, calendar_last_updated_at")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      supabase.from("platform_settings").select("key, value_num").eq("category", "calendar"),
+      supabase.rpc("sim_now" as any),
+    ]);
+    if (pErr) throw new Error(pErr.message);
+
+    const setting = (key: string, fallback: number) =>
+      Number((settings ?? []).find((s: any) => s.key === key)?.value_num ?? fallback);
+    const reviewDays = setting("availability_review_days", 45);
+    const maxAgeDays = setting("availability_max_age_days", 90);
+
+    const now = nowSim ? new Date(nowSim as unknown as string) : new Date();
+    const today = now.toISOString().slice(0, 10);
+    const confirmedAt = (profile as any)?.calendar_last_confirmed_at ?? null;
+    const confirmedMs = confirmedAt ? new Date(confirmedAt).getTime() : -Infinity;
+
+    const { data: rows, error: aErr } = await supabase
+      .from("availability")
+      .select("day, created_at")
+      .eq("freelancer_id", userId)
+      .gte("day", today);
+    if (aErr) throw new Error(aErr.message);
+
+    const needsReviewDays: string[] = [];
+    const unconfirmedDays: string[] = [];
+    for (const r of (rows ?? []) as Array<{ day: string; created_at: string }>) {
+      const eff = Math.max(confirmedMs, new Date(r.created_at).getTime());
+      const ageDays = (now.getTime() - eff) / 86400000;
+      if (ageDays >= maxAgeDays) unconfirmedDays.push(r.day);
+      else if (ageDays >= reviewDays) needsReviewDays.push(r.day);
+    }
+
+    const state: "fresh" | "needs_review" | "unconfirmed" =
+      unconfirmedDays.length > 0 ? "unconfirmed" : needsReviewDays.length > 0 ? "needs_review" : "fresh";
+
+    return {
+      calendar_last_confirmed_at: confirmedAt,
+      calendar_last_updated_at: (profile as any)?.calendar_last_updated_at ?? null,
+      review_days: reviewDays,
+      max_age_days: maxAgeDays,
+      state,
+      future_days: (rows ?? []).length,
+      needs_review_days: needsReviewDays,
+      unconfirmed_days: unconfirmedDays,
+    };
   });
 
 export const getMyAvailability = createServerFn({ method: "GET" })

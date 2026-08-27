@@ -155,6 +155,7 @@ export const generateTestDataset = createServerFn({ method: "POST" })
           location_lat: f.location_lat,
           location_lng: f.location_lng,
           calendar_last_updated_at: new Date().toISOString(),
+          calendar_last_confirmed_at: new Date().toISOString(),
         })
         .eq("user_id", uid);
 

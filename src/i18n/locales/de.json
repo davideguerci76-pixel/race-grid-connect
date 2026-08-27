@@ -150,7 +150,16 @@
       "deselect_month": "Monat abwählen",
       "select_all": "Alle auswählen ({{months}}m)",
       "deselect_all": "Alle abwählen"
-    }
+    },
+    "confirm_button": "Alles weiterhin korrekt — Bestätigen",
+    "confirm_success": "Verfügbarkeit bestätigt. Danke, dass du sie aktuell hältst.",
+    "last_confirmed": "Zuletzt bestätigt vor {{days}} Tag(en) · {{date}}",
+    "never_confirmed": "Noch nicht bestätigt",
+    "freshness_label": "Verfügbarkeits-Check",
+    "freshness_benefit": "Deine Verfügbarkeit ist aktuell. Danke, dass du sie genau hältst.",
+    "state_needs_review": "Einige deiner verfügbaren Tage wurden länger nicht überprüft. Ein kurzer Check hält sie aktuell.",
+    "state_unconfirmed": "Wir nutzen {{count}} deiner Tage vorübergehend nicht mehr für das Matching, da wir nicht sicher sein können, ob sie noch aktuell sind. Du kannst sie jederzeit prüfen und wieder aktivieren.",
+    "legend_unconfirmed": "Bestätigung nötig"
   },
   "matches": {
     "title": "Matches",
