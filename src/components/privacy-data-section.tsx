@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { deleteMyAccount, exportMyData } from "@/lib/privacy.functions";
 import { openCookiePreferences } from "@/lib/iubenda";
 import { PRIVACY_EMAIL } from "@/config/iubenda";
+import { toastError } from "@/lib/errors";
 
 export function PrivacyDataSection() {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export function PrivacyDataSection() {
       URL.revokeObjectURL(url);
       toast.success(t("privacy.export_done", { defaultValue: "Your data export has been downloaded." }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Export failed");
+      toastError(e);
     } finally {
       setBusy(null);
     }

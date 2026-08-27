@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { useAuth } from "@/hooks/use-auth";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/verify-email")({
   ssr: false,
@@ -49,7 +50,7 @@ function VerifyEmailPage() {
       if (error) throw error;
       toast.success(t("verify_email.resent", { defaultValue: "Verification email sent." }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error");
+      toastError(e);
     } finally {
       setSending(false);
     }

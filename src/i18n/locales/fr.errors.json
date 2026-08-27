@@ -1,0 +1,52 @@
+{
+  "errors": {
+    "generic": "Une erreur est survenue. Réessayez.",
+    "crash": "L'application a sorti le drapeau rouge et cet écran s'est arrêté.",
+    "server": "Nos systèmes n'ont pas répondu correctement. Réessayez dans un instant.",
+    "network": "Problème de connexion. Vérifiez votre réseau et réessayez.",
+    "offline": "Vous êtes hors ligne. Reconnectez-vous pour continuer.",
+    "offlineBanner": "Aucune connexion — PITCALL est hors ligne",
+    "forbidden": "Vous n'avez pas accès à cette zone.",
+    "notFound": "Nous n'avons pas trouvé ce que vous cherchiez.",
+    "rateLimited": "Trop de tentatives. Patientez un instant puis réessayez.",
+    "duplicate": "Cet élément existe déjà.",
+    "conflict": "Cette action entre en conflit avec des données existantes.",
+    "invalidData": "Certaines données ne sont pas valides. Vérifiez les champs.",
+    "cancelled": "Action annulée.",
+    "reference": "Référence",
+    "auth": {
+      "session": "Votre session a expiré. Reconnectez-vous.",
+      "invalidCredentials": "E-mail ou mot de passe incorrect.",
+      "emailNotConfirmed": "Confirmez votre adresse e-mail pour continuer."
+    },
+    "tokens": {
+      "insufficient": "Vous n'avez pas assez de tokens pour cette action."
+    },
+    "validation": {
+      "generic": "Vérifiez les champs signalés.",
+      "required": "Ce champ est obligatoire."
+    },
+    "pwa": {
+      "install": "L'installation n'a pas pu être terminée sur cet appareil.",
+      "push": "Les notifications push n'ont pas pu être activées."
+    },
+    "screens": {
+      "crashTitle": "Drapeau rouge",
+      "crashBody": "Cet écran s'est arrêté. Réessayez ou revenez à la grille.",
+      "notFoundTitle": "Hors piste",
+      "notFoundBody": "Cette page n'existe pas ou a quitté le paddock.",
+      "forbiddenTitle": "Zone réservée",
+      "forbiddenBody": "Vous n'avez pas la permission d'accéder à cette partie du paddock."
+    },
+    "actions": {
+      "retry": "Réessayer",
+      "home": "Retour à la grille"
+    }
+  },
+  "confirm": {
+    "defaultTitle": "Confirmer l'action",
+    "defaultDescription": "Voulez-vous continuer ?",
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  }
+}

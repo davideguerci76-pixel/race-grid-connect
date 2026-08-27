@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { adminGetMatchingWeights, adminUpdateMatchingWeights } from "@/lib/admin.functions";
 import { useTranslation } from "react-i18next";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/matching")({
   component: AdminMatchingPage,
@@ -70,7 +71,7 @@ function AdminMatchingPage() {
       toast.success(t("sweep_admin_b.matching.saved"));
       qc.invalidateQueries({ queryKey: ["matching-weights"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.save_failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.save_failed"),
   });
 
   return (

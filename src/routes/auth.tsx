@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import logoClean from "@/assets/pitcall-logo-clean.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
+import { toastError } from "@/lib/errors";
 
 const searchSchema = z.object({
   mode: fallback(z.enum(["signin", "signup"]), "signin").default("signin"),
@@ -51,14 +52,14 @@ function AuthPage() {
       }
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if (result.error) {
-        toast.error(result.error.message ?? t("sweep_public.auth.google_signin_failed"));
+        toastError(result.error, "sweep_public.auth.google_signin_failed");
         setLoading(false);
         return;
       }
       if (result.redirected) return;
       navigate({ to: "/dashboard" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("sweep_public.auth.sign_in_failed"));
+      toastError(e, "sweep_public.auth.sign_in_failed");
       setLoading(false);
     }
   }
@@ -98,7 +99,7 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("sweep_public.auth.auth_failed"));
+      toastError(err, "sweep_public.auth.auth_failed");
     } finally {
       setLoading(false);
     }

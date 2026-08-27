@@ -8,6 +8,7 @@ import { CalendarRange, Upload, Save, ListChecks } from "lucide-react";
 import { listMyCalendars, saveCalendar, type UserCalendar } from "@/lib/calendars.functions";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { daysToEvents, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
+import { toastError } from "@/lib/errors";
 
 const btn =
   "inline-flex items-center gap-2 border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest hover:border-racing-red hover:text-racing-red transition-colors";
@@ -77,7 +78,7 @@ export function CalendarSourcePicker({
       toast.success(t("sweep_public.calendar_source_picker.calendar_saved"));
       qc.invalidateQueries({ queryKey: ["my-calendars"] });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("sweep_public.calendar_source_picker.save_failed"));
+      toastError(e, "sweep_public.calendar_source_picker.save_failed");
     } finally {
       setSaving(false);
     }

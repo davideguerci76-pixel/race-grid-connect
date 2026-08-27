@@ -127,6 +127,50 @@ export type Database = {
           },
         ]
       }
+      client_error_log: {
+        Row: {
+          category: string
+          code: string | null
+          created_at: string
+          id: string
+          is_test: boolean
+          reference_id: string
+          route_pattern: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          reference_id: string
+          route_pattern?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          reference_id?: string
+          route_pattern?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_error_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_hook_config: {
         Row: {
           endpoint: string
@@ -1795,6 +1839,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cleanup_client_error_log: { Args: never; Returns: number }
       cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
       confirm_calendar: { Args: never; Returns: string }

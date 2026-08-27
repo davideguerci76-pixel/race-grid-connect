@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 import { MarketHighlights } from "@/components/market-highlights";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -129,7 +131,7 @@ function DashboardHome() {
   const sosMut = useMutation({
     mutationFn: (sos_id: string) => acceptSos({ data: { sos_id } }),
     onSuccess: () => { toast.success(t("sweep_profile.dashboard.match_locked")); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_profile.dashboard.sos_accept_failed")),
+    onError: (e) => toastError(e, "sweep_profile.dashboard.sos_accept_failed"),
   });
 
   const isTeam = profile?.user_type === "team";
@@ -169,7 +171,7 @@ function DashboardHome() {
                   </div>
                 </div>
                 <button
-                  onClick={() => { if (confirm(t("sweep_profile.dashboard.accept_sos_confirm"))) sosMut.mutate(s.sos_id); }}
+                  onClick={async () => { if (await confirmDialog(t("sweep_profile.dashboard.accept_sos_confirm"))) sosMut.mutate(s.sos_id); }}
                   disabled={sosMut.isPending}
                   className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                 >

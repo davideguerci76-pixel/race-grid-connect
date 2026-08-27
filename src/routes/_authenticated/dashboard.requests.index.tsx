@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +16,7 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Pause, Play, CheckCircle2, XCircle, Copy, RotateCcw } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
   component: RequestsPage,
@@ -55,7 +57,7 @@ function RequestsPage() {
       qc.invalidateQueries({ queryKey: ["my-requests"] });
       toast.success(t("requests.status_updated"));
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
 
   return (
@@ -165,8 +167,8 @@ function RequestsPage() {
                       <CheckCircle2 className="size-4" /> {t("requests.complete")}
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
+                      onClick={async () => {
+                        if (await confirmDialog(t("requests.confirm_close"))) statusMut.mutate({ id: r.id, status: "closed" });
                       }}
                       className="inline-flex items-center gap-2 rounded-2xl border border-racing-red/60 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
                     >

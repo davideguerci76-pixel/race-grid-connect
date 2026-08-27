@@ -1,17 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
+  
   createRootRouteWithContext,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,49 +19,47 @@ import { registerServiceWorker } from "@/lib/pwa/register-sw";
 import { initInstallPromptCapture } from "@/lib/pwa/install-prompt";
 import { AppSplash } from "@/components/app-splash";
 
-
+import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
+import { OfflineBanner } from "@/components/offline-banner";
+import { ConfirmProvider } from "@/hooks/use-confirm";
+import { normalizeCrash } from "@/lib/errors/normalize";
+import { reportError } from "@/lib/errors/report";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-mono text-7xl font-black text-racing-red">404</h1>
-        <h2 className="mt-4 text-xl font-bold uppercase tracking-tight">Off the track</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          This page doesn't exist or has left the paddock.
-        </p>
-        <div className="mt-6">
-          <Link to="/" className="inline-flex items-center justify-center bg-racing-red px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:brightness-110">
-            Back to grid
-          </Link>
-        </div>
-      </div>
-    </div>
+    <PitcallErrorScreen
+      code="404"
+      titleKey="errors.screens.notFoundTitle"
+      bodyKey="errors.screens.notFoundBody"
+    />
   );
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
   const router = useRouter();
-  useEffect(() => { reportLovableError(error, { boundary: "tanstack_root_error_component" }); }, [error]);
+  const [referenceId, setReferenceId] = useState<string | undefined>(undefined);
+
+  // Crashes are always persisted (sanitized) so support can match the code the
+  // user reads on screen with the row in the technical error log.
+  useEffect(() => {
+    const report = reportError(error, normalizeCrash(error), {
+      forceLog: true,
+      context: { boundary: "tanstack_root_error_component" },
+    });
+    setReferenceId(report.referenceId);
+  }, [error]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-bold uppercase tracking-tight">Red flag</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Something went wrong. Try again or head home.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => { router.invalidate(); reset(); }}
-            className="bg-racing-red px-5 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
-          >
-            Try again
-          </button>
-          <a href="/" className="border border-border px-5 py-3 text-xs font-bold uppercase tracking-widest hover:bg-secondary">
-            Home
-          </a>
-        </div>
-      </div>
-    </div>
+    <PitcallErrorScreen
+      code="RED FLAG"
+      titleKey="errors.screens.crashTitle"
+      bodyKey="errors.screens.crashBody"
+      referenceId={referenceId}
+      onRetry={() => {
+        router.invalidate();
+        reset();
+      }}
+    />
   );
 }
 
@@ -149,10 +146,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      
-      <Outlet />
-      <AppSplash />
-      <Toaster theme="dark" position="top-right" />
+      <ConfirmProvider>
+        <OfflineBanner />
+        <Outlet />
+        <AppSplash />
+        <Toaster theme="dark" position="top-right" />
+      </ConfirmProvider>
     </QueryClientProvider>
   );
 }

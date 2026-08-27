@@ -1,3 +1,5 @@
+import { confirmDialog } from "@/hooks/use-confirm";
+import { toastError } from "@/lib/errors";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -73,21 +75,21 @@ export function AdminUserActions({
       toast.success(successMsg);
       qc.invalidateQueries({ queryKey: [invalidateKey] });
     } catch (e: any) {
-      toast.error(e?.message ?? "Action failed");
+      toastError(e);
     } finally {
       setBusy(null);
     }
   }
 
-  const onSuspend = () =>
-    confirm(t("admin_user_actions.confirm_suspend", { defaultValue: "Suspend {{name}}? The account will not be able to sign in.", name })) &&
+  const onSuspend = async () =>
+    await confirmDialog(t("admin_user_actions.confirm_suspend", { defaultValue: "Suspend {{name}}? The account will not be able to sign in.", name })) &&
     run("suspend", () => setBlockedFn({ data: { user_id: userId, blocked: true } }), t("admin_user_actions.suspended", { defaultValue: "Account suspended" }));
 
   const onReactivate = () =>
     run("reactivate", () => setBlockedFn({ data: { user_id: userId, blocked: false } }), t("admin_user_actions.reactivated", { defaultValue: "Account reactivated" }));
 
-  const onDelete = () =>
-    confirm(t("admin_user_actions.confirm_delete", { defaultValue: "Permanently delete {{name}} and all related data? This cannot be undone.", name })) &&
+  const onDelete = async () =>
+    await confirmDialog(t("admin_user_actions.confirm_delete", { defaultValue: "Permanently delete {{name}} and all related data? This cannot be undone.", name })) &&
     run("delete", () => deleteFn({ data: { user_id: userId } }), t("admin_user_actions.deleted", { defaultValue: "User deleted" }));
 
   const onReset = () =>
@@ -97,13 +99,13 @@ export function AdminUserActions({
       t("admin_user_actions.reset_sent", { defaultValue: "Password reset email sent" }),
     );
 
-  const onForceLogout = () =>
-    confirm(t("admin_user_actions.confirm_logout", { defaultValue: "Revoke all active sessions for {{name}}?", name })) &&
+  const onForceLogout = async () =>
+    await confirmDialog(t("admin_user_actions.confirm_logout", { defaultValue: "Revoke all active sessions for {{name}}?", name })) &&
     run("logout", () => logoutFn({ data: { user_id: userId } }), t("admin_user_actions.logged_out", { defaultValue: "All sessions revoked" }));
 
   async function onImpersonate() {
     if (
-      !confirm(
+      !await confirmDialog(
         t("admin_user_actions.confirm_impersonate", {
           defaultValue:
             "Sign in as {{name}}? This action is recorded in the audit log and will replace your current session in the new tab.",
@@ -118,7 +120,7 @@ export function AdminUserActions({
       window.open(res.url, "_blank", "noopener");
       toast.success(t("admin_user_actions.impersonating", { defaultValue: "Impersonation session opened in a new tab" }));
     } catch (e: any) {
-      toast.error(e?.message ?? "Action failed");
+      toastError(e);
     } finally {
       setBusy(null);
     }

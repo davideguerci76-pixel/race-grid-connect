@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { getUserRatingSummary, getAnonymousReviews, unlockReviews, flagRating } from "@/lib/paddock.functions";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError } from "@/lib/errors";
 
 type Variant = "wrench" | "headset";
 
@@ -69,7 +70,7 @@ function FlagReviewButton({ ratingId, alreadyFlagged, onFlagged }: { ratingId: s
       setReason("");
       onFlagged();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: (e: any) => toastError(e),
   });
 
   if (alreadyFlagged) {
@@ -165,7 +166,7 @@ export function AnonymousReviewsSection({
       qc.invalidateQueries({ queryKey: ["anon-reviews", targetUserId] });
       qc.invalidateQueries({ queryKey: ["dashboard-profile"] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Failed"),
+    onError: (e: any) => toastError(e),
   });
 
   const unlocked = !!data?.unlocked || isOwner;

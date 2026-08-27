@@ -1,3 +1,5 @@
+import { confirmDialog } from "@/hooks/use-confirm";
+import { toastError } from "@/lib/errors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -80,7 +82,7 @@ function PitCallManagement() {
 
   async function onImpersonate(teamId: string, teamName: string) {
     if (
-      !confirm(
+      !await confirmDialog(
         t("sweep_admin_b.pitcalls.confirm_impersonate", {
           defaultValue:
             "Sign in as {{name}}? This action is recorded in the audit log and opens their dashboard in a new tab.",
@@ -96,7 +98,7 @@ function PitCallManagement() {
       });
       window.open(res.url, "_blank", "noopener");
     } catch (e: any) {
-      toast.error(e?.message ?? t("sweep_admin_b.common.failed"));
+      toastError(e, "sweep_admin_b.common.failed");
     } finally {
       setImpersonating(null);
     }
@@ -109,7 +111,7 @@ function PitCallManagement() {
       toast.success(t("sweep_admin_b.pitcalls.updated"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.failed"),
   });
   const deleteMut = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { request_id: id } }),
@@ -117,7 +119,7 @@ function PitCallManagement() {
       toast.success(t("sweep_admin_b.pitcalls.deleted"));
       qc.invalidateQueries({ queryKey: ["admin-pitcalls"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.failed"),
   });
 
   const rows = useMemo(() => {
@@ -314,8 +316,8 @@ function PitCallManagement() {
                         <XCircle className="size-3" /> {t("sweep_admin_b.pitcalls.close")}
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm(t("sweep_admin_b.pitcalls.confirm_delete"))) {
+                        onClick={async () => {
+                          if (await confirmDialog(t("sweep_admin_b.pitcalls.confirm_delete"))) {
                             deleteMut.mutate(r.id);
                           }
                         }}

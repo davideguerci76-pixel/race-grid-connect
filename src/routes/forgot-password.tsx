@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -32,7 +33,7 @@ function ForgotPasswordPage() {
       if (error) throw error;
       setSent(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("reset_pw.request_failed", { defaultValue: "Could not send the reset email. Try again." }));
+      toastError(err, "reset_pw.request_failed");
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,7 @@ import { RatingIcons } from "@/components/rating-icons";
 import { addPoolMemberByCode, getMyPool, getPoolMatches, unlockPoolSearch } from "@/lib/pool.functions";
 import { getMyRequests } from "@/lib/paddock.functions";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pool")({
   head: () => ({
@@ -49,7 +50,7 @@ function PoolPage() {
       qc.invalidateQueries({ queryKey: ["my-pool"] });
       qc.invalidateQueries({ queryKey: ["ratable-engagements"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("pool.add_failed")),
+    onError: (e) => toastError(e, "pool.add_failed"),
   });
 
   const openRequests = useMemo(
@@ -191,7 +192,7 @@ function PoolSearchResults({ requestId }: { requestId: string }) {
       qc.invalidateQueries({ queryKey: ["pool-matches", requestId] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("pool.unlock_failed")),
+    onError: (e) => toastError(e, "pool.unlock_failed"),
   });
 
   if (isLoading || !data) return <div className="mt-4 text-sm text-muted-foreground">{t("sweep_engage.common.loading")}</div>;

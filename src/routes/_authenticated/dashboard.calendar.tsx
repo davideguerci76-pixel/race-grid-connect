@@ -14,6 +14,7 @@ import { BackButton } from "@/components/back-button";
 import { CalendarSourcePicker } from "@/components/calendar-source-picker";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -66,7 +67,7 @@ function CalendarPage() {
       toast.success(t("calendar.confirm_success", { defaultValue: "Availability confirmed. You keep top visibility in matches." }));
       qc.invalidateQueries({ queryKey: ["my-calendar-freshness"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
 
   const lastConfirmed = freshness?.calendar_last_confirmed_at ? new Date(freshness.calendar_last_confirmed_at) : null;
@@ -95,7 +96,7 @@ function CalendarPage() {
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_public.dashboard_calendar.save_failed")),
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
 
   if (profile?.user_type !== "freelancer") {

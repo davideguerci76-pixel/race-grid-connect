@@ -1,0 +1,52 @@
+{
+  "errors": {
+    "generic": "Algo ha salido mal. Inténtalo de nuevo.",
+    "crash": "La app ha mostrado bandera roja y esta pantalla se ha detenido.",
+    "server": "Nuestros sistemas no han respondido correctamente. Inténtalo en unos instantes.",
+    "network": "Problema de conexión. Comprueba tu red e inténtalo de nuevo.",
+    "offline": "Estás sin conexión. Reconéctate para continuar.",
+    "offlineBanner": "Sin conexión — PITCALL está offline",
+    "forbidden": "No tienes acceso a esta área.",
+    "notFound": "No hemos encontrado lo que buscabas.",
+    "rateLimited": "Demasiados intentos. Espera un momento y reinténtalo.",
+    "duplicate": "Este elemento ya existe.",
+    "conflict": "Esta acción entra en conflicto con datos existentes.",
+    "invalidData": "Algunos datos no son válidos. Revisa los campos.",
+    "cancelled": "Acción cancelada.",
+    "reference": "Referencia",
+    "auth": {
+      "session": "Tu sesión ha caducado. Inicia sesión de nuevo.",
+      "invalidCredentials": "El email o la contraseña no son correctos.",
+      "emailNotConfirmed": "Confirma tu dirección de email para continuar."
+    },
+    "tokens": {
+      "insufficient": "No tienes tokens suficientes para esta acción."
+    },
+    "validation": {
+      "generic": "Revisa los campos marcados.",
+      "required": "Este campo es obligatorio."
+    },
+    "pwa": {
+      "install": "No se ha podido completar la instalación en este dispositivo.",
+      "push": "No se han podido activar las notificaciones push."
+    },
+    "screens": {
+      "crashTitle": "Bandera roja",
+      "crashBody": "Esta pantalla se ha detenido. Inténtalo de nuevo o vuelve a la parrilla.",
+      "notFoundTitle": "Fuera de pista",
+      "notFoundBody": "Esta página no existe o ha salido del paddock.",
+      "forbiddenTitle": "Área restringida",
+      "forbiddenBody": "No tienes permiso para entrar en esta parte del paddock."
+    },
+    "actions": {
+      "retry": "Reintentar",
+      "home": "Volver a la parrilla"
+    }
+  },
+  "confirm": {
+    "defaultTitle": "Confirmar acción",
+    "defaultDescription": "¿Quieres continuar?",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar"
+  }
+}

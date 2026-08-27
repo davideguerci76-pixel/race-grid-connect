@@ -1,3 +1,4 @@
+import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +15,7 @@ import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/r
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/$id/matches")({
   head: () => ({
@@ -52,7 +54,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.unlock_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.unlock_failed"),
   });
 
   const tierMut = useMutation({
@@ -63,7 +65,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.tier_unlock_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.tier_unlock_failed"),
   });
 
   const confirmFn = useServerFn(requestMatchConfirmation);
@@ -74,7 +76,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["engagements"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.common.failed")),
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
 
   const sosFn = useServerFn(triggerSosCall);
@@ -84,7 +86,7 @@ function RequestMatchesPage() {
       toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 75 }));
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.sos_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.sos_failed"),
   });
 
   const refundFn = useServerFn(refundAndCloseRequest);
@@ -95,7 +97,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_engage.request_matches.refund_failed")),
+    onError: (e) => toastError(e, "sweep_engage.request_matches.refund_failed"),
   });
 
   const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
@@ -116,7 +118,7 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["my-requests"] });
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
-    onError: (e: any) => toast.error(e?.message ?? t("pool.upgrade_failed")),
+    onError: (e: any) => toastError(e, "pool.upgrade_failed"),
   });
 
   const renderPool = (
@@ -163,11 +165,11 @@ function RequestMatchesPage() {
                       </div>
                     )}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const msg = tierInfo.proportional
                           ? t("sweep_engage.request_matches.unlock_tier_confirm_reduced", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, full: tierInfo.entry_cost_full ?? 0, count: tierInfo.real_count ?? 0 })
                           : t("sweep_engage.request_matches.unlock_tier_confirm", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, count: tierInfo.real_count ?? 0 });
-                        if (confirm(msg)) tierMut.mutate({ tier: tierInfo.tier, scope });
+                        if (await confirmDialog(msg)) tierMut.mutate({ tier: tierInfo.tier, scope });
                       }}
                       disabled={tierMut.isPending}
                       className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
@@ -193,8 +195,8 @@ function RequestMatchesPage() {
                       perProfileCost={data!.per_profile_cost}
                       requestFilled={!!requestFilled}
                       onUnlock={() => unlockMut.mutate(m.match_id)}
-                      onConfirm={() => {
-                        if (confirm(t("sweep_engage.request_matches.confirm_match_prompt"))) {
+                      onConfirm={async () => {
+                        if (await confirmDialog(t("sweep_engage.request_matches.confirm_match_prompt"))) {
                           confirmMut.mutate(m.match_id);
                         }
                       }}
@@ -257,8 +259,8 @@ function RequestMatchesPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      if (confirm(t("sweep_engage.request_matches.sos_confirm"))) {
+                    onClick={async () => {
+                      if (await confirmDialog(t("sweep_engage.request_matches.sos_confirm"))) {
                         sosMut.mutate();
                       }
                     }}
@@ -342,15 +344,15 @@ function RequestMatchesPage() {
                 quote={(data as any).refund_quote}
                 hasPartials={data.total_partial_matches > 0}
                 onWait={() => toast.info(t("sweep_engage.request_matches.search_stays_active"))}
-                onRefund={() => {
+                onRefund={async () => {
                   const q = (data as any).refund_quote;
-                  if (confirm(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
+                  if (await confirmDialog(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
                     refundMut.mutate("full");
                   }
                 }}
-                onPartial={() => {
+                onPartial={async () => {
                   const q = (data as any).refund_quote;
-                  if (confirm(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
+                  if (await confirmDialog(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
                     refundMut.mutate("partial");
                   }
                 }}
@@ -378,8 +380,8 @@ function RequestMatchesPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      if (confirm(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
+                    onClick={async () => {
+                      if (await confirmDialog(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
                         upgradeMut.mutate();
                       }
                     }}

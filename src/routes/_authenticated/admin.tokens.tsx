@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
 import { useTranslation } from "react-i18next";
+import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/admin/tokens")({
   component: AdminTokensPage,
@@ -62,7 +63,7 @@ function AdminTokensPage() {
       qc.invalidateQueries({ queryKey: ["admin-settings"] });
       qc.invalidateQueries({ queryKey: ["platform-settings"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : t("sweep_admin_b.common.save_failed")),
+    onError: (e) => toastError(e, "sweep_admin_b.common.save_failed"),
   });
 
   if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</div>;
