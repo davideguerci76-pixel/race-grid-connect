@@ -1,0 +1,52 @@
+{
+  "errors": {
+    "generic": "Qualcosa è andato storto. Riprova.",
+    "crash": "L'app ha esposto bandiera rossa e questa schermata si è interrotta.",
+    "server": "I nostri sistemi non hanno risposto correttamente. Riprova tra poco.",
+    "network": "Problema di connessione. Controlla la rete e riprova.",
+    "offline": "Sei offline. Riconnettiti per continuare.",
+    "offlineBanner": "Nessuna connessione — PITCALL è offline",
+    "forbidden": "Non hai accesso a quest'area.",
+    "notFound": "Non abbiamo trovato quello che cercavi.",
+    "rateLimited": "Troppi tentativi. Attendi un momento e riprova.",
+    "duplicate": "Questo elemento esiste già.",
+    "conflict": "L'azione è in conflitto con dati esistenti.",
+    "invalidData": "Alcuni dati non sono validi. Controlla i campi.",
+    "cancelled": "Azione annullata.",
+    "reference": "Riferimento",
+    "auth": {
+      "session": "La sessione è scaduta. Accedi di nuovo.",
+      "invalidCredentials": "Email o password non corretti.",
+      "emailNotConfirmed": "Conferma il tuo indirizzo email per continuare."
+    },
+    "tokens": {
+      "insufficient": "Non hai abbastanza token per questa azione."
+    },
+    "validation": {
+      "generic": "Controlla i campi evidenziati.",
+      "required": "Questo campo è obbligatorio."
+    },
+    "pwa": {
+      "install": "L'installazione non è stata completata su questo dispositivo.",
+      "push": "Non è stato possibile attivare le notifiche push."
+    },
+    "screens": {
+      "crashTitle": "Bandiera rossa",
+      "crashBody": "Questa schermata si è interrotta. Riprova o torna in griglia.",
+      "notFoundTitle": "Fuori pista",
+      "notFoundBody": "Questa pagina non esiste o ha lasciato il paddock.",
+      "forbiddenTitle": "Area riservata",
+      "forbiddenBody": "Non hai i permessi per accedere a questa parte del paddock."
+    },
+    "actions": {
+      "retry": "Riprova",
+      "home": "Torna in griglia"
+    }
+  },
+  "confirm": {
+    "defaultTitle": "Conferma azione",
+    "defaultDescription": "Vuoi continuare?",
+    "confirm": "Conferma",
+    "cancel": "Annulla"
+  }
+}
