@@ -16,6 +16,8 @@ import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
+import { registerServiceWorker } from "@/lib/pwa/register-sw";
+
 
 
 function NotFoundComponent() {
