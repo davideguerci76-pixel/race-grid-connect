@@ -77,13 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Pit Call matches motorsport freelancers with team Pit Calls by availability, role and location." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/650f27bf-5256-45cb-bd66-763f37eefc13/id-preview-08c64f09--ba911ff1-05bb-4fd7-8266-392e49d01898.lovable.app-1783339043558.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/650f27bf-5256-45cb-bd66-763f37eefc13/id-preview-08c64f09--ba911ff1-05bb-4fd7-8266-392e49d01898.lovable.app-1783339043558.png" },
+      // Installable app (PWA) hints
+      { name: "theme-color", content: "#0b0b0c" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Pit Call" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png", sizes: "180x180" },
       // Fonts are self-hosted (see src/styles.css) — no Google Fonts request.
       { rel: "preload", href: "/fonts/outfit-latin.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
     ],
+
     // iubenda unified embed: cookie banner + auto-blocking of consent-bound
     // scripts. Loaded in <head> so blocking is active before anything else runs.
     scripts: IUBENDA_ENABLED ? [{ type: "text/javascript", src: IUBENDA_SCRIPT_URL }] : [],
