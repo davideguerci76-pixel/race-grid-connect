@@ -150,7 +150,16 @@
       "deselect_month": "Désélectionner le mois",
       "select_all": "Tout sélectionner ({{months}}m)",
       "deselect_all": "Tout désélectionner"
-    }
+    },
+    "confirm_button": "Tout est encore correct — Confirmer",
+    "confirm_success": "Disponibilité confirmée. Merci de la garder à jour.",
+    "last_confirmed": "Dernière confirmation il y a {{days}} jour(s) · {{date}}",
+    "never_confirmed": "Pas encore confirmée",
+    "freshness_label": "Vérification des disponibilités",
+    "freshness_benefit": "Votre disponibilité est à jour. Merci de la garder précise.",
+    "state_needs_review": "Certaines de vos dates disponibles n'ont pas été vérifiées récemment. Une vérification rapide suffit.",
+    "state_unconfirmed": "Nous avons temporairement cessé d'utiliser {{count}} de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver.",
+    "legend_unconfirmed": "À confirmer"
   },
   "matches": {
     "title": "Matches",

@@ -150,7 +150,16 @@
       "deselect_month": "Deselect month",
       "select_all": "Select all ({{months}}m)",
       "deselect_all": "Deselect all"
-    }
+    },
+    "confirm_button": "Everything is still correct — Confirm",
+    "confirm_success": "Availability confirmed. Thanks for keeping it accurate.",
+    "last_confirmed": "Last confirmed {{days}} day(s) ago · {{date}}",
+    "never_confirmed": "Not confirmed yet",
+    "freshness_label": "Availability check",
+    "freshness_benefit": "Your availability is up to date. Thanks for keeping it accurate.",
+    "state_needs_review": "Some of your available dates haven't been reviewed recently. A quick check keeps them accurate.",
+    "state_unconfirmed": "We've temporarily stopped using {{count}} of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again.",
+    "legend_unconfirmed": "Needs confirmation"
   },
   "matches": {
     "title": "Matches",
