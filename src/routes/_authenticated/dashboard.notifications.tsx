@@ -12,6 +12,7 @@ import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { PushSetupCard } from "@/components/push-setup-card";
 import { useAppBadge } from "@/hooks/use-push-notifications";
+import { formatCriterion } from "@/lib/criteria-label";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
@@ -113,7 +114,8 @@ function NotificationsPage() {
               {(notifications as any[]).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
-                const isEngagement = [
+                const info = n.payload?.informational === true;
+                const isEngagement = !info && [
                   "engagement_proposed",
                   "match_taken",
                   "match_reopened",
@@ -131,11 +133,15 @@ function NotificationsPage() {
                         <span className="font-mono text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</span>
                       </div>
                       <div className="mt-1 text-sm">
-                        {isStale
-                          ? n.payload?.state === "unconfirmed"
+                        {isStale ? (
+                          n.payload?.state === "unconfirmed"
                             ? t("sweep_profile.notifications.calendar_stale_unconfirmed_message")
                             : t("sweep_profile.notifications.calendar_stale_message")
-                          : (n.payload?.message ?? n.kind)}
+                        ) : info ? (
+                          <InformationalMessage payload={n.payload} kind={n.kind} />
+                        ) : (
+                          n.payload?.message ?? n.kind
+                        )}
                       </div>
                     </div>
                     {isStale ? (
@@ -155,6 +161,63 @@ function NotificationsPage() {
         </div>
       </div>
       <SiteFooter />
+    </div>
+  );
+}
+
+/**
+ * Renders the three informational freelancer alerts. These never link to the
+ * Pit Call: a potential match is information, not access.
+ */
+function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
+  const { t } = useTranslation();
+  const outcome = payload?.outcome as string | undefined;
+  const score = Math.round(Number(payload?.score ?? 0));
+  const criteria = Array.isArray(payload?.criteria) ? payload.criteria : [];
+
+  if (outcome === "filled" || kind === "match_taken") {
+    const perfect = score >= 100;
+    return (
+      <div className="grid gap-1">
+        <div className="font-medium">{t("pmatch.filled_title")}</div>
+        {perfect ? (
+          <>
+            <div>{t("pmatch.filled_perfect")}</div>
+            <div className="text-muted-foreground">{t("pmatch.filled_perfect_tip")}</div>
+          </>
+        ) : (
+          <>
+            <div>{t("pmatch.filled_score", { score })}</div>
+            {criteria.length > 0 && (
+              <>
+                <div>{t("pmatch.filled_criteria_intro")}</div>
+                <ul className="ml-4 list-disc text-muted-foreground">
+                  {criteria.map((c: any, i: number) => (
+                    <li key={i}>{formatCriterion(c, t)}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <div className="text-muted-foreground">{t("pmatch.filled_tip")}</div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (outcome === "closed" || kind === "request_unfilled") {
+    return (
+      <div className="grid gap-1">
+        <div className="font-medium">{t("pmatch.closed_title")}</div>
+        <div className="text-muted-foreground">{t("pmatch.closed_body")}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-1">
+      <div className="font-medium">{t("pmatch.potential_title")}</div>
+      <div className="text-muted-foreground">{t("pmatch.potential_body")}</div>
     </div>
   );
 }

@@ -50,11 +50,14 @@ export const Route = createFileRoute("/api/public/notification-email")({
 
         let sent = 0;
         for (const n of pending ?? []) {
-          const meta = KIND_META[n.kind as string] ?? {
-            title: "New activity on Pit Call",
-            path: "/dashboard/notifications",
-            label: "Open Pit Call",
-          };
+          const informational = ((n.payload ?? {}) as Record<string, unknown>)["informational"] === true;
+          const meta = informational
+            ? { title: "Pit Call update", path: "/dashboard/notifications", label: "Open Pit Call" }
+            : (KIND_META[n.kind as string] ?? {
+                title: "New activity on Pit Call",
+                path: "/dashboard/notifications",
+                label: "Open Pit Call",
+              });
           try {
             const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(n.user_id as string);
             const email = userRes?.user?.email;

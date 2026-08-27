@@ -43,11 +43,23 @@ const FALLBACK: NotificationTarget = {
   label: "Open Pit Call",
 };
 
+/** True when the alert is purely informational and must not link to a Pit Call. */
+export function isInformationalNotification(payload?: Payload | null): boolean {
+  const p = (payload ?? {}) as Payload;
+  return p["informational"] === true;
+}
+
 /** Resolves the deep-link destination, refining it with payload ids when present. */
 export function resolveNotificationTarget(kind: string, payload?: Payload | null): NotificationTarget {
   const base = BASE[kind] ?? FALLBACK;
   const p = (payload ?? {}) as Payload;
   const requestId = typeof p["request_id"] === "string" ? (p["request_id"] as string) : null;
+
+  // Informational alerts (potential match, Pit Call filled/closed follow-ups)
+  // never grant access to the Pit Call: they land on the notification inbox.
+  if (isInformationalNotification(p)) {
+    return { ...base, path: "/dashboard/notifications", label: FALLBACK.label };
+  }
 
   if (requestId && (kind === "new_matches" || kind === "request_unfilled" || kind === "revealed_by")) {
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };

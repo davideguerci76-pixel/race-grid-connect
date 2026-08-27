@@ -1,0 +1,15 @@
+{
+  "pmatch": {
+    "potential_title": "A new Pit Call matches your profile",
+    "potential_body": "No action is needed yet. Keep an eye on PITCALL to see if the Team requests your confirmation.",
+    "filled_title": "This Pit Call has been filled.",
+    "filled_score": "Your match score was {{score}}%.",
+    "filled_criteria_intro": "These criteria reduced your match:",
+    "filled_tip": "Keep your profile and availability up to date to improve your chances on future Pit Calls.",
+    "filled_perfect": "You were a 100% match, but another freelancer was confirmed first.",
+    "filled_perfect_tip": "Keep your profile and availability up to date — more matching Pit Calls may come your way.",
+    "closed_title": "This Pit Call has been closed.",
+    "closed_body": "The Team closed the request without confirming a freelancer.",
+    "info_badge": "Information only"
+  }
+}

@@ -1959,6 +1959,18 @@ export type Database = {
       dispatch_notification_push: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_contact_checks: { Args: never; Returns: number }
+      emit_pitcall_outcome_notifications: {
+        Args: {
+          _confirmed_freelancer?: string
+          _outcome: string
+          _request_id: string
+        }
+        Returns: number
+      }
+      emit_potential_match_notifications: {
+        Args: { _freelancer_id?: string; _request_id?: string }
+        Returns: number
+      }
       emit_rating_available_notifications: { Args: never; Returns: number }
       emit_team_ghosting_reminders: { Args: never; Returns: number }
       env_is_test: { Args: never; Returns: boolean }
@@ -2007,6 +2019,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      freelancer_match_actionable: {
+        Args: { _freelancer: string; _request: string }
+        Returns: boolean
       }
       gen_pit_code: { Args: never; Returns: string }
       get_anonymous_reviews: {
