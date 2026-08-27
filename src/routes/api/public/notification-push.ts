@@ -48,40 +48,63 @@ export const Route = createFileRoute("/api/public/notification-push")({
         const since = new Date(Date.now() - WINDOW_HOURS * 60 * 60 * 1000).toISOString();
 
         // 1) Fan out: create one delivery row per (notification, subscription).
-        const { data: fresh } = await supabaseAdmin
-          .from("notifications")
-          .select("id, user_id, kind, payload, is_test, created_at")
-          .is("pushed_at", null)
-          .gte("created_at", since)
-          .order("created_at", { ascending: true })
-          .limit(100);
+        // Subscriptions are loaded FIRST and the notification scan is restricted to
+        // their owners. Without that filter, a backlog of undeliverable rows (test
+        // notifications for users with no device keep pushed_at NULL forever) filled
+        // the 100-row batch and starved every real notification, and the per-row
+        // subscription lookups pushed the request past the dispatcher timeout.
+        const { data: allSubs } = await supabaseAdmin
+          .from("push_subscriptions")
+          .select("id, user_id, is_test");
 
-        for (const n of fresh ?? []) {
-          const { data: subs } = await supabaseAdmin
-            .from("push_subscriptions")
-            .select("id")
-            .eq("user_id", n.user_id as string)
-            .eq("is_test", n.is_test as boolean);
-
-          if (subs?.length) {
-            await supabaseAdmin.from("push_deliveries").upsert(
-              subs.map((s) => ({
-                notification_id: n.id as string,
-                subscription_id: s.id as string,
-                is_test: n.is_test as boolean,
-                status: "pending",
-              })),
-              { onConflict: "notification_id,subscription_id", ignoreDuplicates: true },
-            );
-            // Only mark as pushed once at least one delivery row exists, so a
-            // notification created while the user had no active subscription
-            // is still delivered when they re-subscribe within the window.
-            await supabaseAdmin
-              .from("notifications")
-              .update({ pushed_at: new Date().toISOString() })
-              .eq("id", n.id as string);
-          }
+        const subsByKey = new Map<string, string[]>();
+        for (const s of allSubs ?? []) {
+          const key = `${s.user_id as string}:${s.is_test as boolean}`;
+          subsByKey.set(key, [...(subsByKey.get(key) ?? []), s.id as string]);
         }
+        const subUserIds = [...new Set((allSubs ?? []).map((s) => s.user_id as string))];
+
+        const { data: fresh } = subUserIds.length
+          ? await supabaseAdmin
+              .from("notifications")
+              .select("id, user_id, is_test")
+              .is("pushed_at", null)
+              .gte("created_at", since)
+              .in("user_id", subUserIds)
+              .order("created_at", { ascending: true })
+              .limit(100)
+          : { data: [] as Array<{ id: string; user_id: string; is_test: boolean }> };
+
+
+        const deliveryRows: Array<{ notification_id: string; subscription_id: string; is_test: boolean; status: string }> = [];
+        const pushedIds: string[] = [];
+        for (const n of fresh ?? []) {
+          const subIds = subsByKey.get(`${n.user_id as string}:${n.is_test as boolean}`) ?? [];
+          if (!subIds.length) continue;
+          for (const sid of subIds) {
+            deliveryRows.push({
+              notification_id: n.id as string,
+              subscription_id: sid,
+              is_test: n.is_test as boolean,
+              status: "pending",
+            });
+          }
+          // Only mark as pushed once at least one delivery row exists, so a
+          // notification created while the user had no active subscription
+          // is still delivered when they re-subscribe within the window.
+          pushedIds.push(n.id as string);
+        }
+
+        if (deliveryRows.length) {
+          await supabaseAdmin
+            .from("push_deliveries")
+            .upsert(deliveryRows, { onConflict: "notification_id,subscription_id", ignoreDuplicates: true });
+          await supabaseAdmin
+            .from("notifications")
+            .update({ pushed_at: new Date().toISOString() })
+            .in("id", pushedIds);
+        }
+
 
         // 2) Deliver everything still pending or retryable.
         const { data: pending, error } = await supabaseAdmin
