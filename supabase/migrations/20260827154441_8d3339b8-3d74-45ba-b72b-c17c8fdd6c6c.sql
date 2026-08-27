@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.freelancer_match_actionable(uuid, uuid) TO authenticated;
