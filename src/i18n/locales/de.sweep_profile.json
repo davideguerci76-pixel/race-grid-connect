@@ -103,6 +103,18 @@
       "update_calendar": "Verfügbarkeit prüfen",
       "view_engagement": "Engagement ansehen",
       "calendar_stale_unconfirmed_message": "Wir nutzen einige deiner Tage vorübergehend nicht mehr für das Matching, da wir nicht sicher sein können, ob sie noch aktuell sind. Du kannst sie jederzeit prüfen und wieder aktivieren."
+    },
+    "push": {
+      "title": "Push-Benachrichtigungen",
+      "desc": "Erhalte sofort Hinweise auf diesem Gerät, wenn ein neuer Pit-Call-Match, ein Engagement-Update oder eine Erinnerung eintrifft.",
+      "enable": "Push-Benachrichtigungen aktivieren",
+      "disable": "Auf diesem Gerät deaktivieren",
+      "enabled": "Push ist auf diesem Gerät aktiv",
+      "denied": "Benachrichtigungen sind in den Browsereinstellungen blockiert. Erlaube sie für Pit Call und versuche es erneut.",
+      "unsupported": "Dieser Browser unterstützt keine Push-Benachrichtigungen.",
+      "install_title": "Installiere zuerst Pit Call",
+      "install_ios": "Öffne auf iPhone und iPad das Teilen-Menü und tippe auf „Zum Home-Bildschirm“, öffne Pit Call dann über das Symbol, um Push zu aktivieren.",
+      "failed": "Push-Benachrichtigungen konnten nicht aktiviert werden. Bitte erneut versuchen."
     }
   }
 }
