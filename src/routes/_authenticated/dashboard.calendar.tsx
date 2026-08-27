@@ -124,18 +124,28 @@ function CalendarPage() {
             <div className="label-mono">[{t("calendar.freshness_label")}]</div>
 
             <div className={`mt-1 font-mono text-xs ${freshTone}`}>
-              {lastUpdated
+              {lastConfirmed
                 ? t("calendar.last_confirmed", {
                     defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}",
                     days: daysSince,
-                    date: formatDate(lastUpdated),
+                    date: formatDate(lastConfirmed),
                   })
                 : t("calendar.never_confirmed", { defaultValue: "Never confirmed yet" })}
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              {t("calendar.freshness_benefit", {
-                defaultValue: "Confirm regularly to keep top visibility in team matches.",
-              })}
+              {state === "unconfirmed"
+                ? t("calendar.state_unconfirmed", {
+                    defaultValue:
+                      "We've temporarily stopped using {{count}} of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again.",
+                    count: freshness?.unconfirmed_days?.length ?? 0,
+                  })
+                : state === "needs_review"
+                  ? t("calendar.state_needs_review", {
+                      defaultValue: "Some of your available dates haven't been reviewed recently.",
+                    })
+                  : t("calendar.freshness_benefit", {
+                      defaultValue: "Your availability is up to date. Thanks for keeping it accurate.",
+                    })}
             </p>
           </div>
           <button
@@ -145,7 +155,7 @@ function CalendarPage() {
           >
             {confirmMut.isPending
               ? t("common.loading")
-              : t("calendar.confirm_button", { defaultValue: "I confirm my availability" })}
+              : t("calendar.confirm_button", { defaultValue: "Everything is still correct — Confirm" })}
           </button>
         </div>
 
