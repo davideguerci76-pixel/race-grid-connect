@@ -300,7 +300,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {req.notes && <p className="mt-2 text-xs text-muted-foreground">{req.notes}</p>}
+                    {detailsUnlocked && req.notes && <p className="mt-2 text-xs text-muted-foreground">{req.notes}</p>}
                   </div>
                 )}
 
