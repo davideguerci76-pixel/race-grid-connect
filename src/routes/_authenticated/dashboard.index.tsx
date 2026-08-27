@@ -106,15 +106,29 @@ function DashboardHome() {
     },
   });
 
+  // "New matches" = items actually waiting for an action from the current user.
+  // Team: matches with no confirmation request sent yet. Freelancer: pending confirmation requests received.
   const { data: activeMatchesCount = 0 } = useQuery({
-    queryKey: ["active-matches-count", user?.id],
+    queryKey: ["pending-action-count", user?.id, profile?.user_type],
     enabled: !!user && !!profile,
     queryFn: async () => {
-      const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
-      const { count } = await supabase.from("matches").select("*", { count: "exact", head: true }).eq(col, user!.id);
-      return count ?? 0;
+      if (profile!.user_type === "freelancer") {
+        const { count } = await supabase
+          .from("engagements")
+          .select("*", { count: "exact", head: true })
+          .eq("freelancer_id", user!.id)
+          .eq("status", "proposed");
+        return count ?? 0;
+      }
+      const [{ data: matches }, { data: engagements }] = await Promise.all([
+        supabase.from("matches").select("request_id, freelancer_id").eq("team_id", user!.id),
+        supabase.from("engagements").select("request_id, freelancer_id").eq("team_id", user!.id),
+      ]);
+      const handled = new Set((engagements ?? []).map((e) => `${e.request_id}:${e.freelancer_id}`));
+      return (matches ?? []).filter((m) => !handled.has(`${m.request_id}:${m.freelancer_id}`)).length;
     },
   });
+
 
 
 
@@ -147,14 +161,15 @@ function DashboardHome() {
         <InstallAppCard />
 
         {activeMatchesCount > 0 && (
-          <Link to="/dashboard/matches" className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
+          <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-racing-red">[NEW MATCHES]</div>
-              <div className="mt-1 text-xl font-bold">{t("matches.counts_banner", { count: activeMatchesCount, who: profile?.user_type === "freelancer" ? t("nav.teams") : t("nav.freelancers") })}</div>
+              <div className="font-mono text-xs uppercase tracking-widest text-racing-red">{isFreelancer ? t("dashboard.new_free_label") : t("dashboard.new_team_label")}</div>
+              <div className="mt-1 text-xl font-bold">{isFreelancer ? t("dashboard.new_free_body", { count: activeMatchesCount }) : t("dashboard.new_team_body", { count: activeMatchesCount })}</div>
             </div>
-            <span className="font-mono text-xs text-racing-red">{t("dashboard.new_matches_pill", { count: activeMatchesCount })} →</span>
+            <span className="font-mono text-xs text-racing-red">{isFreelancer ? t("dashboard.new_free_pill", { count: activeMatchesCount }) : t("dashboard.new_team_pill", { count: activeMatchesCount })} →</span>
           </Link>
         )}
+
 
         {isFreelancer && (sosCalls as any[]).length > 0 && (
           <div className="mt-6 space-y-2">
