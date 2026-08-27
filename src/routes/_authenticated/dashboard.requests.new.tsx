@@ -836,7 +836,7 @@ function NewRequestPage() {
 
           <button
             type="submit"
-            disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
+            disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0) || datesInvalid}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
             {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost: displayCost, label: t("requests.post_for") })}
