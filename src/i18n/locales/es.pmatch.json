@@ -1,0 +1,15 @@
+{
+  "pmatch": {
+    "potential_title": "Una nueva Pit Call coincide con tu perfil",
+    "potential_body": "Todavía no hay que hacer nada. Mantente atento a PITCALL por si el Team solicita tu confirmación.",
+    "filled_title": "Esta Pit Call ha sido cubierta.",
+    "filled_score": "Tu match score era {{score}}%.",
+    "filled_criteria_intro": "Estos criterios redujeron tu match:",
+    "filled_tip": "Mantén tu perfil y tu disponibilidad al día para mejorar tus opciones en futuras Pit Calls.",
+    "filled_perfect": "Eras un match del 100%, pero otro freelance fue confirmado antes.",
+    "filled_perfect_tip": "Mantén tu perfil y tu disponibilidad al día — pueden llegar más Pit Calls compatibles.",
+    "closed_title": "Esta Pit Call se ha cerrado.",
+    "closed_body": "El Team cerró la solicitud sin confirmar a ningún freelance.",
+    "info_badge": "Solo informativa"
+  }
+}
