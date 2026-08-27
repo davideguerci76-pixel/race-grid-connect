@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { touchPushSubscription } from "@/lib/push.functions";
 
 const KEY = "pitcallPushSeen";
