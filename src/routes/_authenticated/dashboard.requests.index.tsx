@@ -176,7 +176,7 @@ function RequestsPage() {
                     </button>
                   </>
                 )}
-                {(r.status === "completed" || r.status === "closed" || r.status === "filled") && !flags.pitcallCreationDisabled && (
+                {!flags.pitcallCreationDisabled && (
                   <>
                     <Link
                       to="/dashboard/requests/new"
