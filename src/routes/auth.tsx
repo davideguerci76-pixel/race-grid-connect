@@ -186,7 +186,15 @@ function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
               />
+              {isSignup && (
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {t("auth.password_hint", {
+                    defaultValue: "At least 8 characters. Avoid common passwords — they are rejected for security.",
+                  })}
+                </p>
+              )}
             </div>
+
             {isSignup && (
               <label className="flex items-start gap-2 text-xs text-muted-foreground">
                 <input
