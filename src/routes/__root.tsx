@@ -76,8 +76,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Pit Call" },
       { name: "twitter:description", content: "Pit Call matches motorsport freelancers with team Pit Calls by availability, role and location." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/650f27bf-5256-45cb-bd66-763f37eefc13/id-preview-08c64f09--ba911ff1-05bb-4fd7-8266-392e49d01898.lovable.app-1783339043558.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/650f27bf-5256-45cb-bd66-763f37eefc13/id-preview-08c64f09--ba911ff1-05bb-4fd7-8266-392e49d01898.lovable.app-1783339043558.png" },
+      { property: "og:image", content: "https://pitcall.net/og-image.png" },
+      { name: "twitter:image", content: "https://pitcall.net/og-image.png" },
       // Installable app (PWA) hints
       { name: "theme-color", content: "#000000" },
       { name: "mobile-web-app-capable", content: "yes" },

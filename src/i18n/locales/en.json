@@ -657,6 +657,37 @@
         ]
       },
       {
+        "id": "web-push",
+        "heading": "Web push notifications (PWA)",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Push notifications are **never** enabled automatically: they are activated only when you deliberately ask for them inside Pit Call and grant the permission your browser requests."
+          },
+          {
+            "t": "p",
+            "v": "To deliver them, Pit Call stores only the technical data required by the subscription created by your browser:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "the **push endpoint**, the unique address your browser assigns to that installation;",
+              "the **technical keys** needed to encrypt and deliver the message;",
+              "basic **browser/device technical information**, such as the user agent;",
+              "**technical timestamps** (creation and last update of the subscription)."
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Delivery always goes through the push service tied to **your** browser and operating system. Depending on the platform you use, this may be a service operated by Google, Apple, Mozilla or another provider chosen by your browser: Pit Call does not select it and it is not the same for every user. The message content is encrypted and the push service only forwards it to your device."
+          },
+          {
+            "t": "p",
+            "v": "You can **revoke** the subscription at any time by turning notifications off in Pit Call or in your browser/system settings. The subscription is also deleted when you delete your account, through the existing deletion process, and endpoints that are no longer valid (404/410 responses from the push service) are removed automatically by the existing cleanup."
+          }
+        ]
+      },
+      {
         "id": "conservazione",
         "heading": "Data retention",
         "blocks": [

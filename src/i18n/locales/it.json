@@ -657,6 +657,37 @@
         ]
       },
       {
+        "id": "web-push",
+        "heading": "Notifiche web push (PWA)",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Le notifiche push non vengono **mai** attivate automaticamente: sono attivate solo quando le richiedi volontariamente dentro Pit Call e concedi il permesso richiesto dal browser."
+          },
+          {
+            "t": "p",
+            "v": "Per recapitarle, Pit Call conserva solo i dati tecnici necessari alla subscription creata dal tuo browser:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "il **push endpoint**, l'indirizzo univoco che il browser assegna a quell'installazione;",
+              "le **chiavi tecniche** necessarie a cifrare e consegnare il messaggio;",
+              "informazioni tecniche di base su **browser/dispositivo**, come lo user agent;",
+              "**timestamp tecnici** (creazione e ultimo aggiornamento della subscription)."
+            ]
+          },
+          {
+            "t": "p",
+            "v": "La consegna passa sempre attraverso il push service associato al **tuo** browser e sistema operativo. A seconda della piattaforma può trattarsi di un servizio gestito da Google, Apple, Mozilla o altro provider scelto dal browser: Pit Call non lo sceglie e non è lo stesso per tutti gli utenti. Il contenuto del messaggio è cifrato e il push service si limita a inoltrarlo al dispositivo."
+          },
+          {
+            "t": "p",
+            "v": "Puoi **revocare** la subscription in qualsiasi momento disattivando le notifiche in Pit Call o nelle impostazioni del browser/sistema. La subscription viene inoltre eliminata alla cancellazione dell'account, tramite il meccanismo esistente, e gli endpoint non più validi (risposte 404/410 del push service) vengono rimossi automaticamente dal cleanup già attivo."
+          }
+        ]
+      },
+      {
         "id": "conservazione",
         "heading": "Conservazione dei dati",
         "blocks": [
