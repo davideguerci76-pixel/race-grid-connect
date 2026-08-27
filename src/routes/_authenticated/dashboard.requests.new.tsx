@@ -196,6 +196,32 @@ function NewRequestPage() {
 
   const seasonDatesIso = useMemo(() => seasonDates.map(fmt).sort(), [seasonDates]);
 
+  // --- Date validation (client-side, immediate) -------------------------------
+  const DATE_MIN_ISO = `${new Date().getFullYear() - 1}-01-01`;
+  const DATE_MAX_ISO = `${new Date().getFullYear() + 5}-12-31`;
+  const parseIso = (v: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+    const d = new Date(`${v}T00:00:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+  const inRange = (v: string) => v >= DATE_MIN_ISO && v <= DATE_MAX_ISO;
+  const startDateError = useMemo(() => {
+    if (isSeason || !form.start_date) return null;
+    if (!parseIso(form.start_date)) return t("sweep_engage.new_request.date_invalid");
+    if (!inRange(form.start_date)) return t("sweep_engage.new_request.date_out_of_range");
+    return null;
+  }, [isSeason, form.start_date, t]);
+  const endDateError = useMemo(() => {
+    if (isSeason || !form.end_date) return null;
+    if (!parseIso(form.end_date)) return t("sweep_engage.new_request.date_invalid");
+    if (!inRange(form.end_date)) return t("sweep_engage.new_request.date_out_of_range");
+    if (form.start_date && !startDateError && form.end_date < form.start_date)
+      return t("sweep_engage.new_request.date_end_before_start");
+    return null;
+  }, [isSeason, form.end_date, form.start_date, startDateError, t]);
+  const datesInvalid = !isSeason && (!!startDateError || !!endDateError);
+
+
   const mut = useMutation({
     mutationFn: () =>
       create({
@@ -341,6 +367,11 @@ function NewRequestPage() {
               toast.error(t("sweep_engage.new_request.select_working_day"));
               return;
             }
+            if (datesInvalid) {
+              toast.error(startDateError ?? endDateError ?? "");
+              return;
+            }
+
             mut.mutate();
           }}
           className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
@@ -507,12 +538,37 @@ function NewRequestPage() {
             <>
               <div>
                 <label className="label-mono">{t("sweep_engage.new_request.start_date")}</label>
-                <input type="date" required={!isSeason} value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+                <input
+                  type="date"
+                  required={!isSeason}
+                  min={DATE_MIN_ISO}
+                  max={DATE_MAX_ISO}
+                  value={form.start_date}
+                  onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+                  aria-invalid={!!startDateError}
+                  className={`mt-1 w-full border bg-background px-3 py-2 ${startDateError ? "border-racing-red" : "border-border"}`}
+                />
+                {startDateError && (
+                  <p className="mt-1 text-[11px] font-semibold text-racing-red">{startDateError}</p>
+                )}
               </div>
               <div>
                 <label className="label-mono">{t("sweep_engage.new_request.end_date")}</label>
-                <input type="date" required={!isSeason} value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2" />
+                <input
+                  type="date"
+                  required={!isSeason}
+                  min={form.start_date && !startDateError ? form.start_date : DATE_MIN_ISO}
+                  max={DATE_MAX_ISO}
+                  value={form.end_date}
+                  onChange={(e) => setForm({ ...form, end_date: e.target.value })}
+                  aria-invalid={!!endDateError}
+                  className={`mt-1 w-full border bg-background px-3 py-2 ${endDateError ? "border-racing-red" : "border-border"}`}
+                />
+                {endDateError && (
+                  <p className="mt-1 text-[11px] font-semibold text-racing-red">{endDateError}</p>
+                )}
               </div>
+
             </>
           )}
 
@@ -780,7 +836,7 @@ function NewRequestPage() {
 
           <button
             type="submit"
-            disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0)}
+            disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0) || datesInvalid}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
             {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost: displayCost, label: t("requests.post_for") })}
