@@ -278,7 +278,7 @@ function EngagementsPage() {
                         </div>
                       </div>
                     )}
-                    {languages.length > 0 && (
+                    {detailsUnlocked && languages.length > 0 && (
                       <div className="mt-2">
                         <div className="label-mono mb-1">[LANGUAGES]</div>
                         <div className="flex flex-wrap gap-1">
