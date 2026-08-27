@@ -161,14 +161,15 @@ function DashboardHome() {
         <InstallAppCard />
 
         {activeMatchesCount > 0 && (
-          <Link to="/dashboard/matches" className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
+          <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-racing-red">[NEW MATCHES]</div>
-              <div className="mt-1 text-xl font-bold">{t("matches.counts_banner", { count: activeMatchesCount, who: profile?.user_type === "freelancer" ? t("nav.teams") : t("nav.freelancers") })}</div>
+              <div className="font-mono text-xs uppercase tracking-widest text-racing-red">{isFreelancer ? t("dashboard.new_free_label") : t("dashboard.new_team_label")}</div>
+              <div className="mt-1 text-xl font-bold">{isFreelancer ? t("dashboard.new_free_body", { count: activeMatchesCount }) : t("dashboard.new_team_body", { count: activeMatchesCount })}</div>
             </div>
-            <span className="font-mono text-xs text-racing-red">{t("dashboard.new_matches_pill", { count: activeMatchesCount })} →</span>
+            <span className="font-mono text-xs text-racing-red">{isFreelancer ? t("dashboard.new_free_pill", { count: activeMatchesCount }) : t("dashboard.new_team_pill", { count: activeMatchesCount })} →</span>
           </Link>
         )}
+
 
         {isFreelancer && (sosCalls as any[]).length > 0 && (
           <div className="mt-6 space-y-2">
