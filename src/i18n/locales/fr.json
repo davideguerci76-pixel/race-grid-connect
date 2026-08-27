@@ -645,6 +645,37 @@
         ]
       },
       {
+        "id": "web-push",
+        "heading": "Notifications web push (PWA)",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Les notifications push ne sont **jamais** activées automatiquement : elles le sont uniquement lorsque vous les demandez volontairement dans Pit Call et accordez l'autorisation demandée par votre navigateur."
+          },
+          {
+            "t": "p",
+            "v": "Pour les délivrer, Pit Call conserve uniquement les données techniques nécessaires à l'abonnement créé par votre navigateur :"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "le **push endpoint**, l'adresse unique attribuée par le navigateur à cette installation ;",
+              "les **clés techniques** nécessaires au chiffrement et à la remise du message ;",
+              "des informations techniques de base sur le **navigateur/appareil**, comme le user agent ;",
+              "des **horodatages techniques** (création et dernière mise à jour de l'abonnement)."
+            ]
+          },
+          {
+            "t": "p",
+            "v": "La remise passe toujours par le service push associé à **votre** navigateur et à votre système d'exploitation. Selon la plateforme, il peut s'agir d'un service opéré par Google, Apple, Mozilla ou un autre fournisseur choisi par le navigateur : Pit Call ne le choisit pas et il n'est pas le même pour tous les utilisateurs. Le contenu du message est chiffré et le service push se contente de le transmettre à l'appareil."
+          },
+          {
+            "t": "p",
+            "v": "Vous pouvez **révoquer** l'abonnement à tout moment en désactivant les notifications dans Pit Call ou dans les réglages du navigateur/système. L'abonnement est également supprimé lors de la suppression du compte, via le mécanisme existant, et les endpoints devenus invalides (réponses 404/410 du service push) sont supprimés automatiquement par le nettoyage déjà en place."
+          }
+        ]
+      },
+      {
         "id": "conservazione",
         "heading": "Conservation des données",
         "blocks": [

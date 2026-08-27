@@ -645,6 +645,37 @@
         ]
       },
       {
+        "id": "web-push",
+        "heading": "Web-Push-Benachrichtigungen (PWA)",
+        "blocks": [
+          {
+            "t": "p",
+            "v": "Push-Benachrichtigungen werden **nie** automatisch aktiviert: Sie werden nur aktiviert, wenn Sie sie in Pit Call bewusst anfordern und die vom Browser angeforderte Berechtigung erteilen."
+          },
+          {
+            "t": "p",
+            "v": "Für die Zustellung speichert Pit Call ausschließlich die technischen Daten, die das vom Browser erzeugte Abonnement benötigt:"
+          },
+          {
+            "t": "ul",
+            "v": [
+              "den **Push-Endpoint**, die eindeutige Adresse, die der Browser dieser Installation zuweist;",
+              "die **technischen Schlüssel** zur Verschlüsselung und Zustellung der Nachricht;",
+              "grundlegende technische Angaben zu **Browser/Gerät**, etwa den User Agent;",
+              "**technische Zeitstempel** (Erstellung und letzte Aktualisierung des Abonnements)."
+            ]
+          },
+          {
+            "t": "p",
+            "v": "Die Zustellung erfolgt immer über den Push-Dienst **Ihres** Browsers und Betriebssystems. Je nach Plattform kann das ein Dienst von Google, Apple, Mozilla oder einem anderen vom Browser gewählten Anbieter sein: Pit Call wählt ihn nicht aus und er ist nicht für alle Nutzer derselbe. Der Nachrichteninhalt ist verschlüsselt, der Push-Dienst leitet ihn lediglich an das Gerät weiter."
+          },
+          {
+            "t": "p",
+            "v": "Sie können das Abonnement jederzeit **widerrufen**, indem Sie die Benachrichtigungen in Pit Call oder in den Browser-/Systemeinstellungen deaktivieren. Das Abonnement wird außerdem bei der Löschung des Kontos über den bestehenden Mechanismus entfernt; nicht mehr gültige Endpoints (404/410-Antworten des Push-Diensts) werden vom bereits vorhandenen Cleanup automatisch gelöscht."
+          }
+        ]
+      },
+      {
         "id": "conservazione",
         "heading": "Speicherdauer",
         "blocks": [
