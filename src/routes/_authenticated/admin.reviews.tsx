@@ -166,7 +166,7 @@ function AdminReviews() {
                           <Check className="size-3" /> {t("sweep_admin_b.reviews.approve")}
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (await confirmDialog(t("sweep_admin_b.reviews.confirm_delete"))) {
                               mut.mutate({ rating_id: r.id, action: "delete" });
                             }

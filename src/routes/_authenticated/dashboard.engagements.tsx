@@ -424,7 +424,7 @@ function EngagementsPage() {
                       : t("sweep_engage.engagements.cancel_late_team_confirm");
                     return (
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (!await confirmDialog(warn)) return;
                           const reason = window.prompt(t("sweep_engage.engagements.reason_prompt"), "") ?? "";
                           cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });

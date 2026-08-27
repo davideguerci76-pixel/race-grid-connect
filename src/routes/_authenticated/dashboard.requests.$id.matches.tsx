@@ -165,7 +165,7 @@ function RequestMatchesPage() {
                       </div>
                     )}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const msg = tierInfo.proportional
                           ? t("sweep_engage.request_matches.unlock_tier_confirm_reduced", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, full: tierInfo.entry_cost_full ?? 0, count: tierInfo.real_count ?? 0 })
                           : t("sweep_engage.request_matches.unlock_tier_confirm", { label: label.toLowerCase(), tier: tierInfo.tier, cost: tierInfo.entry_cost ?? 0, count: tierInfo.real_count ?? 0 });
@@ -195,7 +195,7 @@ function RequestMatchesPage() {
                       perProfileCost={data!.per_profile_cost}
                       requestFilled={!!requestFilled}
                       onUnlock={() => unlockMut.mutate(m.match_id)}
-                      onConfirm={() => {
+                      onConfirm={async () => {
                         if (await confirmDialog(t("sweep_engage.request_matches.confirm_match_prompt"))) {
                           confirmMut.mutate(m.match_id);
                         }
@@ -259,7 +259,7 @@ function RequestMatchesPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (await confirmDialog(t("sweep_engage.request_matches.sos_confirm"))) {
                         sosMut.mutate();
                       }
@@ -344,13 +344,13 @@ function RequestMatchesPage() {
                 quote={(data as any).refund_quote}
                 hasPartials={data.total_partial_matches > 0}
                 onWait={() => toast.info(t("sweep_engage.request_matches.search_stays_active"))}
-                onRefund={() => {
+                onRefund={async () => {
                   const q = (data as any).refund_quote;
                   if (await confirmDialog(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
                     refundMut.mutate("full");
                   }
                 }}
-                onPartial={() => {
+                onPartial={async () => {
                   const q = (data as any).refund_quote;
                   if (await confirmDialog(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
                     refundMut.mutate("partial");
@@ -380,7 +380,7 @@ function RequestMatchesPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (await confirmDialog(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
                         upgradeMut.mutate();
                       }

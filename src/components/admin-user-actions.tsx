@@ -81,14 +81,14 @@ export function AdminUserActions({
     }
   }
 
-  const onSuspend = () =>
+  const onSuspend = async () =>
     await confirmDialog(t("admin_user_actions.confirm_suspend", { defaultValue: "Suspend {{name}}? The account will not be able to sign in.", name })) &&
     run("suspend", () => setBlockedFn({ data: { user_id: userId, blocked: true } }), t("admin_user_actions.suspended", { defaultValue: "Account suspended" }));
 
   const onReactivate = () =>
     run("reactivate", () => setBlockedFn({ data: { user_id: userId, blocked: false } }), t("admin_user_actions.reactivated", { defaultValue: "Account reactivated" }));
 
-  const onDelete = () =>
+  const onDelete = async () =>
     await confirmDialog(t("admin_user_actions.confirm_delete", { defaultValue: "Permanently delete {{name}} and all related data? This cannot be undone.", name })) &&
     run("delete", () => deleteFn({ data: { user_id: userId } }), t("admin_user_actions.deleted", { defaultValue: "User deleted" }));
 
@@ -99,7 +99,7 @@ export function AdminUserActions({
       t("admin_user_actions.reset_sent", { defaultValue: "Password reset email sent" }),
     );
 
-  const onForceLogout = () =>
+  const onForceLogout = async () =>
     await confirmDialog(t("admin_user_actions.confirm_logout", { defaultValue: "Revoke all active sessions for {{name}}?", name })) &&
     run("logout", () => logoutFn({ data: { user_id: userId } }), t("admin_user_actions.logged_out", { defaultValue: "All sessions revoked" }));
 

@@ -316,7 +316,7 @@ function PitCallManagement() {
                         <XCircle className="size-3" /> {t("sweep_admin_b.pitcalls.close")}
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (await confirmDialog(t("sweep_admin_b.pitcalls.confirm_delete"))) {
                             deleteMut.mutate(r.id);
                           }

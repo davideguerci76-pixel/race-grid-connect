@@ -261,7 +261,7 @@ function MatchesPage() {
                       </span>
                     ) : (
                       <button
-                        onClick={() => { if (await confirmDialog(t("matches.reveal_confirm", { who: isFreelancer ? t("nav.teams") : t("nav.freelancers") }))) mut.mutate(m.id); }}
+                        onClick={async () => { if (await confirmDialog(t("matches.reveal_confirm", { who: isFreelancer ? t("nav.teams") : t("nav.freelancers") }))) mut.mutate(m.id); }}
                         disabled={mut.isPending || matchTaken}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
@@ -270,7 +270,7 @@ function MatchesPage() {
                     )}
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (await confirmDialog(t("sweep_engage.matches.confirm_match_prompt"))) {
                             acceptMut.mutate(m.pending_engagement_id);
                           }

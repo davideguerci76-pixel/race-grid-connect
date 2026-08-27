@@ -171,7 +171,7 @@ function DashboardHome() {
                   </div>
                 </div>
                 <button
-                  onClick={() => { if (await confirmDialog(t("sweep_profile.dashboard.accept_sos_confirm"))) sosMut.mutate(s.sos_id); }}
+                  onClick={async () => { if (await confirmDialog(t("sweep_profile.dashboard.accept_sos_confirm"))) sosMut.mutate(s.sos_id); }}
                   disabled={sosMut.isPending}
                   className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                 >
