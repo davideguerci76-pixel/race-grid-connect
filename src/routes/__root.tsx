@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
+import { IUBENDA_ENABLED, IUBENDA_PRECONFIG, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
 import { registerServiceWorker } from "@/lib/pwa/register-sw";
 import { initInstallPromptCapture } from "@/lib/pwa/install-prompt";
 import { AppSplash } from "@/components/app-splash";
@@ -96,7 +96,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     // iubenda unified embed: cookie banner + auto-blocking of consent-bound
     // scripts. Loaded in <head> so blocking is active before anything else runs.
-    scripts: IUBENDA_ENABLED ? [{ type: "text/javascript", src: IUBENDA_SCRIPT_URL }] : [],
+    // The inline pre-config disables the auto-injected overlays (floating
+    // preferences button + US State Laws badges); the same functions are
+    // exposed as plain links in the PITCALL footer.
+    scripts: IUBENDA_ENABLED
+      ? [
+          {
+            type: "text/javascript",
+            children: IUBENDA_PRECONFIG,
+          },
+          { type: "text/javascript", src: IUBENDA_SCRIPT_URL },
+        ]
+      : [],
+
   }),
 
   shellComponent: RootShell,

@@ -2,12 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
-import { openCookiePreferences } from "@/lib/iubenda";
+import { openCookiePreferences, openPrivacyChoices, useIubendaFooterLinks } from "@/lib/iubenda";
 import { policyUrl } from "@/config/iubenda";
 
 export function SiteFooter() {
   const { t } = useTranslation();
   const flags = usePlatformFlags();
+  const { noticeUrl, hasUsWidget } = useIubendaFooterLinks();
   return (
     <footer className="mt-24 border-t border-border bg-carbon">
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
@@ -76,6 +77,31 @@ export function SiteFooter() {
                 {t("footer.dataInfo")}
               </Link>
             </li>
+
+            {hasUsWidget && noticeUrl && (
+            <li>
+              <a
+                href={noticeUrl}
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+                className="text-muted-foreground transition-colors hover:text-racing-red"
+              >
+                {t("footer.noticeAtCollection")}
+              </a>
+            </li>
+            )}
+
+            {hasUsWidget && (
+            <li>
+              <button
+                type="button"
+                onClick={openPrivacyChoices}
+                className="text-left text-muted-foreground transition-colors hover:text-racing-red"
+              >
+                {t("footer.privacyChoices")}
+              </button>
+            </li>
+            )}
 
             <li>
               <button

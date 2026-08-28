@@ -17,6 +17,62 @@ export function openCookiePreferences() {
   }
 }
 
+/**
+ * Opens the US State Laws preferences panel ("Your Privacy Choices").
+ * Same API the iubenda-injected badge calls; falls back to the standard
+ * preferences panel when the US widget is not active for the visitor.
+ */
+export function openPrivacyChoices() {
+  if (typeof window === "undefined") return;
+  try {
+    const api = window._iub?.cs?.api;
+    if (api?.openUspPreferences) api.openUspPreferences();
+    else if (api?.openUSPreferences) api.openUSPreferences();
+    else api?.openPreferences?.();
+  } catch {
+    /* ignore */
+  }
+}
+
+const NOTICE_SELECTOR = "a.iubenda-cs-uspr-link, .iub__us-widget__link:not(.iubenda-cs-preferences-link)";
+const WIDGET_SELECTOR = ".iub__us-widget, .iub__us-widget__wrapper, button.iubenda-tp-btn, .iubenda-tp-btn";
+
+let noticeHref: string | null = null;
+
+/**
+ * Removes the auto-injected iubenda overlays (US widget tabs + floating
+ * preferences button) from the DOM and captures the "Notice at collection"
+ * URL so the footer can expose the very same destination as a plain link.
+ * The functions themselves stay available through the footer links.
+ */
+export function useIubendaFooterLinks() {
+  const [notice, setNotice] = useState<string | null>(noticeHref);
+  const [usWidget, setUsWidget] = useState(false);
+
+  useEffect(() => {
+    if (!IUBENDA_ENABLED) return;
+    const sweep = () => {
+      const anchor = document.querySelector<HTMLAnchorElement>(NOTICE_SELECTOR);
+      if (anchor) {
+        setUsWidget(true);
+        const href = anchor.getAttribute("href");
+        if (href && href !== "#") {
+          noticeHref = new URL(href, window.location.href).toString();
+          setNotice(noticeHref);
+        }
+      }
+      document.querySelectorAll(WIDGET_SELECTOR).forEach((el) => el.remove());
+    };
+    sweep();
+    const observer = new MutationObserver(sweep);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
+  return { noticeUrl: notice, hasUsWidget: usWidget };
+}
+
+
 function readPurposeConsent(purpose: number): boolean {
   if (typeof window === "undefined") return false;
   try {

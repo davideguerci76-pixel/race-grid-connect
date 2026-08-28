@@ -43,3 +43,11 @@ export function embedUrl(kind: "privacy" | "cookie"): string {
   const suffix = kind === "cookie" ? "/cookie-policy/legal" : "/legal";
   return `https://www.iubenda.com/privacy-policy/${IUBENDA.privacyPolicyId}${suffix}?an=no&s_ck=false&newmarkup=yes`;
 }
+
+/**
+ * Inline pre-configuration executed BEFORE the unified embedding script.
+ * It only disables the auto-injected UI overlays (floating preferences button
+ * and the US State Laws badges), never the underlying privacy features:
+ * the same actions are exposed as plain links in the PITCALL footer.
+ */
+export const IUBENDA_PRECONFIG = `window._iub=window._iub||{};window._iub.csConfiguration=Object.assign({},window._iub.csConfiguration,{floatingPreferencesButtonDisplay:false,floatingPreferencesButtonCaption:false});window._iub.csPreConfiguration=Object.assign({},window._iub.csPreConfiguration,{floatingPreferencesButtonDisplay:false});`;
