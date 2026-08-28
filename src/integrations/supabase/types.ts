@@ -1807,6 +1807,24 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      add_pool_member_from_engagement: {
+        Args: { _engagement_id: string }
+        Returns: {
+          created_at: string
+          engagement_id: string | null
+          freelancer_id: string
+          id: string
+          is_test: boolean
+          source: string
+          team_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "team_pool"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_env: { Args: { _is_test: boolean }; Returns: boolean }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
@@ -1889,6 +1907,7 @@ export type Database = {
       cleanup_client_error_log: { Args: never; Returns: number }
       cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
+      complete_expired_engagements: { Args: never; Returns: number }
       confirm_calendar: { Args: never; Returns: string }
       create_request: {
         Args: { _payload: Json }
