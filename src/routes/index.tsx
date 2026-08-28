@@ -134,15 +134,15 @@ function Home() {
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { icon: UserRoundCheck, t: "how_1_t", b: "how_1_b" },
-              { icon: Headset, t: "how_2_t", b: "how_2_b" },
-              { icon: Cog, t: "how_3_t", b: "how_3_b" },
-              { icon: ListChecks, t: "how_4_t", b: "how_4_b" },
-              { icon: Handshake, t: "how_5_t", b: "how_5_b" },
+              { icon: UserRoundCheck, t: "how_1_t", b: "how_1_b", anim: "group-hover:animate-pit-pulse" },
+              { icon: Headset, t: "how_2_t", b: "how_2_b", anim: "group-hover:animate-pit-pulse" },
+              { icon: Cog, t: "how_3_t", b: "how_3_b", anim: "group-hover:animate-pit-spin" },
+              { icon: ListChecks, t: "how_4_t", b: "how_4_b", anim: "group-hover:animate-pit-list" },
+              { icon: Handshake, t: "how_5_t", b: "how_5_b", anim: "group-hover:animate-pit-pulse group-hover:drop-shadow-[0_0_5px_oklch(0.58_0.22_27/0.5)]" },
             ].map((s, i) => (
-              <div key={s.t} className="rounded-xl border border-border bg-card p-6">
+              <div key={s.t} className="group rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-racing-red/50 hover:shadow-[0_0_24px_-8px_oklch(0.58_0.22_27/0.3)]">
                 <div className="flex items-center justify-between">
-                  <s.icon className="size-8 text-racing-red" strokeWidth={1.5} />
+                  <s.icon className={`size-8 text-racing-red ${s.anim}`} strokeWidth={1.5} />
                   <div className="font-mono text-xs text-muted-foreground">0{i + 1}</div>
                 </div>
                 <div className="mt-4 text-lg font-black uppercase">{t(`home.${s.t}`)}</div>
