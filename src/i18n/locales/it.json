@@ -16,9 +16,10 @@
   },
   "home": {
     "badge": "Live · {{count}} posizioni aperte",
-    "hero_1": "Trova il tuo",
-    "hero_2": "prossimo weekend di gara.",
-    "sub": "Il network d'élite per meccanici, ingegneri di pista, telemetristi e data analyst nel motorsport.",
+    "hero_1": "STOP SEARCHING.",
+    "hero_2": "MATCH.",
+    "hero_3": "INSTANTLY.",
+    "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
     "cta_freelancer_title": "Sono un Freelance",
     "cta_freelancer_body": "Pubblica il calendario e ricevi match",
     "cta_team_title": "Siamo una Scuderia",

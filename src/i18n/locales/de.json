@@ -16,9 +16,10 @@
   },
   "home": {
     "badge": "Live · {{count}} offene Stellen",
-    "hero_1": "Finde dein",
-    "hero_2": "nächstes Rennwochenende.",
-    "sub": "Das Elite-Netzwerk für Mechaniker, Renningenieure, Telemetriker und Data Analysts.",
+    "hero_1": "STOP SEARCHING.",
+    "hero_2": "MATCH.",
+    "hero_3": "INSTANTLY.",
+    "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
     "cta_freelancer_title": "Ich bin Freelancer",
     "cta_freelancer_body": "Kalender freigeben und Matches erhalten",
     "cta_team_title": "Wir sind ein Team",

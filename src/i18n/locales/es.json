@@ -16,9 +16,10 @@
   },
   "home": {
     "badge": "En vivo · {{count}} puestos",
-    "hero_1": "Encuentra tu",
-    "hero_2": "próximo fin de semana de carrera.",
-    "sub": "La red de élite para mecánicos, ingenieros de pista, telemetristas y analistas del motorsport.",
+    "hero_1": "STOP SEARCHING.",
+    "hero_2": "MATCH.",
+    "hero_3": "INSTANTLY.",
+    "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
     "cta_freelancer_title": "Soy Freelance",
     "cta_freelancer_body": "Publica disponibilidad y recibe matches",
     "cta_team_title": "Somos un Equipo",
