@@ -222,7 +222,16 @@
     "cancel": "Annuler",
     "rate": "Évaluer",
     "rating_locked": "Débloqué après confirmation des deux parties",
-    "rate_them": "Évaluer {{name}}"
+    "rate_them": "Évaluer {{name}}",
+    "ask_more_time": "Demander plus de temps",
+    "decline": "Refuser",
+    "decline_confirm": "Refuser cette demande de match ? Vous ne pourrez plus la confirmer.",
+    "declined_toast": "Demande de match refusée",
+    "more_time_toast": "Délai supplémentaire demandé — l'équipe a été prévenue",
+    "request_expired": "Demande expirée",
+    "expires_in_hours": "Expire dans {{count}} h",
+    "expires_in_minutes": "Expire dans {{count}} min",
+    "ask_more_time_hint": "Disponible dans les 12 dernières heures, 5 fois maximum et jamais au-delà du début du Pit Call"
   },
   "rating": {
     "title": "Évaluation",

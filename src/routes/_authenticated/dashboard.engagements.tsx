@@ -10,8 +10,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
+import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
+import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +30,6 @@ function EngagementsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
-  const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
@@ -115,11 +115,6 @@ function EngagementsPage() {
   });
 
 
-  const confirmMut = useMutation({
-    mutationFn: (id: string) => confirmFn({ data: { id } }),
-    onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "sweep_engage.engagements.confirm_failed"),
-  });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const revealFn = useServerFn(revealMatch);
   const revealMut = useMutation({
@@ -442,9 +437,15 @@ function EngagementsPage() {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   {e.status === "proposed" && e.proposed_by !== user?.id && (
-                    <button onClick={() => confirmMut.mutate(e.id)} className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110">
-                      {t("engagements.confirm")}
-                    </button>
+                    <>
+                      <MatchRequestDeadline expiresAt={e.expires_at} />
+                      <MatchRequestActions
+                        engagementId={e.id}
+                        expiresAt={e.expires_at}
+                        extensionCount={e.extension_count ?? 0}
+                        pitcallStart={req?.start_date ?? e.start_date}
+                      />
+                    </>
                   )}
                   {e.status === "confirmed" && !iMarked && !isFreelancer && (
                     <button onClick={() => completeMut.mutate(e.id)} className="bg-foreground px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-background hover:bg-racing-red hover:text-white">

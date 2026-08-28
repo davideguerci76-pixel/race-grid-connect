@@ -222,7 +222,16 @@
     "cancel": "Cancelar",
     "rate": "Valorar",
     "rating_locked": "Se desbloquea al confirmar ambas partes",
-    "rate_them": "Valorar {{name}}"
+    "rate_them": "Valorar {{name}}",
+    "ask_more_time": "Pedir más tiempo",
+    "decline": "Rechazar",
+    "decline_confirm": "¿Rechazar esta solicitud de match? Después no podrás confirmarla.",
+    "declined_toast": "Solicitud de match rechazada",
+    "more_time_toast": "Más tiempo solicitado — el equipo ha sido notificado",
+    "request_expired": "Solicitud caducada",
+    "expires_in_hours": "Caduca en {{count}}h",
+    "expires_in_minutes": "Caduca en {{count}} min",
+    "ask_more_time_hint": "Disponible en las últimas 12 horas, hasta 5 veces y nunca más allá del inicio de la Pit Call"
   },
   "rating": {
     "title": "Valoración",

@@ -7,13 +7,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
 import { PitCallRevealDetail, PitCallRevealTeaser } from "@/components/pitcall-reveal-detail";
+import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 
 import { toastError } from "@/lib/errors";
 
@@ -63,7 +64,6 @@ function MatchesPage() {
   const qc = useQueryClient();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
-  const acceptFn = useServerFn(confirmEngagement);
   const getRequests = useServerFn(getMyRequests);
   const getEngs = useServerFn(getMyEngagements);
 
@@ -90,12 +90,6 @@ function MatchesPage() {
     onError: (e) => toastError(e, "matches.insufficient_tokens"),
   });
 
-  const acceptMut = useMutation({
-    mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
-    onSuccess: () => { toast.success(t("sweep_engage.matches.confirmed_contacts_unlocked")); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "sweep_engage.common.failed"),
-
-  });
 
   if (isTeam) {
     const confirmedByReq = new Map<string, any>();
@@ -277,17 +271,15 @@ function MatchesPage() {
                       </button>
                     )}
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
-                      <button
-                        onClick={async () => {
-                          if (await confirmDialog(t("sweep_engage.matches.confirm_match_prompt"))) {
-                            acceptMut.mutate(m.pending_engagement_id);
-                          }
-                        }}
-                        disabled={acceptMut.isPending}
-                        className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-                      >
-                        {t("engagements.confirm")}
-                      </button>
+                      <>
+                        <MatchRequestDeadline expiresAt={m.pending_engagement?.expires_at} />
+                        <MatchRequestActions
+                          engagementId={m.pending_engagement_id}
+                          expiresAt={m.pending_engagement?.expires_at}
+                          extensionCount={m.pending_engagement?.extension_count ?? 0}
+                          pitcallStart={m.request?.start_date ?? null}
+                        />
+                      </>
                     )}
                     {isFreelancer && matchTaken && (
                       <span className="inline-flex items-center justify-center border border-border bg-secondary/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">

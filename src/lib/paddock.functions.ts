@@ -603,16 +603,22 @@ export const getMyMatches = createServerFn({ method: "GET" })
     // Fetch pending "proposed" engagements addressed to the current user
     const matchIds = rawMatches.map((m: any) => m.id);
     const pendingByMatchId = new Map<string, string>();
+    const pendingInfoByMatchId = new Map<string, { id: string; expires_at: string | null; extension_count: number }>();
     const confirmedMatchIds = new Set<string>();
     const takenRequestIds = new Set<string>();
     if (matchIds.length) {
       const { data: eng } = await supabase
         .from("engagements")
-        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id")
+        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id, expires_at, extension_count")
         .in("match_id", matchIds);
       (eng ?? []).forEach((e: any) => {
         if (e.status === "proposed" && e.proposed_by !== userId && e.match_id) {
           pendingByMatchId.set(e.match_id, e.id);
+          pendingInfoByMatchId.set(e.match_id, {
+            id: e.id,
+            expires_at: e.expires_at ?? null,
+            extension_count: Number(e.extension_count ?? 0),
+          });
         }
         if (e.status === "confirmed" && e.match_id) confirmedMatchIds.add(e.match_id);
       });
@@ -828,6 +834,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
         isConfirmed,
         matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
         pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
+        pending_engagement: pendingInfoByMatchId.get(m.id) ?? null,
       };
     });
 
@@ -899,6 +906,25 @@ export const requestMatchConfirmation = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+export const declineMatchConfirmation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("decline_match_confirmation" as any, { _engagement_id: data.id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const extendMatchConfirmation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("extend_match_confirmation" as any, { _engagement_id: data.id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
 
 export const markEngagementComplete = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -1481,8 +1507,14 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (spent > 0 && pct > 0 && refundFull < 1) refundFull = 1;
     const refundPartial = Math.max(refundFull > 0 ? 1 : 0, Math.round(refundFull / 2));
 
+    // Matches nobody declined / let expire — drives the refund trivio after decline/expiry.
+    const { data: confirmableLeft } = await supabase.rpc("request_confirmable_matches_left" as any, {
+      _request_id: data.request_id,
+    });
+
     return {
       request: req,
+      confirmable_left: Number(confirmableLeft ?? 0),
       items,
       items_partial: itemsPartial,
       hired,

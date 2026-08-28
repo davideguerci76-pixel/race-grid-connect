@@ -339,8 +339,8 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {/* Trivio: zero total matches, still active, no refund yet */}
-            {!hasAnyMatches && !requestFilled && !(data.request as any).partial_refund_taken && (
+            {/* Trivio: no match left to confirm (zero matches, or all declined/expired) */}
+            {(!hasAnyMatches || Number((data as any).confirmable_left ?? 1) === 0) && !requestFilled && !(data.request as any).partial_refund_taken && (
               <ZeroMatchTrivio
                 quote={(data as any).refund_quote}
                 hasPartials={data.total_partial_matches > 0}

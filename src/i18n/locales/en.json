@@ -224,7 +224,16 @@
     "rating_locked": "Rating unlocks after both sides mark completed",
     "rate_them": "Rate {{name}}",
     "confirmed_toast": "Confirmed — contacts unlocked",
-    "marked_complete_toast": "Marked complete"
+    "marked_complete_toast": "Marked complete",
+    "ask_more_time": "Ask more time",
+    "decline": "Decline",
+    "decline_confirm": "Decline this match request? You will not be able to confirm it later.",
+    "declined_toast": "Match request declined",
+    "more_time_toast": "More time requested — the team has been notified",
+    "request_expired": "Request expired",
+    "expires_in_hours": "Expires in {{count}}h",
+    "expires_in_minutes": "Expires in {{count}} min",
+    "ask_more_time_hint": "Available in the last 12 hours, up to 5 times, and never past the Pit Call start"
   },
   "rating": {
     "title": "Rating",

@@ -224,7 +224,16 @@
     "rating_locked": "La valutazione si sblocca dopo la conferma di entrambe le parti",
     "rate_them": "Valuta {{name}}",
     "confirmed_toast": "Confermato — contatti sbloccati",
-    "marked_complete_toast": "Segnato come completato"
+    "marked_complete_toast": "Segnato come completato",
+    "ask_more_time": "Chiedi più tempo",
+    "decline": "Rifiuta",
+    "decline_confirm": "Rifiutare questa richiesta di match? Non potrai più confermarla.",
+    "declined_toast": "Richiesta di match rifiutata",
+    "more_time_toast": "Più tempo richiesto — il Team è stato avvisato",
+    "request_expired": "Richiesta scaduta",
+    "expires_in_hours": "Scade tra {{count}}h",
+    "expires_in_minutes": "Scade tra {{count}} min",
+    "ask_more_time_hint": "Disponibile nelle ultime 12 ore, max 5 volte e mai oltre l'inizio della Pit Call"
   },
   "rating": {
     "title": "Valutazione",
