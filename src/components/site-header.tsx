@@ -235,6 +235,10 @@ export function SiteHeader() {
             <Link to="/contact" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
               <span suppressHydrationWarning>{t("nav.contact")}</span>
             </Link>
+            <Link to="/faq" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
+              <span suppressHydrationWarning>{t("nav.faq")}</span>
+            </Link>
+
             {flags.homeStats && (
             <Link to="/market" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
               <span suppressHydrationWarning>{t("nav.market")}</span>
