@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isValidVat, normalizeVat } from "@/lib/vat";
+import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 // Enums are validated server-side by Postgres; keep TS-side loose to allow the extended taxonomy.
 const disciplineEnum = z.string().min(1).max(64);
@@ -575,10 +576,10 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const emailsById = new Map<string, string | null>();
     if (otherIds.length) {
       if (isFreelancer) {
-        const { data: tps } = await supabase.from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").in("user_id", otherIds);
+        const { data: tps } = await supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).in("user_id", otherIds);
         (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
       } else {
-        const { data: fps } = await supabase.from("freelancer_profiles").select("*").in("user_id", otherIds);
+        const { data: fps } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", otherIds);
         (fps ?? []).forEach((p: any) => freelancerProfilesById.set(p.user_id, p));
       }
       const revealedOtherIds = Array.from(new Set(
@@ -1265,7 +1266,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
     const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select("*").in("user_id", idsSafe),
+      supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
       supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
@@ -1403,7 +1404,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         .maybeSingle();
       if (eng) {
         const fid = (eng as any).freelancer_id as string;
-        const { data: hFp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", fid).maybeSingle();
+        const { data: hFp } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", fid).maybeSingle();
         let hEmail: string | null = null;
         let hPhone: { phone_dial_code: string | null; phone_number: string | null } = { phone_dial_code: null, phone_number: null };
         let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;

@@ -22,6 +22,7 @@ import { BackButton } from "@/components/back-button";
 import { PrivacyDataSection } from "@/components/privacy-data-section";
 import { toastError } from "@/lib/errors";
 import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
+import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
@@ -45,29 +46,46 @@ function ProfilePage() {
       if (isTeam) {
         // Only the non-sensitive columns are readable; `select("*")` would hit the
         // owner-only VAT column and fail with a raw permission error.
-        const [{ data: tp, error: tpError }, vatRes] = await Promise.all([
+        const [{ data: tp, error: tpError }, vatRes, coordsRes] = await Promise.all([
           supabase
             .from("team_profiles")
-            .select(
-              "user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test",
-            )
+            .select(TEAM_PROFILE_COLUMNS)
             .eq("user_id", user!.id)
             .maybeSingle(),
           (supabase.rpc as any)("my_team_vat"),
+          (supabase.rpc as any)("my_profile_coords"),
         ]);
         if (tpError) throw new Error(tpError.message);
-        const tpWithVat = tp ? { ...tp, vat_number: (vatRes?.data as string | null) ?? null } : tp;
+        const teamCoords = Array.isArray(coordsRes?.data) ? coordsRes.data[0] : null;
+        const tpWithVat = tp
+          ? {
+              ...tp,
+              vat_number: (vatRes?.data as string | null) ?? null,
+              location_lat: teamCoords?.location_lat ?? null,
+              location_lng: teamCoords?.location_lng ?? null,
+            }
+          : tp;
         return { ...p, freelancerProfile: null as any, teamProfile: tpWithVat };
       }
 
-      const [{ data: fp, error: fpError }, phoneRes] = await Promise.all([
-        supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+      const [{ data: fp, error: fpError }, phoneRes, coordsRes] = await Promise.all([
+        supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", user!.id).maybeSingle(),
         supabase.rpc("my_freelancer_phone"),
+        (supabase.rpc as any)("my_profile_coords"),
       ]);
       if (fpError) throw new Error(fpError.message);
       // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
       const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
-      const fpWithPhone = fp ? { ...fp, phone_dial_code: phoneRow?.phone_dial_code ?? null, phone_number: phoneRow?.phone_number ?? null } : fp;
+      const coordsRow = Array.isArray(coordsRes?.data) ? coordsRes.data[0] : null;
+      const fpWithPhone = fp
+        ? {
+            ...(fp as any),
+            phone_dial_code: phoneRow?.phone_dial_code ?? null,
+            phone_number: phoneRow?.phone_number ?? null,
+            location_lat: coordsRow?.location_lat ?? null,
+            location_lng: coordsRow?.location_lng ?? null,
+          }
+        : fp;
       return { ...p, freelancerProfile: fpWithPhone, teamProfile: null as any };
     },
   });

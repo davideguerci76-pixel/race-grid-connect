@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREELANCER_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 /** Freelancer: my unique pool code */
 export const getMyPitCode = createServerFn({ method: "GET" })
@@ -235,7 +236,7 @@ export const getPoolMatches = createServerFn({ method: "GET" })
     if (ids.length) {
       const [{ data: profiles }, { data: fps }, { data: ratings }] = await Promise.all([
         supabase.from("profiles").select("id, display_name, first_name, last_name").in("id", ids),
-        supabase.from("freelancer_profiles").select("*").in("user_id", ids),
+        supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", ids),
         supabase.from("ratings").select("to_user_id, stars, overall, unlocked_at").in("to_user_id", ids).not("unlocked_at", "is", null),
       ]);
       pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));

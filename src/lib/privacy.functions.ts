@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 /**
  * GDPR art. 20 — data portability.
@@ -16,12 +17,13 @@ export const exportMyData = createServerFn({ method: "POST" })
       return data ?? [];
     };
 
-    const [profile, freelancerProfile, teamProfile, teamVat, contacts, availability, calendars, notifications, tokens] =
+    const [profile, freelancerProfile, teamProfile, teamVat, myCoords, contacts, availability, calendars, notifications, tokens] =
       await Promise.all([
         (supabase as any).from("profiles").select("*").eq("id", userId).maybeSingle(),
-        (supabase as any).from("freelancer_profiles").select("*").eq("user_id", userId).maybeSingle(),
-        (supabase as any).from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
         (supabase as any).rpc("my_team_vat"),
+        (supabase as any).rpc("my_profile_coords"),
         (supabase as any).from("freelancer_contacts").select("*").eq("user_id", userId).maybeSingle(),
         pick("availability", "freelancer_id"),
         pick("user_calendars", "owner_id"),
@@ -30,12 +32,14 @@ export const exportMyData = createServerFn({ method: "POST" })
       ]);
 
     const ratingsWritten = await pick("ratings", "from_user_id");
+    const coordsRow = Array.isArray(myCoords?.data) ? (myCoords.data[0] as any) : null;
+    const coords = { location_lat: coordsRow?.location_lat ?? null, location_lng: coordsRow?.location_lng ?? null };
 
     return {
       exported_at: new Date().toISOString(),
       account: profile?.data ?? null,
-      freelancer_profile: freelancerProfile?.data ?? null,
-      team_profile: teamProfile?.data ? { ...teamProfile.data, vat_number: (teamVat?.data as string | null) ?? null } : null,
+      freelancer_profile: freelancerProfile?.data ? { ...freelancerProfile.data, ...coords } : null,
+      team_profile: teamProfile?.data ? { ...teamProfile.data, ...coords, vat_number: (teamVat?.data as string | null) ?? null } : null,
       contacts: contacts?.data ?? null,
       availability,
       calendars,
