@@ -100,6 +100,19 @@ function EngagementsPage() {
   const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
   const [locallySubmittedRatings, setLocallySubmittedRatings] = useState<Set<string>>(() => new Set());
+  const [locallyPooled, setLocallyPooled] = useState<Set<string>>(() => new Set());
+  const addPoolFn = useServerFn(addPoolMemberFromEngagement);
+  const addPoolMut = useMutation({
+    mutationFn: (engagementId: string) => addPoolFn({ data: { engagement_id: engagementId } }),
+    onSuccess: (_res, engagementId) => {
+      setLocallyPooled((prev) => new Set(prev).add(engagementId));
+      toast.success(t("pool.added"));
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+      qc.invalidateQueries({ queryKey: ["my-pool"] });
+    },
+    onError: (err) => toastError(err, "pool.add_failed"),
+  });
+
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
