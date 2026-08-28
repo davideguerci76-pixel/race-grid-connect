@@ -279,7 +279,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         languages: data.languages ?? [],
       } as never,
       { onConflict: "user_id" },
-    ).select("*").single();
+    ).select(FREELANCER_PROFILE_COLUMNS).single();
     if (error) throw new Error(error.message);
 
     return row;
