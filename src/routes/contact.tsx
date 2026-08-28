@@ -76,7 +76,7 @@ function ContactPage() {
   function validateField<K extends keyof ContactFormInput>(field: K, value: ContactFormInput[K]) {
     const result = contactSchema.safeParse({ ...form, [field]: value });
     if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors as Record<string, string[] | undefined>;
       setErrors((prev) => ({
         ...prev,
         [field]: fieldErrors[field as string]?.[0] ?? undefined,
@@ -89,7 +89,7 @@ function ContactPage() {
   function validateAll(): boolean {
     const result = contactSchema.safeParse(form);
     if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
+      const fieldErrors = result.error.flatten().fieldErrors as Record<string, string[] | undefined>;
       setErrors(
         Object.fromEntries(
           Object.entries(fieldErrors).map(([k, v]) => [k, v?.[0]]),
