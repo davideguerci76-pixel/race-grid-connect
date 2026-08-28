@@ -228,8 +228,9 @@ export function SiteHeader() {
             <Link to="/about" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
               <span suppressHydrationWarning>{t("nav.about")}</span>
             </Link>
-            {/* Contact page coming soon — positioned, not linked yet */}
-            <span className="border-b border-border/50 py-3 text-muted-foreground/60">{t("nav.contact")}</span>
+            <Link to="/contact" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
+              <span suppressHydrationWarning>{t("nav.contact")}</span>
+            </Link>
             {flags.homeStats && (
             <Link to="/market" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
               <span suppressHydrationWarning>{t("nav.market")}</span>
