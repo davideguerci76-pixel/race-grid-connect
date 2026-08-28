@@ -101,6 +101,10 @@
     "vite": "^8.0.16",
     "vite-plugin-pwa": "^1.3.0"
   },
+  "overrides": {
+    "@tanstack/react-router": "1.170.32",
+    "@tanstack/router-core": "1.171.27"
+  },
   "pnpm": {
     "overrides": {
       "entities": "4.5.0"
