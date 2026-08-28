@@ -117,10 +117,10 @@
     "no_account": "Neu hier?",
     "have_account": "Bereits registriert?",
     "create_account": "Konto erstellen",
-    "type_freelancer": "Ich bin Spezialist",
-    "type_freelancer_desc": "Mechaniker, Ingenieur, Telemetriker.",
+    "type_freelancer": "Ich bin Freelancer",
+    "type_freelancer_desc": "Mechaniker, Ingenieur, Techniker oder anderer Motorsport-Fachkraft.",
     "type_team": "Wir sind ein Team",
-    "type_team_desc": "Rennstall, Factory, Garage.",
+    "type_team_desc": "Rennstall, Hersteller, Konstrukteur oder andere Motorsport-Organisation.",
     "which_are_you": "Was beschreibt dich?",
     "signed_in_as": "Angemeldet als {{email}}",
     "forgot_password": "Passwort vergessen?"

@@ -117,10 +117,10 @@
     "no_account": "¿Nuevo?",
     "have_account": "¿Ya tienes cuenta?",
     "create_account": "Crear cuenta",
-    "type_freelancer": "Soy especialista",
-    "type_freelancer_desc": "Mecánico, ingeniero, telemetrista.",
+    "type_freelancer": "Soy freelance",
+    "type_freelancer_desc": "Mecánico, ingeniero, técnico u otro profesional del motorsport.",
     "type_team": "Somos un equipo",
-    "type_team_desc": "Escudería, factoría, garage.",
+    "type_team_desc": "Equipo de carreras, fabricante, constructor u otra organización de motorsport.",
     "which_are_you": "¿Qué te describe mejor?",
     "signed_in_as": "Sesión: {{email}}",
     "forgot_password": "¿Olvidaste tu contraseña?"
