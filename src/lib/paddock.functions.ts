@@ -828,6 +828,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
         isConfirmed,
         matchTaken: !isConfirmed && (m.request?.id ? takenRequestIds.has(m.request.id) : false),
         pending_engagement_id: pendingByMatchId.get(m.id) ?? null,
+        pending_engagement: pendingInfoByMatchId.get(m.id) ?? null,
       };
     });
 
