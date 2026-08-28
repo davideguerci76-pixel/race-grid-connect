@@ -132,7 +132,7 @@
     "buy_tokens": "Acheter des jetons",
     "your_matches": "Vos matches",
     "my_matches": "MES MATCHES",
-    "active_match_zero": "0 Matchs Actifs",
+    "active_match_zero": "",
     "active_match_one": "1 Match Actif",
     "active_match_other": "{{count}} Matchs Actifs",
     "new_team_label": "[MATCHES À EXAMINER]",
