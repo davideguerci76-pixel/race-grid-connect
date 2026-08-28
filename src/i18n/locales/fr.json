@@ -107,7 +107,7 @@
   },
   "auth": {
     "signin_title": "Connexion",
-    "signup_title": "Rejoindre le paddock",
+    "signup_title": "Rejoindre la grille",
     "email": "Email",
     "password": "Mot de passe",
     "display_name": "Nom",

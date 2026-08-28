@@ -107,7 +107,7 @@
   },
   "auth": {
     "signin_title": "Anmeldung",
-    "signup_title": "Zum Paddock beitreten",
+    "signup_title": "Tritt dem Grid bei",
     "email": "E-Mail",
     "password": "Passwort",
     "display_name": "Name",
