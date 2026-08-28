@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -28,7 +30,9 @@ function AboutPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="container-page py-16 md:py-24">
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="container-page flex-1 py-16 md:py-24">
       {/* Title */}
       <h1 className="text-4xl font-black uppercase italic tracking-tighter md:text-6xl">
         {t("about.title_a")} <span className="text-racing-red">{t("about.title_b")}</span>
@@ -88,6 +92,8 @@ function AboutPage() {
           <ArrowRight className="size-4 text-racing-red transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }
