@@ -89,19 +89,13 @@ function Home() {
             src={logoFull.url}
             alt="Pit Call — Box. Now!"
             width={1089} height={424}
-            className="mb-8 w-full max-w-md object-contain mix-blend-screen"
+            className="mb-8 w-full max-w-[33rem] object-contain mix-blend-screen"
           />
-          <div className="inline-flex items-center gap-2 border border-racing-red/30 bg-racing-red/10 px-3 py-1">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-racing-red" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-racing-red">
-              {t("home.badge", { count: 124 })} LIVE
-            </span>
-          </div>
           <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter md:text-8xl">
-            {t("home.hero_1")}{" "}
-            <span className="text-racing-red">{t("home.hero_2")}</span>
+            {t("home.hero_1")}<br />
+            <span className="text-racing-red">{t("home.hero_2")}</span>{" "}{t("home.hero_3")}
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">{t("home.sub")}</p>
+          <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("home.sub")}</p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 max-w-2xl">
             <Link

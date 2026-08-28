@@ -16,9 +16,10 @@
   },
   "home": {
     "badge": "Live · {{count}} open positions",
-    "hero_1": "Get matched to your",
-    "hero_2": "next race weekend.",
-    "sub": "The elite network for mechanics, race engineers, telemetrists and data analysts across Formula, Rally, GT/Endurance and Karting.",
+    "hero_1": "STOP SEARCHING.",
+    "hero_2": "MATCH.",
+    "hero_3": "INSTANTLY.",
+    "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
     "cta_freelancer_title": "I'm a Freelancer",
     "cta_freelancer_body": "Publish your availability and get matched",
     "cta_team_title": "We're a Team",

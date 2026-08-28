@@ -16,9 +16,10 @@
   },
   "home": {
     "badge": "En direct · {{count}} postes ouverts",
-    "hero_1": "Trouve ton",
-    "hero_2": "prochain weekend de course.",
-    "sub": "Le réseau d'élite pour mécaniciens, ingénieurs piste, télémétristes et data analysts du motorsport.",
+    "hero_1": "STOP SEARCHING.",
+    "hero_2": "MATCH.",
+    "hero_3": "INSTANTLY.",
+    "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
     "cta_freelancer_title": "Je suis Freelance",
     "cta_freelancer_body": "Publie ta dispo et reçois des matches",
     "cta_team_title": "Nous sommes une Écurie",
