@@ -1011,6 +1011,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
         : !!r.match?.revealed_by_team;
       return {
         ...r,
+        in_pool: r.team_id === userId ? poolIds.has(r.freelancer_id) : false,
         revealedByMe,
         freelancer: {
           display_name: disclosed ? (fName?.display_name ?? null) : null,
