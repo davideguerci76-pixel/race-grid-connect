@@ -12,7 +12,9 @@
     "matches": "Correspondances",
     "calendar": "Calendrier",
     "engagements": "Engagements",
-    "pricing": "Tarifs"
+    "pricing": "Tarifs",
+    "about": "À propos",
+    "contact": "Contact"
   },
   "home": {
     "badge": "En direct · {{count}} postes ouverts",
@@ -751,5 +753,23 @@
     "confirm_delete": "Supprimer définitivement {{name}} et toutes les données associées ? Action irréversible.",
     "confirm_logout": "Révoquer toutes les sessions actives de {{name}} ?",
     "confirm_impersonate": "Se connecter en tant que {{name}} ? L'action est enregistrée et remplacera votre session dans le nouvel onglet."
+  },
+  "about": {
+    "title_a": "À PROPOS DE",
+    "title_b": "PITCALL",
+    "hero": "NÉE DANS LE PADDOCK. CRÉÉE POUR LE PADDOCK.",
+    "p1": "PITCALL est née d'un problème simple que nous observons depuis des années dans le sport automobile : les équipes ont besoin des bonnes personnes au bon moment, tandis que les freelances qualifiés doivent être là où on a besoin d'eux, quand ils sont disponibles.",
+    "p2": "Se trouver ne devrait pas être la partie difficile.",
+    "p3": "C'est pourquoi nous avons créé PITCALL : une plateforme de matching conçue autour du fonctionnement réel du sport automobile. Les équipes indiquent au moteur exactement ce dont elles ont besoin. Les freelances fournissent leurs profils, compétences et disponibilités réelles. PITCALL les connecte.",
+    "quote": "Fini les recherches interminables de profils. Fini les annonces génériques.",
+    "p4": "Le moteur PITCALL associe des exigences réelles à des disponibilités réelles et classe les résultats selon ce dont l'équipe a réellement besoin.",
+    "exp_title": "NÉE DE L'EXPÉRIENCE",
+    "exp_p1": "PITCALL a été créée par deux professionnels du sport automobile cumulant plus de 20 ans d'expérience dans le secteur.",
+    "exp_p2": "Elle n'est pas née d'une idée de la façon dont le paddock devrait fonctionner. Elle est née d'années à voir comment il fonctionne réellement — et d'une question :",
+    "exp_p3": "Pourquoi cherchons-nous encore, alors que nous pourrions matcher ?",
+    "mission_title": "NOTRE MISSION",
+    "mission_p1": "Permettre aux équipes et freelances du sport automobile de trouver plus vite et plus facilement le bon match — pour passer moins de temps à chercher et plus de temps sur la grille.",
+    "cta_a": "REJOIGNEZ LA",
+    "cta_b": "GRILLE"
   }
 }

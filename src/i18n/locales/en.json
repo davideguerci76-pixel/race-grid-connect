@@ -12,7 +12,9 @@
     "matches": "Matches",
     "calendar": "Calendar",
     "engagements": "Engagements",
-    "pricing": "Pricing"
+    "pricing": "Pricing",
+    "about": "About",
+    "contact": "Contact"
   },
   "home": {
     "badge": "Live · {{count}} open positions",
@@ -763,5 +765,23 @@
     "confirm_delete": "Permanently delete {{name}} and all related data? This cannot be undone.",
     "confirm_logout": "Revoke all active sessions for {{name}}?",
     "confirm_impersonate": "Sign in as {{name}}? This action is recorded in the audit log and will replace your current session in the new tab."
+  },
+  "about": {
+    "title_a": "ABOUT",
+    "title_b": "PITCALL",
+    "hero": "BUILT IN THE PADDOCK. BUILT FOR THE PADDOCK.",
+    "p1": "PITCALL was born from a simple problem we have seen for years in motorsport: teams need the right people at the right time, while skilled freelancers need to be where they are needed, when they are available.",
+    "p2": "Finding each other shouldn't be the difficult part.",
+    "p3": "That's why we built PITCALL: a matching platform designed around the way motorsport actually works. Teams tell the engine exactly what they need. Freelancers provide their profiles, skills and real availability. PITCALL connects the two.",
+    "quote": "No endless searching through profiles. No generic listings.",
+    "p4": "The PITCALL engine matches real requirements with real availability and ranks the results around what the team actually needs.",
+    "exp_title": "BUILT FROM EXPERIENCE",
+    "exp_p1": "PITCALL was created by two motorsport professionals with more than 20 years of experience in the industry.",
+    "exp_p2": "It wasn't born from an idea of how the paddock should work. It was born from years of seeing how it actually works — and from one question:",
+    "exp_p3": "Why are we still searching, when we could be matching?",
+    "mission_title": "OUR MISSION",
+    "mission_p1": "Make it faster and easier for motorsport teams and freelancers to find the right match — so they can spend less time searching and more time on the grid.",
+    "cta_a": "JOIN THE",
+    "cta_b": "GRID"
   }
 }

@@ -15,18 +15,27 @@ export function SiteFooter() {
           <img src={logoCompact.url} alt="Pit Call" width={1933} height={274} className="h-10 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
-        {flags.homeStats && (
         <div>
           <div className="label-mono mb-3">{t("footer.network")}</div>
           <ul className="space-y-2 text-sm">
+            <li>
+              <Link to="/about" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("nav.about")}
+              </Link>
+            </li>
+            <li>
+              {/* Contact page coming soon */}
+              <span className="text-muted-foreground/60">{t("nav.contact")}</span>
+            </li>
+            {flags.homeStats && (
             <li>
               <Link to="/market" className="text-muted-foreground transition-colors hover:text-racing-red">
                 {t("nav.market")}
               </Link>
             </li>
+            )}
           </ul>
         </div>
-        )}
         <div>
           <div className="label-mono mb-3">{t("footer.legal")}</div>
           <ul className="space-y-2 text-sm">

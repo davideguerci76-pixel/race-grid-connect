@@ -12,7 +12,9 @@
     "matches": "Match",
     "calendar": "Calendario",
     "engagements": "Ingaggi",
-    "pricing": "Prezzi"
+    "pricing": "Prezzi",
+    "about": "Chi siamo",
+    "contact": "Contatti"
   },
   "home": {
     "badge": "Live · {{count}} posizioni aperte",
@@ -763,5 +765,23 @@
     "confirm_delete": "Eliminare definitivamente {{name}} e tutti i dati correlati? L'azione è irreversibile.",
     "confirm_logout": "Revocare tutte le sessioni attive di {{name}}?",
     "confirm_impersonate": "Accedere come {{name}}? L'azione viene registrata nel log e sostituirà la tua sessione nella nuova scheda."
+  },
+  "about": {
+    "title_a": "CHI È",
+    "title_b": "PITCALL",
+    "hero": "CREATA NEL PADDOCK. CREATA PER IL PADDOCK.",
+    "p1": "PITCALL nasce da un problema semplice che vediamo da anni nel motorsport: i team hanno bisogno delle persone giuste al momento giusto, mentre i freelance qualificati devono essere dove servono, quando sono disponibili.",
+    "p2": "Trovarsi non dovrebbe essere la parte difficile.",
+    "p3": "Ecco perché abbiamo creato PITCALL: una piattaforma di matching progettata intorno al modo in cui il motorsport funziona davvero. I team dicono al motore esattamente ciò di cui hanno bisogno. I freelance forniscono profili, competenze e disponibilità reali. PITCALL li mette in contatto.",
+    "quote": "Niente ricerche infinite tra i profili. Niente annunci generici.",
+    "p4": "Il motore PITCALL abbina requisiti reali a disponibilità reali e ordina i risultati in base a ciò di cui il team ha effettivamente bisogno.",
+    "exp_title": "NATA DALL'ESPERIENZA",
+    "exp_p1": "PITCALL è stata creata da due professionisti del motorsport con oltre 20 anni di esperienza nel settore.",
+    "exp_p2": "Non è nata da un'idea di come il paddock dovrebbe funzionare. È nata da anni passati a vedere come funziona davvero — e da una domanda:",
+    "exp_p3": "Perché continuiamo a cercare, quando potremmo fare matching?",
+    "mission_title": "LA NOSTRA MISSIONE",
+    "mission_p1": "Rendere più semplice e veloce per team e freelance del motorsport trovare il match giusto — così da passare meno tempo a cercare e più tempo in pista.",
+    "cta_a": "ENTRA NELLA",
+    "cta_b": "GRIGLIA"
   }
 }
