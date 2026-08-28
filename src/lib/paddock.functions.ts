@@ -1507,8 +1507,14 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (spent > 0 && pct > 0 && refundFull < 1) refundFull = 1;
     const refundPartial = Math.max(refundFull > 0 ? 1 : 0, Math.round(refundFull / 2));
 
+    // Matches nobody declined / let expire — drives the refund trivio after decline/expiry.
+    const { data: confirmableLeft } = await supabase.rpc("request_confirmable_matches_left" as any, {
+      _request_id: data.request_id,
+    });
+
     return {
       request: req,
+      confirmable_left: Number(confirmableLeft ?? 0),
       items,
       items_partial: itemsPartial,
       hired,
