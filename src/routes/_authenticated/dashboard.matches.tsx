@@ -14,6 +14,7 @@ import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
 import { PitCallRevealDetail, PitCallRevealTeaser } from "@/components/pitcall-reveal-detail";
+import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 
 import { toastError } from "@/lib/errors";
 
