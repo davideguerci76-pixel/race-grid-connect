@@ -24,8 +24,9 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              {/* Contact page coming soon */}
-              <span className="text-muted-foreground/60">{t("nav.contact")}</span>
+              <Link to="/contact" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("nav.contact")}
+              </Link>
             </li>
             {flags.homeStats && (
             <li>
