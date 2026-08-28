@@ -31,7 +31,7 @@ function AboutPage() {
     <div className="container-page py-16 md:py-24">
       {/* Title */}
       <h1 className="text-4xl font-black uppercase italic tracking-tighter md:text-6xl">
-        {t("about.title")}
+        {t("about.title_a")} <span className="text-racing-red">{t("about.title_b")}</span>
       </h1>
       <p className="mt-6 max-w-3xl text-lg font-black uppercase italic tracking-tight text-foreground/90 md:text-2xl">
         {t("about.hero")}
@@ -84,7 +84,7 @@ function AboutPage() {
           search={{ mode: "signup" as const }}
           className="group inline-flex items-center gap-3 border border-racing-red/50 bg-racing-red/10 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all hover:border-racing-red hover:bg-racing-red/20"
         >
-          {t("nav.signup")}
+          {t("about.cta_a")} <span className="text-racing-red">{t("about.cta_b")}</span>
           <ArrowRight className="size-4 text-racing-red transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
