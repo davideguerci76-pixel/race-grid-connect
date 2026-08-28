@@ -205,7 +205,22 @@ function DashboardHome() {
             <DashCard to="/dashboard/calendar" icon={Calendar} label={t("dashboard.my_availability_label")} value={t("dashboard.manage_availability_calendar")} />
           )}
           <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
-          <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />
+          {isFreelancer ? (
+            <DashCard
+              to="/dashboard/matches"
+              icon={Users}
+              label={t("dashboard.my_matches")}
+              value={
+                activeMatchesCount === 0
+                  ? t("dashboard.active_match_zero")
+                  : activeMatchesCount === 1
+                    ? t("dashboard.active_match_one")
+                    : t("dashboard.active_match_other", { count: activeMatchesCount })
+              }
+            />
+          ) : (
+            <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />
+          )}
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={String(matchesCount)} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}
