@@ -79,7 +79,7 @@ function ProfilePage() {
       const coordsRow = Array.isArray(coordsRes?.data) ? coordsRes.data[0] : null;
       const fpWithPhone = fp
         ? {
-            ...fp,
+            ...(fp as any),
             phone_dial_code: phoneRow?.phone_dial_code ?? null,
             phone_number: phoneRow?.phone_number ?? null,
             location_lat: coordsRow?.location_lat ?? null,
