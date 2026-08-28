@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { IUBENDA_ENABLED, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
+import { IUBENDA_ENABLED, IUBENDA_PRECONFIG, IUBENDA_SCRIPT_URL } from "@/config/iubenda";
 import { registerServiceWorker } from "@/lib/pwa/register-sw";
 import { initInstallPromptCapture } from "@/lib/pwa/install-prompt";
 import { AppSplash } from "@/components/app-splash";
