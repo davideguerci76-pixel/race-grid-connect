@@ -5,7 +5,7 @@ import heroImg from "@/assets/hero-pit.jpg";
 import logoFull from "@/assets/pitcall-logo-full.png.asset.json";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CalendarClock, ScanSearch, Coins, Star } from "lucide-react";
+import { UserRoundCheck, Headset, Cog, ListChecks, Handshake } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { MarketHighlights, useMarketStats } from "@/components/market-highlights";
 import { getPublicFlags } from "@/lib/flags.functions";
@@ -132,14 +132,15 @@ function Home() {
           <h2 className="mb-12 text-4xl font-black uppercase italic tracking-tighter md:text-5xl">
             {t("home.how_title")}
           </h2>
-          <div className="grid gap-6 md:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {[
-              { icon: CalendarClock, t: "how_1_t", b: "how_1_b" },
-              { icon: ScanSearch, t: "how_2_t", b: "how_2_b" },
-              { icon: Coins, t: "how_3_t", b: "how_3_b" },
-              { icon: Star, t: "how_4_t", b: "how_4_b" },
+              { icon: UserRoundCheck, t: "how_1_t", b: "how_1_b" },
+              { icon: Headset, t: "how_2_t", b: "how_2_b" },
+              { icon: Cog, t: "how_3_t", b: "how_3_b" },
+              { icon: ListChecks, t: "how_4_t", b: "how_4_b" },
+              { icon: Handshake, t: "how_5_t", b: "how_5_b" },
             ].map((s, i) => (
-              <div key={s.t} className="border border-border bg-card p-6">
+              <div key={s.t} className="rounded-xl border border-border bg-card p-6">
                 <div className="flex items-center justify-between">
                   <s.icon className="size-8 text-racing-red" strokeWidth={1.5} />
                   <div className="font-mono text-xs text-muted-foreground">0{i + 1}</div>
