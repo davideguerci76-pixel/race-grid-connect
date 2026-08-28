@@ -210,13 +210,13 @@ function DashboardHome() {
               to="/dashboard/matches"
               icon={Users}
               label={t("dashboard.my_matches")}
-              value={
-                activeMatchesCount === 0
-                  ? t("dashboard.active_match_zero")
-                  : activeMatchesCount === 1
-                    ? t("dashboard.active_match_one")
-                    : t("dashboard.active_match_other", { count: activeMatchesCount })
-              }
+            value={
+              activeMatchesCount === 0
+                ? ""
+                : activeMatchesCount === 1
+                  ? t("dashboard.active_match_one")
+                  : t("dashboard.active_match_other", { count: activeMatchesCount })
+            }
             />
           ) : (
             <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />

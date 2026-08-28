@@ -132,7 +132,7 @@
     "buy_tokens": "Buy tokens",
     "your_matches": "Your matches",
     "my_matches": "MY MATCHES",
-    "active_match_zero": "0 Active Matches",
+    "active_match_zero": "",
     "active_match_one": "1 Active Match",
     "active_match_other": "{{count}} Active Matches",
     "new_team_label": "[MATCHES TO REVIEW]",
