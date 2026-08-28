@@ -129,8 +129,9 @@ export function SiteHeader() {
           <Link to="/about" className={navLinkCls} activeProps={activeCls}>
             <span suppressHydrationWarning>{t("nav.about")}</span>
           </Link>
-          {/* Contact page coming soon — positioned, not linked yet */}
-          <span className="cursor-default text-muted-foreground/60">{t("nav.contact")}</span>
+          <Link to="/contact" className={navLinkCls} activeProps={activeCls}>
+            <span suppressHydrationWarning>{t("nav.contact")}</span>
+          </Link>
           {flags.homeStats && (
           <Link to="/market" className={navLinkCls} activeProps={activeCls}>
             <span suppressHydrationWarning>{t("nav.market")}</span>
