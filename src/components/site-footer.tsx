@@ -28,6 +28,12 @@ export function SiteFooter() {
                 {t("nav.contact")}
               </Link>
             </li>
+            <li>
+              <Link to="/faq" className="text-muted-foreground transition-colors hover:text-racing-red">
+                {t("nav.faq")}
+              </Link>
+            </li>
+
             {flags.homeStats && (
             <li>
               <Link to="/market" className="text-muted-foreground transition-colors hover:text-racing-red">
