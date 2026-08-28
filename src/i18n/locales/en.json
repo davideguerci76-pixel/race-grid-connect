@@ -117,10 +117,10 @@
     "no_account": "New to Pit Call?",
     "have_account": "Already have an account?",
     "create_account": "Create account",
-    "type_freelancer": "I'm a specialist",
-    "type_freelancer_desc": "Mechanic, engineer, telemetrist, tire specialist.",
+    "type_freelancer": "I'm a freelancer",
+    "type_freelancer_desc": "Mechanic, engineer, technician, or other motorsport professional.",
     "type_team": "We're a team",
-    "type_team_desc": "Scuderia, factory, garage or racing squad.",
+    "type_team_desc": "Racing team, manufacturer, constructor, or other motorsport organization.",
     "which_are_you": "What best describes you?",
     "signed_in_as": "Signed in as {{email}}",
     "forgot_password": "Forgot password?"
