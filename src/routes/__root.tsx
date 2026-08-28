@@ -96,7 +96,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
     // iubenda unified embed: cookie banner + auto-blocking of consent-bound
     // scripts. Loaded in <head> so blocking is active before anything else runs.
-    scripts: IUBENDA_ENABLED ? [{ type: "text/javascript", src: IUBENDA_SCRIPT_URL }] : [],
+    // The inline pre-config disables the auto-injected overlays (floating
+    // preferences button + US State Laws badges); the same functions are
+    // exposed as plain links in the PITCALL footer.
+    scripts: IUBENDA_ENABLED
+      ? [
+          {
+            type: "text/javascript",
+            children: IUBENDA_PRECONFIG,
+          },
+          { type: "text/javascript", src: IUBENDA_SCRIPT_URL },
+        ]
+      : [],
+
   }),
 
   shellComponent: RootShell,
