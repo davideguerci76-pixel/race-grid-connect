@@ -126,6 +126,11 @@ export function SiteHeader() {
 
         {/* Desktop nav */}
         <div className="hidden gap-6 text-xs font-bold uppercase tracking-widest text-muted-foreground lg:flex">
+          <Link to="/about" className={navLinkCls} activeProps={activeCls}>
+            <span suppressHydrationWarning>{t("nav.about")}</span>
+          </Link>
+          {/* Contact page coming soon — positioned, not linked yet */}
+          <span className="cursor-default text-muted-foreground/60">{t("nav.contact")}</span>
           {flags.homeStats && (
           <Link to="/market" className={navLinkCls} activeProps={activeCls}>
             <span suppressHydrationWarning>{t("nav.market")}</span>
@@ -219,6 +224,11 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-border bg-background lg:hidden">
           <div className="container-page flex flex-col gap-1 py-4 text-sm font-bold uppercase tracking-widest">
+            <Link to="/about" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
+              <span suppressHydrationWarning>{t("nav.about")}</span>
+            </Link>
+            {/* Contact page coming soon — positioned, not linked yet */}
+            <span className="border-b border-border/50 py-3 text-muted-foreground/60">{t("nav.contact")}</span>
             {flags.homeStats && (
             <Link to="/market" onClick={() => setOpen(false)} className="border-b border-border/50 py-3 hover:text-racing-red" activeProps={activeCls}>
               <span suppressHydrationWarning>{t("nav.market")}</span>
