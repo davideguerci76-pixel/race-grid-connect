@@ -20,8 +20,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TeamsIndexRouteImport } from './routes/teams.index'
-import { Route as FreelancersIndexRouteImport } from './routes/freelancers.index'
 import { Route as TeamsIdRouteImport } from './routes/teams.$id'
 import { Route as LegalInfoRouteImport } from './routes/legal.info'
 import { Route as LegalDocRouteImport } from './routes/legal.$doc'
@@ -109,16 +107,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamsIndexRoute = TeamsIndexRouteImport.update({
-  id: '/teams/',
-  path: '/teams/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FreelancersIndexRoute = FreelancersIndexRouteImport.update({
-  id: '/freelancers/',
-  path: '/freelancers/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeamsIdRoute = TeamsIdRouteImport.update({
@@ -332,8 +320,6 @@ export interface FileRoutesByFullPath {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
-  '/freelancers/': typeof FreelancersIndexRoute
-  '/teams/': typeof TeamsIndexRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -378,8 +364,6 @@ export interface FileRoutesByTo {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
-  '/freelancers': typeof FreelancersIndexRoute
-  '/teams': typeof TeamsIndexRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -428,8 +412,6 @@ export interface FileRoutesById {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
-  '/freelancers/': typeof FreelancersIndexRoute
-  '/teams/': typeof TeamsIndexRoute
   '/_authenticated/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -478,8 +460,6 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
-    | '/freelancers/'
-    | '/teams/'
     | '/admin/calendars'
     | '/admin/launch'
     | '/admin/matching'
@@ -524,8 +504,6 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
-    | '/freelancers'
-    | '/teams'
     | '/admin/calendars'
     | '/admin/launch'
     | '/admin/matching'
@@ -573,8 +551,6 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
-    | '/freelancers/'
-    | '/teams/'
     | '/_authenticated/admin/calendars'
     | '/_authenticated/admin/launch'
     | '/_authenticated/admin/matching'
@@ -621,8 +597,6 @@ export interface RootRouteChildren {
   LegalDocRoute: typeof LegalDocRoute
   LegalInfoRoute: typeof LegalInfoRoute
   TeamsIdRoute: typeof TeamsIdRoute
-  FreelancersIndexRoute: typeof FreelancersIndexRoute
-  TeamsIndexRoute: typeof TeamsIndexRoute
   ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
   ApiPublicNotificationPushRoute: typeof ApiPublicNotificationPushRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -707,20 +681,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/teams/': {
-      id: '/teams/'
-      path: '/teams'
-      fullPath: '/teams/'
-      preLoaderRoute: typeof TeamsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/freelancers/': {
-      id: '/freelancers/'
-      path: '/freelancers'
-      fullPath: '/freelancers/'
-      preLoaderRoute: typeof FreelancersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/teams/$id': {
@@ -1065,8 +1025,6 @@ const rootRouteChildren: RootRouteChildren = {
   LegalDocRoute: LegalDocRoute,
   LegalInfoRoute: LegalInfoRoute,
   TeamsIdRoute: TeamsIdRoute,
-  FreelancersIndexRoute: FreelancersIndexRoute,
-  TeamsIndexRoute: TeamsIndexRoute,
   ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
   ApiPublicNotificationPushRoute: ApiPublicNotificationPushRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
