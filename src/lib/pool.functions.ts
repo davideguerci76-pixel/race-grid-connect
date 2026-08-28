@@ -113,6 +113,21 @@ export const addPoolMemberByCode = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Team: manually add the confirmed freelancer of one of my engagements to my pool.
+ * Owner-scoped SECURITY DEFINER RPC — never creates an engagement or a rating.
+ */
+export const addPoolMemberFromEngagement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { engagement_id: string }) => z.object({ engagement_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("add_pool_member_from_engagement" as any, {
+      _engagement_id: data.engagement_id,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /** Team: pool search cost + unlock state for one pit call */
 export const getPoolSearchState = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

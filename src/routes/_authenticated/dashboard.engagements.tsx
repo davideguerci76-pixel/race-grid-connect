@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
+import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -100,6 +101,19 @@ function EngagementsPage() {
   const [overall, setOverall] = useState(5);
   const [comment, setComment] = useState("");
   const [locallySubmittedRatings, setLocallySubmittedRatings] = useState<Set<string>>(() => new Set());
+  const [locallyPooled, setLocallyPooled] = useState<Set<string>>(() => new Set());
+  const addPoolFn = useServerFn(addPoolMemberFromEngagement);
+  const addPoolMut = useMutation({
+    mutationFn: (engagementId: string) => addPoolFn({ data: { engagement_id: engagementId } }),
+    onSuccess: (_res, engagementId) => {
+      setLocallyPooled((prev) => new Set(prev).add(engagementId));
+      toast.success(t("pool.added"));
+      qc.invalidateQueries({ queryKey: ["engagements"] });
+      qc.invalidateQueries({ queryKey: ["my-pool"] });
+    },
+    onError: (err) => toastError(err, "pool.add_failed"),
+  });
+
 
   const confirmMut = useMutation({
     mutationFn: (id: string) => confirmFn({ data: { id } }),
@@ -466,6 +480,23 @@ function EngagementsPage() {
                       </button>
                     );
                   })()}
+
+                  {/* Manual, team-only pool add. Never creates an engagement or a rating. */}
+                  {!isFreelancer && e.status === "completed" && (
+                    e.in_pool || locallyPooled.has(e.id) ? (
+                      <span className="inline-flex items-center gap-1 border border-sky-400/60 bg-sky-400/10 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-sky-300">
+                        {t("pool.in_my_pool")}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => addPoolMut.mutate(e.id)}
+                        disabled={addPoolMut.isPending}
+                        className="border border-sky-400/60 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-sky-300 hover:bg-sky-400/10 disabled:opacity-60"
+                      >
+                        {t("pool.add_to_my_pool")}
+                      </button>
+                    )
+                  )}
 
 
                   {(e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {

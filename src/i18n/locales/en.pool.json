@@ -45,6 +45,8 @@
     "upgrade_button": "UPGRADE TO STANDARD PITCALL ({{cost}} tokens)",
     "upgrade_confirm": "Upgrade this Pit Call to standard for {{cost}} tokens and unlock {{count}} more freelancer(s)?",
     "upgrade_done": "Pit Call upgraded to standard — {{cost}} tokens spent",
-    "upgrade_failed": "Upgrade failed"
+    "upgrade_failed": "Upgrade failed",
+    "add_to_my_pool": "ADD TO MY POOL",
+    "in_my_pool": "IN MY POOL"
   }
 }

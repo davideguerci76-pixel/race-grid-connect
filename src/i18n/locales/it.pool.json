@@ -45,6 +45,8 @@
     "upgrade_button": "PASSA A STANDARD PITCALL ({{cost}} token)",
     "upgrade_confirm": "Vuoi passare questa Pit Call a standard per {{cost}} token e sbloccare altri {{count}} freelance?",
     "upgrade_done": "Pit Call passata a standard — {{cost}} token spesi",
-    "upgrade_failed": "Upgrade non riuscito"
+    "upgrade_failed": "Upgrade non riuscito",
+    "add_to_my_pool": "AGGIUNGI AL MIO POOL",
+    "in_my_pool": "NEL MIO POOL"
   }
 }
