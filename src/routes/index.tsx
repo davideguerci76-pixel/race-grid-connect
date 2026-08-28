@@ -97,24 +97,30 @@ function Home() {
           </h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("home.sub")}</p>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 max-w-2xl">
+          <div className="mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
             <Link
               to="/auth"
               search={{ mode: "signup" as const, type: "freelancer" as const }}
-              className="group block border-l-4 border-racing-red bg-pit p-6 transition-colors hover:bg-secondary"
+              className="group block border-l-4 border-racing-red bg-pit p-4 transition-all hover:bg-secondary hover:shadow-lg hover:shadow-racing-red/15 md:p-5"
             >
-              <div className="font-mono text-xs font-bold uppercase tracking-widest text-racing-red">[01]</div>
-              <div className="mt-1 text-xl font-bold">{t("home.cta_freelancer_title")}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{t("home.cta_freelancer_body")} <span className="inline-block transition-transform group-hover:translate-x-1">→</span></div>
+              <div className="text-base font-black uppercase italic tracking-tighter text-foreground md:text-lg">
+                {t("home.cta_freelancer_title")}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground md:mt-1 md:text-sm md:whitespace-nowrap">
+                {t("home.cta_freelancer_body")}
+              </div>
             </Link>
             <Link
               to="/auth"
               search={{ mode: "signup" as const, type: "team" as const }}
-              className="group block border-l-4 border-racing-yellow bg-pit p-6 transition-colors hover:bg-secondary"
+              className="group block border-l-4 border-racing-yellow bg-pit p-4 transition-all hover:bg-secondary hover:shadow-lg hover:shadow-racing-yellow/15 md:p-5"
             >
-              <div className="font-mono text-xs font-bold uppercase tracking-widest text-racing-yellow">[02]</div>
-              <div className="mt-1 text-xl font-bold">{t("home.cta_team_title")}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{t("home.cta_team_body")} <span className="inline-block transition-transform group-hover:translate-x-1">→</span></div>
+              <div className="text-base font-black uppercase italic tracking-tighter text-foreground md:text-lg">
+                {t("home.cta_team_title")}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground md:mt-1 md:text-sm md:whitespace-nowrap">
+                {t("home.cta_team_body")}
+              </div>
             </Link>
           </div>
         </div>
