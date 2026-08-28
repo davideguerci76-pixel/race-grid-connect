@@ -213,3 +213,31 @@ button.iubenda-tp-btn:not(.iubenda-floatable-tb-btn):not([data-tp-nostyle], .iub
   border-radius: 1rem;
   box-shadow: 0 1px 0 0 oklch(1 0 0 / 6%) inset, 0 10px 30px -18px oklch(0 0 0 / 80%);
 }
+
+/* HOW section card hover micro-interactions */
+@keyframes pit-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.9; }
+}
+@keyframes pit-spin {
+  0% { transform: rotate(0deg); }
+  60% { transform: rotate(90deg); }
+  100% { transform: rotate(90deg); }
+}
+@keyframes pit-list {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  20% { transform: translateX(2px); opacity: 0.85; }
+  40% { transform: translateX(-1px); opacity: 1; }
+  60% { transform: translateX(1px); opacity: 0.95; }
+  80% { transform: translateX(0); opacity: 1; }
+}
+
+@utility animate-pit-pulse {
+  animation: pit-pulse 0.45s ease-in-out;
+}
+@utility animate-pit-spin {
+  animation: pit-spin 0.5s ease-in-out;
+}
+@utility animate-pit-list {
+  animation: pit-list 0.5s ease-in-out;
+}
