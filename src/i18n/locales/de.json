@@ -14,7 +14,8 @@
     "engagements": "Engagements",
     "pricing": "Preise",
     "about": "Über uns",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "faq": "FAQ"
   },
   "home": {
     "badge": "Live · {{count}} offene Stellen",
@@ -807,5 +808,91 @@
     "error_reasons": "Bitte wähle mindestens einen Grund aus.",
     "error_subject": "Bitte gib einen Betreff ein.",
     "error_message": "Bitte gib eine Nachricht ein (mindestens 10 Zeichen)."
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Alles, was du über PITCALL wissen musst.",
+    "cta_title": "Nicht gefunden, wonach du suchst?",
+    "cta_text": "Kontaktiere uns — wir helfen dir gerne weiter.",
+    "cta_button": "Kontakt aufnehmen",
+    "items": [
+      {
+        "q": "Wie funktioniert das Matching von PITCALL?",
+        "a": [
+          "PITCALL bringt die Anforderungen eines Teams mit echten Freelancer-Profilen und Verfügbarkeiten zusammen.",
+          "Die Matching-Engine berücksichtigt Rolle, Skills, Erfahrung, Sprachen, Standort, Verfügbarkeit und die spezifischen Anforderungen jedes Pit Calls.",
+          "Passende Freelancer werden nach Match-Qualität sortiert, damit Teams sich auf die stärksten Treffer konzentrieren können, statt Profile manuell zu durchsuchen."
+        ]
+      },
+      {
+        "q": "Was ist der Unterschied zwischen Full Match und Partial Match?",
+        "a": [
+          "Ein Full Match deckt alle im Pit Call angefragten Arbeitstage ab und erfüllt die Pflichtanforderungen.",
+          "Ein Partial Match deckt nur einen Teil der angefragten Termine ab. Solche Treffer werden separat und niedriger gereiht angezeigt, damit Teams immer genau wissen, was sie sehen."
+        ]
+      },
+      {
+        "q": "Wie funktioniert die Verfügbarkeit von Freelancern?",
+        "a": [
+          "Freelancer markieren ihre verfügbaren Tage direkt im PITCALL-Kalender.",
+          "Nur als verfügbar markierte Tage werden von der Matching-Engine verwendet. Ein aktuell gehaltener Kalender macht ein Profil zuverlässig matchbar."
+        ]
+      },
+      {
+        "q": "Garantiert PITCALL, dass ein Freelancer verfügbar ist?",
+        "a": [
+          "Nein. PITCALL zeigt die Verfügbarkeit so an, wie sie der Freelancer zu diesem Zeitpunkt angegeben hat.",
+          "Verbindlich wird die Verfügbarkeit erst, wenn beide Seiten den Match bestätigen."
+        ]
+      },
+      {
+        "q": "Wann werden die Identitäten von Team und Freelancer sichtbar?",
+        "a": [
+          "In den frühen Phasen eines Matches bleiben die Identitäten geschützt.",
+          "Teams können die Identität eines Freelancers aufdecken und Freelancer können die Details eines Pit Calls freischalten, aber Namen, Logos und direkte Kontakte werden erst geteilt, wenn beide Seiten den Match bestätigt haben."
+        ]
+      },
+      {
+        "q": "Was passiert, nachdem ein Freelancer einen Match bestätigt hat?",
+        "a": [
+          "Nach der Bestätigung erhalten beide Seiten volle Sichtbarkeit: Identitäten und Kontaktdaten werden freigeschaltet, damit Team und Freelancer die Arbeit direkt organisieren können.",
+          "Der bestätigte Match schließt anschließend die konkurrierenden Vorschläge desselben Pit Calls."
+        ]
+      },
+      {
+        "q": "Kümmert sich PITCALL um Verträge oder Zahlungen zwischen Teams und Freelancern?",
+        "a": [
+          "Nein. PITCALL ist eine Matching-Plattform.",
+          "Vereinbarungen, Verträge, Honorare und Zahlungen werden direkt zwischen Team und Freelancer geregelt."
+        ]
+      },
+      {
+        "q": "Wie funktionieren Bewertungen?",
+        "a": [
+          "Nach einem abgeschlossenen Match können sich Team und Freelancer gegenseitig bewerten.",
+          "Die Bewertungen sind doppelblind: Sie werden erst veröffentlicht, wenn beide Seiten abgestimmt haben oder eine feste Wartezeit verstrichen ist. So bleibt das Feedback ehrlich und frei von Vergeltung."
+        ]
+      },
+      {
+        "q": "Was passiert mit meinen Tokens, wenn ein Pit Call keinen Match findet?",
+        "a": [
+          "Wenn ein Pit Call überhaupt keinen Match erzeugt, kannst du auf neue Profile warten, Teilergebnisse freischalten oder die für die Veröffentlichung verwendeten Tokens zurückerstatten lassen."
+        ]
+      },
+      {
+        "q": "Wie funktionieren PITCALL-Tokens?",
+        "a": [
+          "Tokens sind die Plattform-Credits, mit denen Teams Pit Calls veröffentlichen und Matches freischalten.",
+          "Jede Aktion hat klare, feste Kosten, die vor der Bestätigung angezeigt werden. Keine Abos, keine versteckten Gebühren."
+        ]
+      },
+      {
+        "q": "Berechnet PITCALL etwas für Freelancer?",
+        "a": [
+          "Profil anlegen, Verfügbarkeit pflegen und Matches erhalten ist für Freelancer kostenlos.",
+          "Nur einige optionale Aktionen erfordern Tokens."
+        ]
+      }
+    ]
   }
 }
