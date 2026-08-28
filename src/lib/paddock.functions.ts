@@ -973,6 +973,13 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       }
     } catch { /* ignore admin errors */ }
 
+    // Which freelancers the viewing team already keeps in its pool (manual add CTA state).
+    const poolIds = new Set<string>();
+    if (rows.some((r) => r.team_id === userId)) {
+      const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
+      for (const p of (poolRows ?? []) as any[]) poolIds.add(p.freelancer_id);
+    }
+
     return rows.map((r) => {
       const fName = nameMap.get(r.freelancer_id);
       const tName = nameMap.get(r.team_id);
