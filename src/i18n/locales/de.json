@@ -222,7 +222,16 @@
     "cancel": "Stornieren",
     "rate": "Bewerten",
     "rating_locked": "Bewertung nach beidseitiger Bestätigung",
-    "rate_them": "{{name}} bewerten"
+    "rate_them": "{{name}} bewerten",
+    "ask_more_time": "Mehr Zeit anfragen",
+    "decline": "Ablehnen",
+    "decline_confirm": "Diese Match-Anfrage ablehnen? Du kannst sie danach nicht mehr bestätigen.",
+    "declined_toast": "Match-Anfrage abgelehnt",
+    "more_time_toast": "Mehr Zeit angefragt — das Team wurde benachrichtigt",
+    "request_expired": "Anfrage abgelaufen",
+    "expires_in_hours": "Läuft in {{count}} Std. ab",
+    "expires_in_minutes": "Läuft in {{count}} Min. ab",
+    "ask_more_time_hint": "Nur in den letzten 12 Stunden, maximal 5-mal und nie über den Pit-Call-Start hinaus"
   },
   "rating": {
     "title": "Bewertung",
