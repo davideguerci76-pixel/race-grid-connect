@@ -89,9 +89,9 @@ function Home() {
             src={logoFull.url}
             alt="Pit Call — Box. Now!"
             width={1089} height={424}
-            className="mb-8 w-full max-w-[33rem] object-contain mix-blend-screen"
+            className="mb-8 w-full max-w-[40rem] object-contain mix-blend-screen"
           />
-          <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter md:text-8xl">
+          <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter md:max-w-full md:text-8xl">
             {t("home.hero_1")}<br />
             <span className="text-racing-red">{t("home.hero_2")}</span>{" "}{t("home.hero_3")}
           </h1>
