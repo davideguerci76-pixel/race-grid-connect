@@ -11,7 +11,6 @@ import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { getUnreadNotificationCount } from "@/lib/paddock.functions";
 import { useAppBadge } from "@/hooks/use-push-notifications";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
@@ -56,22 +55,26 @@ export function SiteHeader() {
     },
   });
 
-  const getUnread = useServerFn(getUnreadNotificationCount);
   const qc = useQueryClient();
   const { data: unread } = useQuery({
     queryKey: ["unread-notifications", user?.id],
-    enabled: !!session?.access_token,
+    enabled: !!session?.access_token && !!user?.id,
     retry: false,
     queryFn: async () => {
-      try {
-        return (await getUnread()).count;
-      } catch {
-        return 0;
-      }
+      // Read directly through RLS: avoids a server-function round trip that
+      // 500s whenever the bearer token is missing/expired mid-session.
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .is("read_at", null);
+      if (error) return 0;
+      return count ?? 0;
     },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
+
 
   // Mirror the unread count onto the installed app icon (PWA Badging API).
   useAppBadge(unread);
