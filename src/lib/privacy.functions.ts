@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 /**
  * GDPR art. 20 — data portability.
@@ -19,8 +20,8 @@ export const exportMyData = createServerFn({ method: "POST" })
     const [profile, freelancerProfile, teamProfile, teamVat, contacts, availability, calendars, notifications, tokens] =
       await Promise.all([
         (supabase as any).from("profiles").select("*").eq("id", userId).maybeSingle(),
-        (supabase as any).from("freelancer_profiles").select("*").eq("user_id", userId).maybeSingle(),
-        (supabase as any).from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
+        (supabase as any).from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
         (supabase as any).rpc("my_team_vat"),
         (supabase as any).from("freelancer_contacts").select("*").eq("user_id", userId).maybeSingle(),
         pick("availability", "freelancer_id"),

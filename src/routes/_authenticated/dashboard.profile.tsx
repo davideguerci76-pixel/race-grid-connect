@@ -22,6 +22,7 @@ import { BackButton } from "@/components/back-button";
 import { PrivacyDataSection } from "@/components/privacy-data-section";
 import { toastError } from "@/lib/errors";
 import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
+import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
@@ -48,9 +49,7 @@ function ProfilePage() {
         const [{ data: tp, error: tpError }, vatRes] = await Promise.all([
           supabase
             .from("team_profiles")
-            .select(
-              "user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test",
-            )
+            .select(TEAM_PROFILE_COLUMNS)
             .eq("user_id", user!.id)
             .maybeSingle(),
           (supabase.rpc as any)("my_team_vat"),
@@ -61,7 +60,7 @@ function ProfilePage() {
       }
 
       const [{ data: fp, error: fpError }, phoneRes] = await Promise.all([
-        supabase.from("freelancer_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
+        supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", user!.id).maybeSingle(),
         supabase.rpc("my_freelancer_phone"),
       ]);
       if (fpError) throw new Error(fpError.message);

@@ -11,6 +11,7 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
 import { Lock } from "lucide-react";
 import { BackButton } from "@/components/back-button";
+import { TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 type Search = { req?: string };
 
@@ -41,7 +42,7 @@ function TeamProfile() {
     enabled: !!user,
     queryFn: async () => {
       const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }] = await Promise.all([
-        supabase.from("team_profiles").select("user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_lat, location_lng, location_city, location_region, location_country, location_place_id, is_test").eq("user_id", id).maybeSingle(),
+        supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
         supabase.from("team_reveals").select("team_id").eq("user_id", user!.id).eq("team_id", id).maybeSingle(),
         supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id),

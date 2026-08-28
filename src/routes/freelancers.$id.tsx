@@ -10,6 +10,7 @@ import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { FREELANCER_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -28,7 +29,7 @@ function FreelancerProfile() {
     queryKey: ["freelancer-detail", id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: fp } = await supabase.from("freelancer_profiles").select("*").eq("user_id", id).maybeSingle();
+      const { data: fp } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", id).maybeSingle();
       if (!fp) throw notFound();
       const { data: availability } = await supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60);
       return { fp, availability: availability ?? [] };
