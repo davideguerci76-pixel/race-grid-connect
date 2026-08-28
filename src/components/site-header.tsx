@@ -11,7 +11,6 @@ import { LanguageSwitcher } from "./language-switcher";
 import { TokenBadge } from "./token-badge";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { getUnreadNotificationCount } from "@/lib/paddock.functions";
 import { useAppBadge } from "@/hooks/use-push-notifications";
 import logoCompact from "@/assets/pitcall-logo-clean.png.asset.json";
 
