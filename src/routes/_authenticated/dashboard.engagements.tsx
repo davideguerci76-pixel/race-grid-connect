@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, confirmEngagement, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
+import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { Link } from "@tanstack/react-router";
@@ -30,7 +30,6 @@ function EngagementsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
-  const confirmFn = useServerFn(confirmEngagement);
   const completeFn = useServerFn(markEngagementComplete);
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
@@ -116,11 +115,6 @@ function EngagementsPage() {
   });
 
 
-  const confirmMut = useMutation({
-    mutationFn: (id: string) => confirmFn({ data: { id } }),
-    onSuccess: () => { toast.success(t("engagements.confirmed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "sweep_engage.engagements.confirm_failed"),
-  });
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const revealFn = useServerFn(revealMatch);
   const revealMut = useMutation({

@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyMatches, revealMatch, confirmEngagement, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
+import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
@@ -64,7 +64,6 @@ function MatchesPage() {
   const qc = useQueryClient();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
-  const acceptFn = useServerFn(confirmEngagement);
   const getRequests = useServerFn(getMyRequests);
   const getEngs = useServerFn(getMyEngagements);
 
@@ -91,12 +90,6 @@ function MatchesPage() {
     onError: (e) => toastError(e, "matches.insufficient_tokens"),
   });
 
-  const acceptMut = useMutation({
-    mutationFn: (engagement_id: string) => acceptFn({ data: { id: engagement_id } }),
-    onSuccess: () => { toast.success(t("sweep_engage.matches.confirmed_contacts_unlocked")); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "sweep_engage.common.failed"),
-
-  });
 
   if (isTeam) {
     const confirmedByReq = new Map<string, any>();
