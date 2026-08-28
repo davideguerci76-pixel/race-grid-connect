@@ -259,7 +259,9 @@
     "privacy": "Privacy",
     "terms": "Termini",
     "cookie": "Cookie",
-    "dataInfo": "Informazioni aggiuntive sul trattamento dei dati"
+    "dataInfo": "Informazioni aggiuntive sul trattamento dei dati",
+    "noticeAtCollection": "Informativa al momento della raccolta",
+    "privacyChoices": "Le tue scelte sulla privacy"
   },
   "requests": {
     "title": "Le mie Pit Calls",

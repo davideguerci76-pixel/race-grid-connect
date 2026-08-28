@@ -247,7 +247,9 @@
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "cookie": "Cookies",
-    "dataInfo": "Informations complémentaires sur le traitement des données"
+    "dataInfo": "Informations complémentaires sur le traitement des données",
+    "noticeAtCollection": "Avis au moment de la collecte",
+    "privacyChoices": "Vos choix de confidentialité"
   },
   "requests": {
     "title": "Mes Pit Calls",
