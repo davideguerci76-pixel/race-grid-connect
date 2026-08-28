@@ -467,6 +467,23 @@ function EngagementsPage() {
                     );
                   })()}
 
+                  {/* Manual, team-only pool add. Never creates an engagement or a rating. */}
+                  {!isFreelancer && e.status === "completed" && (
+                    e.in_pool || locallyPooled.has(e.id) ? (
+                      <span className="inline-flex items-center gap-1 border border-sky-400/60 bg-sky-400/10 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-sky-300">
+                        {t("pool.in_my_pool")}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => addPoolMut.mutate(e.id)}
+                        disabled={addPoolMut.isPending}
+                        className="border border-sky-400/60 px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-widest text-sky-300 hover:bg-sky-400/10 disabled:opacity-60"
+                      >
+                        {t("pool.add_to_my_pool")}
+                      </button>
+                    )
+                  )}
+
 
                   {(e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
                     const info = ratableMap.get(e.id);
