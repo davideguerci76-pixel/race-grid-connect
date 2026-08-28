@@ -603,16 +603,22 @@ export const getMyMatches = createServerFn({ method: "GET" })
     // Fetch pending "proposed" engagements addressed to the current user
     const matchIds = rawMatches.map((m: any) => m.id);
     const pendingByMatchId = new Map<string, string>();
+    const pendingInfoByMatchId = new Map<string, { id: string; expires_at: string | null; extension_count: number }>();
     const confirmedMatchIds = new Set<string>();
     const takenRequestIds = new Set<string>();
     if (matchIds.length) {
       const { data: eng } = await supabase
         .from("engagements")
-        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id")
+        .select("id, match_id, request_id, status, proposed_by, freelancer_id, team_id, expires_at, extension_count")
         .in("match_id", matchIds);
       (eng ?? []).forEach((e: any) => {
         if (e.status === "proposed" && e.proposed_by !== userId && e.match_id) {
           pendingByMatchId.set(e.match_id, e.id);
+          pendingInfoByMatchId.set(e.match_id, {
+            id: e.id,
+            expires_at: e.expires_at ?? null,
+            extension_count: Number(e.extension_count ?? 0),
+          });
         }
         if (e.status === "confirmed" && e.match_id) confirmedMatchIds.add(e.match_id);
       });
