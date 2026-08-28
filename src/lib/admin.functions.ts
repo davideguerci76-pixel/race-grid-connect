@@ -1,17 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-async function assertAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden: admin only");
-}
+import { assertAdmin, logAdminAction, freelancerPatch, teamPatch } from "@/lib/admin-helpers";
 
 export const checkAmIAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -419,25 +409,6 @@ export const adminMarketPrivateStats = createServerFn({ method: "GET" })
     };
   });
 
-const freelancerPatch = z.object({
-  user_id: z.string().uuid(),
-  display_name: z.string().trim().max(120).optional(),
-  first_name: z.string().trim().max(80).nullable().optional(),
-  last_name: z.string().trim().max(80).nullable().optional(),
-  token_balance: z.number().int().min(0).max(1_000_000).optional(),
-  headline: z.string().trim().max(200).nullable().optional(),
-  role_group: z.string().trim().max(80).nullable().optional(),
-  location: z.string().trim().max(200).nullable().optional(),
-  day_rate: z.number().int().min(0).max(1_000_000).nullable().optional(),
-  currency: z.string().trim().max(8).optional(),
-  disciplines: z.array(z.string()).optional(),
-  skills: z.array(z.string()).optional(),
-  education: z.string().trim().max(400).nullable().optional(),
-  years_experience: z.number().int().min(0).max(80).nullable().optional(),
-  bio: z.string().trim().max(4000).nullable().optional(),
-  phone_dial_code: z.string().trim().max(8).nullable().optional(),
-  phone_number: z.string().trim().max(40).nullable().optional(),
-});
 
 export const adminUpdateFreelancer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -489,20 +460,6 @@ export const adminUpdateFreelancer = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const teamPatch = z.object({
-  user_id: z.string().uuid(),
-  display_name: z.string().trim().max(120).optional(),
-  token_balance: z.number().int().min(0).max(1_000_000).optional(),
-  team_name: z.string().trim().max(160).optional(),
-  team_type: z.string().trim().max(80).nullable().optional(),
-  location: z.string().trim().max(200).nullable().optional(),
-  primary_discipline: z.string().trim().max(80).nullable().optional(),
-  website: z.string().trim().max(300).nullable().optional(),
-  vat_number: z.string().trim().max(60).nullable().optional(),
-  size: z.string().trim().max(60).nullable().optional(),
-  founded_year: z.number().int().min(1800).max(2200).nullable().optional(),
-  bio: z.string().trim().max(4000).nullable().optional(),
-});
 
 export const adminUpdateTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -590,11 +547,6 @@ export const adminGetTeamPool = createServerFn({ method: "POST" })
   });
 
 // ============ USER MANAGEMENT SUITE ============
-
-async function logAdminAction(admin_id: string, target_user_id: string | null, action: string, details: any = {}) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  await supabaseAdmin.from("admin_audit_log").insert({ admin_id, target_user_id, action, details } as never);
-}
 
 /** Full profile card (anagraphic + professional data) for a single user. */
 export const adminGetUserDetail = createServerFn({ method: "POST" })
