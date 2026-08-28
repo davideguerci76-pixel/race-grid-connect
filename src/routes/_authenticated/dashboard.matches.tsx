@@ -277,17 +277,15 @@ function MatchesPage() {
                       </button>
                     )}
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
-                      <button
-                        onClick={async () => {
-                          if (await confirmDialog(t("sweep_engage.matches.confirm_match_prompt"))) {
-                            acceptMut.mutate(m.pending_engagement_id);
-                          }
-                        }}
-                        disabled={acceptMut.isPending}
-                        className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-                      >
-                        {t("engagements.confirm")}
-                      </button>
+                      <>
+                        <MatchRequestDeadline expiresAt={m.pending_engagement?.expires_at} />
+                        <MatchRequestActions
+                          engagementId={m.pending_engagement_id}
+                          expiresAt={m.pending_engagement?.expires_at}
+                          extensionCount={m.pending_engagement?.extension_count ?? 0}
+                          pitcallStart={m.request?.start_date ?? null}
+                        />
+                      </>
                     )}
                     {isFreelancer && matchTaken && (
                       <span className="inline-flex items-center justify-center border border-border bg-secondary/60 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
