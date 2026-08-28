@@ -29,7 +29,8 @@ function FreelancerProfile() {
     queryKey: ["freelancer-detail", id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: fp } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", id).maybeSingle();
+      const { data: fpRaw } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", id).maybeSingle();
+      const fp = fpRaw as any;
       if (!fp) throw notFound();
       const { data: availability } = await supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60);
       return { fp, availability: availability ?? [] };
