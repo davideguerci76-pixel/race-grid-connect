@@ -12,7 +12,9 @@
     "matches": "Matches",
     "calendar": "Kalender",
     "engagements": "Engagements",
-    "pricing": "Preise"
+    "pricing": "Preise",
+    "about": "Über uns",
+    "contact": "Kontakt"
   },
   "home": {
     "badge": "Live · {{count}} offene Stellen",
@@ -751,5 +753,23 @@
     "confirm_delete": "{{name}} und alle zugehörigen Daten endgültig löschen? Nicht rückgängig zu machen.",
     "confirm_logout": "Alle aktiven Sitzungen von {{name}} widerrufen?",
     "confirm_impersonate": "Als {{name}} anmelden? Die Aktion wird protokolliert und ersetzt Ihre Sitzung im neuen Tab."
+  },
+  "about": {
+    "title_a": "ÜBER",
+    "title_b": "PITCALL",
+    "hero": "IM PADDOCK GEBAUT. FÜR DEN PADDOCK GEBAUT.",
+    "p1": "PITCALL entstand aus einem einfachen Problem, das wir seit Jahren im Motorsport sehen: Teams brauchen die richtigen Leute zur richtigen Zeit, während qualifizierte Freelancer dort sein müssen, wo sie gebraucht werden – wenn sie verfügbar sind.",
+    "p2": "Sich zu finden sollte nicht der schwierige Teil sein.",
+    "p3": "Deshalb haben wir PITCALL gebaut: eine Matching-Plattform, die so funktioniert, wie der Motorsport tatsächlich funktioniert. Teams sagen der Engine genau, was sie brauchen. Freelancer geben Profile, Skills und reale Verfügbarkeit an. PITCALL bringt beide zusammen.",
+    "quote": "Kein endloses Durchsuchen von Profilen. Keine generischen Ausschreibungen.",
+    "p4": "Die PITCALL-Engine matcht reale Anforderungen mit realer Verfügbarkeit und reiht die Ergebnisse nach dem, was das Team tatsächlich braucht.",
+    "exp_title": "AUS ERFAHRUNG GEBAUT",
+    "exp_p1": "PITCALL wurde von zwei Motorsport-Profis mit über 20 Jahren Branchenerfahrung gegründet.",
+    "exp_p2": "Es entstand nicht aus einer Idee, wie der Paddock funktionieren sollte. Es entstand aus jahrelanger Erfahrung, wie er tatsächlich funktioniert – und aus einer Frage:",
+    "exp_p3": "Warum suchen wir noch, wenn wir matchen könnten?",
+    "mission_title": "UNSERE MISSION",
+    "mission_p1": "Motorsport-Teams und Freelancern schneller und einfacher den richtigen Match zu ermöglichen – damit sie weniger Zeit mit Suchen und mehr Zeit auf der Strecke verbringen.",
+    "cta_a": "TRETET DEM",
+    "cta_b": "GRID"
   }
 }

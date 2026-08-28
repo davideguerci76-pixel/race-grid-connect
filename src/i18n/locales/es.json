@@ -12,7 +12,9 @@
     "matches": "Coincidencias",
     "calendar": "Calendario",
     "engagements": "Contratos",
-    "pricing": "Precios"
+    "pricing": "Precios",
+    "about": "Nosotros",
+    "contact": "Contacto"
   },
   "home": {
     "badge": "En vivo · {{count}} puestos",
@@ -751,5 +753,23 @@
     "confirm_delete": "¿Eliminar definitivamente a {{name}} y todos sus datos? No se puede deshacer.",
     "confirm_logout": "¿Revocar todas las sesiones activas de {{name}}?",
     "confirm_impersonate": "¿Iniciar sesión como {{name}}? La acción queda registrada y sustituirá tu sesión en la nueva pestaña."
+  },
+  "about": {
+    "title_a": "SOBRE",
+    "title_b": "PITCALL",
+    "hero": "NACIDA EN EL PADDOCK. CREADA PARA EL PADDOCK.",
+    "p1": "PITCALL nació de un problema sencillo que llevamos años viendo en el automovilismo: los equipos necesitan a las personas adecuadas en el momento adecuado, mientras que los freelance cualificados necesitan estar donde se les necesita, cuando están disponibles.",
+    "p2": "Encontrarse no debería ser la parte difícil.",
+    "p3": "Por eso creamos PITCALL: una plataforma de matching diseñada en torno a cómo funciona realmente el automovilismo. Los equipos indican al motor exactamente lo que necesitan. Los freelance aportan sus perfiles, habilidades y disponibilidad real. PITCALL conecta a ambos.",
+    "quote": "Sin búsquedas interminables de perfiles. Sin anuncios genéricos.",
+    "p4": "El motor PITCALL combina requisitos reales con disponibilidad real y ordena los resultados según lo que el equipo realmente necesita.",
+    "exp_title": "NACIDA DE LA EXPERIENCIA",
+    "exp_p1": "PITCALL fue creada por dos profesionales del automovilismo con más de 20 años de experiencia en el sector.",
+    "exp_p2": "No nació de una idea de cómo debería funcionar el paddock. Nació de años viendo cómo funciona realmente — y de una pregunta:",
+    "exp_p3": "¿Por qué seguimos buscando, cuando podríamos hacer matching?",
+    "mission_title": "NUESTRA MISIÓN",
+    "mission_p1": "Hacer más rápido y fácil que equipos y freelance del automovilismo encuentren el match adecuado — para que pasen menos tiempo buscando y más tiempo en parrilla.",
+    "cta_a": "ÚNETE A LA",
+    "cta_b": "PARRILLA"
   }
 }
