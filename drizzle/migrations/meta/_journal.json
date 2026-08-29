@@ -43,6 +43,13 @@
       "when": 1787936109481,
       "tag": "0005_restrict_freelancer_precise_coords",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788041928220,
+      "tag": "0006_remove_time_machine_and_isolate_cron",
+      "breakpoints": true
     }
   ]
 }

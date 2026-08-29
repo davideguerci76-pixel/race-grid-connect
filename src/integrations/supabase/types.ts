@@ -1887,7 +1887,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      admin_set_time_offset: { Args: { _days: number }; Returns: number }
       availability_day_active: {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
@@ -2406,7 +2405,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      sim_now: { Args: never; Returns: string }
       submit_rating_v2: {
         Args: {
           _comment?: string
