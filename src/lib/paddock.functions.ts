@@ -1822,23 +1822,6 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
     return items;
   });
 
-// ==================== ADMIN NOTIFICATION TRIGGERS ====================
-
-export const adminTriggerRatingNotifications = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("emit_rating_available_notifications");
-    if (error) throw new Error(error.message);
-    return { inserted: (data as number) ?? 0 };
-  });
-
-export const adminTriggerCalendarStale = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("emit_calendar_stale_notifications");
-    if (error) throw new Error(error.message);
-    return { inserted: (data as number) ?? 0 };
-  });
 
 // ---- Cancellations & SOS Call ----
 export const cancelEngagement = createServerFn({ method: "POST" })

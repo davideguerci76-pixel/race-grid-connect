@@ -1,15 +1,11 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
-import { Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
-import { toastError } from "@/lib/errors";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -87,46 +83,9 @@ function AdminLayout() {
           );
         })}
       </div>
-      <AdminTriggers />
       <Outlet />
     </div>
     </>
-  );
-}
-
-function AdminTriggers() {
-  const { t } = useTranslation();
-  const triggerFn = useServerFn(adminTriggerRatingNotifications);
-  const triggerCalFn = useServerFn(adminTriggerCalendarStale);
-
-  const triggerMut = useMutation({
-    mutationFn: () => triggerFn(),
-    onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_rating", { count: r.inserted })),
-    onError: (e) => toastError(e, "sweep_admin_a.failed"),
-  });
-  const triggerCalMut = useMutation({
-    mutationFn: () => triggerCalFn(),
-    onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_calendar", { count: r.inserted })),
-    onError: (e) => toastError(e, "sweep_admin_a.failed"),
-  });
-
-  return (
-    <div className="mb-6 flex flex-wrap items-center gap-2 border border-border p-4">
-      <button
-        onClick={() => triggerMut.mutate()}
-        disabled={triggerMut.isPending}
-        className="inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-      >
-        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_rating_now")}
-      </button>
-      <button
-        onClick={() => triggerCalMut.mutate()}
-        disabled={triggerCalMut.isPending}
-        className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
-      >
-        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_calendar_now")}
-      </button>
-    </div>
   );
 }
 

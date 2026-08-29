@@ -16,12 +16,6 @@
       "launch": "Lancement",
       "testing": "Testing Lab"
     },
-    "time_machine": {
-      "emit_rating_now": "Envoyer les notifications d'évaluation maintenant",
-      "emit_calendar_now": "Envoyer les notifications de calendrier obsolète maintenant",
-      "emitted_rating": "{{count}} notifications d'évaluation envoyées",
-      "emitted_calendar": "{{count}} notifications de calendrier obsolète envoyées"
-    },
     "failed": "Échec",
     "loading": "Chargement…",
     "invalid_number": "Nombre invalide",

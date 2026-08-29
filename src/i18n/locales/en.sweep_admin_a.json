@@ -16,12 +16,6 @@
       "launch": "Launch",
       "testing": "Testing Lab"
     },
-    "time_machine": {
-      "emit_rating_now": "Emit rating notifications now",
-      "emit_calendar_now": "Emit calendar-stale notifications now",
-      "emitted_rating": "Emitted {{count}} rating notifications",
-      "emitted_calendar": "Emitted {{count}} calendar-stale notifications"
-    },
     "failed": "Failed",
     "loading": "Loading…",
     "invalid_number": "Invalid number",
