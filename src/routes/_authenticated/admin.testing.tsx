@@ -242,6 +242,13 @@ function TestingLab() {
             onClick={() => jobsMut.mutate()}
             icon={<Timer className="size-3" />}
           />
+          <SimCard
+            title="Run calendar-stale job (TEST)"
+            desc="Runs the real calendar freshness job (needs review after 30 days, unconfirmed after 60) on TEST records only. LIVE data is never touched."
+            pending={calMut.isPending}
+            onClick={() => calMut.mutate()}
+            icon={<Timer className="size-3" />}
+          />
         </div>
       </div>
 
