@@ -3,6 +3,7 @@ import { CalendarDays, MapPin, Wrench, Flag, Wallet, Languages as LanguagesIcon,
 import { disciplineLabel, educationLabel, languageLabel, languageLevelLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { PoolBadge } from "@/components/pool-badge";
+import { requestStatusLabel } from "@/lib/labels";
 
 type AnyRequest = Record<string, any>;
 
@@ -114,7 +115,7 @@ export function PitCallSummary({ request }: { request: AnyRequest }) {
         {r.search_mode === "pool" && <PoolBadge />}
         {r.status && (
           <span className="ml-auto border border-border bg-background px-2 py-0.5 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            {String(r.status).replace(/_/g, " ")}
+            {requestStatusLabel(r.status)}
           </span>
         )}
       </header>

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { disciplineLabel, roleGroupLabel } from "@/lib/labels";
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site-header";
@@ -137,7 +138,7 @@ function MarketPage() {
             <div className="label-mono">{t("market.top_disciplines")}</div>
             <div className="mt-3">
               {(data?.top_disciplines ?? []).map((d) => (
-                <Bar key={d.discipline} label={d.discipline.replace(/_/g, " ")} value={d.requests} max={maxDisc} />
+                <Bar key={d.discipline} label={disciplineLabel(d.discipline)} value={d.requests} max={maxDisc} />
               ))}
               {!isLoading && (data?.top_disciplines ?? []).length === 0 && (
                 <div className="py-3 font-mono text-xs text-muted-foreground">{t("market.no_data")}</div>
@@ -149,7 +150,7 @@ function MarketPage() {
             <div className="label-mono">{t("market.top_roles")}</div>
             <div className="mt-3">
               {(data?.top_role_groups ?? []).map((d) => (
-                <Bar key={d.role_group} label={d.role_group.replace(/_/g, " ")} value={d.requests} max={maxRole} />
+                <Bar key={d.role_group} label={roleGroupLabel(d.role_group)} value={d.requests} max={maxRole} />
               ))}
               {!isLoading && (data?.top_role_groups ?? []).length === 0 && (
                 <div className="py-3 font-mono text-xs text-muted-foreground">{t("market.no_data")}</div>

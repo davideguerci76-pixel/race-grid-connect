@@ -10,7 +10,8 @@ import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Fla
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard } from "@/lib/paddock.functions";
-import { disciplineLabel } from "@/lib/paddock";
+import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
+import { formatCriterion } from "@/lib/criteria-label";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
@@ -690,7 +691,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
                       {skills.length > 0 && (
                         <DetailBlock title={t("mcard.skills")}>
                           <div className="flex flex-wrap gap-1.5">
-                            {skills.map((s: string) => <Chip key={s}>{s}</Chip>)}
+                            {skills.map((s: string) => <Chip key={s}>{skillLabel(s)}</Chip>)}
                           </div>
                         </DetailBlock>
                       )}
@@ -712,7 +713,7 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
                                 {disciplineLabel(e?.discipline)} · {e?.years ?? 0} {t("mcard.years_short")}
                               </span>
                             ))}
-                            {profile.education && <span>{experiences.length > 0 ? " · " : ""}{profile.education}</span>}
+                            {profile.education && <span>{experiences.length > 0 ? " · " : ""}{educationLabel(profile.education)}</span>}
                           </div>
                         </DetailBlock>
                       )}
@@ -774,19 +775,6 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
   );
 }
 
-
-function formatCriterion(c: any, t: (k: string, o?: any) => string): string {
-  switch (c.kind) {
-    case "role": return t("sweep_engage.criteria.role", { label: c.label ?? "" });
-    case "skill": return t("sweep_engage.criteria.skill", { label: c.label });
-    case "language": return t("sweep_engage.criteria.language", { code: c.code, level: c.level });
-    case "education": return t("sweep_engage.criteria.education");
-    case "day_rate": return t("sweep_engage.criteria.day_rate");
-    case "location": return t("sweep_engage.criteria.location", { label: c.label ?? t("sweep_engage.criteria.distant") });
-    case "missing_days": return t("sweep_engage.criteria.missing_days", { count: c.days });
-    default: return c.kind ?? t("sweep_engage.criteria.criterion");
-  }
-}
 
 function ZeroMatchTrivio({
   quote,

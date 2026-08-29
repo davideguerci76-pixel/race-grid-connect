@@ -215,7 +215,9 @@
       "proposed": "Proposed",
       "confirmed": "Confirmed",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "declined": "Declined",
+      "expired": "Expired"
     },
     "confirm": "Confirm",
     "mark_complete": "Mark as completed",
@@ -921,5 +923,33 @@
         ]
       }
     ]
+  },
+  "notification_kinds": {
+    "admin_alert": "Pit Call notice",
+    "calendar_stale": "Availability check",
+    "contact_check": "Contact check",
+    "engagement_cancelled": "Engagement cancelled",
+    "engagement_completed": "Engagement completed",
+    "engagement_confirmed": "Match confirmed",
+    "engagement_declined": "Match request declined",
+    "engagement_expired": "Match request expired",
+    "engagement_expiring": "Match request expiring",
+    "engagement_more_time": "More time requested",
+    "engagement_proposed": "Match proposed",
+    "ghosting_released": "Engagement released",
+    "match_reopened": "Match reopened",
+    "match_taken": "Match taken",
+    "new_matches": "New Pit Call match",
+    "rating_available": "Rating available",
+    "rating_received": "New rating",
+    "rating_unlocked": "Rating unlocked",
+    "request_unfilled": "Pit Call unfilled",
+    "revealed_by": "Profile revealed",
+    "sos_call": "SOS call",
+    "sos_taken": "SOS call taken",
+    "team_contact_reminder_1": "Contact reminder",
+    "team_contact_reminder_2": "Contact reminder",
+    "team_ghosted": "No answer from the team",
+    "tokens_credited": "Tokens credited"
   }
 }

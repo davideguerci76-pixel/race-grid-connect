@@ -1,3 +1,4 @@
+import { notificationKindLabel } from "@/lib/labels";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -129,7 +130,7 @@ function NotificationsPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         {unread && <span className="inline-block h-2 w-2 rounded-full bg-racing-red" />}
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{n.kind}</span>
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{notificationKindLabel(n.kind)}</span>
                         <span className="font-mono text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</span>
                       </div>
                       <div className="mt-1 text-sm">
@@ -140,7 +141,7 @@ function NotificationsPage() {
                         ) : info ? (
                           <InformationalMessage payload={n.payload} kind={n.kind} />
                         ) : (
-                          n.payload?.message ?? n.kind
+                          n.payload?.message ?? notificationKindLabel(n.kind)
                         )}
                       </div>
                     </div>
