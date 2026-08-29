@@ -561,3 +561,26 @@ export const generatePoolPitCalls = createServerFn({ method: "POST" })
 
     return { created, target, errors: errors.slice(0, 5) };
   });
+
+/**
+ * Runs the real engagement time logic (24h/12h reminders, match-request expiry
+ * with the existing trivio/refund hook, engagement auto-complete) scoped to the
+ * TEST environment. Production cron keeps running the LIVE-only wrappers.
+ */
+export const runTestEngagementJobs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: deadlines, error: e1 } = await supabaseAdmin.rpc(
+      "process_engagement_deadlines_env" as never,
+      { _is_test: true } as never,
+    );
+    if (e1) throw new Error(e1.message);
+    const { data: completed, error: e2 } = await supabaseAdmin.rpc(
+      "complete_expired_engagements_env" as never,
+      { _is_test: true } as never,
+    );
+    if (e2) throw new Error(e2.message);
+    return { deadlines: (deadlines as number) ?? 0, completed: (completed as number) ?? 0 };
+  });
