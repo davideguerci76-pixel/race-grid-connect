@@ -1943,6 +1943,10 @@ export type Database = {
       cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
       complete_expired_engagements: { Args: never; Returns: number }
+      complete_expired_engagements_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       confirm_calendar: { Args: never; Returns: string }
       create_request: {
         Args: { _payload: Json }
@@ -2254,6 +2258,10 @@ export type Database = {
         Returns: boolean
       }
       process_engagement_deadlines: { Args: never; Returns: number }
+      process_engagement_deadlines_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       purge_test_environment: {
         Args: never
         Returns: {
