@@ -10,6 +10,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
+import { requestStatusLabel } from "@/lib/labels";
+import { formatCriterion } from "@/lib/criteria-label";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
@@ -22,18 +24,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
 });
 
-
-function formatCriterion(c: any, t: (k: string, o?: any) => string): string {
-  switch (c.kind) {
-    case "role": return t("sweep_engage.criteria.role", { label: c.label ?? "" });
-    case "skill": return t("sweep_engage.criteria.skill", { label: c.label });
-    case "language": return t("sweep_engage.criteria.language", { code: c.code, level: c.level });
-    case "education": return t("sweep_engage.criteria.education");
-    case "day_rate": return t("sweep_engage.criteria.day_rate");
-    case "location": return t("sweep_engage.criteria.location", { label: c.label ?? t("sweep_engage.criteria.distant") });
-    default: return c.kind ?? t("sweep_engage.criteria.criterion");
-  }
-}
 
 function MissingCriteria({ list }: { list: any[] }) {
   const { t } = useTranslation();
@@ -121,7 +111,7 @@ function MatchesPage() {
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">{r.status}</span>
+                          <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">{requestStatusLabel(r.status)}</span>
                           {(r as any).search_mode === "pool" && <PoolBadge />}
                           <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
                         </div>
@@ -235,7 +225,7 @@ function MatchesPage() {
                       <MissingCriteria list={m.missing_criteria ?? []} />
                       <div className="mt-3 border-t border-border pt-2 text-xs text-muted-foreground">{m.request?.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
-                        {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {t(`discipline.${m.request?.discipline}`)}
+                        {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {disciplineLabel(m.request?.discipline)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">{t("sweep_engage.matches.overlap", { count: m.overlap_days })}</div>
                       {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser />)}
