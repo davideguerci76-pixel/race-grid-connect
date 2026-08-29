@@ -2,6 +2,8 @@ import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
+import { disciplineLabel, educationLabel, engagementStatusLabel, languageLabel, languageLevelLabel, skillLabel } from "@/lib/labels";
+import { formatCriterion } from "@/lib/criteria-label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
@@ -226,7 +228,7 @@ function EngagementsPage() {
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
                         {tp.team_type && <span>{tp.team_type}</span>}
                         {tp.location && <span> · {tp.location}</span>}
-                        {tp.primary_discipline && <span> · {t(`discipline.${tp.primary_discipline}`, { defaultValue: tp.primary_discipline })}</span>}
+                        {tp.primary_discipline && <span> · {disciplineLabel(tp.primary_discipline)}</span>}
                       </div>
                     )}
                     {isFreelancer && !tp?.team_name && (
@@ -244,7 +246,7 @@ function EngagementsPage() {
                     )}
                   </div>
                   <span className="border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-widest">
-                    {t(`engagements.status.${e.status}`)}
+                    {engagementStatusLabel(e.status)}
                   </span>
                 </div>
 
@@ -262,7 +264,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-1">[PIT CALL]</div>
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {t(`discipline.${req.discipline}`, { defaultValue: req.discipline })} · {req.start_date} → {req.end_date}
+                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {disciplineLabel(req.discipline)} · {req.start_date} → {req.end_date}
                       {detailsUnlocked && (req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
                     {/* 1-token reveal: unlocks the anonymous Pit Call details. Team identity stays hidden. */}
@@ -287,10 +289,10 @@ function EngagementsPage() {
                         <div className="label-mono mb-1">[SKILLS]</div>
                         <div className="flex flex-wrap gap-1">
                           {skillsHard.map((s) => (
-                            <span key={`h-${s}`} className="border border-racing-red bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{t(`skills.${s}`, { defaultValue: s })} · hard</span>
+                            <span key={`h-${s}`} className="border border-racing-red bg-racing-red/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-red">{skillLabel(s)} · hard</span>
                           ))}
                           {skillsSoft.filter((s) => !skillsHard.includes(s)).map((s) => (
-                            <span key={`s-${s}`} className="border border-racing-yellow bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-yellow">{t(`skills.${s}`, { defaultValue: s })}</span>
+                            <span key={`s-${s}`} className="border border-racing-yellow bg-racing-yellow/10 px-2 py-0.5 font-mono text-[10px] uppercase text-racing-yellow">{skillLabel(s)}</span>
                           ))}
                         </div>
                       </div>
@@ -301,7 +303,7 @@ function EngagementsPage() {
                         <div className="flex flex-wrap gap-1">
                           {languages.map((l: any, i: number) => (
                             <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${l.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-                              {t(`languages.${l.code}`, { defaultValue: l.code })} ({t(`language_levels.${l.level}`, { defaultValue: l.level })}){l.hard ? " · hard" : ""}
+                              {languageLabel(l.code, l.custom)} ({languageLevelLabel(l.level)}){l.hard ? " · hard" : ""}
                             </span>
                           ))}
                         </div>
@@ -312,7 +314,7 @@ function EngagementsPage() {
                         <div className="label-mono mb-1">[EDUCATION]</div>
                         <div className="flex flex-wrap gap-1">
                           {education.map((ed) => (
-                            <span key={ed} className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{t(`education_options.${ed}`, { defaultValue: ed })}</span>
+                            <span key={ed} className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">{educationLabel(ed)}</span>
                           ))}
                         </div>
                       </div>
@@ -327,7 +329,7 @@ function EngagementsPage() {
                     <div className="flex flex-wrap gap-1">
                       {missing.map((c: any, i: number) => (
                         <span key={i} className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${c.hard ? "border-racing-red text-racing-red" : "border-border text-muted-foreground"}`}>
-                          {c.kind === "role" ? t("sweep_engage.criteria.role", { label: c.label ?? "" }) : c.kind === "skill" ? t("sweep_engage.criteria.skill", { label: c.label }) : c.kind === "language" ? t("sweep_engage.criteria.language", { code: c.code, level: c.level }) : c.kind === "education" ? t("sweep_engage.criteria.education") : c.kind === "day_rate" ? t("sweep_engage.criteria.day_rate") : c.kind === "location" ? t("sweep_engage.criteria.location", { label: c.label ?? t("sweep_engage.criteria.distant") }) : (c.kind ?? t("sweep_engage.criteria.criterion"))}
+                          {formatCriterion(c, t)}
                         </span>
                       ))}
                     </div>
