@@ -17,14 +17,8 @@
       "testing": "Testing Lab"
     },
     "time_machine": {
-      "title": "Máquina del Tiempo (Debug Admin)",
-      "description": "Avanza el reloj simulado para probar las ventanas de valoración sin esperar días reales. Se aplica globalmente a todas las comprobaciones de tiempo de valoración.",
-      "days_offset": "días de desfase",
-      "apply": "Aplicar",
-      "reset": "Restablecer",
       "emit_rating_now": "Enviar notificaciones de valoración ahora",
       "emit_calendar_now": "Enviar notificaciones de calendario obsoleto ahora",
-      "simulated_clock": "Reloj simulado: +{{count}} día(s)",
       "emitted_rating": "Se enviaron {{count}} notificaciones de valoración",
       "emitted_calendar": "Se enviaron {{count}} notificaciones de calendario obsoleto"
     },

@@ -258,7 +258,7 @@ export const generateTestDataset = createServerFn({ method: "POST" })
       }
     }
 
-    await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: null } as never);
+    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: true } as never);
 
     await (supabaseAdmin.from("admin_audit_log") as any).insert({
       admin_id: context.userId,
@@ -551,7 +551,7 @@ export const generatePoolPitCalls = createServerFn({ method: "POST" })
       else created++;
     }
 
-    await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: null } as never);
+    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: true } as never);
 
     await (supabaseAdmin.from("admin_audit_log") as any).insert({
       admin_id: context.userId,

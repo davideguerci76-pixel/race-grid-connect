@@ -234,7 +234,7 @@ export const adminUpdateMatchingWeights = createServerFn({ method: "POST" })
       .eq("id", true);
     if (error) throw new Error(error.message);
     // Recompute all matches with new weights
-    await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: null } as never);
+    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: false } as never);
     return { ok: true };
   });
 

@@ -17,14 +17,8 @@
       "testing": "Testing Lab"
     },
     "time_machine": {
-      "title": "Time Machine (Admin debug)",
-      "description": "Advance the simulated clock to test rating windows without waiting real days. Applies globally to all rating time checks.",
-      "days_offset": "days offset",
-      "apply": "Apply",
-      "reset": "Reset",
       "emit_rating_now": "Emit rating notifications now",
       "emit_calendar_now": "Emit calendar-stale notifications now",
-      "simulated_clock": "Simulated clock: +{{count}} day(s)",
       "emitted_rating": "Emitted {{count}} rating notifications",
       "emitted_calendar": "Emitted {{count}} calendar-stale notifications"
     },
