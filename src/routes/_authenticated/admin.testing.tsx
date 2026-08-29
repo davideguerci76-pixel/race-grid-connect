@@ -93,7 +93,18 @@ function TestingLab() {
     onError: (e) => toastError(e),
   });
 
+  const jobsFn = useServerFn(runTestEngagementJobs);
+  const jobsMut = useMutation({
+    mutationFn: () => jobsFn(),
+    onSuccess: (r: any) => {
+      toast.success(`Time jobs run on TEST: ${r.deadlines} deadline actions, ${r.completed} engagements completed`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
   const size = PRESET_SIZES[preset];
+
 
   return (
     <div className="space-y-6">
