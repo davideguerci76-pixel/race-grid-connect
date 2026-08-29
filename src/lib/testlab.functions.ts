@@ -584,3 +584,16 @@ export const runTestEngagementJobs = createServerFn({ method: "POST" })
     if (e2) throw new Error(e2.message);
     return { deadlines: (deadlines as number) ?? 0, completed: (completed as number) ?? 0 };
   });
+
+export const runTestCalendarStaleJob = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc(
+      "emit_calendar_stale_notifications_env" as never,
+      { _is_test: true } as never,
+    );
+    if (error) throw new Error(error.message);
+    return { notifications: (data as number) ?? 0 };
+  });
