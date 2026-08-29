@@ -83,46 +83,9 @@ function AdminLayout() {
           );
         })}
       </div>
-      <AdminTriggers />
       <Outlet />
     </div>
     </>
-  );
-}
-
-function AdminTriggers() {
-  const { t } = useTranslation();
-  const triggerFn = useServerFn(adminTriggerRatingNotifications);
-  const triggerCalFn = useServerFn(adminTriggerCalendarStale);
-
-  const triggerMut = useMutation({
-    mutationFn: () => triggerFn(),
-    onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_rating", { count: r.inserted })),
-    onError: (e) => toastError(e, "sweep_admin_a.failed"),
-  });
-  const triggerCalMut = useMutation({
-    mutationFn: () => triggerCalFn(),
-    onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_calendar", { count: r.inserted })),
-    onError: (e) => toastError(e, "sweep_admin_a.failed"),
-  });
-
-  return (
-    <div className="mb-6 flex flex-wrap items-center gap-2 border border-border p-4">
-      <button
-        onClick={() => triggerMut.mutate()}
-        disabled={triggerMut.isPending}
-        className="inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-      >
-        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_rating_now")}
-      </button>
-      <button
-        onClick={() => triggerCalMut.mutate()}
-        disabled={triggerCalMut.isPending}
-        className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
-      >
-        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_calendar_now")}
-      </button>
-    </div>
   );
 }
 
