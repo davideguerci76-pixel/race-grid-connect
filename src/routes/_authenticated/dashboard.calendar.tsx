@@ -187,14 +187,14 @@ function CalendarPage() {
           <CalendarSourcePicker
             className="mb-3"
             value={selectedDates.map(isoOf)}
-            onChange={(dates) => mutation.mutate(dates.map(dateOf))}
+            onChange={(dates) => selectDates(dates.map(dateOf))}
             saveLabel={t("sweep_public.dashboard_calendar.save_availability_label")}
           />
           <AvailabilityCalendar
             selected={selectedDates}
             blocked={blockedDates}
             unconfirmed={unconfirmedDates}
-            onSelect={(d) => mutation.mutate(d)}
+            onSelect={(d) => selectDates(d)}
             min={new Date()}
             legend={t("sweep_public.dashboard_calendar.calendar_legend")}
           />
