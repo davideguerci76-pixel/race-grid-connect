@@ -224,8 +224,16 @@ function TestingLab() {
             onClick={() => poolCallsMut.mutate()}
             icon={<FlaskConical className="size-3" />}
           />
+          <SimCard
+            title="Run time jobs (TEST)"
+            desc="Runs the real 24h/12h reminders, match-request expiry (with the usual refund trivio) and engagement auto-complete on TEST records only. LIVE data is never touched."
+            pending={jobsMut.isPending}
+            onClick={() => jobsMut.mutate()}
+            icon={<Timer className="size-3" />}
+          />
         </div>
       </div>
+
 
       <div className="border border-racing-red/50 bg-racing-red/5 p-4">
         <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-racing-red">
