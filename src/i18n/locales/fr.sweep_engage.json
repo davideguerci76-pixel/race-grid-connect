@@ -271,7 +271,8 @@
         "active": "actif",
         "paused": "en pause",
         "closed": "fermé",
-        "completed": "terminé"
+        "completed": "terminé",
+        "filled": "pourvu"
       },
       "view_matches_confirmed": "{{label}} (1) — Confirmé · Pourvu"
     }

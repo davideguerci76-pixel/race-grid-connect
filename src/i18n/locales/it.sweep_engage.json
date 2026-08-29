@@ -271,7 +271,8 @@
         "active": "attivo",
         "paused": "in pausa",
         "closed": "chiuso",
-        "completed": "completato"
+        "completed": "completato",
+        "filled": "coperta"
       },
       "view_matches_confirmed": "{{label}} (1) — Confermato · Coperto"
     }

@@ -215,7 +215,9 @@
       "proposed": "Proposé",
       "confirmed": "Confirmé",
       "completed": "Terminé",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "declined": "Refusé",
+      "expired": "Expiré"
     },
     "confirm": "Confirmer",
     "mark_complete": "Marquer terminé",
@@ -909,5 +911,33 @@
         ]
       }
     ]
+  },
+  "notification_kinds": {
+    "admin_alert": "Avis Pit Call",
+    "calendar_stale": "Vérification des disponibilités",
+    "contact_check": "Vérification de contact",
+    "engagement_cancelled": "Engagement annulé",
+    "engagement_completed": "Engagement terminé",
+    "engagement_confirmed": "Match confirmé",
+    "engagement_declined": "Demande refusée",
+    "engagement_expired": "Demande expirée",
+    "engagement_expiring": "Demande bientôt expirée",
+    "engagement_more_time": "Demande de délai",
+    "engagement_proposed": "Match proposé",
+    "ghosting_released": "Engagement libéré",
+    "match_reopened": "Match rouvert",
+    "match_taken": "Match déjà pris",
+    "new_matches": "Nouveau match Pit Call",
+    "rating_available": "Évaluation disponible",
+    "rating_received": "Nouvelle évaluation",
+    "rating_unlocked": "Évaluation débloquée",
+    "request_unfilled": "Pit Call non pourvu",
+    "revealed_by": "Profil révélé",
+    "sos_call": "Appel SOS",
+    "sos_taken": "Appel SOS pris",
+    "team_contact_reminder_1": "Rappel de contact",
+    "team_contact_reminder_2": "Rappel de contact",
+    "team_ghosted": "Pas de réponse de l'équipe",
+    "tokens_credited": "Jetons crédités"
   }
 }
