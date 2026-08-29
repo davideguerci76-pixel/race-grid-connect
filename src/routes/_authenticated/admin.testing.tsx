@@ -104,6 +104,16 @@ function TestingLab() {
     onError: (e) => toastError(e),
   });
 
+  const calFn = useServerFn(runTestCalendarStaleJob);
+  const calMut = useMutation({
+    mutationFn: () => calFn(),
+    onSuccess: (r: any) => {
+      toast.success(`Calendar-stale job run on TEST: ${r.notifications} notifications emitted`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
   const size = PRESET_SIZES[preset];
 
 
