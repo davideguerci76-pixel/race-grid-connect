@@ -505,7 +505,7 @@ function EngagementsPage() {
                     const mineRated = ratedMap.get(e.id);
                     const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
                     const unlocked = !!info?.unlocked || !!mineRated?.unlocked;
-                    const now = info?.sim_now ? new Date(info.sim_now).getTime() : Date.now();
+                    const now = Date.now();
                     const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
                     const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
                     const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;

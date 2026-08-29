@@ -46,14 +46,13 @@ export const getMyCalendarFreshness = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [{ data: profile, error: pErr }, { data: settings }, { data: nowSim }] = await Promise.all([
+    const [{ data: profile, error: pErr }, { data: settings }] = await Promise.all([
       supabase
         .from("freelancer_profiles")
         .select("calendar_last_confirmed_at, calendar_last_updated_at")
         .eq("user_id", userId)
         .maybeSingle(),
       supabase.from("platform_settings").select("key, value_num").eq("category", "calendar"),
-      supabase.rpc("sim_now" as any),
     ]);
     if (pErr) throw new Error(pErr.message);
 
@@ -62,7 +61,7 @@ export const getMyCalendarFreshness = createServerFn({ method: "GET" })
     const reviewDays = setting("availability_review_days", 45);
     const maxAgeDays = setting("availability_max_age_days", 90);
 
-    const now = nowSim ? new Date(nowSim as unknown as string) : new Date();
+    const now = new Date();
     const today = now.toISOString().slice(0, 10);
     const confirmedAt = (profile as any)?.calendar_last_confirmed_at ?? null;
     const confirmedMs = confirmedAt ? new Date(confirmedAt).getTime() : -Infinity;
@@ -1814,36 +1813,16 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
       .in("status", ["confirmed", "completed"])
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`);
     if (error) throw new Error(error.message);
-    const { data: nowSim } = await supabase.rpc("sim_now");
     const items = [] as any[];
     for (const e of (engs ?? []) as any[]) {
       const { data: opens } = await supabase.rpc("rating_opens_at", { _engagement_id: e.id });
       const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
-      items.push({ ...e, opens_at: opens, sim_now: nowSim, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
+      items.push({ ...e, opens_at: opens, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
     }
     return items;
   });
 
-// ==================== TIME MACHINE (admin) ====================
-
-export const adminGetTimeOffset = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.from("admin_time_settings").select("offset_days, updated_at").eq("id", true).maybeSingle();
-    if (error) throw new Error(error.message);
-    return { offset_days: (data as any)?.offset_days ?? 0, updated_at: (data as any)?.updated_at ?? null };
-  });
-
-export const adminSetTimeOffsetFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((data: { offset_days: number }) => z.object({ offset_days: z.number().int().min(-3650).max(3650) }).parse(data))
-  .handler(async ({ data, context }) => {
-    const { data: out, error } = await context.supabase.rpc("admin_set_time_offset", { _days: data.offset_days });
-    if (error) throw new Error(error.message);
-    // Also emit any pending notifications right away
-    await context.supabase.rpc("emit_rating_available_notifications");
-    return { offset_days: out as number };
-  });
+// ==================== ADMIN NOTIFICATION TRIGGERS ====================
 
 export const adminTriggerRatingNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
