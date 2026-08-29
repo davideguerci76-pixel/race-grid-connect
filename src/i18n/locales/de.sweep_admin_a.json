@@ -16,12 +16,6 @@
       "launch": "Start",
       "testing": "Testing Lab"
     },
-    "time_machine": {
-      "emit_rating_now": "Bewertungsbenachrichtigungen jetzt senden",
-      "emit_calendar_now": "Kalender-veraltet-Benachrichtigungen jetzt senden",
-      "emitted_rating": "{{count}} Bewertungsbenachrichtigungen gesendet",
-      "emitted_calendar": "{{count}} Kalender-veraltet-Benachrichtigungen gesendet"
-    },
     "failed": "Fehlgeschlagen",
     "loading": "Wird geladen…",
     "invalid_number": "Ungültige Zahl",
