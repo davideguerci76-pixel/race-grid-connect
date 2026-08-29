@@ -88,35 +88,22 @@ function AdminLayout() {
           );
         })}
       </div>
-      <TimeMachine />
+      <AdminTriggers />
       <Outlet />
     </div>
     </>
   );
 }
 
-function TimeMachine() {
+function AdminTriggers() {
   const { t } = useTranslation();
-  const qc = useQueryClient();
-  const getFn = useServerFn(adminGetTimeOffset);
-  const setFn = useServerFn(adminSetTimeOffsetFn);
   const triggerFn = useServerFn(adminTriggerRatingNotifications);
   const triggerCalFn = useServerFn(adminTriggerCalendarStale);
-  const { data } = useQuery({ queryKey: ["admin-time-offset"], queryFn: () => getFn() });
-  const [days, setDays] = useState(0);
-  useEffect(() => { if (data) setDays(data.offset_days ?? 0); }, [data]);
 
-  const setMut = useMutation({
-    mutationFn: (n: number) => setFn({ data: { offset_days: n } }),
-    onSuccess: (r: any) => {
-      toast.success(t("sweep_admin_a.time_machine.simulated_clock", { count: r.offset_days }));
-      qc.invalidateQueries();
-    },
-    onError: (e) => toastError(e, "sweep_admin_a.failed"),
-  });
   const triggerMut = useMutation({
     mutationFn: () => triggerFn(),
     onSuccess: (r: any) => toast.success(t("sweep_admin_a.time_machine.emitted_rating", { count: r.inserted })),
+    onError: (e) => toastError(e, "sweep_admin_a.failed"),
   });
   const triggerCalMut = useMutation({
     mutationFn: () => triggerCalFn(),
@@ -125,50 +112,22 @@ function TimeMachine() {
   });
 
   return (
-    <div className="mb-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4">
-      <div className="mb-2 flex items-center gap-2">
-        <Clock className="size-4 text-racing-yellow" />
-        <span className="text-[11px] font-bold uppercase tracking-widest text-racing-yellow">{t("sweep_admin_a.time_machine.title")}</span>
-      </div>
-      <p className="mb-3 text-[11px] text-muted-foreground">
-        {t("sweep_admin_a.time_machine.description")}
-      </p>
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          type="number"
-          value={days}
-          onChange={(e) => setDays(parseInt(e.target.value) || 0)}
-          className="w-24 border border-border bg-background px-2 py-1 font-mono text-sm"
-        />
-        <span className="font-mono text-[11px] text-muted-foreground">{t("sweep_admin_a.time_machine.days_offset")}</span>
-        <button
-          onClick={() => setMut.mutate(days)}
-          disabled={setMut.isPending}
-          className="bg-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-60"
-        >
-          {t("sweep_admin_a.time_machine.apply")}
-        </button>
-        <button
-          onClick={() => { setDays(0); setMut.mutate(0); }}
-          className="border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
-        >
-          {t("sweep_admin_a.time_machine.reset")}
-        </button>
-        <button
-          onClick={() => triggerMut.mutate()}
-          disabled={triggerMut.isPending}
-          className="ml-auto inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
-        >
-          <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_rating_now")}
-        </button>
-        <button
-          onClick={() => triggerCalMut.mutate()}
-          disabled={triggerCalMut.isPending}
-          className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
-        >
-          <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_calendar_now")}
-        </button>
-      </div>
+    <div className="mb-6 flex flex-wrap items-center gap-2 border border-border p-4">
+      <button
+        onClick={() => triggerMut.mutate()}
+        disabled={triggerMut.isPending}
+        className="inline-flex items-center gap-1 border border-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10"
+      >
+        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_rating_now")}
+      </button>
+      <button
+        onClick={() => triggerCalMut.mutate()}
+        disabled={triggerCalMut.isPending}
+        className="inline-flex items-center gap-1 border border-racing-yellow px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+      >
+        <Zap className="size-3" /> {t("sweep_admin_a.time_machine.emit_calendar_now")}
+      </button>
     </div>
   );
 }
+
