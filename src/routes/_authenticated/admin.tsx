@@ -1,13 +1,12 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { checkAmIAdmin } from "@/lib/admin.functions";
-import { adminGetTimeOffset, adminSetTimeOffsetFn, adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
+import { adminTriggerRatingNotifications, adminTriggerCalendarStale } from "@/lib/paddock.functions";
 import { SiteHeader } from "@/components/site-header";
-import { Clock, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { AdminEnvBanner, AdminEnvSwitch } from "@/components/admin-env-switch";
 import { toastError } from "@/lib/errors";

@@ -17,14 +17,8 @@
       "testing": "Testing Lab"
     },
     "time_machine": {
-      "title": "Zeitmaschine (Admin-Debug)",
-      "description": "Stellen Sie die simulierte Uhr vor, um Bewertungsfenster zu testen, ohne echte Tage abzuwarten. Gilt global für alle Zeitprüfungen bei Bewertungen.",
-      "days_offset": "Tage Versatz",
-      "apply": "Anwenden",
-      "reset": "Zurücksetzen",
       "emit_rating_now": "Bewertungsbenachrichtigungen jetzt senden",
       "emit_calendar_now": "Kalender-veraltet-Benachrichtigungen jetzt senden",
-      "simulated_clock": "Simulierte Uhr: +{{count}} Tag(e)",
       "emitted_rating": "{{count}} Bewertungsbenachrichtigungen gesendet",
       "emitted_calendar": "{{count}} Kalender-veraltet-Benachrichtigungen gesendet"
     },

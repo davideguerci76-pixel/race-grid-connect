@@ -99,7 +99,7 @@ function DashboardHome() {
     queryFn: async () => {
       const col = profile!.user_type === "freelancer" ? "freelancer_id" : "team_id";
       const { count } = await supabase
-        .from("match_history" as never)
+        .from("engagements")
         .select("*", { count: "exact", head: true })
         .eq(col, user!.id);
       return count ?? 0;

@@ -17,14 +17,8 @@
       "testing": "Testing Lab"
     },
     "time_machine": {
-      "title": "Machine à Remonter le Temps (Debug Admin)",
-      "description": "Avancez l'horloge simulée pour tester les fenêtres d'évaluation sans attendre de vrais jours. S'applique globalement à toutes les vérifications temporelles d'évaluation.",
-      "days_offset": "jours de décalage",
-      "apply": "Appliquer",
-      "reset": "Réinitialiser",
       "emit_rating_now": "Envoyer les notifications d'évaluation maintenant",
       "emit_calendar_now": "Envoyer les notifications de calendrier obsolète maintenant",
-      "simulated_clock": "Horloge simulée : +{{count}} jour(s)",
       "emitted_rating": "{{count}} notifications d'évaluation envoyées",
       "emitted_calendar": "{{count}} notifications de calendrier obsolète envoyées"
     },
