@@ -83,21 +83,37 @@ function CalendarPage() {
   const blockedDates = blockedDays.map((d: string) => new Date(d + "T00:00:00"));
   const unconfirmedDates = (freshness?.unconfirmed_days ?? []).map((d: string) => new Date(d + "T00:00:00"));
 
+  const fmtDay = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
   const mutation = useMutation({
-    mutationFn: async (dates: Date[] | undefined) => {
-      const fmt = (d: Date) =>
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const next = (dates ?? []).filter((d) => !blockedSet.has(fmt(d)));
+    mutationFn: async ({ nextSet }: { nextSet: Set<string> }) => {
       const currentSet = new Set(myDays.filter((d: string) => !blockedSet.has(d)));
-      const nextSet = new Set(next.map(fmt));
       const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
-    onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
+    onMutate: async ({ nextSet }) => {
+      const key = ["my-availability", user?.id];
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<string[]>(key) ?? [];
+      // Preserve blocked days in the cache; merge the new editable selection.
+      const optimistic = [...new Set([...previous.filter((d) => blockedSet.has(d)), ...nextSet])].sort();
+      qc.setQueryData(key, optimistic);
+      return { previous };
+    },
+    onError: (e, _vars, context) => {
+      if (context?.previous) qc.setQueryData(["my-availability", user?.id], context.previous);
+      toastError(e, "sweep_public.dashboard_calendar.save_failed");
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
   });
+
+  const selectDates = (dates: Date[] | undefined) => {
+    const next = (dates ?? []).map(fmtDay).filter((d) => !blockedSet.has(d));
+    mutation.mutate({ nextSet: new Set(next) });
+  };
 
   if (profile?.user_type !== "freelancer") {
     return (
