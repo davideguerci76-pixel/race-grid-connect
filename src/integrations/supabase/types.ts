@@ -2072,6 +2072,10 @@ export type Database = {
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
+      emit_calendar_stale_notifications_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       emit_contact_checks: { Args: never; Returns: number }
       emit_pitcall_outcome_notifications: {
         Args: {

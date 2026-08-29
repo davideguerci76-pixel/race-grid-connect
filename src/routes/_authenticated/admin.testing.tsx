@@ -11,6 +11,7 @@ import {
   generateTestDataset,
   getTestEnvironmentStats,
   purgeTestEnvironment,
+  runTestCalendarStaleJob,
   runTestEngagementJobs,
 } from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
@@ -98,6 +99,16 @@ function TestingLab() {
     mutationFn: () => jobsFn(),
     onSuccess: (r: any) => {
       toast.success(`Time jobs run on TEST: ${r.deadlines} deadline actions, ${r.completed} engagements completed`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
+  const calFn = useServerFn(runTestCalendarStaleJob);
+  const calMut = useMutation({
+    mutationFn: () => calFn(),
+    onSuccess: (r: any) => {
+      toast.success(`Calendar-stale job run on TEST: ${r.notifications} notifications emitted`);
       qc.invalidateQueries();
     },
     onError: (e) => toastError(e),
@@ -229,6 +240,13 @@ function TestingLab() {
             desc="Runs the real 24h/12h reminders, match-request expiry (with the usual refund trivio) and engagement auto-complete on TEST records only. LIVE data is never touched."
             pending={jobsMut.isPending}
             onClick={() => jobsMut.mutate()}
+            icon={<Timer className="size-3" />}
+          />
+          <SimCard
+            title="Run calendar-stale job (TEST)"
+            desc="Runs the real calendar freshness job (needs review after 30 days, unconfirmed after 60) on TEST records only. LIVE data is never touched."
+            pending={calMut.isPending}
+            onClick={() => calMut.mutate()}
             icon={<Timer className="size-3" />}
           />
         </div>

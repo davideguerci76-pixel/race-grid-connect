@@ -71,6 +71,13 @@
       "when": 1788043303578,
       "tag": "0009_env_scoped_engagement_cron",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788045822597,
+      "tag": "0010_calendar_stale_env_scoped",
+      "breakpoints": true
     }
   ]
 }
