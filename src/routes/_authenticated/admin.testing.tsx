@@ -11,6 +11,7 @@ import {
   generateTestDataset,
   getTestEnvironmentStats,
   purgeTestEnvironment,
+  runTestCalendarStaleJob,
   runTestEngagementJobs,
 } from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
