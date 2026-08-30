@@ -127,6 +127,47 @@ export type Database = {
           },
         ]
       }
+      calendar_day_notes: {
+        Row: {
+          busy: boolean
+          created_at: string
+          day: string
+          freelancer_id: string
+          id: string
+          is_test: boolean
+          note: string
+          updated_at: string
+        }
+        Insert: {
+          busy?: boolean
+          created_at?: string
+          day: string
+          freelancer_id: string
+          id?: string
+          is_test?: boolean
+          note: string
+          updated_at?: string
+        }
+        Update: {
+          busy?: boolean
+          created_at?: string
+          day?: string
+          freelancer_id?: string
+          id?: string
+          is_test?: boolean
+          note?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_day_notes_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_error_log: {
         Row: {
           category: string
