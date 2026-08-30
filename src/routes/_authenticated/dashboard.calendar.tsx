@@ -355,7 +355,7 @@ function CalendarPage() {
             onMonthChange={setMonth}
             cells={cells}
             selected={selected}
-            onSelectDay={setSelected}
+            onSelectDay={handleSelectDay}
             onToggleDay={toggleDay}
             todayLabel={t("pcal.today", { defaultValue: "Today" })}
             actions={
@@ -395,7 +395,7 @@ function CalendarPage() {
             }
             detail={
               selected ? (
-                <div className="min-w-0 space-y-3">
+                <div ref={detailPanelRef} className="min-w-0 space-y-3">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {formatDate(dateOf(selected))}
                   </div>
