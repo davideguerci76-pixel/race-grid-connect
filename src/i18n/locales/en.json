@@ -1032,6 +1032,9 @@
     "mark_unavailable": "Mark unavailable",
     "detail_location": "Location",
     "detail_role": "Role",
-    "view_engagement": "View engagement"
+    "view_engagement": "View engagement",
+    "stat_available_short": "Available",
+    "stat_busy_short": "Busy",
+    "stat_pitcall_short": "Pitcall"
   }
 }

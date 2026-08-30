@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -39,7 +39,7 @@ const CELL_CLASS: Record<string, string> = {
  */
 export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }) {
   const { t } = useTranslation();
-  const { formatMonthYear } = useDateFormat();
+  const { formatMonthYear, formatCustom } = useDateFormat();
   const { user } = useAuth();
   const getAvail = useServerFn(getMyAvailability);
   const getBlocked = useServerFn(getMyBlockedDates);
@@ -49,9 +49,20 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
   const blockedQ = useQuery({ queryKey: ["my-blocked-dates", user?.id], enabled: !!user, queryFn: () => getBlocked() });
   const engQ = useQuery({ queryKey: ["my-engagement-days", user?.id], enabled: !!user, queryFn: () => getEngDays() });
 
-  const month = useMemo(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1), []);
+  // View-only month offset: never persisted, always resets to the real current month.
+  const [offset, setOffset] = useState(0);
+  const month = useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  }, [offset]);
   const days = useMemo(() => monthGrid(month), [month]);
   const todayIso = isoOf(new Date());
+  const monthParam = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`;
+  const weekdays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) => formatCustom(new Date(2024, 0, 1 + i), { weekday: "narrow" })),
+    [formatCustom],
+  );
 
   const states = useMemo(() => {
     if (!availQ.data || !blockedQ.data || !engQ.data) return null;
@@ -88,6 +99,7 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
   return (
     <Link
       to="/dashboard/calendar"
+      search={{ m: monthParam }}
       className="group block border border-border bg-card p-4 transition-colors hover:border-racing-red sm:p-5"
     >
       <div className="flex items-center justify-between gap-2">
@@ -95,12 +107,24 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
           <Calendar className="size-5 shrink-0 text-racing-red" strokeWidth={1.5} />
           <span className="label-mono truncate">{t("dashboard.my_availability_label")}</span>
         </div>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          {formatMonthYear(month)}
-        </span>
+        <div className="flex shrink-0 items-center gap-1">
+          <MonthArrow label="‹" onActivate={() => setOffset((o) => o - 1)} />
+          <span className="min-w-[92px] text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {formatMonthYear(month)}
+          </span>
+          <MonthArrow label="›" onActivate={() => setOffset((o) => o + 1)} />
+        </div>
       </div>
 
       <div className="mx-auto mt-3 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
+        {weekdays.map((w, i) => (
+          <span key={i} className="text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
+            {w}
+          </span>
+        ))}
+      </div>
+
+      <div className="mx-auto mt-1 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
         {(loading ? Array.from({ length: 42 }, () => null) : days).map((d, i) => {
           if (d === null) {
             return <span key={i} className="aspect-square animate-pulse bg-[#15181d]" />;
@@ -113,7 +137,7 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
               key={iso}
               className={`flex aspect-square items-center justify-center font-mono text-[9px] ${CELL_CLASS[state]} ${outside ? "opacity-30" : ""}`}
             >
-              <span className={iso === todayIso ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
+              <span className={iso === todayIso && !outside ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
                 {d.getDate()}
               </span>
             </span>
@@ -122,9 +146,9 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
-        <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available")} dot="bg-[#145c36]" />
-        <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy")} dot="bg-[#17191e]" />
-        <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall")} dot="bg-[#2a1013]" />
+        <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available_short")} dot="bg-[#145c36]" />
+        <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy_short")} dot="bg-[#17191e]" />
+        <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall_short")} dot="bg-[#2a1013]" />
       </div>
     </Link>
   );
@@ -132,10 +156,37 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
 
 function MiniStat({ value, label, dot }: { value: React.ReactNode; label: string; dot: string }) {
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className="flex min-w-0 items-center gap-1.5">
       <span className={`inline-block size-2.5 shrink-0 ${dot}`} />
       <span className="text-base font-black leading-none">{value}</span>
-      <span className="truncate font-mono text-[8px] uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="font-mono text-[8px] uppercase leading-tight tracking-wide text-muted-foreground">{label}</span>
     </div>
+  );
+}
+
+/**
+ * Month stepper rendered inside the card link: a span with button semantics so
+ * no interactive element is nested inside the anchor. Stops the click from
+ * triggering the card navigation.
+ */
+function MonthArrow({ label, onActivate }: { label: string; onActivate: () => void }) {
+  const fire = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onActivate();
+  };
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-label={label === "‹" ? "Previous month" : "Next month"}
+      onClick={fire}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") fire(e);
+      }}
+      className="flex size-7 cursor-pointer select-none items-center justify-center border border-border font-mono text-xs leading-none text-muted-foreground transition-colors hover:border-racing-red hover:text-racing-red"
+    >
+      {label}
+    </span>
   );
 }

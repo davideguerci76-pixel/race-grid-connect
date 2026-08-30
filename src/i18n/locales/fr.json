@@ -1020,6 +1020,9 @@
     "mark_unavailable": "Marquer indisponible",
     "detail_location": "Lieu",
     "detail_role": "Rôle",
-    "view_engagement": "Voir l'engagement"
+    "view_engagement": "Voir l'engagement",
+    "stat_available_short": "Disponibles",
+    "stat_busy_short": "Occupés",
+    "stat_pitcall_short": "Pitcall"
   }
 }

@@ -23,7 +23,21 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
+  validateSearch: (search: Record<string, unknown>): { m?: string } => {
+    const m = typeof search.m === "string" && /^\d{4}-\d{2}$/.test(search.m) ? search.m : undefined;
+    return m ? { m } : {};
+  },
 });
+
+/** Month to open on, from the optional ?m=YYYY-MM search param (view-only). */
+function initialMonth(m?: string): Date {
+  if (m) {
+    const [y, mo] = m.split("-").map(Number);
+    if (y && mo >= 1 && mo <= 12) return new Date(y, mo - 1, 1);
+  }
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
 
 const btn =
   "inline-flex items-center gap-2 border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest hover:border-racing-red hover:text-racing-red transition-colors";
@@ -33,6 +47,7 @@ function CalendarPage() {
   const { formatDate } = useDateFormat();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const qc = useQueryClient();
 
   const { data: profile } = useQuery({
@@ -83,7 +98,7 @@ function CalendarPage() {
     queryFn: () => getEngDays(),
   });
 
-  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [month, setMonth] = useState(() => initialMonth(search.m));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
   const [noteDraft, setNoteDraft] = useState("");
   const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);

@@ -1020,6 +1020,9 @@
     "mark_unavailable": "Als nicht verfügbar markieren",
     "detail_location": "Ort",
     "detail_role": "Rolle",
-    "view_engagement": "Engagement ansehen"
+    "view_engagement": "Engagement ansehen",
+    "stat_available_short": "Verfügbar",
+    "stat_busy_short": "Belegt",
+    "stat_pitcall_short": "Pitcall"
   }
 }

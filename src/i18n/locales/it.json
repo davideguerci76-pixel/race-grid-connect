@@ -1032,6 +1032,9 @@
     "mark_unavailable": "Segna non disponibile",
     "detail_location": "Località",
     "detail_role": "Ruolo",
-    "view_engagement": "Vedi engagement"
+    "view_engagement": "Vedi engagement",
+    "stat_available_short": "Disponibili",
+    "stat_busy_short": "Impegnati",
+    "stat_pitcall_short": "Pitcall"
   }
 }
