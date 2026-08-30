@@ -217,6 +217,29 @@ function CalendarPage() {
   };
 
 
+  /** Day selection: noted days get a brief action highlight + mobile scroll to the detail panel. */
+  const handleSelectDay = (iso: string) => {
+    setSelected(iso);
+    if (protectedSet.has(iso) || !noteMap.has(iso)) return;
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    setActionFlash(false);
+    requestAnimationFrame(() => setActionFlash(true));
+    flashTimerRef.current = setTimeout(() => setActionFlash(false), 1500);
+    // Mobile: the detail panel sits below the grid — bring it (and the correct action) into view.
+    if (window.innerWidth < 768) {
+      setTimeout(() => {
+        const el = detailPanelRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const visible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+        if (!visible) {
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+        }
+      }, 60);
+    }
+  };
+
   /** Quick tap toggle: only for days without a private note. Noted days are protected. */
   const toggleDay = (iso: string) => {
     if (protectedSet.has(iso)) return;
