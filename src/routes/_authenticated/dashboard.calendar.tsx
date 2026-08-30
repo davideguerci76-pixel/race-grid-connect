@@ -90,6 +90,12 @@ function CalendarPage() {
   const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
+  /** Brief highlight of the MARK AVAILABLE/UNAVAILABLE action after tapping a noted day. */
+  const [actionFlash, setActionFlash] = useState(false);
+  const detailPanelRef = useRef<HTMLDivElement | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (flashTimerRef.current) clearTimeout(flashTimerRef.current); }, []);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
