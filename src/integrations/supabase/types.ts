@@ -2241,6 +2241,13 @@ export type Database = {
         Args: { _freelancer: string; _required: string[] }
         Returns: boolean
       }
+      my_day_rate: {
+        Args: never
+        Returns: {
+          currency: string
+          day_rate: number
+        }[]
+      }
       my_freelancer_phone: {
         Args: never
         Returns: {
