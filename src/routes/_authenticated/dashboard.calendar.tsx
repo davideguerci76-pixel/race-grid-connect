@@ -278,26 +278,20 @@ function CalendarPage() {
             onToggleDay={toggleDay}
             todayLabel={t("pcal.today", { defaultValue: "Today" })}
             actions={
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <CalendarSourcePicker
-                  value={[...availableSet].sort()}
-                  onChange={(dates) => selectDates(dates)}
-                  saveLabel={t("sweep_public.dashboard_calendar.save_availability_label")}
-                />
-                <select
-                  defaultValue=""
-                  onChange={(e) => {
-                    const cal = options.find((c) => c.id === e.target.value);
-                    e.target.value = "";
-                    if (cal) setBusyDialog({ calendarId: cal.id, label: cal.name, conflicts: [] });
-                  }}
-                  className="border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest"
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => setAddOpen(true)}
+                  className="inline-flex items-center gap-2 bg-racing-red px-4 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110"
                 >
-                  <option value="">{t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })}</option>
-                  {options.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                  <CalendarPlus className="size-3.5" /> {t("pcal.add.cta", { defaultValue: "Add from calendar" })}
+                </button>
+                <CalendarTools
+                  currentAvailable={[...availableSet].sort()}
+                  protectedDays={protectedSet}
+                  onReshape={(dates) => replaceDates(dates)}
+                  pending={mutation.isPending}
+                />
               </div>
             }
             legend={
