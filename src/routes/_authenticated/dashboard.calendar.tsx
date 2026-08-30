@@ -104,6 +104,8 @@ function CalendarPage() {
     return m;
   }, [engDays]);
   const unconfirmedSet = useMemo(() => new Set(freshness?.unconfirmed_days ?? []), [freshness]);
+  /** Red days: blocked (late-cancel lock) + confirmed engagement days. Never editable, never written. */
+  const protectedSet = useMemo(() => new Set<string>([...blockedSet, ...engMap.keys()]), [blockedSet, engMap]);
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
