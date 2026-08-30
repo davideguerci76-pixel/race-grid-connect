@@ -39,7 +39,7 @@ const CELL_CLASS: Record<string, string> = {
  */
 export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }) {
   const { t } = useTranslation();
-  const { formatMonthYear } = useDateFormat();
+  const { formatMonthYear, formatCustom } = useDateFormat();
   const { user } = useAuth();
   const getAvail = useServerFn(getMyAvailability);
   const getBlocked = useServerFn(getMyBlockedDates);
