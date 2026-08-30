@@ -92,6 +92,13 @@
       "when": 1788078081559,
       "tag": "0012_restrict_freelancer_day_rate",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788090680391,
+      "tag": "0013_calendar_day_notes",
+      "breakpoints": true
     }
   ]
 }
