@@ -579,7 +579,11 @@ export const getMyMatches = createServerFn({ method: "GET" })
         (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
       } else {
         const { data: fps } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", otherIds);
-        (fps ?? []).forEach((p: any) => freelancerProfilesById.set(p.user_id, p));
+        // Rate columns are not Data-API readable; the caller is a party to these
+        // matches, so read them server-side and keep the existing gating.
+        const { fetchRatesByIds } = await import("@/lib/rates.server");
+        const rateMap = await fetchRatesByIds(otherIds);
+        (fps ?? []).forEach((p: any) => freelancerProfilesById.set(p.user_id, { ...p, ...(rateMap.get(p.user_id) ?? { day_rate: null, currency: null }) }));
       }
       const revealedOtherIds = Array.from(new Set(
         rawMatches
@@ -670,8 +674,8 @@ export const getMyMatches = createServerFn({ method: "GET" })
     let myDayRate: number | null = null;
     const candidateStats = new Map<string, { total: number; rank: number }>();
     if (isFreelancer) {
-      const { data: myFp } = await supabase.from("freelancer_profiles").select("day_rate").eq("user_id", userId).maybeSingle();
-      myDayRate = (myFp as any)?.day_rate ?? null;
+      const { data: myRate } = await (supabase.rpc as any)("my_day_rate");
+      myDayRate = (Array.isArray(myRate) ? (myRate[0] as any)?.day_rate : null) ?? null;
       const revealedReqIds = Array.from(new Set(
         rawMatches.filter((m: any) => m.revealed_by_freelancer).map((m: any) => m.request?.id).filter(Boolean),
       ));
@@ -960,11 +964,17 @@ export const getMyEngagements = createServerFn({ method: "GET" })
         ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
         : Promise.resolve({ data: [] as any[] } as any),
       freelancerIds.length
-        ? supabase.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, day_rate, disciplines, skills, bio, travels").in("user_id", freelancerIds)
+        ? supabase.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, disciplines, skills, bio, travels").in("user_id", freelancerIds)
         : Promise.resolve({ data: [] as any[] } as any),
     ]);
     const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
     const fpMap = new Map(((fpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
+    // Engagement parties may see the rate: rows above are already scoped to the caller.
+    {
+      const { fetchRatesByIds } = await import("@/lib/rates.server");
+      const rateMap = await fetchRatesByIds(freelancerIds);
+      for (const [id, fp] of fpMap) Object.assign(fp as any, rateMap.get(id as string) ?? {});
+    }
 
     // RLS on `profiles` restricts to auth.uid()=id, so counterparties' display_name
     // isn't visible via a nested join. Fetch it via admin (the .or above already
@@ -1303,6 +1313,12 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
+    // Request owner (team) — rate stays behind the existing showTech gating below.
+    {
+      const { fetchRatesByIds } = await import("@/lib/rates.server");
+      const rateMap = await fetchRatesByIds(freelancerIds);
+      for (const [id, fp] of fpMap) Object.assign(fp as any, rateMap.get(id as string) ?? {});
+    }
     const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
     // One confirmation request per (pit call, freelancer): persisted state for the CTA
     const { data: reqEngagements } = await supabase
@@ -1437,7 +1453,10 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         .maybeSingle();
       if (eng) {
         const fid = (eng as any).freelancer_id as string;
-        const { data: hFp } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", fid).maybeSingle();
+        const { data: hFpRaw } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", fid).maybeSingle();
+        const { fetchRatesByIds: fetchHiredRates } = await import("@/lib/rates.server");
+        const hiredRate = (await fetchHiredRates([fid])).get(fid) ?? { day_rate: null, currency: null };
+        const hFp = hFpRaw ? { ...(hFpRaw as any), ...hiredRate } : hFpRaw;
         let hEmail: string | null = null;
         let hPhone: { phone_dial_code: string | null; phone_number: string | null } = { phone_dial_code: null, phone_number: null };
         let hProf: { display_name?: string | null; avatar_url?: string | null } | null = null;

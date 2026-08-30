@@ -256,6 +256,12 @@ export const getPoolMatches = createServerFn({ method: "GET" })
       ]);
       pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
       fMap = new Map((fps ?? []).map((f: any) => [f.user_id, f]));
+      // Pool search: caller owns the request; rate stays behind the `unlocked` gate below.
+      {
+        const { fetchRatesByIds } = await import("@/lib/rates.server");
+        const rateMap = await fetchRatesByIds(ids);
+        for (const [id, f] of fMap) Object.assign(f as any, rateMap.get(id as string) ?? {});
+      }
       for (const r of (ratings ?? []) as any[]) {
         const cur = ratingAvg.get(r.to_user_id) ?? { avg: 0, count: 0 };
         const v = Number(r.overall ?? r.stars ?? 0);

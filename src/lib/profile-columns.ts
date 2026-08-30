@@ -3,14 +3,16 @@
  * Data API. Precise coordinates (location_lat / location_lng) are intentionally
  * excluded: they stay server-side for matching / SOS / stats, and the owner can
  * read their own via the `my_profile_coords` RPC.
+ * `day_rate` / `currency` are likewise excluded: SELECT on those columns is
+ * revoked for `anon` / `authenticated`. The owner reads them via the
+ * `my_day_rate` RPC, and authorized PITCALL flows read them server-side with
+ * the admin client after the existing business-logic gating.
  */
 export const FREELANCER_PROFILE_COLUMNS = [
   "user_id",
   "role",
   "headline",
   "disciplines",
-  "day_rate",
-  "currency",
   "travels",
   "location",
   "bio",
@@ -35,3 +37,4 @@ export const FREELANCER_PROFILE_COLUMNS = [
 /** Team profile columns readable by authenticated users (no VAT, no coordinates). */
 export const TEAM_PROFILE_COLUMNS =
   "user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_city, location_region, location_country, location_place_id, is_test";
+
