@@ -1007,6 +1007,8 @@
       "reshape_desc": "Agrupa tus fechas disponibles actuales en eventos y reaplica este patrón semanal. Las fechas PITCALL nunca se tocan.",
       "save_as_calendar": "Guardar la disponibilidad actual como calendario",
       "save_hint": "{{count}} día(s) disponibles se guardarán en tu archivo."
-    }
+    },
+    "mark_available": "Marcar disponible",
+    "mark_unavailable": "Marcar no disponible"
   }
 }
