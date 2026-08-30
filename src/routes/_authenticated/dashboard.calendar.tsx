@@ -18,6 +18,7 @@ import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
@@ -301,6 +302,7 @@ function CalendarPage() {
                   protectedDays={protectedSet}
                   onReshape={(dates) => replaceDates(dates)}
                   pending={mutation.isPending}
+                  month={month}
                 />
               </div>
             }
@@ -329,12 +331,35 @@ function CalendarPage() {
                       <div className="font-black uppercase tracking-tight text-racing-red">
                         {selectedEng.locked ? t("pcal.locked", { defaultValue: "LOCKED" }) : selectedEng.team || t("pcal.pitcall", { defaultValue: "PITCALL" })}
                       </div>
-                      <div className="break-words text-muted-foreground">
-                        {[selectedEng.sub_role ?? selectedEng.role, selectedEng.location].filter(Boolean).join(" · ")}
-                      </div>
+                      {!selectedEng.locked && (
+                        <>
+                          {selectedEng.location && (
+                            <div className="break-words text-muted-foreground">
+                              <span className="font-mono text-[10px] uppercase tracking-widest">{t("pcal.detail_location", { defaultValue: "Location" })}: </span>
+                              {selectedEng.location}
+                            </div>
+                          )}
+                          {(selectedEng.sub_role || selectedEng.role) && (
+                            <div className="break-words text-muted-foreground">
+                              <span className="font-mono text-[10px] uppercase tracking-widest">{t("pcal.detail_role", { defaultValue: "Role" })}: </span>
+                              {selectedEng.sub_role
+                                ? subRoleLabel(selectedEng.sub_role)
+                                : roleGroupLabel(selectedEng.role as string)}
+                            </div>
+                          )}
+                        </>
+                      )}
                       <div className="font-mono text-[11px] text-muted-foreground">
                         {t("pcal.non_editable", { defaultValue: "Confirmed PITCALL · non-editable" })}
                       </div>
+                      {!selectedEng.locked && selectedEng.engagement_id && (
+                        <a
+                          href={`/dashboard/engagements#engagement-${selectedEng.engagement_id}`}
+                          className={`${btn} mt-2`}
+                        >
+                          {t("pcal.view_engagement", { defaultValue: "View engagement" })}
+                        </a>
+                      )}
                     </div>
                   ) : (
                     <div className="min-w-0 space-y-3">

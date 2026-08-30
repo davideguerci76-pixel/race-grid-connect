@@ -1018,9 +1018,18 @@
       "reshape": "Reshape my available dates (Mon → Mon)",
       "reshape_desc": "Groups your current available dates into events and re-applies this weekly pattern. PITCALL days are never touched.",
       "save_as_calendar": "Save current availability as calendar",
-      "save_hint": "{{count}} available day(s) will be stored in your archive."
+      "save_hint": "{{count}} available day(s) will be stored in your archive.",
+      "select_month": "Select month",
+      "deselect_month": "Deselect month",
+      "select_six": "Select next 6 months",
+      "deselect_six": "Deselect next 6 months",
+      "deselect_hint": "Confirmed PITCALL and locked days are never changed.",
+      "nothing_to_remove": "No available days to remove here."
     },
     "mark_available": "Mark available",
-    "mark_unavailable": "Mark unavailable"
+    "mark_unavailable": "Mark unavailable",
+    "detail_location": "Location",
+    "detail_role": "Role",
+    "view_engagement": "View engagement"
   }
 }

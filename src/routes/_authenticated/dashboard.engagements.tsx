@@ -50,6 +50,16 @@ function EngagementsPage() {
   const ratedMap = new Map<string, { unlocked: boolean }>((myRatedIds as any[]).map((r) => [r.engagement_id, { unlocked: !!r.unlocked_at }]));
   const ratableMap = new Map<string, any>((ratable as any[]).map((e) => [e.id, e]));
 
+  // Deep-link support: /dashboard/engagements#engagement-<id> scrolls to the card
+  // once the list has been rendered (data arrives after the initial mount).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (!hash.startsWith("#engagement-") || rows.length === 0) return;
+    const el = document.getElementById(hash.slice(1));
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [rows]);
+
   // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
   // would silently reset before the user has a chance to see it. Users click the
   // "Mark all as read" button below when they've reviewed the list.
@@ -213,7 +223,7 @@ function EngagementsPage() {
             // Teams always see their own Pit Call; freelancers must pay the 1-token reveal.
             const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
             return (
-              <div key={e.id} className={`border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
+              <div key={e.id} id={`engagement-${e.id}`} className={`scroll-mt-24 border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-3">
