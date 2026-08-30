@@ -149,6 +149,40 @@ export function CalendarTools({
         </div>
       )}
 
+      <Dialog open={!!bulkConfirm} onOpenChange={(v) => { if (!v) setBulkConfirm(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">
+              {bulkConfirm?.scope === "six"
+                ? t("pcal.tools.deselect_six", { defaultValue: "Deselect next 6 months" })
+                : t("pcal.tools.deselect_month", { defaultValue: "Deselect month" })}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="font-mono text-[11px] text-racing-red">
+            − {t("pcal.add.will_remove", { count: bulkConfirm?.removed ?? 0, defaultValue: "{{count}} day(s) removed" })}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            {t("pcal.tools.deselect_hint", { defaultValue: "Confirmed PITCALL and locked days are never changed." })}
+          </p>
+          <div className="flex flex-wrap justify-end gap-2">
+            <button type="button" className={btn} onClick={() => setBulkConfirm(null)}>
+              {t("common.cancel", { defaultValue: "Cancel" })}
+            </button>
+            <button
+              type="button"
+              className={btnPrimary}
+              disabled={pending}
+              onClick={() => {
+                if (bulkConfirm) onReshape(bulkConfirm.next);
+                setBulkConfirm(null);
+              }}
+            >
+              {t("pcal.add.apply", { defaultValue: "Apply" })}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={reshapeOpen} onOpenChange={(v) => { setReshapeOpen(v); if (!v) setConfirmed(false); }}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
