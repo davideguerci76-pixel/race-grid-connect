@@ -36,7 +36,7 @@ function gridDays(month: Date): Date[] {
 
 const STATE_CLASS: Record<PitcallDayState, string> = {
   none: "bg-[#0d0f13] text-foreground",
-  available: "bg-[#0e2417] text-foreground",
+  available: "bg-[#145c36] text-foreground",
   busy: "bg-[#17191e] text-foreground",
   engagement: "bg-[#2a1013] text-foreground",
   locked: "bg-[#2a1013] text-foreground",
@@ -44,7 +44,7 @@ const STATE_CLASS: Record<PitcallDayState, string> = {
 
 const CHIP_CLASS: Record<PitcallDayState, string> = {
   none: "border-l-2 border-border bg-[#15181d] text-muted-foreground",
-  available: "border-l-2 border-[#16a34a] bg-[#16a34a]/15 text-[#8ee0ab]",
+  available: "border-l-2 border-[#22c55e] bg-[#22c55e]/20 text-[#a7f3c6]",
   busy: "border-l-2 border-[#5b6070] bg-[#20242b] text-[#c9cedb]",
   engagement: "border-l-2 border-racing-red bg-racing-red/25 text-[#ffd3d3]",
   locked: "border-l-2 border-racing-red bg-racing-red text-white",
