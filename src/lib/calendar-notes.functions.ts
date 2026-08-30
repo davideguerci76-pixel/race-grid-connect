@@ -1,9 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { daysBetweenIso } from "@/lib/calendar-notes.server";
-
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+import { daysBetweenIso } from "@/lib/calendar-days";
 
 export type CalendarDayNote = { day: string; note: string; busy: boolean };
 
@@ -78,7 +76,7 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
 export const setMyDayNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
-    z.object({ day: isoDate, note: z.string().max(60), busy: z.boolean().default(false) }).parse(data),
+    z.object({ day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), note: z.string().max(60), busy: z.boolean().default(false) }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -113,9 +111,9 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z
       .object({
-        dates: z.array(isoDate).max(400),
+        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400),
         label: z.string().trim().min(1).max(60),
-        protectedDays: z.array(isoDate).max(800).default([]),
+        protectedDays: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(800).default([]),
         overwrite: z.boolean().default(false),
       })
       .parse(data),
