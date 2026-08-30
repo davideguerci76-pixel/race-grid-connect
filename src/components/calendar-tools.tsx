@@ -83,6 +83,24 @@ export function CalendarTools({
     };
   }, [editable, reshaped]);
 
+  const [bulkConfirm, setBulkConfirm] = useState<{ scope: "month" | "six"; next: string[]; removed: number } | null>(null);
+
+  /** Bulk availability helpers. Protected days (confirmed PITCALL / LOCKED) are never touched. */
+  const bulkSelect = (days: string[]) => {
+    const add = days.filter((d) => !protectedDays.has(d));
+    onReshape([...new Set([...editable, ...add])].sort());
+  };
+  const bulkDeselect = (days: string[], scope: "month" | "six") => {
+    const drop = new Set(days.filter((d) => !protectedDays.has(d)));
+    const next = editable.filter((d) => !drop.has(d));
+    const removed = editable.length - next.length;
+    if (removed === 0) {
+      toast.info(t("pcal.tools.nothing_to_remove", { defaultValue: "No available days to remove here." }));
+      return;
+    }
+    setBulkConfirm({ scope, next, removed });
+  };
+
   const doSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
