@@ -139,9 +139,11 @@ function CalendarPage() {
 
   const mutation = useMutation({
     mutationFn: async ({ nextSet }: { nextSet: Set<string> }) => {
-      const currentSet = new Set((myDays as string[]).filter((d) => !blockedSet.has(d)));
-      const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
-      const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
+      // Protected (red) days are excluded from both sides: never added, never removed.
+      const currentSet = new Set((myDays as string[]).filter((d) => !protectedSet.has(d)));
+      const target = new Set([...nextSet].filter((d) => !protectedSet.has(d)));
+      const toAdd = [...target].filter((d) => !currentSet.has(d));
+      const toRemove = [...currentSet].filter((d) => !target.has(d));
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
@@ -149,7 +151,9 @@ function CalendarPage() {
       const key = ["my-availability", user?.id];
       await qc.cancelQueries({ queryKey: key });
       const previous = qc.getQueryData<string[]>(key) ?? [];
-      const optimistic = [...new Set([...previous.filter((d) => blockedSet.has(d)), ...nextSet])].sort();
+      const optimistic = [
+        ...new Set([...previous.filter((d) => protectedSet.has(d)), ...[...nextSet].filter((d) => !protectedSet.has(d))]),
+      ].sort();
       qc.setQueryData(key, optimistic);
       return { previous };
     },
@@ -160,18 +164,24 @@ function CalendarPage() {
     onSettled: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
   });
 
-  const selectDates = (dates: string[]) => {
-    const next = dates.filter((d) => !blockedSet.has(d));
-    mutation.mutate({ nextSet: new Set(next) });
+  /** Replace the whole availability set (protected days preserved). */
+  const replaceDates = (dates: string[]) => {
+    mutation.mutate({ nextSet: new Set(dates.filter((d) => !protectedSet.has(d))) });
+  };
+
+  /** Merge dates into the current availability set. */
+  const mergeDates = (dates: string[]) => {
+    mutation.mutate({ nextSet: new Set([...availableSet, ...dates.filter((d) => !protectedSet.has(d))]) });
   };
 
   const toggleDay = (iso: string) => {
-    if (blockedSet.has(iso) || engMap.has(iso)) return;
+    if (protectedSet.has(iso)) return;
     const next = new Set(availableSet);
     if (next.has(iso)) next.delete(iso);
     else next.add(iso);
     mutation.mutate({ nextSet: next });
   };
+
 
   const noteMut = useMutation({
     mutationFn: (vars: { day: string; note: string; busy: boolean }) => saveNote({ data: vars }),
