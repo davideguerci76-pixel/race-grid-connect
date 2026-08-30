@@ -973,6 +973,40 @@
     "detail_count": "{{count}} freelancer(s)",
     "no_engagements": "No hay engagements confirmados en esta fecha.",
     "open_engagement": "Abrir engagement →",
-    "team_card": "Calendario Team"
+    "team_card": "Calendario Team",
+    "add": {
+      "cta": "Añadir desde calendario",
+      "title": "Añadir desde calendario",
+      "step_source": "Elige una fuente",
+      "pick_calendar": "Calendario guardado o de plataforma…",
+      "group_mine": "Mis calendarios guardados",
+      "group_shared": "Calendarios de plataforma / compartidos",
+      "import_ics": "Importar .ics",
+      "no_events": "No se encontraron eventos en este archivo .ics.",
+      "ics_failed": "No se pudo leer este archivo .ics.",
+      "source_summary": "{{events}} evento(s), {{days}} día(s)",
+      "step_intent": "¿Qué quieres hacer?",
+      "mark_available": "Marcar como disponible",
+      "mark_busy": "Marcar como ocupado",
+      "busy_label": "Nota privada usada en esos días",
+      "step_refine": "Opcional: refina cada evento con la regla Lun → Lun",
+      "reset_rule": "Restablecer fin de semana",
+      "step_apply": "Revisar y aplicar",
+      "merge": "Combinar",
+      "replace": "Reemplazar todo",
+      "will_add": "{{count}} día(s) añadidos",
+      "will_remove": "{{count}} día(s) eliminados",
+      "will_busy": "{{count}} día(s) marcados ocupados",
+      "protected_skipped": "{{count}} día(s) PITCALL protegidos y omitidos",
+      "replace_warning": "Entiendo que se eliminarán {{count}} día(s) disponibles, incluidos días de otros meses o años.",
+      "apply": "Aplicar"
+    },
+    "tools": {
+      "title": "Herramientas de calendario",
+      "reshape": "Remodelar mis fechas disponibles (Lun → Lun)",
+      "reshape_desc": "Agrupa tus fechas disponibles actuales en eventos y reaplica este patrón semanal. Las fechas PITCALL nunca se tocan.",
+      "save_as_calendar": "Guardar la disponibilidad actual como calendario",
+      "save_hint": "{{count}} día(s) disponibles se guardarán en tu archivo."
+    }
   }
 }

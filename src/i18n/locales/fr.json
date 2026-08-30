@@ -973,6 +973,40 @@
     "detail_count": "{{count}} freelance(s)",
     "no_engagements": "Aucun engagement confirmé à cette date.",
     "open_engagement": "Ouvrir l'engagement →",
-    "team_card": "Calendrier Team"
+    "team_card": "Calendrier Team",
+    "add": {
+      "cta": "Ajouter depuis un calendrier",
+      "title": "Ajouter depuis un calendrier",
+      "step_source": "Choisir une source",
+      "pick_calendar": "Calendrier enregistré ou de plateforme…",
+      "group_mine": "Mes calendriers enregistrés",
+      "group_shared": "Calendriers plateforme / partagés",
+      "import_ics": "Importer .ics",
+      "no_events": "Aucun événement trouvé dans ce fichier .ics.",
+      "ics_failed": "Impossible de lire ce fichier .ics.",
+      "source_summary": "{{events}} événement(s), {{days}} jour(s)",
+      "step_intent": "Que voulez-vous faire ?",
+      "mark_available": "Marquer comme disponible",
+      "mark_busy": "Marquer comme occupé",
+      "busy_label": "Note privée utilisée sur ces jours",
+      "step_refine": "Optionnel : affiner chaque événement avec la règle Lun → Lun",
+      "reset_rule": "Réinitialiser le week-end",
+      "step_apply": "Vérifier et appliquer",
+      "merge": "Fusionner",
+      "replace": "Tout remplacer",
+      "will_add": "{{count}} jour(s) ajoutés",
+      "will_remove": "{{count}} jour(s) supprimés",
+      "will_busy": "{{count}} jour(s) marqués occupés",
+      "protected_skipped": "{{count}} jour(s) PITCALL protégés et ignorés",
+      "replace_warning": "Je comprends que {{count}} jour(s) disponibles, y compris d'autres mois ou années, seront supprimés.",
+      "apply": "Appliquer"
+    },
+    "tools": {
+      "title": "Outils calendrier",
+      "reshape": "Remodeler mes dates disponibles (Lun → Lun)",
+      "reshape_desc": "Regroupe vos dates disponibles actuelles en événements et réapplique ce schéma hebdomadaire. Les dates PITCALL ne sont jamais modifiées.",
+      "save_as_calendar": "Enregistrer la disponibilité actuelle comme calendrier",
+      "save_hint": "{{count}} jour(s) disponibles seront enregistrés dans votre archive."
+    }
   }
 }
