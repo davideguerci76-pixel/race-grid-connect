@@ -156,10 +156,37 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
 
 function MiniStat({ value, label, dot }: { value: React.ReactNode; label: string; dot: string }) {
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className="flex min-w-0 items-center gap-1.5">
       <span className={`inline-block size-2.5 shrink-0 ${dot}`} />
       <span className="text-base font-black leading-none">{value}</span>
-      <span className="truncate font-mono text-[8px] uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="font-mono text-[8px] uppercase leading-tight tracking-wide text-muted-foreground">{label}</span>
     </div>
+  );
+}
+
+/**
+ * Month stepper rendered inside the card link: a span with button semantics so
+ * no interactive element is nested inside the anchor. Stops the click from
+ * triggering the card navigation.
+ */
+function MonthArrow({ label, onActivate }: { label: string; onActivate: () => void }) {
+  const fire = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onActivate();
+  };
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      aria-label={label === "‹" ? "Previous month" : "Next month"}
+      onClick={fire}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") fire(e);
+      }}
+      className="flex size-7 cursor-pointer select-none items-center justify-center border border-border font-mono text-xs leading-none text-muted-foreground transition-colors hover:border-racing-red hover:text-racing-red"
+    >
+      {label}
+    </span>
   );
 }
