@@ -1006,9 +1006,18 @@
       "reshape": "Meine verfügbaren Tage neu formen (Mo → Mo)",
       "reshape_desc": "Gruppiert deine aktuellen verfügbaren Tage zu Terminen und wendet dieses Wochenmuster erneut an. PITCALL-Tage bleiben unberührt.",
       "save_as_calendar": "Aktuelle Verfügbarkeit als Kalender speichern",
-      "save_hint": "{{count}} verfügbare Tag(e) werden in deinem Archiv gespeichert."
+      "save_hint": "{{count}} verfügbare Tag(e) werden in deinem Archiv gespeichert.",
+      "select_month": "Monat auswählen",
+      "deselect_month": "Monat abwählen",
+      "select_six": "Nächste 6 Monate auswählen",
+      "deselect_six": "Nächste 6 Monate abwählen",
+      "deselect_hint": "Bestätigte PITCALL- und gesperrte Tage werden nie geändert.",
+      "nothing_to_remove": "Hier gibt es keine verfügbaren Tage zum Entfernen."
     },
     "mark_available": "Als verfügbar markieren",
-    "mark_unavailable": "Als nicht verfügbar markieren"
+    "mark_unavailable": "Als nicht verfügbar markieren",
+    "detail_location": "Ort",
+    "detail_role": "Rolle",
+    "view_engagement": "Engagement ansehen"
   }
 }

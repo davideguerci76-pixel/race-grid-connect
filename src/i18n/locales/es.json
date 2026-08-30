@@ -1006,9 +1006,18 @@
       "reshape": "Remodelar mis fechas disponibles (Lun → Lun)",
       "reshape_desc": "Agrupa tus fechas disponibles actuales en eventos y reaplica este patrón semanal. Las fechas PITCALL nunca se tocan.",
       "save_as_calendar": "Guardar la disponibilidad actual como calendario",
-      "save_hint": "{{count}} día(s) disponibles se guardarán en tu archivo."
+      "save_hint": "{{count}} día(s) disponibles se guardarán en tu archivo.",
+      "select_month": "Seleccionar mes",
+      "deselect_month": "Deseleccionar mes",
+      "select_six": "Seleccionar próximos 6 meses",
+      "deselect_six": "Deseleccionar próximos 6 meses",
+      "deselect_hint": "Los días PITCALL confirmados y bloqueados nunca se modifican.",
+      "nothing_to_remove": "No hay días disponibles que eliminar aquí."
     },
     "mark_available": "Marcar disponible",
-    "mark_unavailable": "Marcar no disponible"
+    "mark_unavailable": "Marcar no disponible",
+    "detail_location": "Ubicación",
+    "detail_role": "Rol",
+    "view_engagement": "Ver engagement"
   }
 }
