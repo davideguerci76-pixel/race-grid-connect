@@ -38,8 +38,3 @@ export const FREELANCER_PROFILE_COLUMNS = [
 export const TEAM_PROFILE_COLUMNS =
   "user_id, team_name, initials, team_type, location, primary_discipline, founded_year, size, bio, website, updated_at, location_city, location_region, location_country, location_place_id, is_test";
 
-/** Rate columns, server-side only (admin client, after authorization checks). */
-export const FREELANCER_RATE_COLUMNS = "user_id, day_rate, currency";
-
-/** Full profile columns incl. rate — ONLY for authorized server-side reads. */
-export const FREELANCER_PROFILE_COLUMNS_WITH_RATE = `${FREELANCER_PROFILE_COLUMNS}, day_rate, currency`;
