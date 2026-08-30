@@ -11,9 +11,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
-import { listMyCalendars, type UserCalendar } from "@/lib/calendars.functions";
 import { BackButton } from "@/components/back-button";
-import { CalendarSourcePicker } from "@/components/calendar-source-picker";
+import { CalendarPlus } from "lucide-react";
+import { CalendarAddDialog } from "@/components/calendar-add-dialog";
+import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
@@ -53,7 +54,6 @@ function CalendarPage() {
   const getEngDays = useServerFn(getMyEngagementDays);
   const saveNote = useServerFn(setMyDayNote);
   const applyBusy = useServerFn(applySavedCalendarAsBusy);
-  const listCals = useServerFn(listMyCalendars);
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -80,16 +80,12 @@ function CalendarPage() {
     enabled: !!user && isFreelancer,
     queryFn: () => getEngDays(),
   });
-  const { data: calendars } = useQuery({
-    queryKey: ["my-calendars"],
-    enabled: !!user && isFreelancer,
-    queryFn: () => listCals(),
-  });
 
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
   const [noteDraft, setNoteDraft] = useState("");
-  const [busyDialog, setBusyDialog] = useState<{ calendarId: string; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
@@ -103,6 +99,8 @@ function CalendarPage() {
     return m;
   }, [engDays]);
   const unconfirmedSet = useMemo(() => new Set(freshness?.unconfirmed_days ?? []), [freshness]);
+  /** Red days: blocked (late-cancel lock) + confirmed engagement days. Never editable, never written. */
+  const protectedSet = useMemo(() => new Set<string>([...blockedSet, ...engMap.keys()]), [blockedSet, engMap]);
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
@@ -136,9 +134,11 @@ function CalendarPage() {
 
   const mutation = useMutation({
     mutationFn: async ({ nextSet }: { nextSet: Set<string> }) => {
-      const currentSet = new Set((myDays as string[]).filter((d) => !blockedSet.has(d)));
-      const toAdd = [...nextSet].filter((d) => !currentSet.has(d));
-      const toRemove = [...currentSet].filter((d) => !nextSet.has(d));
+      // Protected (red) days are excluded from both sides: never added, never removed.
+      const currentSet = new Set((myDays as string[]).filter((d) => !protectedSet.has(d)));
+      const target = new Set([...nextSet].filter((d) => !protectedSet.has(d)));
+      const toAdd = [...target].filter((d) => !currentSet.has(d));
+      const toRemove = [...currentSet].filter((d) => !target.has(d));
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
@@ -146,7 +146,9 @@ function CalendarPage() {
       const key = ["my-availability", user?.id];
       await qc.cancelQueries({ queryKey: key });
       const previous = qc.getQueryData<string[]>(key) ?? [];
-      const optimistic = [...new Set([...previous.filter((d) => blockedSet.has(d)), ...nextSet])].sort();
+      const optimistic = [
+        ...new Set([...previous.filter((d) => protectedSet.has(d)), ...[...nextSet].filter((d) => !protectedSet.has(d))]),
+      ].sort();
       qc.setQueryData(key, optimistic);
       return { previous };
     },
@@ -157,18 +159,24 @@ function CalendarPage() {
     onSettled: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
   });
 
-  const selectDates = (dates: string[]) => {
-    const next = dates.filter((d) => !blockedSet.has(d));
-    mutation.mutate({ nextSet: new Set(next) });
+  /** Replace the whole availability set (protected days preserved). */
+  const replaceDates = (dates: string[]) => {
+    mutation.mutate({ nextSet: new Set(dates.filter((d) => !protectedSet.has(d))) });
+  };
+
+  /** Merge dates into the current availability set. */
+  const mergeDates = (dates: string[]) => {
+    mutation.mutate({ nextSet: new Set([...availableSet, ...dates.filter((d) => !protectedSet.has(d))]) });
   };
 
   const toggleDay = (iso: string) => {
-    if (blockedSet.has(iso) || engMap.has(iso)) return;
+    if (protectedSet.has(iso)) return;
     const next = new Set(availableSet);
     if (next.has(iso)) next.delete(iso);
     else next.add(iso);
     mutation.mutate({ nextSet: next });
   };
+
 
   const noteMut = useMutation({
     mutationFn: (vars: { day: string; note: string; busy: boolean }) => saveNote({ data: vars }),
@@ -200,7 +208,6 @@ function CalendarPage() {
     setNoteDraft(selected ? (noteMap.get(selected)?.note ?? "") : "");
   }, [selected, noteMap]);
 
-  const options: UserCalendar[] = [...(calendars?.mine ?? []), ...(calendars?.shared ?? [])];
   const lastConfirmed = freshness?.calendar_last_confirmed_at ? new Date(freshness.calendar_last_confirmed_at) : null;
   const daysSince = lastConfirmed ? Math.floor((Date.now() - lastConfirmed.getTime()) / 86400000) : null;
   const state = freshness?.state ?? "fresh";
@@ -265,26 +272,20 @@ function CalendarPage() {
             onToggleDay={toggleDay}
             todayLabel={t("pcal.today", { defaultValue: "Today" })}
             actions={
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <CalendarSourcePicker
-                  value={[...availableSet].sort()}
-                  onChange={(dates) => selectDates(dates)}
-                  saveLabel={t("sweep_public.dashboard_calendar.save_availability_label")}
-                />
-                <select
-                  defaultValue=""
-                  onChange={(e) => {
-                    const cal = options.find((c) => c.id === e.target.value);
-                    e.target.value = "";
-                    if (cal) setBusyDialog({ calendarId: cal.id, label: cal.name, conflicts: [] });
-                  }}
-                  className="border border-border bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-widest"
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => setAddOpen(true)}
+                  className="inline-flex items-center gap-2 bg-racing-red px-4 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110"
                 >
-                  <option value="">{t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })}</option>
-                  {options.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                  <CalendarPlus className="size-3.5" /> {t("pcal.add.cta", { defaultValue: "Add from calendar" })}
+                </button>
+                <CalendarTools
+                  currentAvailable={[...availableSet].sort()}
+                  protectedDays={protectedSet}
+                  onReshape={(dates) => replaceDates(dates)}
+                  pending={mutation.isPending}
+                />
               </div>
             }
             legend={
@@ -365,6 +366,16 @@ function CalendarPage() {
         </div>
       </div>
 
+      <CalendarAddDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        currentAvailable={[...availableSet].sort()}
+        protectedDays={protectedSet}
+        pending={mutation.isPending || busyMut.isPending}
+        onApplyAvailable={(dates, mode) => (mode === "replace" ? replaceDates(dates) : mergeDates(dates))}
+        onApplyBusy={(dates, label) => setBusyDialog({ dates, label, conflicts: [] })}
+      />
+
       {busyDialog && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-3">
           <div className="w-full max-w-md min-w-0 border border-border bg-card p-4">
@@ -400,9 +411,8 @@ function CalendarPage() {
                   className={btn}
                   disabled={busyMut.isPending}
                   onClick={() => {
-                    const cal = options.find((c) => c.id === busyDialog.calendarId);
                     const skip = new Set(busyDialog.conflicts.map((c) => c.day));
-                    busyMut.mutate({ dates: (cal?.dates ?? []).filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
+                    busyMut.mutate({ dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
                   }}
                 >
                   {t("pcal.keep_existing", { defaultValue: "Keep existing" })}
@@ -412,10 +422,7 @@ function CalendarPage() {
                 type="button"
                 className="bg-racing-red px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
                 disabled={busyMut.isPending || !busyDialog.label.trim()}
-                onClick={() => {
-                  const cal = options.find((c) => c.id === busyDialog.calendarId);
-                  busyMut.mutate({ dates: cal?.dates ?? [], label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 });
-                }}
+                onClick={() => busyMut.mutate({ dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 })}
               >
                 {busyDialog.conflicts.length > 0
                   ? t("pcal.overwrite", { defaultValue: "Overwrite" })

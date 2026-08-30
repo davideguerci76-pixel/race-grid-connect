@@ -985,6 +985,40 @@
     "detail_count": "{{count}} freelancer",
     "no_engagements": "Nessun engagement confermato in questa data.",
     "open_engagement": "Apri engagement →",
-    "team_card": "Calendario Team"
+    "team_card": "Calendario Team",
+    "add": {
+      "cta": "Aggiungi da calendario",
+      "title": "Aggiungi da calendario",
+      "step_source": "Scegli una sorgente",
+      "pick_calendar": "Calendario salvato o di piattaforma…",
+      "group_mine": "I miei calendari salvati",
+      "group_shared": "Calendari piattaforma / condivisi",
+      "import_ics": "Importa .ics",
+      "no_events": "Nessun evento trovato in questo file .ics.",
+      "ics_failed": "Impossibile leggere questo file .ics.",
+      "source_summary": "{{events}} evento/i, {{days}} giorno/i",
+      "step_intent": "Cosa vuoi fare?",
+      "mark_available": "Segna come disponibile",
+      "mark_busy": "Segna come occupato",
+      "busy_label": "Nota privata usata su quei giorni",
+      "step_refine": "Opzionale: rifinisci ogni evento con la regola Lun → Lun",
+      "reset_rule": "Ripristina weekend",
+      "step_apply": "Verifica e applica",
+      "merge": "Unisci",
+      "replace": "Sostituisci tutto",
+      "will_add": "{{count}} giorno/i aggiunti",
+      "will_remove": "{{count}} giorno/i rimossi",
+      "will_busy": "{{count}} giorno/i segnati occupati",
+      "protected_skipped": "{{count}} giorno/i PITCALL protetti e saltati",
+      "replace_warning": "Ho capito che {{count}} giorno/i disponibili, inclusi giorni di altri mesi o anni, verranno rimossi.",
+      "apply": "Applica"
+    },
+    "tools": {
+      "title": "Strumenti calendario",
+      "reshape": "Rimodella le mie date disponibili (Lun → Lun)",
+      "reshape_desc": "Raggruppa le date disponibili attuali in eventi e riapplica questo schema settimanale. Le date PITCALL non vengono mai toccate.",
+      "save_as_calendar": "Salva la disponibilità attuale come calendario",
+      "save_hint": "{{count}} giorno/i disponibili verranno salvati nel tuo archivio."
+    }
   }
 }

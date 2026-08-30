@@ -985,6 +985,40 @@
     "detail_count": "{{count}} freelancer(s)",
     "no_engagements": "No confirmed engagements on this date.",
     "open_engagement": "Open engagement →",
-    "team_card": "Team calendar"
+    "team_card": "Team calendar",
+    "add": {
+      "cta": "Add from calendar",
+      "title": "Add from calendar",
+      "step_source": "Choose a source",
+      "pick_calendar": "Saved or platform calendar…",
+      "group_mine": "My saved calendars",
+      "group_shared": "Platform / shared calendars",
+      "import_ics": "Import .ics",
+      "no_events": "No events found in this .ics file.",
+      "ics_failed": "Could not read this .ics file.",
+      "source_summary": "{{events}} event(s), {{days}} day(s)",
+      "step_intent": "What do you want to do?",
+      "mark_available": "Mark as available",
+      "mark_busy": "Mark as busy",
+      "busy_label": "Private note used on those days",
+      "step_refine": "Optional: refine each event with a Mon → Mon rule",
+      "reset_rule": "Reset weekend default",
+      "step_apply": "Review and apply",
+      "merge": "Merge",
+      "replace": "Replace all",
+      "will_add": "{{count}} day(s) added",
+      "will_remove": "{{count}} day(s) removed",
+      "will_busy": "{{count}} day(s) marked busy",
+      "protected_skipped": "{{count}} PITCALL day(s) protected and skipped",
+      "replace_warning": "I understand {{count}} available day(s), including days in other months or years, will be removed.",
+      "apply": "Apply"
+    },
+    "tools": {
+      "title": "Calendar tools",
+      "reshape": "Reshape my available dates (Mon → Mon)",
+      "reshape_desc": "Groups your current available dates into events and re-applies this weekly pattern. PITCALL days are never touched.",
+      "save_as_calendar": "Save current availability as calendar",
+      "save_hint": "{{count}} available day(s) will be stored in your archive."
+    }
   }
 }

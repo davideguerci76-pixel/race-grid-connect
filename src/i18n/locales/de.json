@@ -973,6 +973,40 @@
     "detail_count": "{{count}} Freelancer",
     "no_engagements": "Keine bestätigten Engagements an diesem Datum.",
     "open_engagement": "Engagement öffnen →",
-    "team_card": "Team-Kalender"
+    "team_card": "Team-Kalender",
+    "add": {
+      "cta": "Aus Kalender hinzufügen",
+      "title": "Aus Kalender hinzufügen",
+      "step_source": "Quelle wählen",
+      "pick_calendar": "Gespeicherter oder Plattform-Kalender…",
+      "group_mine": "Meine gespeicherten Kalender",
+      "group_shared": "Plattform- / geteilte Kalender",
+      "import_ics": ".ics importieren",
+      "no_events": "Keine Termine in dieser .ics-Datei gefunden.",
+      "ics_failed": "Diese .ics-Datei konnte nicht gelesen werden.",
+      "source_summary": "{{events}} Termin(e), {{days}} Tag(e)",
+      "step_intent": "Was möchtest du tun?",
+      "mark_available": "Als verfügbar markieren",
+      "mark_busy": "Als belegt markieren",
+      "busy_label": "Private Notiz für diese Tage",
+      "step_refine": "Optional: jeden Termin mit der Mo → Mo Regel verfeinern",
+      "reset_rule": "Wochenende zurücksetzen",
+      "step_apply": "Prüfen und anwenden",
+      "merge": "Zusammenführen",
+      "replace": "Alles ersetzen",
+      "will_add": "{{count}} Tag(e) hinzugefügt",
+      "will_remove": "{{count}} Tag(e) entfernt",
+      "will_busy": "{{count}} Tag(e) als belegt markiert",
+      "protected_skipped": "{{count}} PITCALL-Tag(e) geschützt und übersprungen",
+      "replace_warning": "Mir ist klar, dass {{count}} verfügbare Tag(e), auch in anderen Monaten oder Jahren, entfernt werden.",
+      "apply": "Anwenden"
+    },
+    "tools": {
+      "title": "Kalender-Tools",
+      "reshape": "Meine verfügbaren Tage neu formen (Mo → Mo)",
+      "reshape_desc": "Gruppiert deine aktuellen verfügbaren Tage zu Terminen und wendet dieses Wochenmuster erneut an. PITCALL-Tage bleiben unberührt.",
+      "save_as_calendar": "Aktuelle Verfügbarkeit als Kalender speichern",
+      "save_hint": "{{count}} verfügbare Tag(e) werden in deinem Archiv gespeichert."
+    }
   }
 }
