@@ -169,13 +169,29 @@ function CalendarPage() {
     mutation.mutate({ nextSet: new Set([...availableSet, ...dates.filter((d) => !protectedSet.has(d))]) });
   };
 
+  /** Quick tap toggle: only for days without a private note. Noted days are protected. */
   const toggleDay = (iso: string) => {
     if (protectedSet.has(iso)) return;
+    if (noteMap.has(iso)) return; // noted day: change only via explicit detail action
     const next = new Set(availableSet);
     if (next.has(iso)) next.delete(iso);
     else next.add(iso);
     mutation.mutate({ nextSet: next });
   };
+
+  /** Explicit availability change from the detail panel. The private note is preserved. */
+  const setDayAvailability = (iso: string, available: boolean) => {
+    if (protectedSet.has(iso)) return;
+    const next = new Set(availableSet);
+    if (available) next.add(iso);
+    else next.delete(iso);
+    mutation.mutate({ nextSet: next });
+    const existing = noteMap.get(iso);
+    if (existing && existing.busy === available) {
+      noteMut.mutate({ day: iso, note: existing.note, busy: !available });
+    }
+  };
+
 
 
   const noteMut = useMutation({
