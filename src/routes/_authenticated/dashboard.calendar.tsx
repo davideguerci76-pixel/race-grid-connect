@@ -90,6 +90,12 @@ function CalendarPage() {
   const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
+  /** Brief highlight of the MARK AVAILABLE/UNAVAILABLE action after tapping a noted day. */
+  const [actionFlash, setActionFlash] = useState(false);
+  const detailPanelRef = useRef<HTMLDivElement | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (flashTimerRef.current) clearTimeout(flashTimerRef.current); }, []);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
@@ -211,6 +217,29 @@ function CalendarPage() {
   };
 
 
+  /** Day selection: noted days get a brief action highlight + mobile scroll to the detail panel. */
+  const handleSelectDay = (iso: string) => {
+    setSelected(iso);
+    if (protectedSet.has(iso) || !noteMap.has(iso)) return;
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    setActionFlash(false);
+    requestAnimationFrame(() => setActionFlash(true));
+    flashTimerRef.current = setTimeout(() => setActionFlash(false), 1500);
+    // Mobile: the detail panel sits below the grid — bring it (and the correct action) into view.
+    if (window.innerWidth < 768) {
+      setTimeout(() => {
+        const el = detailPanelRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const visible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+        if (!visible) {
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+        }
+      }, 60);
+    }
+  };
+
   /** Quick tap toggle: only for days without a private note. Noted days are protected. */
   const toggleDay = (iso: string) => {
     if (protectedSet.has(iso)) return;
@@ -326,7 +355,7 @@ function CalendarPage() {
             onMonthChange={setMonth}
             cells={cells}
             selected={selected}
-            onSelectDay={setSelected}
+            onSelectDay={handleSelectDay}
             onToggleDay={toggleDay}
             todayLabel={t("pcal.today", { defaultValue: "Today" })}
             actions={
@@ -366,7 +395,7 @@ function CalendarPage() {
             }
             detail={
               selected ? (
-                <div className="min-w-0 space-y-3">
+                <div ref={detailPanelRef} className="min-w-0 space-y-3">
                   <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {formatDate(dateOf(selected))}
                   </div>
@@ -415,7 +444,7 @@ function CalendarPage() {
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
-                          className={btn}
+                          className={`${btn} ${actionFlash && noteMap.has(selected) ? "pcal-action-pulse" : ""}`}
                           disabled={!selectedEditable || mutation.isPending}
                           onClick={() => setDayAvailability(selected, selectedCell?.state !== "available")}
                         >
