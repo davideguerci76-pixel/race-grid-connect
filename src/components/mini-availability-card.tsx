@@ -137,7 +137,7 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
               key={iso}
               className={`flex aspect-square items-center justify-center font-mono text-[9px] ${CELL_CLASS[state]} ${outside ? "opacity-30" : ""}`}
             >
-              <span className={iso === todayIso ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
+              <span className={iso === todayIso && !outside ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
                 {d.getDate()}
               </span>
             </span>
