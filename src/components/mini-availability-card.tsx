@@ -49,9 +49,20 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
   const blockedQ = useQuery({ queryKey: ["my-blocked-dates", user?.id], enabled: !!user, queryFn: () => getBlocked() });
   const engQ = useQuery({ queryKey: ["my-engagement-days", user?.id], enabled: !!user, queryFn: () => getEngDays() });
 
-  const month = useMemo(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1), []);
+  // View-only month offset: never persisted, always resets to the real current month.
+  const [offset, setOffset] = useState(0);
+  const month = useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  }, [offset]);
   const days = useMemo(() => monthGrid(month), [month]);
   const todayIso = isoOf(new Date());
+  const monthParam = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`;
+  const weekdays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) => formatCustom(new Date(2024, 0, 1 + i), { weekday: "narrow" })),
+    [formatCustom],
+  );
 
   const states = useMemo(() => {
     if (!availQ.data || !blockedQ.data || !engQ.data) return null;
