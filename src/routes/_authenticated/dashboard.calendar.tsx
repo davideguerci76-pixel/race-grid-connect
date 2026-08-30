@@ -301,6 +301,7 @@ function CalendarPage() {
                   protectedDays={protectedSet}
                   onReshape={(dates) => replaceDates(dates)}
                   pending={mutation.isPending}
+                  month={month}
                 />
               </div>
             }
