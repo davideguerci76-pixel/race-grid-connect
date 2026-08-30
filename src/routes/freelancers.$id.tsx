@@ -87,12 +87,6 @@ function FreelancerProfile() {
                 );
               })()}
             </div>
-            {fp.day_rate && (
-              <div className="text-right">
-                <div className="label-mono">Day rate</div>
-                <div className="mt-1 font-mono text-2xl font-black text-racing-yellow">{fp.currency} {fp.day_rate}</div>
-              </div>
-            )}
           </div>
           {fp.bio && <p className="mt-3 text-sm text-muted-foreground">{fp.bio}</p>}
           <div className="mt-6 flex flex-wrap gap-2">
