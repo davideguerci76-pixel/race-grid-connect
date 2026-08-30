@@ -19,17 +19,47 @@ const btn =
 const btnPrimary =
   "inline-flex items-center gap-2 bg-racing-red px-4 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40";
 
+const pad = (n: number) => String(n).padStart(2, "0");
+const isoLocal = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+/** All days of the given month (local time), as ISO strings. */
+function monthDays(month: Date): string[] {
+  const out: string[] = [];
+  const d = new Date(month.getFullYear(), month.getMonth(), 1);
+  while (d.getMonth() === month.getMonth()) {
+    out.push(isoLocal(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
+/** Today → same day +6 months (inclusive), as ISO strings. */
+function nextSixMonthsDays(): string[] {
+  const out: string[] = [];
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  const end = new Date(d);
+  end.setMonth(end.getMonth() + 6);
+  while (d <= end) {
+    out.push(isoLocal(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
 /** Collapsed drawer with the less frequent calendar utilities. */
 export function CalendarTools({
   currentAvailable,
   protectedDays,
   onReshape,
   pending,
+  month,
 }: {
   currentAvailable: string[];
   protectedDays: Set<string>;
   onReshape: (dates: string[]) => void;
   pending?: boolean;
+  month: Date;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
