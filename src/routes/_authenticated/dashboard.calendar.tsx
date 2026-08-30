@@ -82,11 +82,6 @@ function CalendarPage() {
     enabled: !!user && isFreelancer,
     queryFn: () => getEngDays(),
   });
-  const { data: calendars } = useQuery({
-    queryKey: ["my-calendars"],
-    enabled: !!user && isFreelancer,
-    queryFn: () => listCals(),
-  });
 
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
