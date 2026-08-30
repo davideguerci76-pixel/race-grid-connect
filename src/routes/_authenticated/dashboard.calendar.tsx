@@ -47,6 +47,7 @@ function CalendarPage() {
   const { formatDate } = useDateFormat();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const qc = useQueryClient();
 
   const { data: profile } = useQuery({
