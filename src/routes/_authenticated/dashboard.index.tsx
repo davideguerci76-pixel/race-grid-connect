@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyOpenSosCalls, acceptSosCall } from "@/lib/paddock.functions";
 import { MarketHighlights } from "@/components/market-highlights";
+import { MiniAvailabilityCard } from "@/components/mini-availability-card";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
 import { toastError } from "@/lib/errors";
@@ -197,15 +198,21 @@ function DashboardHome() {
           </div>
         )}
 
+        {isFreelancer && (
+          <div className="mt-8">
+            <MiniAvailabilityCard
+              fallback={<DashCard to="/dashboard/calendar" icon={Calendar} label={t("dashboard.my_availability_label")} value={t("dashboard.manage_availability_calendar")} />}
+            />
+          </div>
+        )}
+
         <div className="mt-8 grid gap-4 md:grid-cols-5">
           <DashCard to="/dashboard/profile" icon={User} label={t("nav.profile")} value="→" />
-          {isTeam ? (
+          {isTeam && (
             <>
               <DashCard to="/dashboard/requests" icon={Briefcase} label={t("requests.title")} value={t("requests.new")} />
               <DashCard to="/dashboard/team-calendar" icon={Calendar} label={t("pcal.team_card")} value="→" />
             </>
-          ) : (
-            <DashCard to="/dashboard/calendar" icon={Calendar} label={t("dashboard.my_availability_label")} value={t("dashboard.manage_availability_calendar")} />
           )}
           <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
           {isFreelancer ? (

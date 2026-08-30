@@ -16,6 +16,7 @@ import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
+import { calendarDayState } from "@/lib/calendar-days";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
@@ -114,22 +115,25 @@ function CalendarPage() {
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
-    for (const [day, e] of engMap) {
-      map.set(day, {
-        state: e.locked ? "locked" : "engagement",
-        label: e.locked ? t("pcal.locked", { defaultValue: "LOCKED" }) : [e.team, e.location].filter(Boolean).join(" · ") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
-        disabled: true,
-      });
+    const noted = new Set(noteMap.keys());
+    const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys()]);
+    for (const day of all) {
+      const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
+      if (state === "locked") {
+        map.set(day, { state, label: t("pcal.locked", { defaultValue: "LOCKED" }), disabled: true });
+      } else if (state === "engagement") {
+        const e = engMap.get(day);
+        map.set(day, {
+          state,
+          label: (e ? [e.team, e.location].filter(Boolean).join(" · ") : "") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
+          disabled: true,
+        });
+      } else if (state === "available") {
+        map.set(day, { state, label: noteMap.get(day)?.note ?? null, unconfirmed: unconfirmedSet.has(day) });
+      } else if (state === "busy") {
+        map.set(day, { state, label: noteMap.get(day)?.note ?? null });
+      }
     }
-    for (const day of availableSet) {
-      if (map.has(day)) continue;
-      map.set(day, { state: "available", label: noteMap.get(day)?.note ?? null, unconfirmed: unconfirmedSet.has(day) });
-    }
-    for (const [day, n] of noteMap) {
-      if (map.has(day)) continue;
-      map.set(day, { state: "busy", label: n.note });
-    }
-    for (const day of blockedSet) if (!map.has(day)) map.set(day, { state: "engagement", disabled: true, label: t("pcal.pitcall", { defaultValue: "PITCALL" }) });
     return map;
   }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, t]);
 
