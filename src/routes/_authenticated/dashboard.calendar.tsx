@@ -169,13 +169,29 @@ function CalendarPage() {
     mutation.mutate({ nextSet: new Set([...availableSet, ...dates.filter((d) => !protectedSet.has(d))]) });
   };
 
+  /** Quick tap toggle: only for days without a private note. Noted days are protected. */
   const toggleDay = (iso: string) => {
     if (protectedSet.has(iso)) return;
+    if (noteMap.has(iso)) return; // noted day: change only via explicit detail action
     const next = new Set(availableSet);
     if (next.has(iso)) next.delete(iso);
     else next.add(iso);
     mutation.mutate({ nextSet: next });
   };
+
+  /** Explicit availability change from the detail panel. The private note is preserved. */
+  const setDayAvailability = (iso: string, available: boolean) => {
+    if (protectedSet.has(iso)) return;
+    const next = new Set(availableSet);
+    if (available) next.add(iso);
+    else next.delete(iso);
+    mutation.mutate({ nextSet: next });
+    const existing = noteMap.get(iso);
+    if (existing && existing.busy === available) {
+      noteMut.mutate({ day: iso, note: existing.note, busy: !available });
+    }
+  };
+
 
 
   const noteMut = useMutation({
@@ -327,6 +343,19 @@ function CalendarPage() {
                           ? t("pcal.legend_available", { defaultValue: "Available" })
                           : t("pcal.legend_busy", { defaultValue: "Busy / private" })}
                       </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className={btn}
+                          disabled={!selectedEditable || mutation.isPending}
+                          onClick={() => setDayAvailability(selected, selectedCell?.state !== "available")}
+                        >
+                          {selectedCell?.state === "available"
+                            ? t("pcal.mark_unavailable", { defaultValue: "Mark unavailable" })
+                            : t("pcal.mark_available", { defaultValue: "Mark available" })}
+                        </button>
+                      </div>
+
                       <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <input
                           value={noteDraft}

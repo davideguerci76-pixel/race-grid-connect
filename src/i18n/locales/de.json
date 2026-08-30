@@ -1007,6 +1007,8 @@
       "reshape_desc": "Gruppiert deine aktuellen verfügbaren Tage zu Terminen und wendet dieses Wochenmuster erneut an. PITCALL-Tage bleiben unberührt.",
       "save_as_calendar": "Aktuelle Verfügbarkeit als Kalender speichern",
       "save_hint": "{{count}} verfügbare Tag(e) werden in deinem Archiv gespeichert."
-    }
+    },
+    "mark_available": "Als verfügbar markieren",
+    "mark_unavailable": "Als nicht verfügbar markieren"
   }
 }

@@ -1007,6 +1007,8 @@
       "reshape_desc": "Regroupe vos dates disponibles actuelles en événements et réapplique ce schéma hebdomadaire. Les dates PITCALL ne sont jamais modifiées.",
       "save_as_calendar": "Enregistrer la disponibilité actuelle comme calendrier",
       "save_hint": "{{count}} jour(s) disponibles seront enregistrés dans votre archive."
-    }
+    },
+    "mark_available": "Marquer disponible",
+    "mark_unavailable": "Marquer indisponible"
   }
 }
