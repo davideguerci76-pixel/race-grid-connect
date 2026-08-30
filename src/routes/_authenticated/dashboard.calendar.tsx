@@ -343,6 +343,19 @@ function CalendarPage() {
                           ? t("pcal.legend_available", { defaultValue: "Available" })
                           : t("pcal.legend_busy", { defaultValue: "Busy / private" })}
                       </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className={btn}
+                          disabled={!selectedEditable || mutation.isPending}
+                          onClick={() => setDayAvailability(selected, selectedCell?.state !== "available")}
+                        >
+                          {selectedCell?.state === "available"
+                            ? t("pcal.mark_unavailable", { defaultValue: "Mark unavailable" })
+                            : t("pcal.mark_available", { defaultValue: "Mark available" })}
+                        </button>
+                      </div>
+
                       <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                         <input
                           value={noteDraft}
