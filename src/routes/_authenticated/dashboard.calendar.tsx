@@ -89,7 +89,8 @@ function CalendarPage() {
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
   const [noteDraft, setNoteDraft] = useState("");
-  const [busyDialog, setBusyDialog] = useState<{ calendarId: string; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
