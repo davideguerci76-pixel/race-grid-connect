@@ -25,7 +25,7 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("engagements")
       .select(
-        "id, team_id, start_date, end_date, status, cancellation_kind, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
+        "id, team_id, request_id, start_date, end_date, status, cancellation_kind, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
       )
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed", "cancelled"]);
@@ -41,6 +41,19 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
       for (const t of (tps ?? []) as any[]) nameMap.set(t.user_id, t.team_name);
     }
 
+    // The freelancer may not be able to read the request row directly (RLS), so the
+    // public Pit Call context (location, role) is resolved server-side, like the team name.
+    const reqIds = Array.from(new Set(relevant.map((r) => r.request_id).filter(Boolean)));
+    const reqMap = new Map<string, any>();
+    if (reqIds.length) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: reqs } = await supabaseAdmin
+        .from("requests")
+        .select("id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates")
+        .in("id", reqIds as string[]);
+      for (const q of (reqs ?? []) as any[]) reqMap.set(q.id, q);
+    }
+
     const out: Array<{
       day: string;
       engagement_id: string;
@@ -52,20 +65,21 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
       title: string | null;
     }> = [];
     for (const r of relevant) {
-      const season = Array.isArray(r.request?.season_dates) ? r.request.season_dates : [];
+      const req = r.request ?? reqMap.get(r.request_id) ?? null;
+      const season = Array.isArray(req?.season_dates) ? req.season_dates : [];
       const days = season.length
         ? season.map((d: string) => String(d).slice(0, 10))
-        : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
+        : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
       for (const day of days) {
         out.push({
           day,
           engagement_id: r.id,
           locked: r.status === "cancelled",
           team: nameMap.get(r.team_id) ?? null,
-          location: r.request?.circuit ?? r.request?.location ?? null,
-          role: r.request?.role_group ?? null,
-          sub_role: r.request?.sub_role ?? null,
-          title: r.request?.title ?? null,
+          location: req?.circuit ?? req?.location ?? null,
+          role: req?.role_group ?? null,
+          sub_role: req?.sub_role ?? null,
+          title: req?.title ?? null,
         });
       }
     }
