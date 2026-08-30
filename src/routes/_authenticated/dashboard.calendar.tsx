@@ -137,19 +137,23 @@ function CalendarPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async ({ nextSet }: { nextSet: Set<string>; isUndo?: boolean }) => {
-      // Protected (red) days are excluded from both sides: never added, never removed.
-      const currentSet = new Set((myDays as string[]).filter((d) => !protectedSet.has(d)));
-      const target = new Set([...nextSet].filter((d) => !protectedSet.has(d)));
+    mutationFn: async (vars: { nextSet: Set<string>; isUndo?: boolean; base?: string[] }) => {
+      // Diff against the state captured in onMutate (never against the optimistic cache).
+      const base = vars.base ?? (qc.getQueryData<string[]>(["my-availability", user?.id]) ?? []);
+      const currentSet = new Set(base.filter((d) => !protectedSet.has(d)));
+      const target = new Set([...vars.nextSet].filter((d) => !protectedSet.has(d)));
       const toAdd = [...target].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !target.has(d));
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
-    onMutate: async ({ nextSet, isUndo }) => {
+    onMutate: async (vars) => {
+      const { nextSet, isUndo } = vars;
       const key = ["my-availability", user?.id];
       await qc.cancelQueries({ queryKey: key });
       const previous = qc.getQueryData<string[]>(key) ?? [];
+      // Same object reference reaches mutationFn: give it the pre-change baseline.
+      vars.base = previous;
       const optimistic = [
         ...new Set([...previous.filter((d) => protectedSet.has(d)), ...[...nextSet].filter((d) => !protectedSet.has(d))]),
       ].sort();
@@ -164,6 +168,7 @@ function CalendarPage() {
       expectedRef.current = optimistic;
       return { previous };
     },
+
     onError: (e, _v, context) => {
       if (context?.previous) qc.setQueryData(["my-availability", user?.id], context.previous);
       setUndoSnapshot(null);
