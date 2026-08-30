@@ -100,7 +100,7 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-7 gap-[3px]" aria-hidden>
+      <div className="mx-auto mt-3 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
         {(loading ? Array.from({ length: 42 }, () => null) : days).map((d, i) => {
           if (d === null) {
             return <span key={i} className="aspect-square animate-pulse bg-[#15181d]" />;
