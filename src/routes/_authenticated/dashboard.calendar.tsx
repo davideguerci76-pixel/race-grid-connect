@@ -16,6 +16,7 @@ import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
+import { calendarDayState } from "@/lib/calendar-days";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
