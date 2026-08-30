@@ -13,7 +13,9 @@ import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalenda
 import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
 import { listMyCalendars, type UserCalendar } from "@/lib/calendars.functions";
 import { BackButton } from "@/components/back-button";
-import { CalendarSourcePicker } from "@/components/calendar-source-picker";
+import { CalendarPlus } from "lucide-react";
+import { CalendarAddDialog } from "@/components/calendar-add-dialog";
+import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
