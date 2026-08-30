@@ -8,6 +8,30 @@ export function isoOfUtc(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 }
 
+export type CalendarDayState = "none" | "available" | "busy" | "engagement" | "locked";
+
+/**
+ * Pure day-state resolution shared by the full calendar and the dashboard
+ * mini-preview. Precedence: engagement (locked > engagement) > blocked >
+ * available > noted-busy > none. No I/O, no business logic beyond ordering.
+ */
+export function calendarDayState(
+  iso: string,
+  opts: {
+    available: Set<string>;
+    blocked: Set<string>;
+    engagements: Map<string, { locked?: boolean | null }>;
+    noted?: Set<string>;
+  },
+): CalendarDayState {
+  const eng = opts.engagements.get(iso);
+  if (eng) return eng.locked ? "locked" : "engagement";
+  if (opts.blocked.has(iso)) return "engagement";
+  if (opts.available.has(iso)) return "available";
+  if (opts.noted?.has(iso)) return "busy";
+  return "none";
+}
+
 export function daysBetweenIso(start: string, end: string): string[] {
   const days: string[] = [];
   const cur = new Date(`${String(start).slice(0, 10)}T00:00:00.000Z`);
