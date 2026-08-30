@@ -11,7 +11,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
-import { listMyCalendars, type UserCalendar } from "@/lib/calendars.functions";
 import { BackButton } from "@/components/back-button";
 import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
@@ -55,7 +54,6 @@ function CalendarPage() {
   const getEngDays = useServerFn(getMyEngagementDays);
   const saveNote = useServerFn(setMyDayNote);
   const applyBusy = useServerFn(applySavedCalendarAsBusy);
-  const listCals = useServerFn(listMyCalendars);
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -210,7 +208,6 @@ function CalendarPage() {
     setNoteDraft(selected ? (noteMap.get(selected)?.note ?? "") : "");
   }, [selected, noteMap]);
 
-  const options: UserCalendar[] = [...(calendars?.mine ?? []), ...(calendars?.shared ?? [])];
   const lastConfirmed = freshness?.calendar_last_confirmed_at ? new Date(freshness.calendar_last_confirmed_at) : null;
   const daysSince = lastConfirmed ? Math.floor((Date.now() - lastConfirmed.getTime()) / 86400000) : null;
   const state = freshness?.state ?? "fresh";
@@ -368,6 +365,16 @@ function CalendarPage() {
           />
         </div>
       </div>
+
+      <CalendarAddDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        currentAvailable={[...availableSet].sort()}
+        protectedDays={protectedSet}
+        pending={mutation.isPending || busyMut.isPending}
+        onApplyAvailable={(dates, mode) => (mode === "replace" ? replaceDates(dates) : mergeDates(dates))}
+        onApplyBusy={(dates, label) => setBusyDialog({ dates, label, conflicts: [] })}
+      />
 
       {busyDialog && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-3">
