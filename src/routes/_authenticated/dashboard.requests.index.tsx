@@ -65,22 +65,22 @@ function RequestsPage() {
       <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
             <div className="label-mono">[MY PIT CALLS]</div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("requests.title")}</h1>
+            <h1 className="max-w-full text-3xl font-black uppercase italic leading-tight sm:text-4xl">{t("requests.title")}</h1>
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("requests.subtitle")}</p>
           </div>
           {flags.pitcallCreationDisabled ? (
-            <div className="shrink-0 border border-border bg-secondary px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="w-full border border-border bg-secondary px-4 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-foreground sm:w-auto sm:max-w-xs">
               {t("sweep_admin_a.pitcall_creation_disabled")}
             </div>
           ) : (
           <Link
             to="/dashboard/requests/new"
             title={t("requests.helper")}
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 sm:w-auto"
           >
             <Plus className="size-4" /> {t("requests.new")}
 
@@ -102,8 +102,8 @@ function RequestsPage() {
           )}
           {requests.map((r) => (
             <div key={r.id} className="card-surface p-5 transition-colors hover:border-racing-red/60">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
                     {(r as any).search_mode === "pool" && <PoolBadge />}
@@ -112,7 +112,7 @@ function RequestsPage() {
                       {(r as any).sub_role ? subRoleLabel((r as any).sub_role) : roleGroupLabel((r as any).role_group)} · {disciplineLabel(r.discipline)}
                     </span>
                   </div>
-                  <h2 className="mt-1 text-xl font-bold">{r.title}</h2>
+                  <h2 className="mt-1 break-words text-xl font-bold">{r.title}</h2>
                   <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5"><Calendar className="size-3.5" />{r.start_date} → {r.end_date}</span>
                     {(r.circuit || r.location) && (

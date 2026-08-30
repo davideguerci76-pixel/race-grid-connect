@@ -136,13 +136,13 @@ function ProfilePage() {
           {user?.id && <ProfileRatingBadge userId={user.id} isFreelancer={isFreelancer} />}
         </div>
 
-        <div className="mt-8 grid gap-8 md:grid-cols-2">
-          <div className="border border-border bg-card p-6">
+        <div className="mt-8 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-2">
+          <div className="min-w-0 border border-border bg-card p-4 sm:p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">{t("sweep_profile.profile.personal_info")}</h2>
             <PersonalInfoSection profile={profile} />
           </div>
 
-          <div className="border border-border bg-card p-6">
+          <div className="min-w-0 border border-border bg-card p-4 sm:p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">
               {isFreelancer ? t("sweep_profile.profile.freelancer_info") : t("sweep_profile.profile.team_info")}
             </h2>
@@ -302,7 +302,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <div className="text-sm">
+      <div className="min-w-0 text-sm">
         <span className="text-muted-foreground">{t("sweep_profile.profile.email")}:</span>
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
@@ -310,8 +310,8 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       {isFreelancer && <PitCodeBlock />}
       <div className="text-sm">
         <span className="text-muted-foreground">{t("profile.account_type")}:</span>
-        <span className="ml-2 font-mono uppercase">{profile?.user_type ?? "—"}</span>
-        <span className="ml-2 text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
+        <span className="ml-2 break-words font-mono uppercase">{profile?.user_type ?? "—"}</span>
+        <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
       {!isFreelancer && (editing ? (
         <>
@@ -809,7 +809,7 @@ function TeamSection({ profile }: { profile: any }) {
       <Row label={t("sweep_profile.team.discipline")} value={disciplineLabel(profile?.primary_discipline)} mono />
       <div className="text-sm">
         <span className="text-muted-foreground">{t("sweep_profile.team.website")}:</span>
-        <span className="ml-2">{profile?.website ? <a href={profile.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{profile.website}</a> : "—"}</span>
+        <span className="ml-2 break-all">{profile?.website ? <a href={profile.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{profile.website}</a> : "—"}</span>
       </div>
       <div className="text-sm"><span className="text-muted-foreground">{t("sweep_profile.common.bio")}:</span><p className="mt-1">{profile?.bio ?? "—"}</p></div>
       <button onClick={() => setEditing(true)} className="mt-2 text-xs text-racing-red hover:underline">{t("sweep_profile.team.edit_info")}</button>
@@ -879,9 +879,9 @@ function LegalNameBlock({ profile }: { profile: any }) {
 
 function Row({ label, value, mono, bold }: { label: string; value: string; mono?: boolean; bold?: boolean }) {
   return (
-    <div className="text-sm">
+    <div className="min-w-0 text-sm">
       <span className="text-muted-foreground">{label}:</span>
-      <span className={`ml-2 ${mono ? "font-mono" : ""} ${bold ? "font-bold" : ""}`}>{value}</span>
+      <span className={`ml-2 break-words [overflow-wrap:anywhere] ${mono ? "font-mono" : ""} ${bold ? "font-bold" : ""}`}>{value}</span>
     </div>
   );
 }

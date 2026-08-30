@@ -279,14 +279,14 @@ function NewRequestPage() {
       <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
-        <div className="flex items-center justify-between gap-4">
-          <div>
+        <div className="grid min-w-0 grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div className="min-w-0">
             <div className="label-mono">[NEW PIT CALL]</div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("requests.new")}</h1>
+            <h1 className="max-w-full text-3xl font-black uppercase italic leading-tight sm:text-4xl">{t("requests.new")}</h1>
             <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
 
           </div>
-          <Link to="/dashboard/requests" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-racing-red">
+          <Link to="/dashboard/requests" className="w-fit text-xs uppercase tracking-widest text-muted-foreground hover:text-racing-red">
             ← {t("requests.back")}
           </Link>
         </div>
@@ -374,7 +374,7 @@ function NewRequestPage() {
 
             mut.mutate();
           }}
-          className="mt-6 grid gap-4 border border-border bg-card p-6 md:grid-cols-2"
+          className="mt-6 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 border border-border bg-card p-4 sm:p-6 md:grid-cols-2 [&>*]:min-w-0"
         >
           <fieldset disabled={identical} className="contents">
 
@@ -407,11 +407,11 @@ function NewRequestPage() {
 
           <div>
             <label className="label-mono">{t("sweep_engage.new_request.sub_role_label")}</label>
-            <div className="mt-1 flex gap-2">
+            <div className="mt-1 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
               <select
                 value={form.sub_role}
                 onChange={(e) => setForm({ ...form, sub_role: e.target.value })}
-                className="flex-1 border border-border bg-background px-3 py-2"
+                className="w-full min-w-0 border border-border bg-background px-3 py-2"
               >
                 <option value="">{t("sweep_engage.new_request.any_sub_role")}</option>
                 {subRolesForGroup(form.role_group).map((o) => (
@@ -422,7 +422,7 @@ function NewRequestPage() {
                 value={form.sub_role_min_level}
                 onChange={(e) => setForm({ ...form, sub_role_min_level: e.target.value as "junior" | "intermediate" | "senior" })}
                 disabled={!form.sub_role}
-                className="border border-border bg-background px-3 py-2 disabled:opacity-40"
+                className="w-full min-w-0 border border-border bg-background px-3 py-2 disabled:opacity-40 sm:w-auto"
               >
                 {SUB_ROLE_LEVELS.map((l) => (<option key={l} value={l}>{levelLabel(l)}</option>))}
               </select>
@@ -488,24 +488,24 @@ function NewRequestPage() {
 
               {locRelevance !== "not_relevant" && (
                 <>
-                  <div className="inline-flex border border-border">
+                  <div className="grid w-full min-w-0 grid-cols-2 border border-border sm:inline-flex sm:w-auto">
                     <button
                       type="button"
                       onClick={() => setLocAnchor("this")}
-                      className={`px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "this" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                      className={`min-w-0 px-2 py-2 text-[11px] font-bold uppercase sm:px-3 ${locAnchor === "this" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
                     >
                       {t("sweep_engage.new_request.this_location")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setLocAnchor("team")}
-                      className={`border-l border-border px-3 py-2 text-[11px] font-bold uppercase ${locAnchor === "team" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
+                      className={`min-w-0 border-l border-border px-2 py-2 text-[11px] font-bold uppercase sm:px-3 ${locAnchor === "team" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-secondary"}`}
                     >
                       {t("sweep_engage.new_request.team_location")}
                     </button>
                   </div>
 
-                  <label className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
+                  <label className="flex min-w-0 flex-wrap items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
                     {t("sweep_engage.new_request.max_distance")}
                     <select
                       value={locRadius}
@@ -707,7 +707,7 @@ function NewRequestPage() {
             </p>
             <div className="mt-2 space-y-2">
               {experienceReqs.map((req, i) => (
-                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_140px_120px_auto]">
+                <div key={i} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_140px_120px_auto] [&>*]:min-w-0">
                   <select
                     value={req.discipline}
                     onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, discipline: ev.target.value } : r))}
@@ -765,7 +765,7 @@ function NewRequestPage() {
             </p>
             <div className="mt-2 space-y-2">
               {languageReqs.map((req, i) => (
-                <div key={i} className="grid grid-cols-1 gap-2 border border-border bg-background/40 p-2 md:grid-cols-[1fr_1fr_120px_auto]">
+                <div key={i} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2 border border-border bg-background/40 p-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_120px_auto] [&>*]:min-w-0">
                   <select
                     value={req.code}
                     onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
@@ -860,9 +860,9 @@ function SelectField({
   options: { value: string; label: string }[];
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <label className="label-mono">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2">
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 w-full min-w-0 border border-border bg-background px-3 py-2">
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
