@@ -18,6 +18,23 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
+// The client closing the socket mid-render (reload, navigation, preview iframe
+// swap) surfaces as an "aborted"/ECONNRESET throw. That is not an app error and
+// must not render the 500 error page.
+export function isClientAbort(error: unknown): boolean {
+  const seen = new Set<unknown>();
+  let cur: unknown = error;
+  while (cur && typeof cur === "object" && !seen.has(cur)) {
+    seen.add(cur);
+    const e = cur as { code?: unknown; name?: unknown; message?: unknown; cause?: unknown };
+    if (e.code === "ECONNRESET" || e.code === "ABORT_ERR") return true;
+    if (e.name === "AbortError") return true;
+    if (typeof e.message === "string" && /^aborted$/i.test(e.message)) return true;
+    cur = e.cause;
+  }
+  return false;
+}
+
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
@@ -28,21 +45,16 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   const body = await response.clone().text();
   if (!isH3SwallowedErrorBody(body)) return response;
 
-  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
+  const captured = consumeLastCapturedError();
+  if (isClientAbort(captured)) return new Response(null, { status: 499 });
+
+  console.error(captured ?? new Error(`h3 swallowed SSR error: ${body}`));
   return new Response(renderErrorPage(), {
     status: 500,
     headers: { "content-type": "text/html; charset=utf-8" },
   });
 }
 
-function isH3SwallowedErrorBody(body: string): boolean {
-  try {
-    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
-    return payload.unhandled === true && payload.message === "HTTPError";
-  } catch {
-    return false;
-  }
-}
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
