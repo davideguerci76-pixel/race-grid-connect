@@ -18,6 +18,7 @@ import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
