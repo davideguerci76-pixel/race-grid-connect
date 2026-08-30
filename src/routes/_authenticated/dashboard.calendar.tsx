@@ -134,7 +134,7 @@ function CalendarPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async ({ nextSet }: { nextSet: Set<string> }) => {
+    mutationFn: async ({ nextSet }: { nextSet: Set<string>; isUndo?: boolean }) => {
       // Protected (red) days are excluded from both sides: never added, never removed.
       const currentSet = new Set((myDays as string[]).filter((d) => !protectedSet.has(d)));
       const target = new Set([...nextSet].filter((d) => !protectedSet.has(d)));
