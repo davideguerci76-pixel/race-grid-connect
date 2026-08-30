@@ -87,6 +87,9 @@ function CalendarPage() {
   const [noteDraft, setNoteDraft] = useState("");
   const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
+  const inFlightRef = useRef(0);
+  const expectedRef = useRef<string[] | null>(null);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
