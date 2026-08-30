@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { getMyAvailability, getMyBlockedDates } from "@/lib/paddock.functions";
 import { getMyEngagementDays } from "@/lib/calendar-notes.functions";
