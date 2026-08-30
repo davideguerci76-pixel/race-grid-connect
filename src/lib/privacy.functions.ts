@@ -17,13 +17,14 @@ export const exportMyData = createServerFn({ method: "POST" })
       return data ?? [];
     };
 
-    const [profile, freelancerProfile, teamProfile, teamVat, myCoords, contacts, availability, calendars, notifications, tokens] =
+    const [profile, freelancerProfile, teamProfile, teamVat, myCoords, myRate, contacts, availability, calendars, notifications, tokens] =
       await Promise.all([
         (supabase as any).from("profiles").select("*").eq("id", userId).maybeSingle(),
         (supabase as any).from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
         (supabase as any).from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", userId).maybeSingle(),
         (supabase as any).rpc("my_team_vat"),
         (supabase as any).rpc("my_profile_coords"),
+        (supabase as any).rpc("my_day_rate"),
         (supabase as any).from("freelancer_contacts").select("*").eq("user_id", userId).maybeSingle(),
         pick("availability", "freelancer_id"),
         pick("user_calendars", "owner_id"),
@@ -34,11 +35,12 @@ export const exportMyData = createServerFn({ method: "POST" })
     const ratingsWritten = await pick("ratings", "from_user_id");
     const coordsRow = Array.isArray(myCoords?.data) ? (myCoords.data[0] as any) : null;
     const coords = { location_lat: coordsRow?.location_lat ?? null, location_lng: coordsRow?.location_lng ?? null };
+    const rateRow = Array.isArray(myRate?.data) ? (myRate.data[0] as any) : null;
 
     return {
       exported_at: new Date().toISOString(),
       account: profile?.data ?? null,
-      freelancer_profile: freelancerProfile?.data ? { ...freelancerProfile.data, ...coords } : null,
+      freelancer_profile: freelancerProfile?.data ? { ...freelancerProfile.data, ...coords, ...(rateRow ?? { day_rate: null, currency: null }) } : null,
       team_profile: teamProfile?.data ? { ...teamProfile.data, ...coords, vat_number: (teamVat?.data as string | null) ?? null } : null,
       contacts: contacts?.data ?? null,
       availability,
