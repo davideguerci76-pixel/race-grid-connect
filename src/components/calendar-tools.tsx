@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CalendarRange, Save, Settings2, Wand2 } from "lucide-react";
+import { CalendarCheck, CalendarRange, CalendarX, Save, Settings2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { saveCalendar } from "@/lib/calendars.functions";
 import { daysToEvents } from "@/lib/ics";
