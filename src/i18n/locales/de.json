@@ -1012,6 +1012,8 @@
       "select_six": "Nächste 6 Monate auswählen",
       "deselect_six": "Nächste 6 Monate abwählen",
       "deselect_hint": "Bestätigte PITCALL- und gesperrte Tage werden nie geändert.",
+      "undo": "Letzte Änderung rückgängig",
+      "undo_toast": "Verfügbarkeit wiederhergestellt",
       "nothing_to_remove": "Hier gibt es keine verfügbaren Tage zum Entfernen."
     },
     "mark_available": "Als verfügbar markieren",

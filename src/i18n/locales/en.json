@@ -1024,6 +1024,8 @@
       "select_six": "Select next 6 months",
       "deselect_six": "Deselect next 6 months",
       "deselect_hint": "Confirmed PITCALL and locked days are never changed.",
+      "undo": "Undo last change",
+      "undo_toast": "Availability restored",
       "nothing_to_remove": "No available days to remove here."
     },
     "mark_available": "Mark available",
