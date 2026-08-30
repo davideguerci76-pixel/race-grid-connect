@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicNotificationPushRouteImport } from './routes/api/public/notification-push'
 import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
+import { Route as AuthenticatedDashboardTeamCalendarRouteImport } from './routes/_authenticated/dashboard.team-calendar'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
 import { Route as AuthenticatedDashboardPoolRouteImport } from './routes/_authenticated/dashboard.pool'
 import { Route as AuthenticatedDashboardNotificationsRouteImport } from './routes/_authenticated/dashboard.notifications'
@@ -166,6 +167,12 @@ const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
     path: '/tokens',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
+const AuthenticatedDashboardTeamCalendarRoute =
+  AuthenticatedDashboardTeamCalendarRouteImport.update({
+    id: '/team-calendar',
+    path: '/team-calendar',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardProfileRoute =
@@ -337,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -381,6 +389,7 @@ export interface FileRoutesByTo {
   '/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -429,6 +438,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/notifications': typeof AuthenticatedDashboardNotificationsRoute
   '/_authenticated/dashboard/pool': typeof AuthenticatedDashboardPoolRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/_authenticated/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -477,6 +487,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/pool'
     | '/dashboard/profile'
+    | '/dashboard/team-calendar'
     | '/dashboard/tokens'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -521,6 +532,7 @@ export interface FileRouteTypes {
     | '/dashboard/notifications'
     | '/dashboard/pool'
     | '/dashboard/profile'
+    | '/dashboard/team-calendar'
     | '/dashboard/tokens'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -568,6 +580,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/notifications'
     | '/_authenticated/dashboard/pool'
     | '/_authenticated/dashboard/profile'
+    | '/_authenticated/dashboard/team-calendar'
     | '/_authenticated/dashboard/tokens'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -758,6 +771,13 @@ declare module '@tanstack/react-router' {
       path: '/tokens'
       fullPath: '/dashboard/tokens'
       preLoaderRoute: typeof AuthenticatedDashboardTokensRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
+    '/_authenticated/dashboard/team-calendar': {
+      id: '/_authenticated/dashboard/team-calendar'
+      path: '/team-calendar'
+      fullPath: '/dashboard/team-calendar'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamCalendarRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/profile': {
@@ -963,6 +983,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardNotificationsRoute: typeof AuthenticatedDashboardNotificationsRoute
   AuthenticatedDashboardPoolRoute: typeof AuthenticatedDashboardPoolRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
+  AuthenticatedDashboardTeamCalendarRoute: typeof AuthenticatedDashboardTeamCalendarRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
@@ -981,6 +1002,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardNotificationsRoute,
     AuthenticatedDashboardPoolRoute: AuthenticatedDashboardPoolRoute,
     AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
+    AuthenticatedDashboardTeamCalendarRoute:
+      AuthenticatedDashboardTeamCalendarRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardRequestsNewRoute:
