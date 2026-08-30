@@ -409,9 +409,8 @@ function CalendarPage() {
                   className={btn}
                   disabled={busyMut.isPending}
                   onClick={() => {
-                    const cal = options.find((c) => c.id === busyDialog.calendarId);
                     const skip = new Set(busyDialog.conflicts.map((c) => c.day));
-                    busyMut.mutate({ dates: (cal?.dates ?? []).filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
+                    busyMut.mutate({ dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
                   }}
                 >
                   {t("pcal.keep_existing", { defaultValue: "Keep existing" })}
@@ -421,10 +420,7 @@ function CalendarPage() {
                 type="button"
                 className="bg-racing-red px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
                 disabled={busyMut.isPending || !busyDialog.label.trim()}
-                onClick={() => {
-                  const cal = options.find((c) => c.id === busyDialog.calendarId);
-                  busyMut.mutate({ dates: cal?.dates ?? [], label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 });
-                }}
+                onClick={() => busyMut.mutate({ dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 })}
               >
                 {busyDialog.conflicts.length > 0
                   ? t("pcal.overwrite", { defaultValue: "Overwrite" })
