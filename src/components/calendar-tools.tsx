@@ -125,6 +125,18 @@ export function CalendarTools({
 
       {open && (
         <div className="mt-2 flex flex-wrap gap-2">
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkSelect(monthDays(month))}>
+            <CalendarCheck className="size-3.5" /> {t("pcal.tools.select_month", { defaultValue: "Select month" })}
+          </button>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(monthDays(month), "month")}>
+            <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_month", { defaultValue: "Deselect month" })}
+          </button>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkSelect(nextSixMonthsDays())}>
+            <CalendarCheck className="size-3.5" /> {t("pcal.tools.select_six", { defaultValue: "Select next 6 months" })}
+          </button>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(), "six")}>
+            <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_six", { defaultValue: "Deselect next 6 months" })}
+          </button>
           <button type="button" className={btn} onClick={() => setReshapeOpen(true)}>
             <Wand2 className="size-3.5" /> {t("pcal.tools.reshape", { defaultValue: "Reshape my available dates (Mon → Mon)" })}
           </button>
