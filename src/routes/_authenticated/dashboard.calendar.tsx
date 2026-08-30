@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -87,6 +87,9 @@ function CalendarPage() {
   const [noteDraft, setNoteDraft] = useState("");
   const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
+  const inFlightRef = useRef(0);
+  const expectedRef = useRef<string[] | null>(null);
 
   const blockedSet = useMemo(() => new Set(blockedDays as string[]), [blockedDays]);
   const availableSet = useMemo(
@@ -134,7 +137,7 @@ function CalendarPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async ({ nextSet }: { nextSet: Set<string> }) => {
+    mutationFn: async ({ nextSet }: { nextSet: Set<string>; isUndo?: boolean }) => {
       // Protected (red) days are excluded from both sides: never added, never removed.
       const currentSet = new Set((myDays as string[]).filter((d) => !protectedSet.has(d)));
       const target = new Set([...nextSet].filter((d) => !protectedSet.has(d)));
@@ -143,7 +146,7 @@ function CalendarPage() {
       if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
       if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
     },
-    onMutate: async ({ nextSet }) => {
+    onMutate: async ({ nextSet, isUndo }) => {
       const key = ["my-availability", user?.id];
       await qc.cancelQueries({ queryKey: key });
       const previous = qc.getQueryData<string[]>(key) ?? [];
@@ -151,14 +154,46 @@ function CalendarPage() {
         ...new Set([...previous.filter((d) => protectedSet.has(d)), ...[...nextSet].filter((d) => !protectedSet.has(d))]),
       ].sort();
       qc.setQueryData(key, optimistic);
+      // Single-level undo: keep the state before the first change of a rapid burst.
+      if (isUndo) {
+        setUndoSnapshot(null);
+      } else if (inFlightRef.current === 0) {
+        setUndoSnapshot(previous);
+      }
+      inFlightRef.current += 1;
+      expectedRef.current = optimistic;
       return { previous };
     },
     onError: (e, _v, context) => {
       if (context?.previous) qc.setQueryData(["my-availability", user?.id], context.previous);
+      setUndoSnapshot(null);
       toastError(e, "sweep_public.dashboard_calendar.save_failed");
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ["my-availability"] }),
+    onSettled: () => {
+      inFlightRef.current = Math.max(0, inFlightRef.current - 1);
+      qc.invalidateQueries({ queryKey: ["my-availability"] });
+    },
   });
+
+  /** Restore the exact pre-change snapshot (protected days always preserved). */
+  const undoLastChange = () => {
+    if (!undoSnapshot || mutation.isPending) return;
+    mutation.mutate(
+      { nextSet: new Set(undoSnapshot.filter((d) => !protectedSet.has(d))), isUndo: true },
+      { onSuccess: () => toast.success(t("pcal.tools.undo_toast", { defaultValue: "Availability restored" })) },
+    );
+    setUndoSnapshot(null);
+  };
+
+  /** Drop a stale snapshot when an external refetch really changed the availability. */
+  useEffect(() => {
+    if (inFlightRef.current > 0 || !undoSnapshot) return;
+    const expected = expectedRef.current;
+    if (!expected) return;
+    const current = [...(myDays as string[])].sort();
+    const same = current.length === expected.length && current.every((d, i) => d === expected[i]);
+    if (!same) setUndoSnapshot(null);
+  }, [myDays, undoSnapshot]);
 
   /** Replace the whole availability set (protected days preserved). */
   const replaceDates = (dates: string[]) => {
@@ -169,6 +204,7 @@ function CalendarPage() {
   const mergeDates = (dates: string[]) => {
     mutation.mutate({ nextSet: new Set([...availableSet, ...dates.filter((d) => !protectedSet.has(d))]) });
   };
+
 
   /** Quick tap toggle: only for days without a private note. Noted days are protected. */
   const toggleDay = (iso: string) => {
@@ -303,7 +339,10 @@ function CalendarPage() {
                   onReshape={(dates) => replaceDates(dates)}
                   pending={mutation.isPending}
                   month={month}
+                  canUndo={!!undoSnapshot}
+                  onUndo={undoLastChange}
                 />
+
               </div>
             }
             legend={

@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CalendarCheck, CalendarRange, CalendarX, Save, Settings2, Wand2 } from "lucide-react";
+import { CalendarCheck, CalendarRange, CalendarX, Save, Settings2, Undo2, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { saveCalendar } from "@/lib/calendars.functions";
 import { daysToEvents } from "@/lib/ics";
@@ -54,12 +54,16 @@ export function CalendarTools({
   onReshape,
   pending,
   month,
+  canUndo,
+  onUndo,
 }: {
   currentAvailable: string[];
   protectedDays: Set<string>;
   onReshape: (dates: string[]) => void;
   pending?: boolean;
   month: Date;
+  canUndo?: boolean;
+  onUndo?: () => void;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -137,12 +141,18 @@ export function CalendarTools({
           <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(), "six")}>
             <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_six", { defaultValue: "Deselect next 6 months" })}
           </button>
+          {canUndo && (
+            <button type="button" className={btn} disabled={pending} onClick={() => onUndo?.()}>
+              <Undo2 className="size-3.5" /> {t("pcal.tools.undo", { defaultValue: "Undo last change" })}
+            </button>
+          )}
           <button type="button" className={btn} onClick={() => setReshapeOpen(true)}>
             <Wand2 className="size-3.5" /> {t("pcal.tools.reshape", { defaultValue: "Reshape my available dates (Mon → Mon)" })}
           </button>
           <button type="button" className={btn} onClick={() => setSaveOpen(true)}>
             <Save className="size-3.5" /> {t("pcal.tools.save_as_calendar", { defaultValue: "Save current availability as calendar" })}
           </button>
+
           <Link to="/dashboard/calendars" className={btn}>
             <CalendarRange className="size-3.5" /> {t("sweep_public.calendar_source_picker.manage_calendars")}
           </Link>

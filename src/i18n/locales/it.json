@@ -1024,6 +1024,8 @@
       "select_six": "Seleziona prossimi 6 mesi",
       "deselect_six": "Deseleziona prossimi 6 mesi",
       "deselect_hint": "I giorni PITCALL confermati e bloccati non vengono mai modificati.",
+      "undo": "Annulla ultima modifica",
+      "undo_toast": "Disponibilità ripristinata",
       "nothing_to_remove": "Nessun giorno disponibile da rimuovere qui."
     },
     "mark_available": "Segna disponibile",
