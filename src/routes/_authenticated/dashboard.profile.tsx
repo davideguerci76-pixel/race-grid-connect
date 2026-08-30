@@ -128,15 +128,15 @@ function ProfilePage() {
       <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>
       <div className="container-page py-12">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
             <div className="label-mono">[PROFILE]</div>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("nav.profile")}</h1>
+            <h1 className="max-w-full text-3xl font-black uppercase italic leading-tight sm:text-4xl">{t("nav.profile")}</h1>
           </div>
           {user?.id && <ProfileRatingBadge userId={user.id} isFreelancer={isFreelancer} />}
         </div>
 
-        <div className="mt-8 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-2">
+        <div className="mt-8 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 sm:gap-8 md:grid-cols-2">
           <div className="min-w-0 border border-border bg-card p-4 sm:p-6">
             <h2 className="font-mono text-xs uppercase tracking-widest text-racing-red">{t("sweep_profile.profile.personal_info")}</h2>
             <PersonalInfoSection profile={profile} />
