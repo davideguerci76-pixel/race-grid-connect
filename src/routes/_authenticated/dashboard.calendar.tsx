@@ -339,7 +339,10 @@ function CalendarPage() {
                   onReshape={(dates) => replaceDates(dates)}
                   pending={mutation.isPending}
                   month={month}
+                  canUndo={!!undoSnapshot}
+                  onUndo={undoLastChange}
                 />
+
               </div>
             }
             legend={
