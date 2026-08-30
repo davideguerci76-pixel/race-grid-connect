@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { BackButton } from "@/components/back-button";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
 import { getTeamCalendarDays } from "@/lib/calendar-notes.functions";
-import { subRoleLabel, roleGroupLabel } from "@/lib/labels";
+import { roleDisplay } from "@/lib/labels";
 import { dateOf, isoOf } from "@/lib/ics";
 import { useDateFormat } from "@/lib/date-locale";
 
@@ -114,7 +114,7 @@ function TeamCalendarPage() {
                         <li key={it.engagement_id + it.day} className="min-w-0 py-2">
                           <div className="truncate text-sm font-black uppercase tracking-tight">{it.freelancer}</div>
                           <div className="break-words text-xs text-muted-foreground">
-                            {[it.sub_role ? subRoleLabel(it.sub_role) : it.role ? roleGroupLabel(it.role) : null, it.location, it.title]
+                            {[roleDisplay(it.role, it.sub_role), it.location, it.title]
                               .filter(Boolean)
                               .join(" · ")}
                           </div>
