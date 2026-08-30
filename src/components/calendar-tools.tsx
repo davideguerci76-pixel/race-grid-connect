@@ -54,12 +54,16 @@ export function CalendarTools({
   onReshape,
   pending,
   month,
+  canUndo,
+  onUndo,
 }: {
   currentAvailable: string[];
   protectedDays: Set<string>;
   onReshape: (dates: string[]) => void;
   pending?: boolean;
   month: Date;
+  canUndo?: boolean;
+  onUndo?: () => void;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
