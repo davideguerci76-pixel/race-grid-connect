@@ -99,6 +99,7 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
   return (
     <Link
       to="/dashboard/calendar"
+      search={{ m: monthParam }}
       className="group block border border-border bg-card p-4 transition-colors hover:border-racing-red sm:p-5"
     >
       <div className="flex items-center justify-between gap-2">
@@ -106,12 +107,24 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
           <Calendar className="size-5 shrink-0 text-racing-red" strokeWidth={1.5} />
           <span className="label-mono truncate">{t("dashboard.my_availability_label")}</span>
         </div>
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          {formatMonthYear(month)}
-        </span>
+        <div className="flex shrink-0 items-center gap-1">
+          <MonthArrow label="‹" onActivate={() => setOffset((o) => o - 1)} />
+          <span className="min-w-[92px] text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {formatMonthYear(month)}
+          </span>
+          <MonthArrow label="›" onActivate={() => setOffset((o) => o + 1)} />
+        </div>
       </div>
 
       <div className="mx-auto mt-3 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
+        {weekdays.map((w, i) => (
+          <span key={i} className="text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
+            {w}
+          </span>
+        ))}
+      </div>
+
+      <div className="mx-auto mt-1 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
         {(loading ? Array.from({ length: 42 }, () => null) : days).map((d, i) => {
           if (d === null) {
             return <span key={i} className="aspect-square animate-pulse bg-[#15181d]" />;
