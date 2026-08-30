@@ -119,7 +119,7 @@ function CalendarPage() {
     }
     for (const [day, n] of noteMap) {
       if (map.has(day)) continue;
-      map.set(day, { state: n.busy ? "busy" : "none", label: n.note });
+      map.set(day, { state: "busy", label: n.note });
     }
     for (const day of blockedSet) if (!map.has(day)) map.set(day, { state: "engagement", disabled: true, label: t("pcal.pitcall", { defaultValue: "PITCALL" }) });
     return map;
