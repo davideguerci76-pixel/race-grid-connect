@@ -146,9 +146,9 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
-        <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available")} dot="bg-[#145c36]" />
-        <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy")} dot="bg-[#17191e]" />
-        <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall")} dot="bg-[#2a1013]" />
+        <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available_short")} dot="bg-[#145c36]" />
+        <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy_short")} dot="bg-[#17191e]" />
+        <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall_short")} dot="bg-[#2a1013]" />
       </div>
     </Link>
   );
