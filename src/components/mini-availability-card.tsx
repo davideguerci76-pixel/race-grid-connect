@@ -100,52 +100,84 @@ export function MiniAvailabilityCard({ fallback }: { fallback: React.ReactNode }
     <Link
       to="/dashboard/calendar"
       search={{ m: monthParam }}
-      className="group block border border-border bg-card p-4 transition-colors hover:border-racing-red sm:p-5"
+      className="group block border border-border bg-card p-4 transition-colors hover:border-racing-red sm:p-5 md:grid md:grid-cols-[minmax(0,1fr)_220px] md:items-start md:gap-5 lg:grid-cols-[minmax(0,1fr)_260px]"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <Calendar className="size-5 shrink-0 text-racing-red" strokeWidth={1.5} />
-          <span className="label-mono truncate">{t("dashboard.my_availability_label")}</span>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <MonthArrow label="‹" onActivate={() => setOffset((o) => o - 1)} />
-          <span className="min-w-[92px] text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            {formatMonthYear(month)}
-          </span>
-          <MonthArrow label="›" onActivate={() => setOffset((o) => o + 1)} />
-        </div>
-      </div>
-
-      <div className="mx-auto mt-3 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
-        {weekdays.map((w, i) => (
-          <span key={i} className="text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
-            {w}
-          </span>
-        ))}
-      </div>
-
-      <div className="mx-auto mt-1 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px]" aria-hidden>
-        {(loading ? Array.from({ length: 42 }, () => null) : days).map((d, i) => {
-          if (d === null) {
-            return <span key={i} className="aspect-square animate-pulse bg-[#15181d]" />;
-          }
-          const iso = isoOf(d);
-          const state = states!.get(iso) ?? "none";
-          const outside = d.getMonth() !== month.getMonth();
-          return (
-            <span
-              key={iso}
-              className={`flex aspect-square items-center justify-center font-mono text-[9px] ${CELL_CLASS[state]} ${outside ? "opacity-30" : ""}`}
-            >
-              <span className={iso === todayIso && !outside ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
-                {d.getDate()}
-              </span>
+      {/* Main area: calendar */}
+      <div className="min-w-0">
+        {/* Mobile header: label + month/arrows */}
+        <div className="flex items-center justify-between gap-2 md:hidden">
+          <div className="flex min-w-0 items-center gap-2">
+            <Calendar className="size-5 shrink-0 text-racing-red" strokeWidth={1.5} />
+            <span className="label-mono truncate">{t("dashboard.my_availability_label")}</span>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <MonthArrow label="‹" onActivate={() => setOffset((o) => o - 1)} />
+            <span className="min-w-[92px] text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              {formatMonthYear(month)}
             </span>
-          );
-        })}
+            <MonthArrow label="›" onActivate={() => setOffset((o) => o + 1)} />
+          </div>
+        </div>
+
+        <div className="mx-auto mt-3 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px] md:mx-0 md:mt-0 md:max-w-none" aria-hidden>
+          {weekdays.map((w, i) => (
+            <span key={i} className="text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground md:text-[10px]">
+              {w}
+            </span>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-1 grid w-full max-w-[260px] grid-cols-7 gap-[3px] sm:max-w-[300px] md:mx-0 md:mt-2 md:max-w-none" aria-hidden>
+          {(loading ? Array.from({ length: 42 }, () => null) : days).map((d, i) => {
+            if (d === null) {
+              return <span key={i} className="aspect-square animate-pulse bg-[#15181d]" />;
+            }
+            const iso = isoOf(d);
+            const state = states!.get(iso) ?? "none";
+            const outside = d.getMonth() !== month.getMonth();
+            return (
+              <span
+                key={iso}
+                className={`flex aspect-square items-center justify-center font-mono text-[9px] md:text-sm ${CELL_CLASS[state]} ${outside ? "opacity-30" : ""}`}
+              >
+                <span className={iso === todayIso && !outside ? "bg-racing-yellow px-1 font-black text-carbon" : "text-muted-foreground"}>
+                  {d.getDate()}
+                </span>
+              </span>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+      {/* Desktop secondary area */}
+      <div className="hidden min-w-0 flex-col justify-between md:flex">
+        <div>
+          <div className="flex items-center gap-2">
+            <Calendar className="size-5 shrink-0 text-racing-red" strokeWidth={1.5} />
+            <span className="label-mono truncate">{t("dashboard.my_availability_label")}</span>
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-1">
+            <MonthArrow label="‹" onActivate={() => setOffset((o) => o - 1)} />
+            <span className="min-w-[92px] text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              {formatMonthYear(month)}
+            </span>
+            <MonthArrow label="›" onActivate={() => setOffset((o) => o + 1)} />
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2 border-t border-border pt-4">
+          <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available_short")} dot="bg-[#145c36]" />
+          <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy_short")} dot="bg-[#17191e]" />
+          <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall_short")} dot="bg-[#2a1013]" />
+        </div>
+
+        <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-racing-red">
+          {t("dashboard.open_calendar")} →
+        </div>
+      </div>
+
+      {/* Mobile stats */}
+      <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3 md:hidden">
         <MiniStat value={loading ? "–" : stats!.available} label={t("pcal.stat_available_short")} dot="bg-[#145c36]" />
         <MiniStat value={loading ? "–" : stats!.busy} label={t("pcal.stat_busy_short")} dot="bg-[#17191e]" />
         <MiniStat value={loading ? "–" : stats!.pitcall} label={t("pcal.stat_pitcall_short")} dot="bg-[#2a1013]" />
