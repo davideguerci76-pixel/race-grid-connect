@@ -1,3 +1,7 @@
+// Registers the client-abort guards (process + global handlers). Imported here
+// because start.ts loads in BOTH dev and production, unlike server.ts.
+import "./lib/error-capture";
+
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
