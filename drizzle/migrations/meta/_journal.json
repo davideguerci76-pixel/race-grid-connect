@@ -99,6 +99,13 @@
       "when": 1788090680391,
       "tag": "0013_calendar_day_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788177139039,
+      "tag": "0014_owner_set_sensitive_freelancer_fields",
+      "breakpoints": true
     }
   ]
 }
