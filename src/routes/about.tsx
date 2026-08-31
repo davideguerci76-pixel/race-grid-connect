@@ -29,6 +29,7 @@ export const Route = createFileRoute("/about")({
 
 function AboutPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   return (
     <div className="flex min-h-screen flex-col">
