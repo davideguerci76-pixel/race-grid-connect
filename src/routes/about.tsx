@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
