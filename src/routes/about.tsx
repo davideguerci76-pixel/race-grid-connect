@@ -84,16 +84,18 @@ function AboutPage() {
       </section>
 
       {/* CTA */}
-      <div className="mt-20">
-        <Link
-          to="/auth"
-          search={{ mode: "signup" as const }}
-          className="group inline-flex items-center gap-3 border border-racing-red/50 bg-racing-red/10 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all hover:border-racing-red hover:bg-racing-red/20"
-        >
-          {t("about.cta_a")} <span className="text-racing-red">{t("about.cta_b")}</span>
-          <ArrowRight className="size-4 text-racing-red transition-transform group-hover:translate-x-1" />
-        </Link>
-      </div>
+      {!user && (
+        <div className="mt-20">
+          <Link
+            to="/auth"
+            search={{ mode: "signup" as const }}
+            className="group inline-flex items-center gap-3 border border-racing-red/50 bg-racing-red/10 px-6 py-4 text-sm font-black uppercase tracking-widest transition-all hover:border-racing-red hover:bg-racing-red/20"
+          >
+            {t("about.cta_a")} <span className="text-racing-red">{t("about.cta_b")}</span>
+            <ArrowRight className="size-4 text-racing-red transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+      )}
       </main>
       <SiteFooter />
     </div>
