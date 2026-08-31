@@ -8,6 +8,25 @@ import {
 } from "@/config/iubenda";
 
 let iubendaLoading = false;
+let iubendaEmbedsLoading = false;
+
+const IUBENDA_EMBEDS_URL = "https://cdn.iubenda.com/iubenda.js";
+
+/**
+ * Loads the official iubenda legal-documents embed script (iubenda.js)
+ * client-side, AFTER React hydration. It transforms the footer anchors with
+ * the `iubenda-embed` classes into dark (iubenda-black) inline policy
+ * widgets. Guarded so it never initializes twice.
+ */
+export function loadIubendaEmbeds() {
+  if (typeof window === "undefined" || !IUBENDA_ENABLED || iubendaEmbedsLoading) return;
+  if (document.querySelector(`script[src="${IUBENDA_EMBEDS_URL}"]`)) return;
+  iubendaEmbedsLoading = true;
+  const s = document.createElement("script");
+  s.type = "text/javascript";
+  s.src = IUBENDA_EMBEDS_URL;
+  document.head.appendChild(s);
+}
 
 /**
  * Loads the iubenda unified embed client-side, AFTER React hydration.

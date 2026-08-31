@@ -50,9 +50,8 @@ export function SiteFooter() {
             <li>
               <a
                 href={policyUrl("privacy")}
-                target="_blank"
-                rel="noreferrer noopener nofollow"
-                className="text-muted-foreground transition-colors hover:text-racing-red"
+                title="Privacy Policy"
+                className="iubenda-black iubenda-noiframe iubenda-embed text-muted-foreground transition-colors hover:text-racing-red"
               >
                 {t("footer.privacy")}
               </a>
@@ -65,9 +64,8 @@ export function SiteFooter() {
             <li>
               <a
                 href={policyUrl("cookie")}
-                target="_blank"
-                rel="noreferrer noopener nofollow"
-                className="text-muted-foreground transition-colors hover:text-racing-red"
+                title="Cookie Policy"
+                className="iubenda-black iubenda-noiframe iubenda-embed text-muted-foreground transition-colors hover:text-racing-red"
               >
                 {t("footer.cookie")}
               </a>
@@ -107,7 +105,7 @@ export function SiteFooter() {
               <button
                 type="button"
                 onClick={openCookiePreferences}
-                className="text-left text-muted-foreground transition-colors hover:text-racing-red"
+                className="iubenda-cs-preferences-link text-left text-muted-foreground transition-colors hover:text-racing-red"
               >
                 {t("consent.preferences", { defaultValue: "Cookie preferences" })}
               </button>
