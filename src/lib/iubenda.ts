@@ -1,5 +1,34 @@
 import { useEffect, useState } from "react";
-import { IUBENDA, IUBENDA_ENABLED, IUB_PURPOSE } from "@/config/iubenda";
+import {
+  IUBENDA,
+  IUBENDA_ENABLED,
+  IUBENDA_PRECONFIG,
+  IUBENDA_SCRIPT_URL,
+  IUB_PURPOSE,
+} from "@/config/iubenda";
+
+let iubendaLoading = false;
+
+/**
+ * Loads the iubenda unified embed client-side, AFTER React hydration.
+ * Injecting it from the SSR <head> made iubenda append the banner to <body>
+ * before hydration finished; React then cleared the body to recover from the
+ * resulting mismatch and the banner disappeared. Post-hydration injection
+ * avoids that entirely. Guarded so it can never initialize twice.
+ */
+export function loadIubenda() {
+  if (typeof window === "undefined" || !IUBENDA_ENABLED || iubendaLoading) return;
+  if (document.querySelector(`script[src="${IUBENDA_SCRIPT_URL}"]`)) return;
+  iubendaLoading = true;
+  const pre = document.createElement("script");
+  pre.type = "text/javascript";
+  pre.text = IUBENDA_PRECONFIG;
+  const main = document.createElement("script");
+  main.type = "text/javascript";
+  main.src = IUBENDA_SCRIPT_URL;
+  document.head.appendChild(pre);
+  document.head.appendChild(main);
+}
 
 declare global {
   interface Window {
