@@ -94,20 +94,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preload", href: "/fonts/outfit-latin.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
     ],
 
-    // iubenda unified embed: cookie banner + auto-blocking of consent-bound
-    // scripts. Loaded in <head> so blocking is active before anything else runs.
-    // The inline pre-config disables the auto-injected overlays (floating
-    // preferences button + US State Laws badges); the same functions are
-    // exposed as plain links in the PITCALL footer.
-    scripts: IUBENDA_ENABLED
-      ? [
-          {
-            type: "text/javascript",
-            children: IUBENDA_PRECONFIG,
-          },
-          { type: "text/javascript", src: IUBENDA_SCRIPT_URL },
-        ]
-      : [],
+    // iubenda is intentionally NOT in head scripts: injecting it during SSR
+    // made it append the banner to <body> before hydration, and React's
+    // hydration-mismatch recovery then removed it. It is loaded client-side
+    // after hydration via loadIubenda() (see src/lib/iubenda.ts).
 
   }),
 
