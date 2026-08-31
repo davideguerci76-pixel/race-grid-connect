@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import "../i18n";
 import { applySavedLanguage } from "../i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { loadIubenda } from "@/lib/iubenda";
+import { loadIubenda, loadIubendaEmbeds } from "@/lib/iubenda";
 import { registerServiceWorker } from "@/lib/pwa/register-sw";
 import { initInstallPromptCapture } from "@/lib/pwa/install-prompt";
 import { AppSplash } from "@/components/app-splash";
@@ -122,7 +122,10 @@ function RootComponent() {
 
   // Load iubenda only after hydration so its banner can't be wiped by
   // React's hydration-mismatch body recovery.
-  useEffect(() => loadIubenda(), []);
+  useEffect(() => {
+    loadIubenda();
+    loadIubendaEmbeds();
+  }, []);
 
   // Restore the user's saved language after hydration (SSR always renders 'en').
   useEffect(() => applySavedLanguage(), []);
