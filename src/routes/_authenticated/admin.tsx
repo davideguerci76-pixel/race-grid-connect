@@ -31,9 +31,11 @@ function AdminLayout() {
   });
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  if (authLoading || (session && isLoading)) return <div className="container-page py-10 text-sm text-muted-foreground">{t("sweep_admin_a.checking_access")}</div>;
-  if (!data?.isAdmin) {
-    throw redirect({ to: "/" });
+  if (authLoading || !session || isLoading || data === undefined) {
+    return <div className="container-page py-10 text-sm text-muted-foreground">{t("sweep_admin_a.checking_access")}</div>;
+  }
+  if (!data.isAdmin) {
+    return <Navigate to="/" />;
   }
 
   const tabs = [
