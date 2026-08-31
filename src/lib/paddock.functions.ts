@@ -255,6 +255,10 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     if (profileError) throw new Error(profileError.message);
     if (profile?.user_type !== "freelancer") throw new Error("This account is not a freelancer profile");
 
+    // Sensitive columns (day_rate, location_lat/lng) are NOT writable through the
+    // Data API upsert: SELECT is revoked on them for `authenticated`, and an
+    // ON CONFLICT DO UPDATE requires SELECT on every referenced column.
+    // They are persisted owner-scoped via the `set_my_rate_location` RPC below.
     const { data: row, error } = await context.supabase.from("freelancer_profiles").upsert(
       {
         user_id: context.userId,
@@ -264,10 +268,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         disciplines: data.disciplines,
         skills: data.skills ?? [],
         education: data.education || null,
-        day_rate: data.day_rate ?? null,
         location: data.location || null,
-        location_lat: data.location_lat ?? null,
-        location_lng: data.location_lng ?? null,
         location_city: data.location_city ?? null,
         location_region: data.location_region ?? null,
         location_country: data.location_country ?? null,
@@ -280,6 +281,14 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
       { onConflict: "user_id" },
     ).select(FREELANCER_PROFILE_COLUMNS).single();
     if (error) throw new Error(error.message);
+
+    const { error: sensitiveError } = await (context.supabase.rpc as any)("set_my_rate_location", {
+      _day_rate: data.day_rate ?? null,
+      _location_lat: data.location_lat ?? null,
+      _location_lng: data.location_lng ?? null,
+    });
+    if (sensitiveError) throw new Error(sensitiveError.message);
+
 
     return row;
   });

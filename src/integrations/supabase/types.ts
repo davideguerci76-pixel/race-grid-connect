@@ -2404,6 +2404,14 @@ export type Database = {
       reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
+      set_my_rate_location: {
+        Args: {
+          _day_rate: number
+          _location_lat: number
+          _location_lng: number
+        }
+        Returns: boolean
+      }
       set_request_status: {
         Args: {
           _id: string
