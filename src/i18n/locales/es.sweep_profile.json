@@ -108,7 +108,7 @@
       "team_strong_reached": "Tu Pit Call ha alcanzado un resultado de match fuerte.",
       "team_match_activity": "Hay nueva actividad de matching en tu Pit Call.",
       "hot_partial_title": "Hay más oportunidades cerca",
-      "hot_partial_body": "A tu calendario le faltan {{count}} día(s) requeridos. Añádelos para desbloquear más oportunidades."
+      "hot_partial_body": "A tu calendario le faltan {{count}} día(s) requeridos. Añádelos para desbloquear más oportunidades.",
       "calendar_stale_unconfirmed_message": "Hemos dejado de usar temporalmente algunas de tus fechas para el matching porque no podemos asegurar que sigan vigentes. Revísalas cuando quieras para reactivarlas."
     },
     "push": {

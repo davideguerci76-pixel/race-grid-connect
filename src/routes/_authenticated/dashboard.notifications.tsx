@@ -165,12 +165,7 @@ function NotificationsPage() {
                       </div>
                     </div>
                     {isStale ? (
-                      <Link
-                        onClick={markClicked}
-                        to="/dashboard/calendar"
-                        search={{ m: String(n.payload?.month ?? ""), days: Array.isArray(n.payload?.missing_days) ? n.payload.missing_days.join(",") : undefined }}
-                        className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110"
-                      >
+                      <Link onClick={markClicked} to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
                     ) : isTeamMatch && n.payload?.request_id ? (
