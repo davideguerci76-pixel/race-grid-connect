@@ -1338,21 +1338,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const tiersPartial = tiersFor(allPartial.length, isPoolRequest ? poolUnlockedTiers : unlockedPartial);
 
     const allFreelancerIds = Array.from(new Set([...allFull, ...allPartial].map((m: any) => m.freelancer_id)));
-    const requiredDays = (() => {
-      const seasonDates = Array.isArray((req as any).season_dates) ? (req as any).season_dates : [];
-      if (seasonDates.length) return seasonDates.map((d: string) => String(d).slice(0, 10));
-      const start = String((req as any).start_date ?? "").slice(0, 10);
-      const end = String((req as any).end_date ?? "").slice(0, 10);
-      if (!start || !end) return [] as string[];
-      const days: string[] = [];
-      const cursor = new Date(`${start}T00:00:00.000Z`);
-      const last = new Date(`${end}T00:00:00.000Z`);
-      while (!Number.isNaN(cursor.getTime()) && !Number.isNaN(last.getTime()) && cursor.getTime() <= last.getTime()) {
-        days.push(cursor.toISOString().slice(0, 10));
-        cursor.setUTCDate(cursor.getUTCDate() + 1);
-      }
-      return days;
-    })();
+    const { data: requiredDaysData, error: requiredDaysError } = await (supabase.rpc as any)("request_required_days", {
+      _request_id: data.request_id,
+    });
+    if (requiredDaysError) throw new Error(requiredDaysError.message);
+    const requiredDays = ((requiredDaysData ?? []) as string[]).map((day) => String(day).slice(0, 10));
     const ratingAvg = new Map<string, { avg: number; count: number }>();
     const availabilityByFreelancer = new Map<string, Set<string>>();
     if (allFreelancerIds.length) {
