@@ -355,7 +355,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     );
     if (recomputeError) throw new Error(recomputeError.message);
 
-    return { ...row, recompute_count: Number(recomputeResult ?? 0) };
+    return row;
   });
 
 export const updateMyPhone = createServerFn({ method: "POST" })
