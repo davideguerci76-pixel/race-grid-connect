@@ -56,7 +56,7 @@ export function useRequiredDatesText() {
 
 type Props = {
   /** Request-like object with season_dates / start_date / end_date. */
-  request: { season_dates?: string[] | null; start_date?: string | null; end_date?: string | null } | null | undefined;
+  request: { duration?: string | null; season_dates?: string[] | null; start_date?: string | null; end_date?: string | null } | null | undefined;
   /** Optional engagement snapshot (covered_days) that overrides the request dates. */
   dates?: string[] | null;
   className?: string;
@@ -66,13 +66,22 @@ type Props = {
 
 /**
  * Single semantic renderer for Pit Call dates.
- * - Championship (sparse season_dates): "6 CHAMPIONSHIP DAYS" + compact sparse list.
+ * - Championship (full_season / sparse engagement snapshot): "6 CHAMPIONSHIP DAYS" + compact sparse list.
  * - Normal Pit Call: plain start → end range.
  */
 export function PitCallDates({ request, dates, className, detailed = true }: Props) {
   const { t } = useTranslation();
   const text = useRequiredDatesText();
   const required = normalizeIsoDates(dates ?? request?.season_dates);
+  const isSparseSnapshot = Boolean(dates?.length && groupConsecutive(required).length > 1);
+  const isChampionship = request?.duration === "full_season" || (!request?.duration && isSparseSnapshot);
+
+  if (!isChampionship) {
+    const start = dates?.length ? required[0] : request?.start_date;
+    const end = dates?.length ? required[required.length - 1] : request?.end_date;
+    if (!start) return null;
+    return <span className={className}>{start} → {end}</span>;
+  }
 
   if (!required.length) {
     if (!request?.start_date) return null;

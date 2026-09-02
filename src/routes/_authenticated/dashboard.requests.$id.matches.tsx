@@ -6,10 +6,10 @@ import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame } from "lucide-react";
+import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame, Pencil, Play, Ban } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard, activateRequestNow, redCancelRequest } from "@/lib/paddock.functions";
 import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { formatCriterion } from "@/lib/criteria-label";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
@@ -102,6 +102,8 @@ function RequestMatchesPage() {
   });
 
   const refundFn = useServerFn(refundAndCloseRequest);
+  const activateNowFn = useServerFn(activateRequestNow);
+  const redCancelFn = useServerFn(redCancelRequest);
   const refundMut = useMutation({
     mutationFn: (mode: "full" | "partial") => refundFn({ data: { request_id: id, mode } }),
     onSuccess: (r: any) => {
@@ -110,6 +112,23 @@ function RequestMatchesPage() {
       qc.invalidateQueries({ queryKey: ["token-balance"] });
     },
     onError: (e) => toastError(e, "sweep_engage.request_matches.refund_failed"),
+  });
+  const activateMut = useMutation({
+    mutationFn: () => activateNowFn({ data: { request_id: id } }),
+    onSuccess: () => {
+      toast.success(t("sweep_engage.request_matches.activated_now"));
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+    },
+    onError: (e) => toastError(e, "sweep_engage.request_matches.activate_failed"),
+  });
+  const redCancelMut = useMutation({
+    mutationFn: () => redCancelFn({ data: { request_id: id } }),
+    onSuccess: (r) => {
+      toast.success(t("sweep_engage.request_matches.red_cancelled", { tokens: r.refund_tokens }));
+      qc.invalidateQueries({ queryKey: ["request-matches", id] });
+      qc.invalidateQueries({ queryKey: ["token-balance"] });
+    },
+    onError: (e) => toastError(e, "sweep_engage.request_matches.red_cancel_failed"),
   });
 
   const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
@@ -285,6 +304,25 @@ function RequestMatchesPage() {
                     {matchPotential ? t(`sweep_engage.request_matches.potential_${matchPotential}`) : "—"}
                   </span>
                 </div>
+                {(() => {
+                  const state = (data as any).modify_state ?? {};
+                  return (
+                    <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-racing-yellow/30 pt-4">
+                      <Link to="/dashboard/requests/new" search={{ from: id, mode: "modify" }} className="inline-flex items-center gap-2 border border-racing-yellow px-4 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10">
+                        <Pencil className="size-3" /> {t("sweep_engage.request_matches.modify_button")}
+                      </Link>
+                      <button onClick={async () => { if (await confirmDialog(t("sweep_engage.request_matches.activate_now_confirm"))) activateMut.mutate(); }} disabled={activateMut.isPending} className="inline-flex items-center gap-2 border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-60">
+                        <Play className="size-3" /> {t("sweep_engage.request_matches.activate_now_button")}
+                      </button>
+                      {state.red_cancel_eligible && (
+                        <button onClick={async () => { if (await confirmDialog(t("sweep_engage.request_matches.red_cancel_confirm"))) redCancelMut.mutate(); }} disabled={redCancelMut.isPending} className="inline-flex items-center gap-2 border border-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60">
+                          <Ban className="size-3" /> {t("sweep_engage.request_matches.red_cancel_button")}
+                        </button>
+                      )}
+                      <span className="font-mono text-[10px] uppercase text-muted-foreground">{t("sweep_engage.request_matches.modify_budget_status", { used: state.modify_count ?? 0, max: state.max_modify ?? 3, left: state.budget_left ?? 0 })}</span>
+                    </div>
+                  );
+                })()}
               </section>
             )}
 

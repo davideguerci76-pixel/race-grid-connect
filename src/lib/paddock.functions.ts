@@ -553,7 +553,53 @@ export const createRequest = createServerFn({ method: "POST" })
     return row;
   });
 
+/** Post-review MODIFY: server decides what counts as a meaningful change. */
+export const modifyRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        request_id: z.string().uuid(),
+        patch: z.record(z.string(), z.unknown()),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await (context.supabase.rpc as any)("modify_request", {
+      _request_id: data.request_id,
+      _payload: data.patch,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+/** RED cancel during the review window: 100% token return when eligible. */
+export const redCancelRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await (context.supabase.rpc as any)("red_cancel_request", {
+      _request_id: data.request_id,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return { refund_tokens: Number(row?.refund_tokens ?? 0), balance: Number(row?.balance ?? 0) };
+  });
+
+/** End the post-review window early and publish the Pit Call. */
+export const activateRequestNow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await (context.supabase.rpc as any)("activate_request_now", {
+      _request_id: data.request_id,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
 export const setRequestStatus = createServerFn({ method: "POST" })
+
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string; status: "active" | "paused" | "closed" | "completed" }) =>
     z.object({ id: z.string().uuid(), status: z.enum(["active", "paused", "closed", "completed"]) }).parse(data),
@@ -1263,8 +1309,32 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         request: req,
         in_review: true,
         review_deadline_at: (req as any).review_deadline_at ?? null,
-        match_potential: ((req as any).initial_match_potential ?? null) as "strong" | "targeted" | "red" | null,
+        match_potential: (((req as any).match_potential_current ?? (req as any).initial_match_potential) ?? null) as
+          | "strong"
+          | "targeted"
+          | "red"
+          | null,
+        // Anti-probing: only limits and eligibility leave the server, never counts.
+        modify_state: await (async () => {
+          const [{ data: budgetLeft }, settingsRows] = await Promise.all([
+            (supabase.rpc as any)("team_recheck_budget_left", { _team_id: userId }),
+            supabase.from("platform_settings").select("key, value_num").in("key", ["max_modify_per_pitcall"]),
+          ]);
+          const maxModify = Number(
+            (settingsRows.data ?? []).find((s: any) => s.key === "max_modify_per_pitcall")?.value_num ?? 3,
+          );
+          const modifyCount = Number((req as any).modify_count ?? 0);
+          const currentBand = ((req as any).match_potential_current ?? (req as any).initial_match_potential) ?? null;
+          return {
+            modify_count: modifyCount,
+            max_modify: maxModify,
+            budget_left: Number(budgetLeft ?? 0),
+            can_modify: modifyCount < maxModify && Number(budgetLeft ?? 0) > 0,
+            red_cancel_eligible: currentBand === "red" && !(req as any).red_cancelled_at && !(req as any).refund_kind,
+          };
+        })(),
         confirmable_left: 0,
+
         items: [] as any[],
         items_partial: [] as any[],
         hired: null as any,
