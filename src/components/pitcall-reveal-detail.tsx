@@ -90,9 +90,14 @@ export function PitCallRevealDetail({ detail }: { detail: Detail | null }) {
           {l.location_radius_km != null && <Row label={t("reveal.radius")} value={`${l.location_radius_km} km`} />}
           <Row label={t("reveal.travel")} value={l.travel_required ? t("reveal.yes") : t("reveal.no")} />
           {l.duration && <Row label={t("reveal.duration")} value={t(`duration.${l.duration}`, { defaultValue: String(l.duration) })} />}
-          {l.start_date && <Row label={t("reveal.dates")} value={`${l.start_date} → ${l.end_date}`} />}
-          {Array.isArray(l.season_dates) && l.season_dates.length > 0 && (
-            <Row label={t("reveal.season_days")} value={t("reveal.days_count", { count: l.season_dates.length })} />
+          {/* Championship Pit Calls list their real sparse required dates, never a continuous range. */}
+          {seasonDates.length > 0 ? (
+            <>
+              <Row label={t("reveal.season_days")} value={t("championship.days_count", { count: seasonDates.length })} />
+              <Row label={t("reveal.dates")} value={requiredDatesText(seasonDates)} />
+            </>
+          ) : (
+            l.start_date && <Row label={t("reveal.dates")} value={`${l.start_date} → ${l.end_date}`} />
           )}
         </Section>
 
