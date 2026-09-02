@@ -12,7 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
-import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch } from "@/lib/paddock.functions";
+import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { Link } from "@tanstack/react-router";
@@ -132,6 +132,12 @@ function EngagementsPage() {
   const revealMut = useMutation({
     mutationFn: (matchId: string) => revealFn({ data: { match_id: matchId } }),
     onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
+    onError: (e) => toastError(e, "sweep_engage.common.failed"),
+  });
+  const withdrawFn = useServerFn(withdrawMatchConfirmation);
+  const withdrawMut = useMutation({
+    mutationFn: (id: string) => withdrawFn({ data: { id } }),
+    onSuccess: () => { toast.success(t("engagements.withdrawn_toast", { defaultValue: "Request withdrawn" })); qc.invalidateQueries(); },
     onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const cancelFn = useServerFn(cancelEngagement);
@@ -457,6 +463,20 @@ function EngagementsPage() {
                         extensionCount={e.extension_count ?? 0}
                         pitcallStart={req?.start_date ?? e.start_date}
                       />
+                    </>
+                  )}
+                  {e.status === "proposed" && e.proposed_by === user?.id && (
+                    <>
+                      <MatchRequestDeadline expiresAt={e.expires_at} />
+                      <button
+                        onClick={async () => {
+                          if (await confirmDialog(t("engagements.withdraw_confirm", { defaultValue: "Withdraw this request? The freelancer's days will be released." }))) withdrawMut.mutate(e.id);
+                        }}
+                        disabled={withdrawMut.isPending}
+                        className="border border-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60"
+                      >
+                        {t("engagements.withdraw", { defaultValue: "Withdraw request" })}
+                      </button>
                     </>
                   )}
                   {e.status === "confirmed" && !iMarked && !isFreelancer && (

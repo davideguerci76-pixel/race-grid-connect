@@ -21,11 +21,27 @@ export const setAvailability = createServerFn({ method: "POST" })
       const rows = data.dates.map((d) => ({ freelancer_id: userId, day: d }));
       const { error } = await supabase.from("availability").upsert(rows, { onConflict: "freelancer_id,day" });
       if (error) throw new Error(error.message);
-    } else {
-      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", data.dates);
+      return { ok: true, skipped: [] as string[] };
+    }
+    // FROZEN GREEN: days snapshotted into a pending Request Confirmation cannot
+    // be removed. The DB trigger is authoritative; here we simply skip them so
+    // the rest of the selection still saves instead of aborting the statement.
+    const { data: pending } = await supabase
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", userId)
+      .eq("status", "proposed");
+    const frozen = new Set<string>();
+    for (const row of ((pending ?? []) as Array<{ covered_days: string[] | null }>)) {
+      for (const d of row.covered_days ?? []) frozen.add(String(d).slice(0, 10));
+    }
+    const skipped = data.dates.filter((d) => frozen.has(d));
+    const removable = data.dates.filter((d) => !frozen.has(d));
+    if (removable.length) {
+      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", removable);
       if (error) throw new Error(error.message);
     }
-    return { ok: true };
+    return { ok: true, skipped };
   });
 
 export const confirmMyCalendar = createServerFn({ method: "POST" })
@@ -165,6 +181,27 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
       const daysToBlock = worked.length ? worked : daysBetween(engagement.start_date, engagement.end_date);
       daysToBlock.forEach((day) => out.add(day));
     });
+    return Array.from(out);
+  });
+
+/**
+ * FROZEN GREEN days: availability snapshotted into a Request Confirmation that
+ * is still pending. Still green (other teams can match them), but locked from
+ * removal until the request is confirmed, declined, expired or withdrawn.
+ */
+export const getMyFrozenDates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", context.userId)
+      .eq("status", "proposed");
+    if (error) throw new Error(error.message);
+    const out = new Set<string>();
+    for (const row of ((data ?? []) as Array<{ covered_days: string[] | null }>)) {
+      for (const d of row.covered_days ?? []) out.add(String(d).slice(0, 10));
+    }
     return Array.from(out);
   });
 
@@ -515,7 +552,7 @@ export const getMyRequests = createServerFn({ method: "GET" })
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
       const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
-        supabase.from("matches").select("request_id, freelancer_id").in("request_id", ids),
+        supabase.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
         supabase
           .from("engagements")
           .select("id, request_id, status")
@@ -572,6 +609,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const { data: matches, error } = await supabase
       .from("matches")
       .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url), team:profiles!matches_team_id_fkey(id, display_name, avatar_url)")
+      .eq("stale", false)
       .eq(col, userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -919,6 +957,16 @@ export const requestMatchConfirmation = createServerFn({ method: "POST" })
     return row;
   });
 
+/** Team-side: pull back a still-pending Request Confirmation (releases Frozen Green days). */
+export const withdrawMatchConfirmation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("withdraw_match_confirmation" as any, { _engagement_id: data.id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
 export const declineMatchConfirmation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
@@ -1200,6 +1248,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
+      .eq("stale", false)
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
