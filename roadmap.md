@@ -1,5 +1,5 @@
-- [ ] STEP 6: implement Match Potential band, Post Review metadata, and activation flow
-- [ ] STEP 6: implement server-authoritative full Pit Call Preview and band-only Team response
-- [ ] STEP 6: gate pending_review from Freelancer visibility, actionability, HOT, and notifications
-- [ ] STEP 6: verify manual/automatic activation, immutability, TEST/LIVE isolation, and regressions
-- [ ] STEP 6: report A–R test results and stop before STEP 7
+- [ ] STEP 8: audit and consolidate Team match notifications on the existing notification pipeline
+- [ ] STEP 8: implement server-authoritative first-match, first-full, STRONG, and aggregated activity events
+- [ ] STEP 8: preserve pending_review silence, TEST/LIVE isolation, and existing delivery channels
+- [ ] STEP 8: implement individual Notification Center read state and deep-link routing
+- [ ] STEP 8: run TEST-only E2E and report the exact requested matrix; stop before STEP 9
