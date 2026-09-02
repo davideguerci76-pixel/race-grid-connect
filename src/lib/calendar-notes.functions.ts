@@ -212,10 +212,13 @@ export const getTeamCalendarDays = createServerFn({ method: "GET" })
       title: string | null;
     }> = [];
     for (const r of rows) {
+      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
       const season = Array.isArray(r.request?.season_dates) ? r.request.season_dates : [];
-      const days = season.length
-        ? season.map((d: string) => String(d).slice(0, 10))
-        : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
+      const days = covered.length
+        ? covered.map((d: string) => String(d).slice(0, 10))
+        : season.length
+          ? season.map((d: string) => String(d).slice(0, 10))
+          : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
       for (const day of days) {
         out.push({
           day,
