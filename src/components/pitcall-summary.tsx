@@ -4,6 +4,7 @@ import { disciplineLabel, educationLabel, languageLabel, languageLevelLabel, ski
 import { levelLabel, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { PoolBadge } from "@/components/pool-badge";
 import { requestStatusLabel } from "@/lib/labels";
+import { PitCallDates } from "@/components/championship-dates";
 
 type AnyRequest = Record<string, any>;
 
@@ -70,9 +71,8 @@ export function PitCallSummary({ request }: { request: AnyRequest }) {
   const { t } = useTranslation();
   const r = request ?? {};
 
-  const isSeason = r.duration === "full_season";
   const seasonDates: string[] = Array.isArray(r.season_dates) ? r.season_dates : [];
-  const dayCount = isSeason ? seasonDates.length : daysBetween(r.start_date, r.end_date);
+  const dayCount = seasonDates.length > 0 ? seasonDates.length : daysBetween(r.start_date, r.end_date);
 
   const roleValue = r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group);
   const roleSub = r.sub_role ? `${levelLabel(r.sub_role_min_level ?? "junior")}+` : null;
@@ -139,9 +139,15 @@ export function PitCallSummary({ request }: { request: AnyRequest }) {
           <Fact
             icon={<CalendarDays className="size-3" />}
             label={t("sweep_engage.pitcall_summary.dates")}
-            value={isSeason ? t("sweep_engage.pitcall_summary.full_season") : `${fmtDate(r.start_date)} → ${fmtDate(r.end_date)}`}
+            value={
+              seasonDates.length > 0 ? (
+                <PitCallDates request={r} className="text-base font-bold" />
+              ) : (
+                `${fmtDate(r.start_date)} → ${fmtDate(r.end_date)}`
+              )
+            }
             sub={
-              isSeason
+              seasonDates.length > 0
                 ? t("sweep_engage.pitcall_summary.season_days", { count: dayCount, from: fmtDate(r.start_date), to: fmtDate(r.end_date) })
                 : t("sweep_engage.pitcall_summary.days", { count: dayCount })
             }
