@@ -1238,6 +1238,13 @@ export const getRequestMatches = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    // If the post-review window has elapsed, the request goes live before we read it.
+    try {
+      await (supabase.rpc as any)("activate_request_if_due", { _request_id: data.request_id });
+    } catch {
+      // Non-fatal: the scheduled activation still covers this request.
+    }
+
     const { data: req, error: reqErr } = await supabase
       .from("requests")
       .select("*")
@@ -1247,13 +1254,17 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (!req) throw new Error("Request not found");
     if (req.team_id !== userId) throw new Error("Not owner of this request");
     const isPoolRequest = (req as any).search_mode === "pool";
+    const inReview = (req as any).status === "pending_review";
 
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: data.request_id } as never);
-    } catch {
-      // Keep the page resilient if a live recompute is temporarily unavailable; existing matches still render below.
+    if (!inReview) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: data.request_id } as never);
+      } catch {
+        // Keep the page resilient if a live recompute is temporarily unavailable; existing matches still render below.
+      }
     }
+
 
     const settingKeys = [
       "cost_tier2_entry",
