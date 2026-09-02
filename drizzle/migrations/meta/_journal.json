@@ -288,6 +288,13 @@
       "when": 1788385108911,
       "tag": "0040_engagement_client_field_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1788385333029,
+      "tag": "0041_engagement_guard_updated_at",
+      "breakpoints": true
     }
   ]
 }
