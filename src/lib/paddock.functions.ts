@@ -127,7 +127,7 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("start_date, end_date, status, request:requests(start_date, end_date, season_dates)")
+      .select("start_date, end_date, status, covered_days, request:requests(start_date, end_date, season_dates)")
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed"]);
     if (error) throw new Error(error.message);
