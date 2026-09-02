@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
-import { createRequest, getMyRequests } from "@/lib/paddock.functions";
+import { createRequest, getMyRequests, modifyRequest } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { getMyPool } from "@/lib/pool.functions";
 import { PitCallSummary } from "@/components/pitcall-summary";
@@ -38,8 +38,9 @@ const RADIUS_OPTIONS: Array<{ value: string; label: string }> = [
 
 const search = z.object({
   from: fallback(z.string().optional(), undefined),
-  mode: fallback(z.enum(["similar", "identical"]).optional(), undefined),
+  mode: fallback(z.enum(["similar", "identical", "modify"]).optional(), undefined),
 });
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/new")({
@@ -63,6 +64,8 @@ function NewRequestPage() {
   const qc = useQueryClient();
   const { from, mode } = Route.useSearch();
   const identical = mode === "identical" && !!from;
+  const isModify = mode === "modify" && !!from;
+
 
 
   const { data: profile } = useQuery({
@@ -87,6 +90,8 @@ function NewRequestPage() {
 
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);
+  const modify = useServerFn(modifyRequest);
+
   const fetchSettings = useServerFn(getPlatformSettings);
   const fetchPool = useServerFn(getMyPool);
 
@@ -152,8 +157,9 @@ function NewRequestPage() {
       duration: s.duration as DurationType,
       circuit: s.circuit ?? "",
       location: s.location ?? "",
-      start_date: identical ? (s.start_date ?? "") : "",
-      end_date: identical ? (s.end_date ?? "") : "",
+      start_date: identical || isModify ? (s.start_date ?? "") : "",
+      end_date: identical || isModify ? (s.end_date ?? "") : "",
+
       budget_min: s.budget_min ? String(s.budget_min) : "",
       budget_max: s.budget_max ? String(s.budget_max) : "",
       budget_unit: (s.budget_unit as "day" | "event" | "season") ?? "day",
@@ -179,7 +185,7 @@ function NewRequestPage() {
     } else {
       setSeasonDates([]);
     }
-  }, [source, identical]);
+  }, [source, identical, isModify]);
 
   const isSeason = form.duration === "full_season";
   const baseCost = isSeason
@@ -193,7 +199,7 @@ function NewRequestPage() {
   const displayCost = searchMode === "pool" && !identical ? poolSearchCost : standardCost;
 
   const balance = profile?.token_balance ?? 0;
-  const canAfford = balance >= displayCost;
+  const canAfford = isModify || balance >= displayCost;
 
   const seasonDatesIso = useMemo(() => seasonDates.map(fmt).sort(), [seasonDates]);
 
@@ -223,57 +229,60 @@ function NewRequestPage() {
   const datesInvalid = !isSeason && (!!startDateError || !!endDateError);
 
 
+  const requestPayload = {
+    title: form.title,
+    role_group: form.role_group,
+    sub_role: form.sub_role || null,
+    sub_role_min_level: form.sub_role_min_level,
+    sub_role_hard: subRoleHard,
+    discipline: form.discipline,
+    duration: form.duration,
+    circuit: form.circuit || null,
+    location: form.location || null,
+    start_date: isSeason ? seasonDatesIso[0] : form.start_date,
+    end_date: isSeason ? seasonDatesIso[seasonDatesIso.length - 1] : form.end_date,
+    budget_min: form.budget_min ? parseInt(form.budget_min) : null,
+    budget_max: form.budget_max ? parseInt(form.budget_max) : null,
+    budget_unit: isSeason ? "season" : form.budget_unit,
+    notes: form.notes || null,
+    ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+    travel_required: travelRequired,
+    skills,
+    skills_hard: skillsHard,
+    education,
+    experience_requirements: experienceReqs,
+    languages: languageReqs.map((l) => ({
+      code: l.code,
+      level: l.level,
+      hard: l.hard,
+      custom: l.code === "other" ? (l.custom ?? null) : null,
+    })),
+    ...(identical && from ? { repost_of: from } : {}),
+    location_lat: locationCoords.lat,
+    location_lng: locationCoords.lng,
+    location_city: locationDetails.city,
+    location_region: locationDetails.region,
+    location_country: locationDetails.country,
+    location_place_id: locationDetails.placeId,
+    location_relevance: locRelevance,
+    location_anchor: locAnchor,
+    location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
+    search_mode: searchMode,
+  } as never;
+
   const mut = useMutation({
     mutationFn: () =>
-      create({
-        data: {
-          title: form.title,
-          role_group: form.role_group,
-          sub_role: form.sub_role || null,
-          sub_role_min_level: form.sub_role_min_level,
-          sub_role_hard: subRoleHard,
-          discipline: form.discipline,
-          duration: form.duration,
-          circuit: form.circuit || null,
-          location: form.location || null,
-          start_date: isSeason ? seasonDatesIso[0] : form.start_date,
-          end_date: isSeason ? seasonDatesIso[seasonDatesIso.length - 1] : form.end_date,
-          budget_min: form.budget_min ? parseInt(form.budget_min) : null,
-          budget_max: form.budget_max ? parseInt(form.budget_max) : null,
-          budget_unit: isSeason ? "season" : form.budget_unit,
-          notes: form.notes || null,
-          ...(isSeason ? { season_dates: seasonDatesIso } : {}),
-          travel_required: travelRequired,
-          skills,
-          skills_hard: skillsHard,
-          education,
-          experience_requirements: experienceReqs,
-          languages: languageReqs.map((l) => ({
-            code: l.code,
-            level: l.level,
-            hard: l.hard,
-            custom: l.code === "other" ? (l.custom ?? null) : null,
-          })),
-          ...(identical && from ? { repost_of: from } : {}),
-          location_lat: locationCoords.lat,
-          location_lng: locationCoords.lng,
-          location_city: locationDetails.city,
-          location_region: locationDetails.region,
-          location_country: locationDetails.country,
-          location_place_id: locationDetails.placeId,
-          location_relevance: locRelevance,
-          location_anchor: locAnchor,
-          location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : parseInt(locRadius),
-          search_mode: searchMode,
-        } as never,
-      }),
+      isModify && from
+        ? modify({ data: { request_id: from, patch: requestPayload } })
+        : create({ data: requestPayload }),
     onSuccess: () => {
-      toast.success(t("requests.posted", { cost: displayCost }));
+      toast.success(t(isModify ? "sweep_engage.new_request.modified" : "requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
-      navigate({ to: searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests" });
+      navigate({ to: isModify ? "/dashboard/requests/$id/matches" : searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests", params: isModify && from ? { id: from } : undefined });
     },
     onError: (e) => toastError(e),
   });
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -282,9 +291,10 @@ function NewRequestPage() {
       <div className="container-page py-12">
         <div className="grid min-w-0 grid-cols-1 items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <div className="label-mono">[NEW PIT CALL]</div>
-            <h1 className="max-w-full text-3xl font-black uppercase italic leading-tight sm:text-4xl">{t("requests.new")}</h1>
-            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
+            <div className="label-mono">[{isModify ? t("sweep_engage.new_request.modify_title") : t("requests.new").toUpperCase()}]</div>
+            <h1 className="max-w-full text-3xl font-black uppercase italic leading-tight sm:text-4xl">{isModify ? t("sweep_engage.new_request.modify_title") : t("requests.new")}</h1>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">{isModify ? t("sweep_engage.new_request.modify_helper") : t("requests.helper")}</p>
+
 
           </div>
           <Link to="/dashboard/requests" className="w-fit text-xs uppercase tracking-widest text-muted-foreground hover:text-racing-red">
@@ -292,61 +302,36 @@ function NewRequestPage() {
           </Link>
         </div>
 
-        {/* Standard vs My Pool search mode */}
-        <div className="mt-6 border border-border bg-card p-4">
-          <div className="label-mono">[{t("pool.mode_title")}]</div>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
-            {(["standard", "pool"] as SearchMode[]).map((m) => {
-              const active = searchMode === m;
-              const isPool = m === "pool";
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setSearchMode(m)}
-                  className={`border p-4 text-left transition-colors ${
-                    active
-                      ? isPool
-                        ? "border-sky-400 bg-sky-400/10"
-                        : "border-racing-red bg-racing-red/10"
-                      : "border-border hover:bg-secondary"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`inline-block size-3 rounded-full border ${
-                        active ? (isPool ? "border-sky-400 bg-sky-400" : "border-racing-red bg-racing-red") : "border-muted-foreground"
-                      }`}
-                    />
-                    <span className="text-sm font-bold uppercase tracking-widest">
-                      {isPool ? t("pool.mode_pool") : t("pool.mode_standard")}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {isPool ? t("pool.mode_pool_desc") : t("pool.mode_standard_desc")}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-          {searchMode === "pool" && (
-            <div className="mt-3 border border-sky-400/50 bg-sky-400/5 p-3 text-xs text-sky-200">
-              {t("pool.mode_pool_note", { count: (pool as any[]).length, cost: poolSearchCost })}
+        {!isModify && (
+          <div className="mt-6 border border-border bg-card p-4">
+            <div className="label-mono">[{t("pool.mode_title")}]</div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {(["standard", "pool"] as SearchMode[]).map((m) => {
+                const active = searchMode === m;
+                const isPool = m === "pool";
+                return (
+                  <button key={m} type="button" onClick={() => setSearchMode(m)} className={`border p-4 text-left transition-colors ${active ? isPool ? "border-sky-400 bg-sky-400/10" : "border-racing-red bg-racing-red/10" : "border-border hover:bg-secondary"}`}>
+                    <div className="flex items-center gap-2"><span className={`inline-block size-3 rounded-full border ${active ? (isPool ? "border-sky-400 bg-sky-400" : "border-racing-red bg-racing-red") : "border-muted-foreground"}`} /><span className="text-sm font-bold uppercase tracking-widest">{isPool ? t("pool.mode_pool") : t("pool.mode_standard")}</span></div>
+                    <p className="mt-2 text-xs text-muted-foreground">{isPool ? t("pool.mode_pool_desc") : t("pool.mode_standard_desc")}</p>
+                  </button>
+                );
+              })}
             </div>
-          )}
-        </div>
+            {searchMode === "pool" && <div className="mt-3 border border-sky-400/50 bg-sky-400/5 p-3 text-xs text-sky-200">{t("pool.mode_pool_note", { count: (pool as any[]).length, cost: poolSearchCost })}</div>}
+          </div>
+        )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
-          <span className="font-mono text-xs uppercase text-muted-foreground">{t("requests.cost")}:</span>
-          <span className="font-bold text-racing-red">{displayCost} tokens</span>
-          <span className="ml-auto font-mono text-xs uppercase text-muted-foreground">{t("requests.balance")}:</span>
-          <span className={`font-bold ${canAfford ? "text-foreground" : "text-racing-red"}`}>{balance}</span>
-          {!canAfford && (
-            <Link to="/dashboard/tokens" className="ml-3 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10">
-              {t("requests.top_up")}
-            </Link>
-          )}
-        </div>
+
+        {!isModify && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 border border-border bg-card p-4 text-sm">
+            <span className="font-mono text-xs uppercase text-muted-foreground">{t("requests.cost")}:</span>
+            <span className="font-bold text-racing-red">{displayCost} tokens</span>
+            <span className="ml-auto font-mono text-xs uppercase text-muted-foreground">{t("requests.balance")}:</span>
+            <span className={`font-bold ${canAfford ? "text-foreground" : "text-racing-red"}`}>{balance}</span>
+            {!canAfford && <Link to="/dashboard/tokens" className="ml-3 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10">{t("requests.top_up")}</Link>}
+          </div>
+        )}
+
 
         <div className="mt-6">
           <div className="mb-2 label-mono text-racing-red">[{t("sweep_engage.new_request.preview_title")}]</div>
