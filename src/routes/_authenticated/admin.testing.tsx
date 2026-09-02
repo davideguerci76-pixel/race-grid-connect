@@ -99,7 +99,7 @@ function TestingLab() {
   const jobsMut = useMutation({
     mutationFn: () => jobsFn(),
     onSuccess: (r: any) => {
-      toast.success(`Time jobs run on TEST: ${r.deadlines} deadline actions, ${r.completed} engagements completed`);
+      toast.success(`Time jobs run on TEST: ${r.deadlines} deadline actions, ${r.completed} engagements completed, ${r.hotPartialNotifications} HOT Partial notifications`);
       qc.invalidateQueries();
     },
     onError: (e) => toastError(e),
