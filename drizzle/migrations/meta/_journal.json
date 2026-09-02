@@ -169,6 +169,13 @@
       "when": 1788348103973,
       "tag": "0023_restore_required_days_ssot_core_definitions",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788348998244,
+      "tag": "0024_availability_recompute_queue",
+      "breakpoints": true
     }
   ]
 }
