@@ -2755,6 +2755,10 @@ export type Database = {
         Args: { _request_id: string }
         Returns: undefined
       }
+      record_team_match_notifications_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       red_cancel_request: {
         Args: { _request_id: string }
         Returns: {
