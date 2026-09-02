@@ -17,6 +17,7 @@ import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
 import { PitCallRevealDetail, PitCallRevealTeaser } from "@/components/pitcall-reveal-detail";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
+import { PitCallDates } from "@/components/championship-dates";
 
 import { toastError } from "@/lib/errors";
 
@@ -116,7 +117,7 @@ function MatchesPage() {
                           <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
                         </div>
                         <div className="mt-1 text-lg font-bold">{r.title}</div>
-                        <div className="mt-1 font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}</div>
+                        <div className="mt-1 font-mono text-xs text-muted-foreground"><PitCallDates request={r} /></div>
                         {eng && (
                           <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
                             {t("sweep_engage.matches.confirmed_match")}: {eng.freelancer?.display_name ?? t("sweep_engage.matches.freelancer_fallback")}
@@ -225,7 +226,7 @@ function MatchesPage() {
                       <MissingCriteria list={m.missing_criteria ?? []} />
                       <div className="mt-3 border-t border-border pt-2 text-xs text-muted-foreground">{m.request?.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground">
-                        {m.request?.start_date} → {m.request?.end_date} · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {disciplineLabel(m.request?.discipline)}
+                        <PitCallDates request={m.request} /> · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {disciplineLabel(m.request?.discipline)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">{t("sweep_engage.matches.overlap", { count: m.overlap_days })}</div>
                       {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser />)}

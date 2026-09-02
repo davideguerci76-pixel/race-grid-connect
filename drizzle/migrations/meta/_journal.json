@@ -120,6 +120,13 @@
       "when": 1788337690595,
       "tag": "0016_stale_matches_and_orphan_proposed_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788339925544,
+      "tag": "0017_championship_sparse_dates_semantics",
+      "breakpoints": true
     }
   ]
 }

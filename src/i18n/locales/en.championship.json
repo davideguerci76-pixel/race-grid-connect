@@ -1,0 +1,7 @@
+{
+  "championship": {
+    "days_count_one": "{{count}} CHAMPIONSHIP DAY",
+    "days_count_other": "{{count}} CHAMPIONSHIP DAYS",
+    "sparse_note": "Sparse dates — not a continuous period"
+  }
+}

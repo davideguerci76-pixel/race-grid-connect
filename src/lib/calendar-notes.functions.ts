@@ -25,7 +25,7 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("engagements")
       .select(
-        "id, team_id, request_id, start_date, end_date, status, cancellation_kind, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
+        "id, team_id, request_id, start_date, end_date, status, cancellation_kind, covered_days, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
       )
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed", "cancelled"]);
@@ -66,10 +66,15 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     }> = [];
     for (const r of relevant) {
       const req = r.request ?? reqMap.get(r.request_id) ?? null;
+      // covered_days is the snapshot of what this freelancer actually covers: it is the
+      // only source of truth. Legacy engagements (NULL snapshot) fall back to request dates.
+      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
       const season = Array.isArray(req?.season_dates) ? req.season_dates : [];
-      const days = season.length
-        ? season.map((d: string) => String(d).slice(0, 10))
-        : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
+      const days = covered.length
+        ? covered.map((d: string) => String(d).slice(0, 10))
+        : season.length
+          ? season.map((d: string) => String(d).slice(0, 10))
+          : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
       for (const day of days) {
         out.push({
           day,
@@ -178,7 +183,7 @@ export const getTeamCalendarDays = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("engagements")
       .select(
-        "id, freelancer_id, request_id, start_date, end_date, status, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
+        "id, freelancer_id, request_id, start_date, end_date, status, covered_days, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
       )
       .eq("team_id", userId)
       .in("status", ["confirmed", "completed"]);
@@ -207,10 +212,13 @@ export const getTeamCalendarDays = createServerFn({ method: "GET" })
       title: string | null;
     }> = [];
     for (const r of rows) {
+      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
       const season = Array.isArray(r.request?.season_dates) ? r.request.season_dates : [];
-      const days = season.length
-        ? season.map((d: string) => String(d).slice(0, 10))
-        : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
+      const days = covered.length
+        ? covered.map((d: string) => String(d).slice(0, 10))
+        : season.length
+          ? season.map((d: string) => String(d).slice(0, 10))
+          : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
       for (const day of days) {
         out.push({
           day,

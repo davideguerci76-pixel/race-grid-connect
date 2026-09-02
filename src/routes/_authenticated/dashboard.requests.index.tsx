@@ -16,6 +16,7 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
+import { PitCallDates } from "@/components/championship-dates";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
@@ -114,7 +115,7 @@ function RequestsPage() {
                   </div>
                   <h2 className="mt-1 break-words text-xl font-bold">{r.title}</h2>
                   <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5"><Calendar className="size-3.5" />{r.start_date} → {r.end_date}</span>
+                    <span className="inline-flex items-center gap-1.5"><Calendar className="size-3.5" /><PitCallDates request={r} /></span>
                     {(r.circuit || r.location) && (
                       <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5" />{[r.circuit, r.location].filter(Boolean).join(" · ")}</span>
                     )}

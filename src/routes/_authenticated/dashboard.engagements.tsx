@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { PitCallDates } from "@/components/championship-dates";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
@@ -280,7 +281,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-1">[PIT CALL]</div>
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {disciplineLabel(req.discipline)} · {req.start_date} → {req.end_date}
+                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {disciplineLabel(req.discipline)} · <PitCallDates request={req} />
                       {detailsUnlocked && (req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
                     {/* 1-token reveal: unlocks the anonymous Pit Call details. Team identity stays hidden. */}
@@ -354,7 +355,7 @@ function EngagementsPage() {
 
                 <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-3">
                   <div className="font-mono text-xs text-muted-foreground">
-                    {e.start_date} → {e.end_date} · {e.currency} {e.fee ?? "—"}
+                    <PitCallDates request={e} dates={e.covered_days} /> · {e.currency} {e.fee ?? "—"}
                   </div>
                 </div>
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
