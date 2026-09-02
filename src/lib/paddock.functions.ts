@@ -21,11 +21,27 @@ export const setAvailability = createServerFn({ method: "POST" })
       const rows = data.dates.map((d) => ({ freelancer_id: userId, day: d }));
       const { error } = await supabase.from("availability").upsert(rows, { onConflict: "freelancer_id,day" });
       if (error) throw new Error(error.message);
-    } else {
-      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", data.dates);
+      return { ok: true, skipped: [] as string[] };
+    }
+    // FROZEN GREEN: days snapshotted into a pending Request Confirmation cannot
+    // be removed. The DB trigger is authoritative; here we simply skip them so
+    // the rest of the selection still saves instead of aborting the statement.
+    const { data: pending } = await supabase
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", userId)
+      .eq("status", "proposed");
+    const frozen = new Set<string>();
+    for (const row of ((pending ?? []) as Array<{ covered_days: string[] | null }>)) {
+      for (const d of row.covered_days ?? []) frozen.add(String(d).slice(0, 10));
+    }
+    const skipped = data.dates.filter((d) => frozen.has(d));
+    const removable = data.dates.filter((d) => !frozen.has(d));
+    if (removable.length) {
+      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", removable);
       if (error) throw new Error(error.message);
     }
-    return { ok: true };
+    return { ok: true, skipped };
   });
 
 export const confirmMyCalendar = createServerFn({ method: "POST" })
