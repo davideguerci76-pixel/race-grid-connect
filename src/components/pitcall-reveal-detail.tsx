@@ -67,8 +67,10 @@ export function PitCallRevealTeaser({ detailCount }: { detailCount?: number }) {
 /** Everything the single 1-token reveal unlocks. No team identity, ever. */
 export function PitCallRevealDetail({ detail }: { detail: Detail | null }) {
   const { t } = useTranslation();
+  const requiredDatesText = useRequiredDatesText();
   if (!detail) return null;
   const { logistics: l, requirements: r, economics: e, candidates } = detail;
+  const seasonDates = normalizeIsoDates(l.season_dates);
 
   const place = [l.location_city, l.location_region, l.location_country].filter(Boolean).join(", ") || l.location || null;
   const langs: any[] = Array.isArray(r.languages) ? r.languages : [];
