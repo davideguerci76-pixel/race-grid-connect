@@ -2400,6 +2400,25 @@ export type Database = {
           sub_scores: Json
         }[]
       }
+      get_public_freelancer_profile: {
+        Args: { _user_id: string }
+        Returns: {
+          bio: string
+          disciplines: string[]
+          education: string
+          headline: string
+          location: string
+          location_city: string
+          location_country: string
+          location_region: string
+          role_group: string
+          skills: string[]
+          sub_roles: Json
+          travels: boolean
+          user_id: string
+          years_experience: number
+        }[]
+      }
       get_setting_num: {
         Args: { _default: number; _key: string }
         Returns: number

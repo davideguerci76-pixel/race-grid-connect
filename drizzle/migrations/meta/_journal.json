@@ -218,6 +218,13 @@
       "when": 1788355168897,
       "tag": "0030_env_session_guard_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788358108988,
+      "tag": "0031_public_freelancer_profile_rpc",
+      "breakpoints": true
     }
   ]
 }
