@@ -269,7 +269,7 @@ function RequestMatchesPage() {
               <section className="mt-5 border-2 border-racing-yellow/70 bg-racing-yellow/5 p-5" aria-live="polite">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="label-mono text-racing-yellow">[{t("sweep_engage.request_matches.pitcall_preview_title")]}</div>
+                    <div className="label-mono text-racing-yellow">[{t("sweep_engage.request_matches.pitcall_preview_title")}]</div>
                     <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
                       {t("sweep_engage.request_matches.pitcall_preview_body")}
                     </p>

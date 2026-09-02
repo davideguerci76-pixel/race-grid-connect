@@ -349,7 +349,7 @@ function NewRequestPage() {
         </div>
 
         <div className="mt-6">
-          <div className="mb-2 label-mono text-racing-red">[{t("sweep_engage.new_request.preview_title")]}</div>
+          <div className="mb-2 label-mono text-racing-red">[{t("sweep_engage.new_request.preview_title")}]</div>
           <p className="mb-3 text-xs text-muted-foreground">{t("sweep_engage.new_request.preview_helper")}</p>
           <PitCallSummary
             request={{
