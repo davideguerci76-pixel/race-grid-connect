@@ -2858,7 +2858,13 @@ export type Database = {
         | "frozen"
         | "deleted"
         | "approved"
-      request_status: "active" | "paused" | "closed" | "completed" | "filled"
+      request_status:
+        | "active"
+        | "paused"
+        | "closed"
+        | "completed"
+        | "filled"
+        | "pending_review"
       token_reason:
         | "signup_bonus"
         | "purchase"
@@ -3124,7 +3130,14 @@ export const Constants = {
         "deleted",
         "approved",
       ],
-      request_status: ["active", "paused", "closed", "completed", "filled"],
+      request_status: [
+        "active",
+        "paused",
+        "closed",
+        "completed",
+        "filled",
+        "pending_review",
+      ],
       token_reason: [
         "signup_bonus",
         "purchase",
