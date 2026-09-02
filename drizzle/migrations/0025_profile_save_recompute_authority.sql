@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS freelancer_profiles_recompute ON public.freelancer_profiles;
