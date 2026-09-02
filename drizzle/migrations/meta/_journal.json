@@ -295,6 +295,13 @@
       "when": 1788385333029,
       "tag": "0041_engagement_guard_updated_at",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1788385622954,
+      "tag": "0042_engagement_completion_notifications_definer",
+      "breakpoints": true
     }
   ]
 }

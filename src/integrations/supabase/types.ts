@@ -2502,6 +2502,10 @@ export type Database = {
         Returns: number
       }
       emit_contact_checks: { Args: never; Returns: number }
+      emit_engagement_completed_notifications: {
+        Args: { _engagement_id: string }
+        Returns: number
+      }
       emit_hot_partial_notifications: {
         Args: { _is_test: boolean }
         Returns: number
