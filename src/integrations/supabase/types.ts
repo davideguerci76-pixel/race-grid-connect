@@ -1269,6 +1269,7 @@ export type Database = {
       }
       requests: {
         Row: {
+          activated_at: string | null
           budget_max: number | null
           budget_min: number | null
           budget_unit: string
@@ -1283,6 +1284,7 @@ export type Database = {
           ever_partial_matched: boolean
           experience_requirements: Json
           id: string
+          initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
           languages: Json
@@ -1296,11 +1298,13 @@ export type Database = {
           location_radius_km: number | null
           location_region: string | null
           location_relevance: string
+          match_potential_current: string | null
           notes: string | null
           partial_refund_taken: boolean
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
           role_hard: boolean
@@ -1319,6 +1323,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          activated_at?: string | null
           budget_max?: number | null
           budget_min?: number | null
           budget_unit?: string
@@ -1333,6 +1338,7 @@ export type Database = {
           ever_partial_matched?: boolean
           experience_requirements?: Json
           id?: string
+          initial_match_potential?: string | null
           is_active?: boolean
           is_test?: boolean
           languages?: Json
@@ -1346,11 +1352,13 @@ export type Database = {
           location_radius_km?: number | null
           location_region?: string | null
           location_relevance?: string
+          match_potential_current?: string | null
           notes?: string | null
           partial_refund_taken?: boolean
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
+          review_deadline_at?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           role_hard?: boolean
@@ -1369,6 +1377,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          activated_at?: string | null
           budget_max?: number | null
           budget_min?: number | null
           budget_unit?: string
@@ -1383,6 +1392,7 @@ export type Database = {
           ever_partial_matched?: boolean
           experience_requirements?: Json
           id?: string
+          initial_match_potential?: string | null
           is_active?: boolean
           is_test?: boolean
           languages?: Json
@@ -1396,11 +1406,13 @@ export type Database = {
           location_radius_km?: number | null
           location_region?: string | null
           location_relevance?: string
+          match_potential_current?: string | null
           notes?: string | null
           partial_refund_taken?: boolean
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
+          review_deadline_at?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
           role_hard?: boolean
@@ -1906,6 +1918,69 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      activate_request_if_due: {
+        Args: { _request_id: string }
+        Returns: {
+          activated_at: string | null
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
+          end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
+          experience_requirements: Json
+          id: string
+          initial_match_potential: string | null
+          is_active: boolean
+          is_test: boolean
+          languages: Json
+          location: string | null
+          location_anchor: string
+          location_city: string | null
+          location_country: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
+          location_radius_km: number | null
+          location_region: string | null
+          location_relevance: string
+          match_potential_current: string | null
+          notes: string | null
+          partial_refund_taken: boolean
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
+          review_deadline_at: string | null
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
+          role_hard: boolean
+          search_mode: string | null
+          season_dates: string[] | null
+          skills: string[]
+          skills_hard: string[]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
+          team_id: string
+          title: string
+          travel_required: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       add_pool_member_by_code: {
         Args: { _code: string }
         Returns: {
@@ -1974,6 +2049,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      auto_activate_pending_reviews: { Args: never; Returns: number }
+      auto_activate_pending_reviews_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       availability_day_active: {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
@@ -2027,6 +2107,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      classify_match_potential: {
+        Args: { _match_count: number }
+        Returns: string
+      }
       cleanup_client_error_log: { Args: never; Returns: number }
       cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
@@ -2043,6 +2127,7 @@ export type Database = {
       create_request: {
         Args: { _payload: Json }
         Returns: {
+          activated_at: string | null
           budget_max: number | null
           budget_min: number | null
           budget_unit: string
@@ -2057,6 +2142,7 @@ export type Database = {
           ever_partial_matched: boolean
           experience_requirements: Json
           id: string
+          initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
           languages: Json
@@ -2070,11 +2156,13 @@ export type Database = {
           location_radius_km: number | null
           location_region: string | null
           location_relevance: string
+          match_potential_current: string | null
           notes: string | null
           partial_refund_taken: boolean
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
           role_hard: boolean
@@ -2495,6 +2583,7 @@ export type Database = {
           _status: Database["public"]["Enums"]["request_status"]
         }
         Returns: {
+          activated_at: string | null
           budget_max: number | null
           budget_min: number | null
           budget_unit: string
@@ -2509,6 +2598,7 @@ export type Database = {
           ever_partial_matched: boolean
           experience_requirements: Json
           id: string
+          initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
           languages: Json
@@ -2522,11 +2612,13 @@ export type Database = {
           location_radius_km: number | null
           location_region: string | null
           location_relevance: string
+          match_potential_current: string | null
           notes: string | null
           partial_refund_taken: boolean
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
           role_hard: boolean
@@ -2858,7 +2950,13 @@ export type Database = {
         | "frozen"
         | "deleted"
         | "approved"
-      request_status: "active" | "paused" | "closed" | "completed" | "filled"
+      request_status:
+        | "active"
+        | "paused"
+        | "closed"
+        | "completed"
+        | "filled"
+        | "pending_review"
       token_reason:
         | "signup_bonus"
         | "purchase"
@@ -3124,7 +3222,14 @@ export const Constants = {
         "deleted",
         "approved",
       ],
-      request_status: ["active", "paused", "closed", "completed", "filled"],
+      request_status: [
+        "active",
+        "paused",
+        "closed",
+        "completed",
+        "filled",
+        "pending_review",
+      ],
       token_reason: [
         "signup_bonus",
         "purchase",

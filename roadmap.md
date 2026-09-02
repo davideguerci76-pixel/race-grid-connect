@@ -1,5 +1,5 @@
-- [ ] STEP 5: audit current availability recompute paths
-- [ ] STEP 5: implement server-authoritative availability recompute queue and worker
-- [ ] STEP 5: update availability/confirm flows without changing unrelated business logic
-- [ ] STEP 5: run debounce, worker, race, Frozen Green, confirm, and regression tests
-- [ ] STEP 5: report results and stop before STEP 6
+- [ ] STEP 6: implement Match Potential band, Post Review metadata, and activation flow
+- [ ] STEP 6: implement server-authoritative full Pit Call Preview and band-only Team response
+- [ ] STEP 6: gate pending_review from Freelancer visibility, actionability, HOT, and notifications
+- [ ] STEP 6: verify manual/automatic activation, immutability, TEST/LIVE isolation, and regressions
+- [ ] STEP 6: report A–R test results and stop before STEP 7
