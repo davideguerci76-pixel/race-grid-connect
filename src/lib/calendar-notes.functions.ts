@@ -66,15 +66,19 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     }> = [];
     for (const r of relevant) {
       const req = r.request ?? reqMap.get(r.request_id) ?? null;
-      // covered_days is the snapshot of what this freelancer actually covers: it is the
-      // only source of truth. Legacy engagements (NULL snapshot) fall back to request dates.
-      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
-      const season = Array.isArray(req?.season_dates) ? req.season_dates : [];
-      const days = covered.length
-        ? covered.map((d: string) => String(d).slice(0, 10))
-        : season.length
-          ? season.map((d: string) => String(d).slice(0, 10))
-          : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
+      // covered_days is the immutable snapshot of what this freelancer covers.
+      let days: string[];
+      if (Array.isArray(r.covered_days) && r.covered_days.length) {
+        days = r.covered_days.map((d: string) => String(d).slice(0, 10));
+      } else if (r.request_id) {
+        const { data: required, error: requiredError } = await (supabase.rpc as any)("request_required_days", {
+          _request_id: r.request_id,
+        });
+        if (requiredError) throw new Error(requiredError.message);
+        days = ((required ?? []) as string[]).map((d) => String(d).slice(0, 10));
+      } else {
+        days = daysBetweenIso(r.start_date, r.end_date);
+      }
       for (const day of days) {
         out.push({
           day,
@@ -212,23 +216,29 @@ export const getTeamCalendarDays = createServerFn({ method: "GET" })
       title: string | null;
     }> = [];
     for (const r of rows) {
-      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
-      const season = Array.isArray(r.request?.season_dates) ? r.request.season_dates : [];
-      const days = covered.length
-        ? covered.map((d: string) => String(d).slice(0, 10))
-        : season.length
-          ? season.map((d: string) => String(d).slice(0, 10))
-          : daysBetweenIso(r.request?.start_date ?? r.start_date, r.request?.end_date ?? r.end_date);
+      const req = r.request ?? null;
+      let days: string[];
+      if (Array.isArray(r.covered_days) && r.covered_days.length) {
+        days = r.covered_days.map((d: string) => String(d).slice(0, 10));
+      } else if (r.request_id) {
+        const { data: required, error: requiredError } = await (supabase.rpc as any)("request_required_days", {
+          _request_id: r.request_id,
+        });
+        if (requiredError) throw new Error(requiredError.message);
+        days = ((required ?? []) as string[]).map((d) => String(d).slice(0, 10));
+      } else {
+        days = daysBetweenIso(r.start_date, r.end_date);
+      }
       for (const day of days) {
         out.push({
           day,
           engagement_id: r.id,
           request_id: r.request_id ?? null,
           freelancer: nameMap.get(r.freelancer_id) ?? "",
-          role: r.request?.role_group ?? null,
-          sub_role: r.request?.sub_role ?? null,
-          location: r.request?.circuit ?? r.request?.location ?? null,
-          title: r.request?.title ?? null,
+          role: req?.role_group ?? null,
+          sub_role: req?.sub_role ?? null,
+          location: req?.circuit ?? req?.location ?? null,
+          title: req?.title ?? null,
         });
       }
     }
