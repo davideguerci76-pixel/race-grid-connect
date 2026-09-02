@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getMyNotifications, markAllNotificationsRead } from "@/lib/paddock.functions";
+import { getMyNotifications, markAllNotificationsRead, markNotificationRead } from "@/lib/paddock.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
@@ -37,6 +37,7 @@ function NotificationsPage() {
   const qc = useQueryClient();
   const notifsFn = useServerFn(getMyNotifications);
   const markRead = useServerFn(markAllNotificationsRead);
+  const markOneRead = useServerFn(markNotificationRead);
 
   const { data: notifications = [] } = useQuery({
     queryKey: ["my-notifications", user?.id],
@@ -115,8 +116,9 @@ function NotificationsPage() {
               {(notifications as any[]).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
-                const info = n.payload?.informational === true;
-                const isEngagement = !info && [
+                const isTeamMatch = n.kind === "new_matches" && n.payload?.audience === "team";
+                const info = !isTeamMatch && n.payload?.informational === true;
+                const isEngagement = !info && !isTeamMatch && [
                   "engagement_proposed",
                   "match_taken",
                   "match_reopened",
@@ -125,8 +127,23 @@ function NotificationsPage() {
                   "rating_available",
                   "rating_unlocked",
                 ].includes(n.kind);
+                const markClicked = () => {
+                  if (n.read_at) return;
+                  void markOneRead({ data: { id: n.id } }).then(() => {
+                    qc.invalidateQueries({ queryKey: ["unread-notifications"] });
+                    qc.invalidateQueries({ queryKey: ["my-notifications"] });
+                  }).catch(() => {});
+                };
+                const teamEvent = n.payload?.event as string | undefined;
                 return (
-                  <li key={n.id} className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "bg-racing-red/5" : ""}`}>
+                  <li
+                    key={n.id}
+                    onClick={markClicked}
+                    onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") markClicked(); }}
+                    role="button"
+                    tabIndex={0}
+                    className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "bg-racing-red/5" : ""}`}
+                  >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         {unread && <span className="inline-block h-2 w-2 rounded-full bg-racing-red" />}
@@ -134,7 +151,9 @@ function NotificationsPage() {
                         <span className="font-mono text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</span>
                       </div>
                       <div className="mt-1 text-sm">
-                        {isStale ? (
+                        {isTeamMatch ? (
+                          <TeamMatchMessage event={teamEvent} t={t} />
+                        ) : isStale ? (
                           n.payload?.state === "unconfirmed"
                             ? t("sweep_profile.notifications.calendar_stale_unconfirmed_message")
                             : t("sweep_profile.notifications.calendar_stale_message")
@@ -146,11 +165,15 @@ function NotificationsPage() {
                       </div>
                     </div>
                     {isStale ? (
-                      <Link to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
+                      <Link onClick={markClicked} to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
+                    ) : isTeamMatch ? (
+                      <Link onClick={markClicked} to={`/dashboard/requests/${n.payload?.request_id}/matches`} className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
+                        {t("sweep_profile.notifications.view_matches")}
+                      </Link>
                     ) : isEngagement ? (
-                      <Link to="/dashboard/engagements" className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
+                      <Link onClick={markClicked} to="/dashboard/engagements" className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
                         {t("sweep_profile.notifications.view_engagement")}
                       </Link>
                     ) : null}
@@ -170,6 +193,17 @@ function NotificationsPage() {
  * Renders the three informational freelancer alerts. These never link to the
  * Pit Call: a potential match is information, not access.
  */
+function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => string }) {
+  const key = event === "team_first_match"
+    ? "sweep_profile.notifications.team_first_match"
+    : event === "team_first_full"
+      ? "sweep_profile.notifications.team_first_full"
+      : event === "team_strong_reached"
+        ? "sweep_profile.notifications.team_strong_reached"
+        : "sweep_profile.notifications.team_match_activity";
+  return <span>{t(key)}</span>;
+}
+
 function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
   const { t } = useTranslation();
   const outcome = payload?.outcome as string | undefined;

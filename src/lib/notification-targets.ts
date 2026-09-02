@@ -58,6 +58,13 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
   const base = BASE[kind] ?? FALLBACK;
   const p = (payload ?? {}) as Payload;
   const requestId = typeof p["request_id"] === "string" ? (p["request_id"] as string) : null;
+  const audience = p["audience"] === "team" ? "team" : "freelancer";
+
+  // Team match alerts are actionable for the request owner. They are never
+  // informational teasers, so send the team straight to its Match Results.
+  if (audience === "team" && requestId && kind === "new_matches") {
+    return { ...base, path: `/dashboard/requests/${requestId}/matches` };
+  }
 
   // Informational alerts (potential match, Pit Call filled/closed follow-ups)
   // never grant access to the Pit Call: they land on the notification inbox.
@@ -76,5 +83,16 @@ export function notificationBody(kind: string, payload?: Payload | null): string
   const p = (payload ?? {}) as Payload;
   const message = p["message"];
   if (typeof message === "string" && message.trim()) return message;
+
+  if (p["audience"] === "team" && kind === "new_matches") {
+    switch (p["event"]) {
+      case "team_first_match": return "A freelancer matches your Pit Call.";
+      case "team_first_full": return "Your Pit Call has its first full match.";
+      case "team_strong_reached": return "Your Pit Call has reached a strong match result.";
+      case "team_match_activity": return "There is new matching activity on your Pit Call.";
+      default: return "New matching activity on your Pit Call.";
+    }
+  }
+
   return resolveNotificationTarget(kind, payload).title;
 }
