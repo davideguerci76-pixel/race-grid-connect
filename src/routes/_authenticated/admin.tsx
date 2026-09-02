@@ -45,6 +45,7 @@ function AdminLayout() {
     { to: "/admin/permissions", label: t("sweep_admin_a.tabs.permissions") },
     { to: "/admin/matching", label: t("sweep_admin_a.tabs.matching") },
     { to: "/admin/tokens", label: t("sweep_admin_a.tabs.tokens") },
+    { to: "/admin/platform-rules", label: t("sweep_admin_a.tabs.platform_rules") },
     { to: "/admin/reviews", label: t("sweep_admin_a.tabs.reviews") },
     { to: "/admin/calendars", label: t("sweep_admin_a.tabs.calendars") },
     { to: "/admin/wiki", label: t("sweep_admin_a.tabs.wiki") },
