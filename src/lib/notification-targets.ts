@@ -95,6 +95,13 @@ export function notificationBody(kind: string, payload?: Payload | null): string
   const message = p["message"];
   if (typeof message === "string" && message.trim()) return message;
 
+  if (p["event"] === "hot_partial") {
+    const missing = Array.isArray(p["missing_days"]) ? p["missing_days"].length : 0;
+    return missing > 0
+      ? `Your calendar is missing ${missing} required day${missing === 1 ? "" : "s"}. Review availability to unlock more opportunities.`
+      : "Review your calendar for more opportunities.";
+  }
+
   if (p["audience"] === "team" && kind === "new_matches") {
     switch (p["event"]) {
       case "team_first_match": return "A freelancer matches your Pit Call.";
