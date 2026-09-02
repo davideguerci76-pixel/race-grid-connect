@@ -127,7 +127,7 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("engagements")
-      .select("start_date, end_date, status, covered_days, request:requests(start_date, end_date, season_dates)")
+      .select("request_id, start_date, end_date, status, covered_days")
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed"]);
     if (error) throw new Error(error.message);
@@ -150,18 +150,15 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     };
 
     const engagements = (data ?? []) as Array<{
+      request_id?: string | null;
       start_date: string;
       end_date: string;
       covered_days?: string[] | null;
-      request?: { start_date?: string | null; end_date?: string | null; season_dates?: string[] | null } | null;
     }>;
-
-    // covered_days is the source of truth: for any engagement that carries the
-    // snapshot taken at Request Confirmation, the UI must show exactly those
-    // days as blocked — never recompute from current availability or expand
-    // the start..end range.
     const out = new Set<string>();
     const legacy: typeof engagements = [];
+
+    // New confirmations carry the exact immutable snapshot.
     for (const e of engagements) {
       const covered = Array.isArray(e.covered_days) ? e.covered_days : null;
       if (covered && covered.length) {
@@ -171,23 +168,30 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
       }
     }
 
-    // Legacy fallback (engagements created before covered_days existed).
+    // Legacy records with a request use the database SSOT. Only records without
+    // request linkage fall back to their stored engagement range.
     if (legacy.length) {
-      const requiredByEngagement = legacy.map((r) => {
-        const seasonDates = Array.isArray(r.request?.season_dates) ? r.request?.season_dates : [];
-        if (seasonDates.length) return seasonDates.map((d) => String(d).slice(0, 10));
-        const start = r.request?.start_date ?? r.start_date;
-        const end = r.request?.end_date ?? r.end_date;
-        return daysBetween(start, end);
-      });
+      const requiredByEngagement = await Promise.all(
+        legacy.map(async (engagement) => {
+          if (engagement.request_id) {
+            const { data: required, error: requiredError } = await (supabase.rpc as any)("request_required_days", {
+              _request_id: engagement.request_id,
+            });
+            if (requiredError) throw new Error(requiredError.message);
+            return ((required ?? []) as string[]).map((day) => String(day).slice(0, 10));
+          }
+          return daysBetween(engagement.start_date, engagement.end_date);
+        }),
+      );
       const allRequired = Array.from(new Set(requiredByEngagement.flat()));
       const available = new Set<string>();
       if (allRequired.length) {
-        const { data: availableDays } = await supabase
+        const { data: availableDays, error: availableError } = await supabase
           .from("availability")
           .select("day")
           .eq("freelancer_id", userId)
           .in("day", allRequired);
+        if (availableError) throw new Error(availableError.message);
         for (const row of (availableDays ?? []) as Array<{ day: string }>) {
           available.add(String(row.day).slice(0, 10));
         }
