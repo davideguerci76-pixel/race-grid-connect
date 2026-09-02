@@ -23,9 +23,10 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
-  validateSearch: (search: Record<string, unknown>): { m?: string } => {
+  validateSearch: (search: Record<string, unknown>): { m?: string; days?: string } => {
     const m = typeof search.m === "string" && /^\d{4}-\d{2}$/.test(search.m) ? search.m : undefined;
-    return m ? { m } : {};
+    const days = typeof search.days === "string" && search.days.split(",").every((day) => /^\d{4}-\d{2}-\d{2}$/.test(day)) ? search.days : undefined;
+    return m || days ? { ...(m ? { m } : {}), ...(days ? { days } : {}) } : {};
   },
 });
 
@@ -112,6 +113,7 @@ function CalendarPage() {
   const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
+  const hotPartialDays = useMemo(() => new Set((search.days ?? "").split(",").filter(Boolean)), [search.days]);
   /** Brief highlight of the MARK AVAILABLE/UNAVAILABLE action after tapping a noted day. */
   const [actionFlash, setActionFlash] = useState(false);
   const detailPanelRef = useRef<HTMLDivElement | null>(null);
@@ -143,32 +145,36 @@ function CalendarPage() {
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
     const noted = new Set(noteMap.keys());
-    const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet]);
-    for (const day of all) {
+     const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet, ...hotPartialDays]);
+     for (const day of all) {
       const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
       if (state === "locked") {
-        map.set(day, { state, label: t("pcal.locked", { defaultValue: "LOCKED" }), disabled: true });
+        map.set(day, { state, label: t("pcal.locked", { defaultValue: "LOCKED" }), highlighted: hotPartialDays.has(day), disabled: true });
       } else if (state === "engagement") {
         const e = engMap.get(day);
-        map.set(day, {
-          state,
-          label: (e ? [e.team, e.location].filter(Boolean).join(" · ") : "") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
-          disabled: true,
-        });
+         map.set(day, {
+           state,
+           label: (e ? [e.team, e.location].filter(Boolean).join(" · ") : "") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
+           highlighted: hotPartialDays.has(day),
+           disabled: true,
+         });
       } else if (state === "available") {
         const frozen = frozenSet.has(day);
         map.set(day, {
           state,
           label: noteMap.get(day)?.note ?? (frozen ? t("pcal.frozen", { defaultValue: "REQUESTED" }) : null),
           unconfirmed: unconfirmedSet.has(day),
+          highlighted: hotPartialDays.has(day),
           disabled: frozen,
         });
-      } else if (state === "busy") {
-        map.set(day, { state, label: noteMap.get(day)?.note ?? null });
+       } else if (state === "busy") {
+         map.set(day, { state, label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
+       } else if (hotPartialDays.has(day)) {
+         map.set(day, { state: "none", highlighted: true });
       }
     }
     return map;
-  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, t]);
+  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, hotPartialDays, t]);
 
   const confirmMut = useMutation({
     mutationFn: () => confirmCal(),

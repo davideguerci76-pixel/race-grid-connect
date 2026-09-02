@@ -13,6 +13,8 @@ export type PitcallDayCell = {
   count?: number;
   /** Availability declared but not recently reviewed. */
   unconfirmed?: boolean;
+  /** Highlighted as a suggested day (e.g. HOT Partial missing Required Day). */
+  highlighted?: boolean;
   disabled?: boolean;
 };
 
@@ -156,6 +158,7 @@ export function PitcallCalendar({
                 isSelected ? "outline outline-2 -outline-offset-2 outline-white" : "",
                 isRed ? "shadow-[inset_0_0_18px_-6px_var(--racing-red)]" : "",
                 cell.unconfirmed ? "ring-1 ring-inset ring-dashed ring-[#16a34a]" : "",
+                cell.highlighted ? "ring-2 ring-inset ring-racing-yellow" : "",
               ].join(" ")}
             >
               <span className="flex items-center justify-between gap-1">

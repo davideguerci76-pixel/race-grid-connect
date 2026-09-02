@@ -267,6 +267,13 @@
       "when": 1788365110742,
       "tag": "0037_step8_team_match_notifications_activation_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1788365919245,
+      "tag": "0038_step9_hot_partial_missing_days",
+      "breakpoints": true
     }
   ]
 }

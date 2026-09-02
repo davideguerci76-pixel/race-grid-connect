@@ -177,6 +177,15 @@ function NotificationsPage() {
                       >
                         {t("sweep_profile.notifications.view_matches")}
                       </Link>
+                    ) : n.payload?.event === "hot_partial" ? (
+                      <Link
+                        onClick={markClicked}
+                        to="/dashboard/calendar"
+                        search={{ m: String(n.payload?.month ?? ""), days: Array.isArray(n.payload?.missing_days) ? n.payload.missing_days.join(",") : undefined }}
+                        className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110"
+                      >
+                        {t("sweep_profile.notifications.update_calendar")}
+                      </Link>
                     ) : isEngagement ? (
                       <Link onClick={markClicked} to="/dashboard/engagements" className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
                         {t("sweep_profile.notifications.view_engagement")}
@@ -211,6 +220,18 @@ function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => st
 
 function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
   const { t } = useTranslation();
+  if (payload?.event === "hot_partial") {
+    const days = Array.isArray(payload?.missing_days) ? payload.missing_days : [];
+    return (
+      <div className="grid gap-1">
+        <div className="font-medium">{t("sweep_profile.notifications.hot_partial_title")}</div>
+        <div className="text-muted-foreground">
+          {t("sweep_profile.notifications.hot_partial_body", { count: days.length })}
+        </div>
+        {days.length > 0 && <div className="font-mono text-xs text-racing-yellow">{days.join(" · ")}</div>}
+      </div>
+    );
+  }
   const outcome = payload?.outcome as string | undefined;
   const score = Math.round(Number(payload?.score ?? 0));
   const criteria = Array.isArray(payload?.criteria) ? payload.criteria : [];

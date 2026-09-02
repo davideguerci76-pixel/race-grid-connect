@@ -66,6 +66,17 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };
   }
 
+  // HOT Partial: the freelancer is only told which of their own days are
+  // missing, never which team or Pit Call asked. Destination is the calendar.
+  if (kind === "new_matches" && p["event"] === "hot_partial") {
+    const month = typeof p["month"] === "string" ? (p["month"] as string) : null;
+    return {
+      title: "Missing days on your calendar",
+      path: month ? `/dashboard/calendar?m=${month}` : "/dashboard/calendar",
+      label: "Open calendar",
+    };
+  }
+
   // Informational alerts (potential match, Pit Call filled/closed follow-ups)
   // never grant access to the Pit Call: they land on the notification inbox.
   if (isInformationalNotification(p)) {
@@ -83,6 +94,13 @@ export function notificationBody(kind: string, payload?: Payload | null): string
   const p = (payload ?? {}) as Payload;
   const message = p["message"];
   if (typeof message === "string" && message.trim()) return message;
+
+  if (p["event"] === "hot_partial") {
+    const missing = Array.isArray(p["missing_days"]) ? p["missing_days"].length : 0;
+    return missing > 0
+      ? `Your calendar is missing ${missing} required day${missing === 1 ? "" : "s"}. Review availability to unlock more opportunities.`
+      : "Review your calendar for more opportunities.";
+  }
 
   if (p["audience"] === "team" && kind === "new_matches") {
     switch (p["event"]) {
