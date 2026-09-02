@@ -3,6 +3,6 @@
 - [x] STEP 8: preserve pending_review silence, TEST/LIVE isolation, and existing delivery channels
 - [x] STEP 8: implement individual Notification Center read state and deep-link routing
 - [x] STEP 8: run TEST-only E2E and report the exact requested matrix; stop before STEP 9
-- [ ] STEP 9: implement HOT Partial missing Required Days recovery without changing matching/scoring
-- [ ] STEP 9: integrate anonymous Freelancer notification, calendar month/highlight CTA, and dedup
-- [ ] STEP 9: run TEST-only E2E matrix and confirm TEST/LIVE isolation; stop before STEP 10
+- [x] STEP 9: implement HOT Partial missing Required Days recovery without changing matching/scoring
+- [x] STEP 9: integrate anonymous Freelancer notification, calendar month/highlight CTA, and dedup
+- [x] STEP 9: run TEST-only E2E matrix and confirm TEST/LIVE isolation; stop before STEP 10

@@ -628,14 +628,19 @@ export const runTestAvailabilityRecomputeQueue = createServerFn({ method: "POST"
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin.rpc(
-      "process_availability_recompute_queue_env" as never,
-      { _is_test: true } as never,
-    );
-    if (error) throw new Error(error.message);
-    const { count } = await (supabaseAdmin.from("availability_recompute_queue" as never) as any)
+     const { data, error } = await supabaseAdmin.rpc(
+       "process_availability_recompute_queue_env" as never,
+       { _is_test: true } as never,
+     );
+     if (error) throw new Error(error.message);
+     const { data: hotPartialNotifications, error: eHot } = await supabaseAdmin.rpc(
+       "run_hot_partial_test" as never,
+       {} as never,
+     );
+     if (eHot) throw new Error(eHot.message);
+     const { count } = await (supabaseAdmin.from("availability_recompute_queue" as never) as any)
       .select("*", { count: "exact", head: true })
       .eq("is_test", true);
-    return { processed: (data as number) ?? 0, pending: count ?? 0 };
+     return { processed: (data as number) ?? 0, pending: count ?? 0, hotPartialNotifications: (hotPartialNotifications as number) ?? 0 };
   });
 

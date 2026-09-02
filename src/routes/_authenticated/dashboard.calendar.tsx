@@ -145,18 +145,19 @@ function CalendarPage() {
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
     const noted = new Set(noteMap.keys());
-    const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet]);
-    for (const day of all) {
+     const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet, ...hotPartialDays]);
+     for (const day of all) {
       const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
       if (state === "locked") {
-        map.set(day, { state, label: t("pcal.locked", { defaultValue: "LOCKED" }), disabled: true });
+        map.set(day, { state, label: t("pcal.locked", { defaultValue: "LOCKED" }), highlighted: hotPartialDays.has(day), disabled: true });
       } else if (state === "engagement") {
         const e = engMap.get(day);
-        map.set(day, {
-          state,
-          label: (e ? [e.team, e.location].filter(Boolean).join(" · ") : "") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
-          disabled: true,
-        });
+         map.set(day, {
+           state,
+           label: (e ? [e.team, e.location].filter(Boolean).join(" · ") : "") || t("pcal.pitcall", { defaultValue: "PITCALL" }),
+           highlighted: hotPartialDays.has(day),
+           disabled: true,
+         });
       } else if (state === "available") {
         const frozen = frozenSet.has(day);
         map.set(day, {
@@ -166,8 +167,10 @@ function CalendarPage() {
           highlighted: hotPartialDays.has(day),
           disabled: frozen,
         });
-      } else if (state === "busy") {
-        map.set(day, { state, label: noteMap.get(day)?.note ?? null });
+       } else if (state === "busy") {
+         map.set(day, { state, label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
+       } else if (hotPartialDays.has(day)) {
+         map.set(day, { state: "none", highlighted: true });
       }
     }
     return map;
