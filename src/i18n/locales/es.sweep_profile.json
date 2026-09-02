@@ -102,6 +102,11 @@
       "calendar_stale_message": "Algunas de tus fechas disponibles no se han revisado recientemente. Una comprobación rápida mantiene tu disponibilidad precisa.",
       "update_calendar": "Revisar disponibilidad",
       "view_engagement": "Ver engagement",
+      "view_matches": "Ver matches",
+      "team_first_match": "Un freelancer coincide con tu Pit Call.",
+      "team_first_full": "Tu Pit Call tiene su primer match completo.",
+      "team_strong_reached": "Tu Pit Call ha alcanzado un resultado de match fuerte.",
+      "team_match_activity": "Hay nueva actividad de matching en tu Pit Call.",
       "calendar_stale_unconfirmed_message": "Hemos dejado de usar temporalmente algunas de tus fechas para el matching porque no podemos asegurar que sigan vigentes. Revísalas cuando quieras para reactivarlas."
     },
     "push": {

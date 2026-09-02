@@ -246,6 +246,27 @@
       "when": 1788363156195,
       "tag": "0034_step7_lock_check_blockers",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1788364846366,
+      "tag": "0035_step8_team_match_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788365032658,
+      "tag": "0036_step8_team_match_notifications_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1788365110742,
+      "tag": "0037_step8_team_match_notifications_activation_gate",
+      "breakpoints": true
     }
   ]
 }

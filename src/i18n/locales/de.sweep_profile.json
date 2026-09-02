@@ -102,6 +102,11 @@
       "calendar_stale_message": "Einige deiner verfügbaren Tage wurden länger nicht überprüft. Ein kurzer Check hält deine Verfügbarkeit genau.",
       "update_calendar": "Verfügbarkeit prüfen",
       "view_engagement": "Engagement ansehen",
+      "view_matches": "Matches ansehen",
+      "team_first_match": "Ein Freelancer passt zu deinem Pit Call.",
+      "team_first_full": "Dein Pit Call hat seinen ersten vollständigen Match.",
+      "team_strong_reached": "Dein Pit Call hat ein starkes Matchergebnis erreicht.",
+      "team_match_activity": "Es gibt neue Matching-Aktivität für deinen Pit Call.",
       "calendar_stale_unconfirmed_message": "Wir nutzen einige deiner Tage vorübergehend nicht mehr für das Matching, da wir nicht sicher sein können, ob sie noch aktuell sind. Du kannst sie jederzeit prüfen und wieder aktivieren."
     },
     "push": {

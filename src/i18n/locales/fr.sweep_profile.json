@@ -102,6 +102,11 @@
       "calendar_stale_message": "Certaines de vos dates disponibles n'ont pas été vérifiées récemment. Une vérification rapide garde vos disponibilités exactes.",
       "update_calendar": "Vérifier les disponibilités",
       "view_engagement": "Voir l'engagement",
+      "view_matches": "Voir les matches",
+      "team_first_match": "Un freelance correspond à votre Pit Call.",
+      "team_first_full": "Votre Pit Call a son premier match complet.",
+      "team_strong_reached": "Votre Pit Call a atteint un résultat de matching fort.",
+      "team_match_activity": "Une nouvelle activité de matching est disponible sur votre Pit Call.",
       "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver."
     },
     "push": {

@@ -577,12 +577,27 @@ export const runTestEngagementJobs = createServerFn({ method: "POST" })
       { _is_test: true } as never,
     );
     if (e1) throw new Error(e1.message);
+    const { data: reviewActivations, error: eReview } = await supabaseAdmin.rpc(
+      "auto_activate_pending_reviews_env" as never,
+      { _is_test: true } as never,
+    );
+    if (eReview) throw new Error(eReview.message);
+    const { data: teamMatchNotifications, error: eTeam } = await supabaseAdmin.rpc(
+      "run_team_match_notifications_test" as never,
+      {} as never,
+    );
+    if (eTeam) throw new Error(eTeam.message);
     const { data: completed, error: e2 } = await supabaseAdmin.rpc(
       "complete_expired_engagements_env" as never,
       { _is_test: true } as never,
     );
     if (e2) throw new Error(e2.message);
-    return { deadlines: (deadlines as number) ?? 0, completed: (completed as number) ?? 0 };
+    return {
+      deadlines: (deadlines as number) ?? 0,
+      completed: (completed as number) ?? 0,
+      reviewActivations: (reviewActivations as number) ?? 0,
+      teamMatchNotifications: (teamMatchNotifications as number) ?? 0,
+    };
   });
 
 export const runTestCalendarStaleJob = createServerFn({ method: "POST" })

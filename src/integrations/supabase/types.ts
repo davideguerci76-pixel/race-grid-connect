@@ -1616,6 +1616,63 @@ export type Database = {
           },
         ]
       }
+      team_match_notification_state: {
+        Row: {
+          activity_pending: boolean
+          created_at: string
+          first_full_notified: boolean
+          first_match_notified: boolean
+          is_test: boolean
+          last_activity_notified_at: string
+          match_fingerprint: string
+          request_id: string
+          strong_reached_notified: boolean
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          activity_pending?: boolean
+          created_at?: string
+          first_full_notified?: boolean
+          first_match_notified?: boolean
+          is_test?: boolean
+          last_activity_notified_at?: string
+          match_fingerprint?: string
+          request_id: string
+          strong_reached_notified?: boolean
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          activity_pending?: boolean
+          created_at?: string
+          first_full_notified?: boolean
+          first_match_notified?: boolean
+          is_test?: boolean
+          last_activity_notified_at?: string
+          match_fingerprint?: string
+          request_id?: string
+          strong_reached_notified?: boolean
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_match_notification_state_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_match_notification_state_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_pool: {
         Row: {
           created_at: string
@@ -2408,6 +2465,11 @@ export type Database = {
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
       emit_team_ghosting_reminders: { Args: never; Returns: number }
+      emit_team_match_activity: { Args: never; Returns: number }
+      emit_team_match_activity_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       enqueue_availability_recompute: {
         Args: { _freelancer_id: string; _is_test: boolean }
         Returns: undefined
@@ -2689,6 +2751,14 @@ export type Database = {
         Args: { _source?: string; _version: string }
         Returns: string
       }
+      record_team_match_notifications: {
+        Args: { _request_id: string }
+        Returns: undefined
+      }
+      record_team_match_notifications_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       red_cancel_request: {
         Args: { _request_id: string }
         Returns: {
@@ -2779,6 +2849,7 @@ export type Database = {
       reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
+      run_team_match_notifications_test: { Args: never; Returns: number }
       set_my_rate_location: {
         Args: {
           _day_rate: number
