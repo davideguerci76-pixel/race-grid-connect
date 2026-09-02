@@ -15,7 +15,7 @@ import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-qu
 import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
