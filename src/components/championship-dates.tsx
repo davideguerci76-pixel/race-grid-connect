@@ -55,9 +55,12 @@ export function useRequiredDatesText() {
 }
 
 type Props = {
-  /** Request-like object with season_dates / start_date / end_date. */
+  /** Request-like object with duration / season_dates / start_date / end_date. */
   request: { duration?: string | null; season_dates?: string[] | null; start_date?: string | null; end_date?: string | null } | null | undefined;
-  /** Optional engagement snapshot (covered_days) that overrides the request dates. */
+  /**
+   * Optional engagement snapshot (covered_days). This is the contractual snapshot of the
+   * days actually covered — it NEVER identifies the Pit Call type, it only supplies the dates.
+   */
   dates?: string[] | null;
   className?: string;
   /** Show the compact sparse date list under the day count. */
@@ -66,15 +69,18 @@ type Props = {
 
 /**
  * Single semantic renderer for Pit Call dates.
- * - Championship (full_season / sparse engagement snapshot): "6 CHAMPIONSHIP DAYS" + compact sparse list.
- * - Normal Pit Call: plain start → end range.
+ * Type authority is the request itself (`duration === "full_season"`), never the shape of
+ * `covered_days`: ordinary Pit Calls also have covered_days and must render as a plain range.
+ * - Championship (duration full_season, sparse season_dates / covered_days): "6 CHAMPIONSHIP DAYS" + list.
+ * - Full Season without sparse dates: plain start → end range.
+ * - Ordinary Pit Call: plain start → end range.
  */
 export function PitCallDates({ request, dates, className, detailed = true }: Props) {
   const { t } = useTranslation();
   const text = useRequiredDatesText();
   const required = normalizeIsoDates(dates ?? request?.season_dates);
-  const isSparseSnapshot = Boolean(dates?.length && groupConsecutive(required).length > 1);
-  const isChampionship = request?.duration === "full_season" || (!request?.duration && isSparseSnapshot);
+  const isChampionship = request?.duration === "full_season";
+
 
   if (!isChampionship) {
     const start = dates?.length ? required[0] : request?.start_date;
