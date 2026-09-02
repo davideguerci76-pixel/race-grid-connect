@@ -134,6 +134,13 @@
       "when": 1788343192928,
       "tag": "0018_v23_platform_rules_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788347148766,
+      "tag": "0019_required_days_ssot",
+      "breakpoints": true
     }
   ]
 }

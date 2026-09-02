@@ -2413,6 +2413,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      request_required_days: {
+        Args: { _request_id: string }
+        Returns: string[]
+      }
       request_start_ts: { Args: { _request_id: string }; Returns: string }
       reveal_match: {
         Args: { _match_id: string }
