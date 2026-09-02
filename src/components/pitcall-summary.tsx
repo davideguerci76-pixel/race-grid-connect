@@ -71,9 +71,8 @@ export function PitCallSummary({ request }: { request: AnyRequest }) {
   const { t } = useTranslation();
   const r = request ?? {};
 
-  const isSeason = r.duration === "full_season";
   const seasonDates: string[] = Array.isArray(r.season_dates) ? r.season_dates : [];
-  const dayCount = isSeason ? seasonDates.length : daysBetween(r.start_date, r.end_date);
+  const dayCount = seasonDates.length > 0 ? seasonDates.length : daysBetween(r.start_date, r.end_date);
 
   const roleValue = r.sub_role ? subRoleLabel(r.sub_role) : roleGroupLabel(r.role_group);
   const roleSub = r.sub_role ? `${levelLabel(r.sub_role_min_level ?? "junior")}+` : null;
