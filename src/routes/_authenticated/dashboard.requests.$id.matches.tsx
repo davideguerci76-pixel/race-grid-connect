@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame, Pencil, Play, Ban } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard, modifyRequest, activateRequestNow, redCancelRequest } from "@/lib/paddock.functions";
+import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard, activateRequestNow, redCancelRequest } from "@/lib/paddock.functions";
 import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { formatCriterion } from "@/lib/criteria-label";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";

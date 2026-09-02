@@ -245,7 +245,7 @@ function NewRequestPage() {
     budget_max: form.budget_max ? parseInt(form.budget_max) : null,
     budget_unit: isSeason ? "season" : form.budget_unit,
     notes: form.notes || null,
-    ...(isSeason ? { season_dates: seasonDatesIso } : {}),
+    ...(isSeason ? { season_dates: seasonDatesIso } : isModify ? { season_dates: null } : {}),
     travel_required: travelRequired,
     skills,
     skills_hard: skillsHard,
@@ -861,7 +861,7 @@ function NewRequestPage() {
             disabled={mut.isPending || !canAfford || (isSeason && seasonDatesIso.length === 0) || datesInvalid}
             className="md:col-span-2 bg-racing-red py-3 text-sm font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
           >
-            {mut.isPending ? "…" : t("sweep_engage.new_request.post_for_tokens", { cost: displayCost, label: t("requests.post_for") })}
+            {mut.isPending ? "…" : isModify ? t("sweep_engage.new_request.save_changes") : t("sweep_engage.new_request.post_for_tokens", { cost: displayCost, label: t("requests.post_for") })}
           </button>
         </form>
       </div>
