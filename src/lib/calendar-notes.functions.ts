@@ -25,7 +25,7 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("engagements")
       .select(
-        "id, team_id, request_id, start_date, end_date, status, cancellation_kind, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
+        "id, team_id, request_id, start_date, end_date, status, cancellation_kind, covered_days, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
       )
       .eq("freelancer_id", userId)
       .in("status", ["confirmed", "completed", "cancelled"]);
