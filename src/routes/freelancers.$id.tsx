@@ -38,7 +38,7 @@ function FreelancerProfile() {
   });
 
   if (authLoading) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
-  if (!user) return <PublicFreelancerProfile id={id} />;
+  if (!user) return <UnauthorizedFreelancerProfile />;
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
 
   const { fp, availability } = data;
