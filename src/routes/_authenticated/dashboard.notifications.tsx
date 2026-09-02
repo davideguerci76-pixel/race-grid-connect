@@ -189,7 +189,12 @@ function NotificationsPage() {
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
                     ) : isEngagement ? (
-                      <Link onClick={markClicked} to="/dashboard/engagements" className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
+                      <Link
+                        onClick={markClicked}
+                        to="/dashboard/engagements"
+                        hash={engagementId ? `engagement-${engagementId}` : undefined}
+                        className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      >
                         {t("sweep_profile.notifications.view_engagement")}
                       </Link>
                     ) : null}
