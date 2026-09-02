@@ -502,7 +502,10 @@ function RequestMatchesPage() {
                 )}
               </section>
             </div>
+              </>
+            )}
           </>
+
         )}
       </div>
       <SiteFooter />
