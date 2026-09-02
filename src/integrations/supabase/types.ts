@@ -238,6 +238,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -277,6 +278,7 @@ export type Database = {
           cancelled_by?: string | null
           confirmed_at?: string | null
           contact_check_sent_at?: string | null
+          covered_days?: string[] | null
           created_at?: string
           currency?: string
           declined_at?: string | null
@@ -316,6 +318,7 @@ export type Database = {
           cancelled_by?: string | null
           confirmed_at?: string | null
           contact_check_sent_at?: string | null
+          covered_days?: string[] | null
           created_at?: string
           currency?: string
           declined_at?: string | null
@@ -640,6 +643,7 @@ export type Database = {
           revealed_by_team: boolean
           score: number
           skills_score: number
+          stale: boolean
           team_id: string
         }
         Insert: {
@@ -661,6 +665,7 @@ export type Database = {
           revealed_by_team?: boolean
           score?: number
           skills_score?: number
+          stale?: boolean
           team_id: string
         }
         Update: {
@@ -682,6 +687,7 @@ export type Database = {
           revealed_by_team?: boolean
           score?: number
           skills_score?: number
+          stale?: boolean
           team_id?: string
         }
         Relationships: [
@@ -1773,6 +1779,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -1821,6 +1828,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -1941,6 +1949,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -1983,6 +1992,10 @@ export type Database = {
       cleanup_client_error_log: { Args: never; Returns: number }
       cleanup_push_deliveries: { Args: never; Returns: number }
       close_expired_requests: { Args: never; Returns: number }
+      close_proposed_for_request: {
+        Args: { _kind: string; _request_id: string }
+        Returns: number
+      }
       complete_expired_engagements: { Args: never; Returns: number }
       complete_expired_engagements_env: {
         Args: { _is_test: boolean }
@@ -2062,6 +2075,10 @@ export type Database = {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
       }
+      day_frozen_by_pending_request: {
+        Args: { _day: string; _freelancer: string }
+        Returns: boolean
+      }
       decline_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
@@ -2071,6 +2088,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -2142,6 +2160,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -2194,6 +2213,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -2353,6 +2373,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -2526,6 +2547,7 @@ export type Database = {
           cancelled_by: string | null
           confirmed_at: string | null
           contact_check_sent_at: string | null
+          covered_days: string[] | null
           created_at: string
           currency: string
           declined_at: string | null
@@ -2605,6 +2627,55 @@ export type Database = {
           tokens_spent: number
           total_matches: number
         }[]
+      }
+      withdraw_match_confirmation: {
+        Args: { _engagement_id: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          covered_days: string[] | null
+          created_at: string
+          currency: string
+          declined_at: string | null
+          end_date: string
+          expired_at: string | null
+          expires_at: string | null
+          extension_count: number
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          is_test: boolean
+          match_id: string | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          reminder_12_sent_at: string | null
+          reminder_24_sent_at: string | null
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
