@@ -552,7 +552,7 @@ export const getMyRequests = createServerFn({ method: "GET" })
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
       const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
-        supabase.from("matches").select("request_id, freelancer_id").in("request_id", ids),
+        supabase.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
         supabase
           .from("engagements")
           .select("id, request_id, status")
@@ -609,6 +609,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const { data: matches, error } = await supabase
       .from("matches")
       .select("*, request:requests(*), freelancer:profiles!matches_freelancer_id_fkey(id, display_name, avatar_url), team:profiles!matches_team_id_fkey(id, display_name, avatar_url)")
+      .eq("stale", false)
       .eq(col, userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -1247,6 +1248,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
       .select("*")
+      .eq("stale", false)
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 

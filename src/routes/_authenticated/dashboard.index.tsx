@@ -122,7 +122,7 @@ function DashboardHome() {
         return count ?? 0;
       }
       const [{ data: matches }, { data: engagements }] = await Promise.all([
-        supabase.from("matches").select("request_id, freelancer_id").eq("team_id", user!.id),
+        supabase.from("matches").select("request_id, freelancer_id").eq("stale", false).eq("team_id", user!.id),
         supabase.from("engagements").select("request_id, freelancer_id").eq("team_id", user!.id),
       ]);
       const handled = new Set((engagements ?? []).map((e) => `${e.request_id}:${e.freelancer_id}`));

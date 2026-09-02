@@ -200,6 +200,7 @@ export const getPoolMatches = createServerFn({ method: "GET" })
     const { data: matches, error: mErr } = await supabase
       .from("matches")
       .select("*")
+      .eq("stale", false)
       .eq("request_id", data.request_id)
       .in("freelancer_id", poolIds);
     if (mErr) throw new Error(mErr.message);
