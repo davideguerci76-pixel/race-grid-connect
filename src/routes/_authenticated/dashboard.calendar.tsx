@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
-import { setAvailability, getMyAvailability, getMyBlockedDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
+import { setAvailability, getMyAvailability, getMyBlockedDates, getMyFrozenDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
 import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
 import { BackButton } from "@/components/back-button";
 import { CalendarPlus } from "lucide-react";
@@ -64,6 +64,7 @@ function CalendarPage() {
 
   const getAvail = useServerFn(getMyAvailability);
   const getBlocked = useServerFn(getMyBlockedDates);
+  const getFrozen = useServerFn(getMyFrozenDates);
   const setAvail = useServerFn(setAvailability);
   const getFresh = useServerFn(getMyCalendarFreshness);
   const confirmCal = useServerFn(confirmMyCalendar);
@@ -81,6 +82,11 @@ function CalendarPage() {
     queryKey: ["my-blocked-dates", user?.id],
     enabled: !!user && isFreelancer,
     queryFn: () => getBlocked(),
+  });
+  const { data: frozenDays = [] } = useQuery({
+    queryKey: ["my-frozen-dates", user?.id],
+    enabled: !!user && isFreelancer,
+    queryFn: () => getFrozen(),
   });
   const { data: freshness } = useQuery({
     queryKey: ["my-calendar-freshness", user?.id],
@@ -125,13 +131,19 @@ function CalendarPage() {
     return m;
   }, [engDays]);
   const unconfirmedSet = useMemo(() => new Set(freshness?.unconfirmed_days ?? []), [freshness]);
-  /** Red days: blocked (late-cancel lock) + confirmed engagement days. Never editable, never written. */
-  const protectedSet = useMemo(() => new Set<string>([...blockedSet, ...engMap.keys()]), [blockedSet, engMap]);
+  /** FROZEN GREEN: still available (other teams can match them) but locked while a Request Confirmation is pending. */
+  const frozenSet = useMemo(() => new Set((frozenDays as string[]).filter((d) => !blockedSet.has(d))), [frozenDays, blockedSet]);
+  /** Red days: blocked (late-cancel lock) + confirmed engagement days. Never editable, never written.
+   *  Frozen green days join them for write purposes only: they stay green, but cannot be removed. */
+  const protectedSet = useMemo(
+    () => new Set<string>([...blockedSet, ...engMap.keys(), ...frozenSet]),
+    [blockedSet, engMap, frozenSet],
+  );
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
     const noted = new Set(noteMap.keys());
-    const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys()]);
+    const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet]);
     for (const day of all) {
       const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
       if (state === "locked") {
@@ -144,13 +156,19 @@ function CalendarPage() {
           disabled: true,
         });
       } else if (state === "available") {
-        map.set(day, { state, label: noteMap.get(day)?.note ?? null, unconfirmed: unconfirmedSet.has(day) });
+        const frozen = frozenSet.has(day);
+        map.set(day, {
+          state,
+          label: noteMap.get(day)?.note ?? (frozen ? t("pcal.frozen", { defaultValue: "REQUESTED" }) : null),
+          unconfirmed: unconfirmedSet.has(day),
+          disabled: frozen,
+        });
       } else if (state === "busy") {
         map.set(day, { state, label: noteMap.get(day)?.note ?? null });
       }
     }
     return map;
-  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, t]);
+  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, t]);
 
   const confirmMut = useMutation({
     mutationFn: () => confirmCal(),
