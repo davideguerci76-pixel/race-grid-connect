@@ -253,6 +253,13 @@
       "when": 1788364846366,
       "tag": "0035_step8_team_match_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788365032658,
+      "tag": "0036_step8_team_match_notifications_fix",
+      "breakpoints": true
     }
   ]
 }

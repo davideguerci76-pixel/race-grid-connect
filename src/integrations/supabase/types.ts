@@ -2845,6 +2845,7 @@ export type Database = {
       reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
+      run_team_match_notifications_test: { Args: never; Returns: number }
       set_my_rate_location: {
         Args: {
           _day_rate: number
