@@ -236,7 +236,10 @@
     "request_expired": "Richiesta scaduta",
     "expires_in_hours": "Scade tra {{count}}h",
     "expires_in_minutes": "Scade tra {{count}} min",
-    "ask_more_time_hint": "Disponibile nelle ultime 12 ore, max 5 volte e mai oltre l'inizio della Pit Call"
+    "ask_more_time_hint": "Disponibile nelle ultime 12 ore, max 5 volte e mai oltre l'inizio della Pit Call",
+    "withdraw": "Ritira richiesta",
+    "withdraw_confirm": "Ritirare la richiesta? I giorni del freelance verranno liberati.",
+    "withdrawn_toast": "Richiesta ritirata"
   },
   "rating": {
     "title": "Valutazione",
@@ -1036,6 +1039,7 @@
     "view_engagement": "Vedi engagement",
     "stat_available_short": "Disponibili",
     "stat_busy_short": "Impegnati",
-    "stat_pitcall_short": "Pitcall"
+    "stat_pitcall_short": "Pitcall",
+    "frozen": "RICHIESTO"
   }
 }

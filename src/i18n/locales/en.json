@@ -236,7 +236,10 @@
     "request_expired": "Request expired",
     "expires_in_hours": "Expires in {{count}}h",
     "expires_in_minutes": "Expires in {{count}} min",
-    "ask_more_time_hint": "Available in the last 12 hours, up to 5 times, and never past the Pit Call start"
+    "ask_more_time_hint": "Available in the last 12 hours, up to 5 times, and never past the Pit Call start",
+    "withdraw": "Withdraw request",
+    "withdraw_confirm": "Withdraw this request? The freelancer's days will be released.",
+    "withdrawn_toast": "Request withdrawn"
   },
   "rating": {
     "title": "Rating",
@@ -1036,6 +1039,7 @@
     "view_engagement": "View engagement",
     "stat_available_short": "Available",
     "stat_busy_short": "Busy",
-    "stat_pitcall_short": "Pitcall"
+    "stat_pitcall_short": "Pitcall",
+    "frozen": "REQUESTED"
   }
 }

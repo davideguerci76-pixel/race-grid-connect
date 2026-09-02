@@ -234,7 +234,10 @@
     "request_expired": "Anfrage abgelaufen",
     "expires_in_hours": "Läuft in {{count}} Std. ab",
     "expires_in_minutes": "Läuft in {{count}} Min. ab",
-    "ask_more_time_hint": "Nur in den letzten 12 Stunden, maximal 5-mal und nie über den Pit-Call-Start hinaus"
+    "ask_more_time_hint": "Nur in den letzten 12 Stunden, maximal 5-mal und nie über den Pit-Call-Start hinaus",
+    "withdraw": "Anfrage zurückziehen",
+    "withdraw_confirm": "Diese Anfrage zurückziehen? Die Tage des Freelancers werden freigegeben.",
+    "withdrawn_toast": "Anfrage zurückgezogen"
   },
   "rating": {
     "title": "Bewertung",
@@ -1024,6 +1027,7 @@
     "view_engagement": "Engagement ansehen",
     "stat_available_short": "Verfügbar",
     "stat_busy_short": "Belegt",
-    "stat_pitcall_short": "Pitcall"
+    "stat_pitcall_short": "Pitcall",
+    "frozen": "ANGEFRAGT"
   }
 }
