@@ -281,6 +281,13 @@
       "when": 1788366355117,
       "tag": "0039_step9_hot_partial_env_and_anonymity_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1788385108911,
+      "tag": "0040_engagement_client_field_guard",
+      "breakpoints": true
     }
   ]
 }
