@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { MapPin, ListChecks, Wallet, Lock } from "lucide-react";
 import { skillLabel, educationLabel, languageLabel, disciplineLabel } from "@/lib/paddock";
 import { levelLabel } from "@/lib/roles";
+import { normalizeIsoDates, useRequiredDatesText } from "@/components/championship-dates";
 
 type Detail = {
   logistics: Record<string, any>;
