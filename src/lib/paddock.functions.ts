@@ -1256,6 +1256,39 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const isPoolRequest = (req as any).search_mode === "pool";
     const inReview = (req as any).status === "pending_review";
 
+    // Post-review window: band-only payload. No raw match counts, tiers or profiles
+    // leave the server while the Pit Call is still in preview.
+    if (inReview) {
+      return {
+        request: req,
+        in_review: true,
+        review_deadline_at: (req as any).review_deadline_at ?? null,
+        match_potential: ((req as any).initial_match_potential ?? null) as "strong" | "targeted" | "red" | null,
+        confirmable_left: 0,
+        items: [] as any[],
+        items_partial: [] as any[],
+        hired: null as any,
+        tiers: [] as any[],
+        tiers_partial: [] as any[],
+        per_profile_cost: 0,
+        total_matches: 0,
+        total_partial_matches: 0,
+        outside_pool_count: 0,
+        upgrade_cost: 0,
+        hard_cap: 0,
+        partial_banner: null as any,
+        refund_quote: {
+          spent: 0,
+          hard_count: 0,
+          min_pct: 0,
+          drop_pct: 0,
+          refund_pct: 0,
+          refund_full: 0,
+          refund_partial: 0,
+        },
+      };
+    }
+
     if (!inReview) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
