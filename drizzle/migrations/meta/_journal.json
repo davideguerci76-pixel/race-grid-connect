@@ -127,6 +127,13 @@
       "when": 1788339925544,
       "tag": "0017_championship_sparse_dates_semantics",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788343192928,
+      "tag": "0018_v23_platform_rules_settings",
+      "breakpoints": true
     }
   ]
 }
