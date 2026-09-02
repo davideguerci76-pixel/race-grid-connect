@@ -141,6 +141,13 @@
       "when": 1788347148766,
       "tag": "0019_required_days_ssot",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788347903436,
+      "tag": "0020_required_days_ssot_core_consumers",
+      "breakpoints": true
     }
   ]
 }
