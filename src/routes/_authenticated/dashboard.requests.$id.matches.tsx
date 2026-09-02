@@ -288,6 +288,10 @@ function RequestMatchesPage() {
               </section>
             )}
 
+            {!inReview && (
+              <>
+
+
             <div className="border border-border bg-card p-5">
               <p className="text-xs text-muted-foreground">
                 {t("sweep_engage.request_matches.matches_intro_1")} <span className="font-bold text-racing-yellow">{t("sweep_engage.request_matches.top3")}</span> {t("sweep_engage.request_matches.matches_intro_2", { cost: data.per_profile_cost, hardCap: data.hard_cap })}
