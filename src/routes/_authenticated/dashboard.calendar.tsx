@@ -23,9 +23,10 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
   component: CalendarPage,
-  validateSearch: (search: Record<string, unknown>): { m?: string } => {
+  validateSearch: (search: Record<string, unknown>): { m?: string; days?: string } => {
     const m = typeof search.m === "string" && /^\d{4}-\d{2}$/.test(search.m) ? search.m : undefined;
-    return m ? { m } : {};
+    const days = typeof search.days === "string" && search.days.split(",").every((day) => /^\d{4}-\d{2}-\d{2}$/.test(day)) ? search.days : undefined;
+    return m || days ? { ...(m ? { m } : {}), ...(days ? { days } : {}) } : {};
   },
 });
 
@@ -112,6 +113,7 @@ function CalendarPage() {
   const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
+  const hotPartialDays = useMemo(() => new Set((search.days ?? "").split(",").filter(Boolean)), [search.days]);
   /** Brief highlight of the MARK AVAILABLE/UNAVAILABLE action after tapping a noted day. */
   const [actionFlash, setActionFlash] = useState(false);
   const detailPanelRef = useRef<HTMLDivElement | null>(null);
@@ -161,6 +163,7 @@ function CalendarPage() {
           state,
           label: noteMap.get(day)?.note ?? (frozen ? t("pcal.frozen", { defaultValue: "REQUESTED" }) : null),
           unconfirmed: unconfirmedSet.has(day),
+          highlighted: hotPartialDays.has(day),
           disabled: frozen,
         });
       } else if (state === "busy") {
@@ -168,7 +171,7 @@ function CalendarPage() {
       }
     }
     return map;
-  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, t]);
+  }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, hotPartialDays, t]);
 
   const confirmMut = useMutation({
     mutationFn: () => confirmCal(),
