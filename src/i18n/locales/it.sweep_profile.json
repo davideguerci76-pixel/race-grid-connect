@@ -107,6 +107,8 @@
       "team_first_full": "Il tuo Pit Call ha il suo primo match completo.",
       "team_strong_reached": "Il tuo Pit Call ha raggiunto un risultato di matching forte.",
       "team_match_activity": "C'è nuova attività di matching sul tuo Pit Call.",
+      "hot_partial_title": "Altre opportunità sono vicine",
+      "hot_partial_body": "Nel tuo calendario mancano {{count}} giorni richiesti. Aggiungili per sbloccare altre opportunità."
       "calendar_stale_unconfirmed_message": "Abbiamo temporaneamente smesso di usare alcune delle tue date per il matching perché non possiamo essere certi che siano ancora valide. Puoi rivederle quando vuoi per riattivarle."
     },
     "push": {

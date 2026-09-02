@@ -182,10 +182,6 @@ function NotificationsPage() {
                       >
                         {t("sweep_profile.notifications.view_matches")}
                       </Link>
-                    ) : isTeamMatch && n.payload?.request_id ? (
-                      <Link onClick={markClicked} to="/dashboard/requests/$id/matches" params={{ id: String(n.payload.request_id) }} className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
-                        {t("sweep_profile.notifications.view_matches")}
-                      </Link>
                     ) : n.payload?.event === "hot_partial" ? (
                       <Link
                         onClick={markClicked}
