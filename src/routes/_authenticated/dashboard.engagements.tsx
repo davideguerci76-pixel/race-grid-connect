@@ -15,7 +15,7 @@ import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-qu
 import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
@@ -53,13 +53,20 @@ function EngagementsPage() {
 
   // Deep-link support: /dashboard/engagements#engagement-<id> scrolls to the card
   // once the list has been rendered (data arrives after the initial mount).
+  // The hash comes from the router so an in-app navigation from the Notification
+  // Center re-triggers the scroll even when the page is already mounted.
+  const locationHash = useRouterState({ select: (s) => s.location.hash });
+  const targetEngagementId = locationHash?.startsWith("engagement-")
+    ? locationHash.slice("engagement-".length)
+    : locationHash?.startsWith("#engagement-")
+      ? locationHash.slice("#engagement-".length)
+      : null;
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash;
-    if (!hash.startsWith("#engagement-") || rows.length === 0) return;
-    const el = document.getElementById(hash.slice(1));
+    if (typeof window === "undefined" || !targetEngagementId || rows.length === 0) return;
+    const el = document.getElementById(`engagement-${targetEngagementId}`);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [rows]);
+  }, [rows, targetEngagementId]);
 
   // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
   // would silently reset before the user has a chance to see it. Users click the
@@ -230,7 +237,7 @@ function EngagementsPage() {
             // Teams always see their own Pit Call; freelancers must pay the 1-token reveal.
             const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
             return (
-              <div key={e.id} id={`engagement-${e.id}`} className={`scroll-mt-24 border p-5 ${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
+              <div key={e.id} id={`engagement-${e.id}`} className={`scroll-mt-24 border p-5 ${targetEngagementId === e.id ? "ring-2 ring-racing-yellow ring-offset-2 ring-offset-background " : ""}${perfect ? "border-racing-yellow bg-racing-yellow/5" : "border-border bg-card"}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-3">
