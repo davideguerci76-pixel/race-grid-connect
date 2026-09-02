@@ -1200,6 +1200,51 @@ export type Database = {
           },
         ]
       }
+      request_recheck_ledger: {
+        Row: {
+          created_at: string
+          id: string
+          is_test: boolean
+          kind: string
+          request_id: string | null
+          team_id: string
+          units: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          kind: string
+          request_id?: string | null
+          team_id: string
+          units?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          kind?: string
+          request_id?: string | null
+          team_id?: string
+          units?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_recheck_ledger_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_recheck_ledger_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       request_team_reveals: {
         Row: {
           created_at: string
@@ -1288,6 +1333,7 @@ export type Database = {
           is_active: boolean
           is_test: boolean
           languages: Json
+          last_modified_at: string | null
           location: string | null
           location_anchor: string
           location_city: string | null
@@ -1299,8 +1345,11 @@ export type Database = {
           location_region: string | null
           location_relevance: string
           match_potential_current: string | null
+          modify_count: number
           notes: string | null
           partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
@@ -1342,6 +1391,7 @@ export type Database = {
           is_active?: boolean
           is_test?: boolean
           languages?: Json
+          last_modified_at?: string | null
           location?: string | null
           location_anchor?: string
           location_city?: string | null
@@ -1353,8 +1403,11 @@ export type Database = {
           location_region?: string | null
           location_relevance?: string
           match_potential_current?: string | null
+          modify_count?: number
           notes?: string | null
           partial_refund_taken?: boolean
+          red_cancel_tokens?: number | null
+          red_cancelled_at?: string | null
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
@@ -1396,6 +1449,7 @@ export type Database = {
           is_active?: boolean
           is_test?: boolean
           languages?: Json
+          last_modified_at?: string | null
           location?: string | null
           location_anchor?: string
           location_city?: string | null
@@ -1407,8 +1461,11 @@ export type Database = {
           location_region?: string | null
           location_relevance?: string
           match_potential_current?: string | null
+          modify_count?: number
           notes?: string | null
           partial_refund_taken?: boolean
+          red_cancel_tokens?: number | null
+          red_cancelled_at?: string | null
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
@@ -1940,6 +1997,7 @@ export type Database = {
           is_active: boolean
           is_test: boolean
           languages: Json
+          last_modified_at: string | null
           location: string | null
           location_anchor: string
           location_city: string | null
@@ -1951,8 +2009,78 @@ export type Database = {
           location_region: string | null
           location_relevance: string
           match_potential_current: string | null
+          modify_count: number
           notes: string | null
           partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
+          review_deadline_at: string | null
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
+          role_hard: boolean
+          search_mode: string | null
+          season_dates: string[] | null
+          skills: string[]
+          skills_hard: string[]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
+          team_id: string
+          title: string
+          travel_required: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      activate_request_now: {
+        Args: { _request_id: string }
+        Returns: {
+          activated_at: string | null
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
+          end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
+          experience_requirements: Json
+          id: string
+          initial_match_potential: string | null
+          is_active: boolean
+          is_test: boolean
+          languages: Json
+          last_modified_at: string | null
+          location: string | null
+          location_anchor: string
+          location_city: string | null
+          location_country: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
+          location_radius_km: number | null
+          location_region: string | null
+          location_relevance: string
+          match_potential_current: string | null
+          modify_count: number
+          notes: string | null
+          partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
@@ -2146,6 +2274,7 @@ export type Database = {
           is_active: boolean
           is_test: boolean
           languages: Json
+          last_modified_at: string | null
           location: string | null
           location_anchor: string
           location_city: string | null
@@ -2157,8 +2286,11 @@ export type Database = {
           location_region: string | null
           location_relevance: string
           match_potential_current: string | null
+          modify_count: number
           notes: string | null
           partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
@@ -2432,6 +2564,73 @@ export type Database = {
         Args: { _freelancer: string; _required: string[] }
         Returns: boolean
       }
+      modify_request: {
+        Args: { _payload: Json; _request_id: string }
+        Returns: {
+          activated_at: string | null
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
+          end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
+          experience_requirements: Json
+          id: string
+          initial_match_potential: string | null
+          is_active: boolean
+          is_test: boolean
+          languages: Json
+          last_modified_at: string | null
+          location: string | null
+          location_anchor: string
+          location_city: string | null
+          location_country: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
+          location_radius_km: number | null
+          location_region: string | null
+          location_relevance: string
+          match_potential_current: string | null
+          modify_count: number
+          notes: string | null
+          partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
+          review_deadline_at: string | null
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
+          role_hard: boolean
+          search_mode: string | null
+          season_dates: string[] | null
+          skills: string[]
+          skills_hard: string[]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
+          team_id: string
+          title: string
+          travel_required: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       my_day_rate: {
         Args: never
         Returns: {
@@ -2489,6 +2688,13 @@ export type Database = {
       record_legal_acceptance: {
         Args: { _source?: string; _version: string }
         Returns: string
+      }
+      red_cancel_request: {
+        Args: { _request_id: string }
+        Returns: {
+          balance: number
+          refund_tokens: number
+        }[]
       }
       refund_and_close_request: {
         Args: { _mode: string; _request_id: string }
@@ -2553,6 +2759,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      request_matching_fingerprint: {
+        Args: { _request_id: string }
+        Returns: Json
+      }
       request_required_days: {
         Args: { _request_id: string }
         Returns: string[]
@@ -2602,6 +2812,7 @@ export type Database = {
           is_active: boolean
           is_test: boolean
           languages: Json
+          last_modified_at: string | null
           location: string | null
           location_anchor: string
           location_city: string | null
@@ -2613,8 +2824,11 @@ export type Database = {
           location_region: string | null
           location_relevance: string
           match_potential_current: string | null
+          modify_count: number
           notes: string | null
           partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
@@ -2735,6 +2949,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      team_recheck_budget_left: { Args: { _team_id: string }; Returns: number }
       touch_push_subscription: { Args: { _endpoint: string }; Returns: boolean }
       trigger_sos_call: {
         Args: { _request_id: string }
