@@ -116,7 +116,7 @@ function MatchesPage() {
                           <span className="font-mono text-[11px] uppercase text-muted-foreground">{roleLabel(r.role)} · {disciplineLabel(r.discipline)}</span>
                         </div>
                         <div className="mt-1 text-lg font-bold">{r.title}</div>
-                        <div className="mt-1 font-mono text-xs text-muted-foreground">{r.start_date} → {r.end_date}</div>
+                        <div className="mt-1 font-mono text-xs text-muted-foreground"><PitCallDates request={r} /></div>
                         {eng && (
                           <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
                             {t("sweep_engage.matches.confirmed_match")}: {eng.freelancer?.display_name ?? t("sweep_engage.matches.freelancer_fallback")}
