@@ -51,7 +51,7 @@ function RequestMatchesPage() {
 
   const [reviewNow, setReviewNow] = useState(() => Date.now());
   const reviewDeadline = (data as any)?.review_deadline_at ?? null;
-  const inReview = Boolean((data as any)?.in_review || (data as any)?.request?.status === "pending_review");
+  const inReview = Boolean((data as any)?.in_review);
   useEffect(() => {
     if (!inReview || !reviewDeadline) return;
     const timer = window.setInterval(() => setReviewNow(Date.now()), 1000);
