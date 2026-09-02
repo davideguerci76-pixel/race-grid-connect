@@ -126,7 +126,9 @@
       "not_selected_tooltip": "Non selezionato",
       "notes": "Note",
       "pick_location_hint": "Scegli una posizione dal menu a tendina per catturarne le coordinate.",
-      "post_for_tokens": "{{label}} {{cost}} token",
+      "preview_title": "ANTEPRIMA PIT CALL",
+       "preview_helper": "Controlla la richiesta prima di pubblicarla. L\u2019anteprima si aggiorna mentre modifichi il form.",
+       "post_for_tokens": "{{label}} {{cost}} token",
       "preferred_education": "Istruzione preferita",
       "relevant": "Rilevante",
       "remove": "Rimuovi",
@@ -215,7 +217,14 @@
       "partial_banner_case_b": "Cerchi più opzioni con date flessibili? Controlla altri professionisti con disponibilità parziale e valuta i loro giorni mancanti.",
       "partial_refund_credited": "{{tokens}} token accreditati ({{pct}}%). I match parziali sono ora aperti qui sotto.",
       "perfect_match_short": "Match perfetto",
-      "pitcall_match_confirmed_note": "PitCall — Match confermato per \"{{title}}\"",
+      "pitcall_preview_title": "ANTEPRIMA PIT CALL",
+       "pitcall_preview_body": "Il potenziale di match \u00e8 calcolato sulla richiesta attuale. Puoi ancora modificare il Pit Call durante questa finestra di revisione, prima che diventi visibile ai freelancer.",
+       "review_remaining": "TEMPO DI REVISIONE",
+       "match_potential": "POTENZIALE MATCH",
+       "potential_strong": "STRONG",
+       "potential_targeted": "TARGETED",
+       "potential_red": "RED",
+       "pitcall_match_confirmed_note": "PitCall — Match confermato per \"{{title}}\"",
       "proportional_note": "Solo {{count}} match reale/i in questo livello (max {{max}}). Quota d'ingresso ridotta proporzionalmente da {{full}} a {{cost}} token.",
       "rank_tier_locked": "Posizione #{{rank}} — livello bloccato",
       "rank_tier_overlap": "Posizione #{{rank}} · livello {{tier}} · {{count}} giorno/i di sovrapposizione",
@@ -272,7 +281,8 @@
         "paused": "in pausa",
         "closed": "chiuso",
         "completed": "completato",
-        "filled": "coperta"
+        "filled": "coperta",
+         "pending_review": "in revisione"
       },
       "view_matches_confirmed": "{{label}} (1) — Confermato · Coperto"
     }

@@ -126,7 +126,9 @@
       "not_selected_tooltip": "Not selected",
       "notes": "Notes",
       "pick_location_hint": "Pick a location from the dropdown so we can capture its coordinates.",
-      "post_for_tokens": "{{label}} {{cost}} tokens",
+      "preview_title": "PIT CALL PREVIEW",
+       "preview_helper": "Review the request before posting. The preview updates as you edit the form.",
+       "post_for_tokens": "{{label}} {{cost}} tokens",
       "preferred_education": "Preferred education",
       "relevant": "Relevant",
       "remove": "Remove",
@@ -215,7 +217,14 @@
       "partial_banner_case_b": "Looking for more options with flexible dates? Check other professionals with partial availability and evaluate their missing days.",
       "partial_refund_credited": "{{tokens}} token(s) credited ({{pct}}%). Partial matches are now open below.",
       "perfect_match_short": "Perfect match",
-      "pitcall_match_confirmed_note": "PitCall — Match confirmed for \"{{title}}\"",
+      "pitcall_preview_title": "PIT CALL PREVIEW",
+       "pitcall_preview_body": "Your match potential is calculated from the current request. You can still adjust the Pit Call during this review window before it becomes visible to freelancers.",
+       "review_remaining": "REVIEW REMAINING",
+       "match_potential": "MATCH POTENTIAL",
+       "potential_strong": "STRONG",
+       "potential_targeted": "TARGETED",
+       "potential_red": "RED",
+       "pitcall_match_confirmed_note": "PitCall — Match confirmed for \"{{title}}\"",
       "proportional_note": "Only {{count}} real match(es) in this tier (max {{max}}). Entry fee reduced proportionally from {{full}} to {{cost}} token(s).",
       "rank_tier_locked": "Rank #{{rank}} — tier locked",
       "rank_tier_overlap": "Rank #{{rank}} · tier {{tier}} · {{count}} day(s) of overlap",
@@ -272,7 +281,8 @@
         "paused": "paused",
         "closed": "closed",
         "completed": "completed",
-        "filled": "filled"
+        "filled": "filled",
+         "pending_review": "under review"
       },
       "view_matches_confirmed": "{{label}} (1) — Confirmed · Filled"
     }

@@ -126,7 +126,9 @@
       "not_selected_tooltip": "Non sélectionné",
       "notes": "Notes",
       "pick_location_hint": "Choisissez un lieu dans la liste déroulante pour en capturer les coordonnées.",
-      "post_for_tokens": "{{label}} {{cost}} tokens",
+      "preview_title": "APER\u00c7U DU PIT CALL",
+       "preview_helper": "V\u00e9rifiez la demande avant de la publier. L\u2019aper\u00e7u se met \u00e0 jour pendant la saisie.",
+       "post_for_tokens": "{{label}} {{cost}} tokens",
       "preferred_education": "Formation préférée",
       "relevant": "Pertinent",
       "remove": "Supprimer",
@@ -215,7 +217,14 @@
       "partial_banner_case_b": "Vous cherchez plus d'options avec des dates flexibles ? Consultez d'autres professionnels à disponibilité partielle et évaluez leurs jours manquants.",
       "partial_refund_credited": "{{tokens}} token(s) crédités ({{pct}}%). Les matches partiels sont désormais ouverts ci-dessous.",
       "perfect_match_short": "Match parfait",
-      "pitcall_match_confirmed_note": "PitCall — Match confirmé pour « {{title}} »",
+      "pitcall_preview_title": "APER\u00c7U DU PIT CALL",
+       "pitcall_preview_body": "Le potentiel de match est calcul\u00e9 \u00e0 partir de la demande actuelle. Vous pouvez encore modifier le Pit Call pendant cette fen\u00eatre de v\u00e9rification avant sa visibilit\u00e9 pour les freelances.",
+       "review_remaining": "V\u00c9RIFICATION RESTANTE",
+       "match_potential": "POTENTIEL DE MATCH",
+       "potential_strong": "STRONG",
+       "potential_targeted": "TARGETED",
+       "potential_red": "RED",
+       "pitcall_match_confirmed_note": "PitCall — Match confirmé pour « {{title}} »",
       "proportional_note": "Seulement {{count}} match(es) réel(s) dans ce niveau (max {{max}}). Frais d'entrée réduits proportionnellement de {{full}} à {{cost}} token(s).",
       "rank_tier_locked": "Rang #{{rank}} — niveau verrouillé",
       "rank_tier_overlap": "Rang #{{rank}} · niveau {{tier}} · {{count}} jour(s) de chevauchement",
@@ -272,7 +281,8 @@
         "paused": "en pause",
         "closed": "fermé",
         "completed": "terminé",
-        "filled": "pourvu"
+        "filled": "pourvu",
+         "pending_review": "en v\u00e9rification"
       },
       "view_matches_confirmed": "{{label}} (1) — Confirmé · Pourvu"
     }
