@@ -2397,6 +2397,7 @@ export type Database = {
         Args: { _freelancer_id: string; _is_test: boolean }
         Returns: number
       }
+      recompute_my_matches_after_profile_save: { Args: never; Returns: number }
       record_legal_acceptance: {
         Args: { _source?: string; _version: string }
         Returns: string
