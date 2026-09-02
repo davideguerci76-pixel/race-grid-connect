@@ -1,5 +1,5 @@
-- [ ] STEP 8: audit and consolidate Team match notifications on the existing notification pipeline
-- [ ] STEP 8: implement server-authoritative first-match, first-full, STRONG, and aggregated activity events
-- [ ] STEP 8: preserve pending_review silence, TEST/LIVE isolation, and existing delivery channels
-- [ ] STEP 8: implement individual Notification Center read state and deep-link routing
-- [ ] STEP 8: run TEST-only E2E and report the exact requested matrix; stop before STEP 9
+- [x] STEP 8: audit and consolidate Team match notifications on the existing notification pipeline
+- [x] STEP 8: implement server-authoritative first-match, first-full, STRONG, and aggregated activity events
+- [x] STEP 8: preserve pending_review silence, TEST/LIVE isolation, and existing delivery channels
+- [x] STEP 8: implement individual Notification Center read state and deep-link routing
+- [x] STEP 8: run TEST-only E2E and report the exact requested matrix; stop before STEP 9

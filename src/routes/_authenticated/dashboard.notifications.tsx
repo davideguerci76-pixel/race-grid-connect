@@ -168,8 +168,13 @@ function NotificationsPage() {
                       <Link onClick={markClicked} to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
-                    ) : isTeamMatch ? (
-                      <Link onClick={markClicked} to={`/dashboard/requests/${n.payload?.request_id}/matches`} className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary">
+                    ) : isTeamMatch && n.payload?.request_id ? (
+                      <Link
+                        onClick={markClicked}
+                        to="/dashboard/requests/$id/matches"
+                        params={{ id: String(n.payload.request_id) }}
+                        className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                      >
                         {t("sweep_profile.notifications.view_matches")}
                       </Link>
                     ) : isEngagement ? (
