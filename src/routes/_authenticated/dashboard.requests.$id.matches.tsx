@@ -104,8 +104,11 @@ function RequestMatchesPage() {
   });
 
   const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
+  const inReview = Boolean((data as any)?.in_review);
+  const reviewDeadline = (data as any)?.review_deadline_at ?? null;
+  const matchPotential = ((data as any)?.match_potential ?? null) as "strong" | "targeted" | "red" | null;
   const isFirstDayToday = data?.request?.start_date ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
-  const sosEligible = Boolean(data?.request && !requestFilled && isFirstDayToday && data.request.duration !== "full_season");
+  const sosEligible = Boolean(data?.request && !requestFilled && !inReview && isFirstDayToday && data.request.duration !== "full_season");
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
