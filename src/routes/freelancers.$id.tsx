@@ -114,3 +114,84 @@ function FreelancerProfile() {
     </div>
   );
 }
+
+/**
+ * Signed-out visitor view. Anonymous visitors have no Data API grant on
+ * `freelancer_profiles` (intentional), so the public, non-identifying subset is
+ * read through the `get_public_freelancer_profile` RPC. No day rate, no
+ * coordinates, no pit code, no contacts, no availability, no reviews.
+ */
+function PublicFreelancerProfile({ id }: { id: string }) {
+  const { t } = useTranslation();
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["freelancer-public", id],
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)("get_public_freelancer_profile", { _user_id: id });
+      if (error) throw new Error(error.message);
+      return (Array.isArray(data) ? data[0] : data) ?? null;
+    },
+  });
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
+      <div className="container-page pt-6"><BackButton /></div>
+      {isLoading ? (
+        <div className="container-page py-16 text-center text-sm text-muted-foreground">{t("common.loading")}</div>
+      ) : !data || isError ? (
+        <div className="container-page py-16 text-center">
+          <div className="label-mono">[NOT FOUND]</div>
+          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Freelancer not found</h1>
+        </div>
+      ) : (
+        <div className="container-page py-12">
+          <div className="border border-border bg-card p-8">
+            <h1 className="text-3xl font-black uppercase italic tracking-tighter">
+              {(data as any).headline || roleGroupLabel((data as any).role_group)}
+            </h1>
+            <div className="mt-1 text-sm text-muted-foreground">
+              {roleGroupLabel((data as any).role_group)}
+              {parseSubRoles((data as any).sub_roles).length
+                ? ` · ${parseSubRoles((data as any).sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}`
+                : ""}{" "}
+              · {(data as any).location ?? "—"}
+            </div>
+            {(data as any).education && (
+              <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
+                {educationLabel((data as any).education)}
+              </div>
+            )}
+            {(data as any).bio && <p className="mt-3 text-sm text-muted-foreground">{(data as any).bio}</p>}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {((data as any).disciplines ?? []).map((d: string) => (
+                <span key={d} className="border border-racing-red/40 bg-racing-red/10 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">
+                  {disciplineLabel(d)}
+                </span>
+              ))}
+            </div>
+            {((data as any).skills ?? []).length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {((data as any).skills as string[]).map((s) => (
+                  <span key={s} className="border border-border bg-secondary/40 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                    {skillLabel(s)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 border border-border bg-card p-8 text-center">
+            <div className="label-mono">[LOCKED]</div>
+            <h2 className="mt-2 text-2xl font-black uppercase italic tracking-tighter">
+              Sign in to see availability and reviews
+            </h2>
+            <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">
+              Sign in / Register
+            </Link>
+          </div>
+        </div>
+      )}
+      <SiteFooter />
+    </div>
+  );
+}
