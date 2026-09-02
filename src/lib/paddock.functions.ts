@@ -350,7 +350,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
 
     // Recompute only after every profile write has succeeded. This intentionally
     // bypasses the calendar debounce queue and performs one logical freelancer-wide recompute.
-    const { data: recomputeResult, error: recomputeError } = await (context.supabase.rpc as any)(
+    const { error: recomputeError } = await (context.supabase.rpc as any)(
       "recompute_my_matches_after_profile_save",
     );
     if (recomputeError) throw new Error(recomputeError.message);
