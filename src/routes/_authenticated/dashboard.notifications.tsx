@@ -118,7 +118,9 @@ function NotificationsPage() {
                 const isStale = n.kind === "calendar_stale";
                 const isTeamMatch = n.kind === "new_matches" && n.payload?.audience === "team";
                 const info = !isTeamMatch && n.payload?.informational === true;
-                const isEngagement = !info && !isTeamMatch && [
+                // Stable object id persisted server-side. Never inferred from text.
+                const engagementId = typeof n.payload?.engagement_id === "string" ? n.payload.engagement_id : null;
+                const isEngagement = !info && !isTeamMatch && (!!engagementId || [
                   "engagement_proposed",
                   "match_taken",
                   "match_reopened",
@@ -126,7 +128,7 @@ function NotificationsPage() {
                   "contact_check",
                   "rating_available",
                   "rating_unlocked",
-                ].includes(n.kind);
+                ].includes(n.kind));
                 const markClicked = () => {
                   if (n.read_at) return;
                   void markOneRead({ data: { id: n.id } }).then(() => {
