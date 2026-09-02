@@ -184,6 +184,27 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     return Array.from(out);
   });
 
+/**
+ * FROZEN GREEN days: availability snapshotted into a Request Confirmation that
+ * is still pending. Still green (other teams can match them), but locked from
+ * removal until the request is confirmed, declined, expired or withdrawn.
+ */
+export const getMyFrozenDates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", context.userId)
+      .eq("status", "proposed");
+    if (error) throw new Error(error.message);
+    const out = new Set<string>();
+    for (const row of ((data ?? []) as Array<{ covered_days: string[] | null }>)) {
+      for (const d of row.covered_days ?? []) out.add(String(d).slice(0, 10));
+    }
+    return Array.from(out);
+  });
+
 // ---- Profile saving ----
 // Teams only: the profile "name" is the team name. Freelancers are identified
 // exclusively by their locked legal name (first_name + last_name).
