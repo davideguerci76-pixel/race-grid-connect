@@ -66,10 +66,15 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     }> = [];
     for (const r of relevant) {
       const req = r.request ?? reqMap.get(r.request_id) ?? null;
+      // covered_days is the snapshot of what this freelancer actually covers: it is the
+      // only source of truth. Legacy engagements (NULL snapshot) fall back to request dates.
+      const covered = Array.isArray(r.covered_days) ? r.covered_days : [];
       const season = Array.isArray(req?.season_dates) ? req.season_dates : [];
-      const days = season.length
-        ? season.map((d: string) => String(d).slice(0, 10))
-        : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
+      const days = covered.length
+        ? covered.map((d: string) => String(d).slice(0, 10))
+        : season.length
+          ? season.map((d: string) => String(d).slice(0, 10))
+          : daysBetweenIso(req?.start_date ?? r.start_date, req?.end_date ?? r.end_date);
       for (const day of days) {
         out.push({
           day,
