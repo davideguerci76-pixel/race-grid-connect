@@ -355,7 +355,7 @@ function EngagementsPage() {
 
                 <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border pt-3">
                   <div className="font-mono text-xs text-muted-foreground">
-                    {e.start_date} → {e.end_date} · {e.currency} {e.fee ?? "—"}
+                    <PitCallDates request={e} dates={e.covered_days} /> · {e.currency} {e.fee ?? "—"}
                   </div>
                 </div>
                 {e.notes && <p className="mt-2 text-sm text-muted-foreground">{e.notes}</p>}
