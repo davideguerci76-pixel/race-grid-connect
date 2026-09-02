@@ -1,0 +1,7 @@
+{
+  "championship": {
+    "days_count_one": "{{count}} MEISTERSCHAFTSTAG",
+    "days_count_other": "{{count}} MEISTERSCHAFTSTAGE",
+    "sparse_note": "Verstreute Termine — kein durchgehender Zeitraum"
+  }
+}
