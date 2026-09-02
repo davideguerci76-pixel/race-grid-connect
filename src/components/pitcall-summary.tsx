@@ -140,9 +140,15 @@ export function PitCallSummary({ request }: { request: AnyRequest }) {
           <Fact
             icon={<CalendarDays className="size-3" />}
             label={t("sweep_engage.pitcall_summary.dates")}
-            value={isSeason ? t("sweep_engage.pitcall_summary.full_season") : `${fmtDate(r.start_date)} → ${fmtDate(r.end_date)}`}
+            value={
+              seasonDates.length > 0 ? (
+                <PitCallDates request={r} className="text-base font-bold" />
+              ) : (
+                `${fmtDate(r.start_date)} → ${fmtDate(r.end_date)}`
+              )
+            }
             sub={
-              isSeason
+              seasonDates.length > 0
                 ? t("sweep_engage.pitcall_summary.season_days", { count: dayCount, from: fmtDate(r.start_date), to: fmtDate(r.end_date) })
                 : t("sweep_engage.pitcall_summary.days", { count: dayCount })
             }
