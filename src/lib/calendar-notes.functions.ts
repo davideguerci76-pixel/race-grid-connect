@@ -183,7 +183,7 @@ export const getTeamCalendarDays = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("engagements")
       .select(
-        "id, freelancer_id, request_id, start_date, end_date, status, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
+        "id, freelancer_id, request_id, start_date, end_date, status, covered_days, request:requests(id, title, role_group, sub_role, location, circuit, start_date, end_date, season_dates)",
       )
       .eq("team_id", userId)
       .in("status", ["confirmed", "completed"]);
