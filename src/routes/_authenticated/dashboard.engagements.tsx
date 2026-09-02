@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { PitCallDates } from "@/components/championship-dates";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
