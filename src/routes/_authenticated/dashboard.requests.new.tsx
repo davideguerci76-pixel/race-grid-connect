@@ -15,6 +15,7 @@ import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { createRequest, getMyRequests } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { getMyPool } from "@/lib/pool.functions";
+import { PitCallSummary } from "@/components/pitcall-summary";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
 import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
@@ -345,6 +346,42 @@ function NewRequestPage() {
               {t("requests.top_up")}
             </Link>
           )}
+        </div>
+
+        <div className="mt-6">
+          <div className="mb-2 label-mono text-racing-red">[{t("sweep_engage.new_request.preview_title")}]</div>
+          <p className="mb-3 text-xs text-muted-foreground">{t("sweep_engage.new_request.preview_helper")}</p>
+          <PitCallSummary
+            request={{
+              title: form.title || t("sweep_engage.new_request.title_placeholder"),
+              role_group: form.role_group,
+              sub_role: form.sub_role || null,
+              sub_role_min_level: form.sub_role_min_level,
+              sub_role_hard: subRoleHard,
+              discipline: form.discipline,
+              duration: form.duration,
+              circuit: form.circuit || null,
+              location: form.location || null,
+              start_date: isSeason ? seasonDatesIso[0] : form.start_date,
+              end_date: isSeason ? seasonDatesIso[seasonDatesIso.length - 1] : form.end_date,
+              season_dates: seasonDatesIso,
+              budget_min: form.budget_min ? Number(form.budget_min) : null,
+              budget_max: form.budget_max ? Number(form.budget_max) : null,
+              budget_unit: isSeason ? "season" : form.budget_unit,
+              currency: "EUR",
+              skills,
+              skills_hard: skillsHard,
+              education,
+              experience_requirements: experienceReqs,
+              languages: languageReqs,
+              travel_required: travelRequired,
+              location_city: locationDetails.city,
+              location_region: locationDetails.region,
+              location_country: locationDetails.country,
+              location_relevance: locRelevance,
+              location_radius_km: locRelevance === "not_relevant" || locRadius === "any" ? null : Number(locRadius),
+            }}
+          />
         </div>
 
         {identical && (

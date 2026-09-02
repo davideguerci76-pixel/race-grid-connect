@@ -1,6 +1,6 @@
 import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +48,15 @@ function RequestMatchesPage() {
     queryFn: () => fetchMatches({ data: { request_id: id } }),
     retry: false,
   });
+
+  const [reviewNow, setReviewNow] = useState(() => Date.now());
+  const reviewDeadline = (data as any)?.review_deadline_at ?? null;
+  const inReview = Boolean((data as any)?.in_review);
+  useEffect(() => {
+    if (!inReview || !reviewDeadline) return;
+    const timer = window.setInterval(() => setReviewNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [inReview, reviewDeadline]);
 
 
   const unlockMut = useMutation({
@@ -104,8 +113,20 @@ function RequestMatchesPage() {
   });
 
   const requestFilled = data?.request?.status === "filled" || data?.request?.status === "completed";
+  const matchPotential = ((data as any)?.match_potential ?? null) as "strong" | "targeted" | "red" | null;
+  const reviewRemainingMs = reviewDeadline ? Math.max(0, new Date(reviewDeadline).getTime() - reviewNow) : 0;
+  const reviewMinutes = Math.floor(reviewRemainingMs / 60000);
+  const reviewSeconds = Math.floor((reviewRemainingMs % 60000) / 1000);
+  const reviewCountdown = reviewMinutes >= 60
+    ? `${Math.floor(reviewMinutes / 60)}h ${String(reviewMinutes % 60).padStart(2, "0")}m`
+    : `${reviewMinutes}m ${String(reviewSeconds).padStart(2, "0")}s`;
+  const potentialTone = matchPotential === "strong"
+    ? "border-emerald-400/70 bg-emerald-400/10 text-emerald-300"
+    : matchPotential === "targeted"
+      ? "border-racing-yellow/70 bg-racing-yellow/10 text-racing-yellow"
+      : "border-racing-red/70 bg-racing-red/10 text-racing-red";
   const isFirstDayToday = data?.request?.start_date ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
-  const sosEligible = Boolean(data?.request && !requestFilled && isFirstDayToday && data.request.duration !== "full_season");
+  const sosEligible = Boolean(data?.request && !requestFilled && !inReview && isFirstDayToday && data.request.duration !== "full_season");
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
@@ -243,6 +264,29 @@ function RequestMatchesPage() {
         {data && (
           <>
             <PitCallSummary request={data.request as never} />
+
+            {inReview && (
+              <section className="mt-5 border-2 border-racing-yellow/70 bg-racing-yellow/5 p-5" aria-live="polite">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="label-mono text-racing-yellow">[{t("sweep_engage.request_matches.pitcall_preview_title")}]</div>
+                    <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                      {t("sweep_engage.request_matches.pitcall_preview_body")}
+                    </p>
+                  </div>
+                  <div className="shrink-0 border border-racing-yellow/60 px-3 py-2 text-right">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_engage.request_matches.review_remaining")}</div>
+                    <div className="mt-1 font-mono text-xl font-bold tabular-nums text-racing-yellow">{reviewCountdown}</div>
+                  </div>
+                </div>
+                <div className={`mt-4 inline-flex items-center gap-2 border px-3 py-2 font-mono text-xs font-bold uppercase tracking-widest ${potentialTone}`}>
+                  <span>{t("sweep_engage.request_matches.match_potential")}</span>
+                  <span aria-label={matchPotential ? t(`sweep_engage.request_matches.potential_${matchPotential}`) : "—"}>
+                    {matchPotential ? t(`sweep_engage.request_matches.potential_${matchPotential}`) : "—"}
+                  </span>
+                </div>
+              </section>
+            )}
 
             <div className="border border-border bg-card p-5">
               <p className="text-xs text-muted-foreground">

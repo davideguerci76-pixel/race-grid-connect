@@ -126,7 +126,9 @@
       "not_selected_tooltip": "Nicht ausgewählt",
       "notes": "Notizen",
       "pick_location_hint": "Wählen Sie einen Standort aus der Dropdown-Liste, um dessen Koordinaten zu erfassen.",
-      "post_for_tokens": "{{label}} {{cost}} Token",
+      "preview_title": "PIT-CALL-VORSCHAU",
+       "preview_helper": "Pr\u00fcfen Sie die Anfrage vor der Ver\u00f6ffentlichung. Die Vorschau wird w\u00e4hrend der Eingabe aktualisiert.",
+       "post_for_tokens": "{{label}} {{cost}} Token",
       "preferred_education": "Bevorzugte Ausbildung",
       "relevant": "Relevant",
       "remove": "Entfernen",
@@ -215,7 +217,14 @@
       "partial_banner_case_b": "Suchen Sie nach weiteren Optionen mit flexiblen Terminen? Sehen Sie sich andere Fachleute mit teilweiser Verfügbarkeit an und bewerten Sie deren fehlende Tage.",
       "partial_refund_credited": "{{tokens}} Token gutgeschrieben ({{pct}}%). Teil-Matches sind jetzt unten geöffnet.",
       "perfect_match_short": "Perfekter Match",
-      "pitcall_match_confirmed_note": "PitCall — Match bestätigt für „{{title}}“",
+      "pitcall_preview_title": "PIT-CALL-VORSCHAU",
+       "pitcall_preview_body": "Das Match-Potenzial wird anhand der aktuellen Anfrage berechnet. Sie k\u00f6nnen den Pit Call w\u00e4hrend dieses Pr\u00fcfzeitraums noch anpassen, bevor er f\u00fcr Freelancer sichtbar wird.",
+       "review_remaining": "VERBLEIBENDE PR\u00dcFZEIT",
+       "match_potential": "MATCH-POTENZIAL",
+       "potential_strong": "STRONG",
+       "potential_targeted": "TARGETED",
+       "potential_red": "RED",
+       "pitcall_match_confirmed_note": "PitCall — Match bestätigt für „{{title}}“",
       "proportional_note": "Nur {{count}} echte(r) Match(es) in dieser Stufe (max. {{max}}). Eintrittsgebühr proportional von {{full}} auf {{cost}} Token reduziert.",
       "rank_tier_locked": "Rang #{{rank}} — Stufe gesperrt",
       "rank_tier_overlap": "Rang #{{rank}} · Stufe {{tier}} · {{count}} Tag(e) Überschneidung",
@@ -272,7 +281,8 @@
         "paused": "pausiert",
         "closed": "geschlossen",
         "completed": "abgeschlossen",
-        "filled": "besetzt"
+        "filled": "besetzt",
+         "pending_review": "in Pr\u00fcfung"
       },
       "view_matches_confirmed": "{{label}} (1) — Bestätigt · Besetzt"
     }

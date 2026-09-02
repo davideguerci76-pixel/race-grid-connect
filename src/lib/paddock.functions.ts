@@ -642,7 +642,11 @@ export const getMyMatches = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    const rawMatches = (matches ?? []) as any[];
+    // A Pit Call inside its post-review window is invisible to Freelancers:
+    // the Team can still change its mind before the request goes live.
+    const rawMatches = ((matches ?? []) as any[]).filter(
+      (m) => !(isFreelancer && m.request?.status === "pending_review"),
+    );
     const otherIds = Array.from(new Set(rawMatches.map((m) => (isFreelancer ? m.team_id : m.freelancer_id))));
 
     const teamProfilesById = new Map<string, any>();
@@ -1234,6 +1238,13 @@ export const getRequestMatches = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    // If the post-review window has elapsed, the request goes live before we read it.
+    try {
+      await (supabase.rpc as any)("activate_request_if_due", { _request_id: data.request_id });
+    } catch {
+      // Non-fatal: the scheduled activation still covers this request.
+    }
+
     const { data: req, error: reqErr } = await supabase
       .from("requests")
       .select("*")
@@ -1243,13 +1254,17 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     if (!req) throw new Error("Request not found");
     if (req.team_id !== userId) throw new Error("Not owner of this request");
     const isPoolRequest = (req as any).search_mode === "pool";
+    const inReview = (req as any).status === "pending_review";
 
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: data.request_id } as never);
-    } catch {
-      // Keep the page resilient if a live recompute is temporarily unavailable; existing matches still render below.
+    if (!inReview) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.rpc("recompute_matches", { _freelancer_id: null, _request_id: data.request_id } as never);
+      } catch {
+        // Keep the page resilient if a live recompute is temporarily unavailable; existing matches still render below.
+      }
     }
+
 
     const settingKeys = [
       "cost_tier2_entry",
@@ -1609,6 +1624,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
 
     return {
       request: req,
+      in_review: inReview,
+      review_deadline_at: (req as any).review_deadline_at ?? null,
+      match_potential: ((req as any).initial_match_potential ?? null) as "strong" | "targeted" | "red" | null,
       confirmable_left: Number(confirmableLeft ?? 0),
       items,
       items_partial: itemsPartial,
