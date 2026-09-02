@@ -218,6 +218,30 @@
       "approve_publish": "Approva e pubblica",
       "reject": "Rifiuta",
       "edit_dates": "Modifica date"
+    },
+    "platform_rules": {
+      "title": "Regole della piattaforma",
+      "description": "Controlli di configurazione riservati alle prossime regole della piattaforma. I valori sono salvati ora, ma non sono attivi nei flussi correnti.",
+      "groups": {
+        "match_potential": "Match Potential",
+        "request_modify": "Revisione e modifica richiesta",
+        "notifications": "Notifiche",
+        "calendar": "Calendario e ricalcolo"
+      },
+      "fields": {
+        "strong_match_threshold": { "label": "Soglia Strong match", "description": "Numero di match Full + Partial necessari perché un Pit Call raggiunga STRONG Match Potential." },
+        "max_modify_per_pitcall": { "label": "Modifiche massime per Pit Call", "description": "Numero massimo di modifiche consentite per ogni Pit Call." },
+        "daily_recheck_budget": { "label": "Budget Team di ricontrollo su 24 ore", "description": "Numero massimo di unità condivise di ricontrollo disponibili per un Team in una finestra mobile di 24 ore." },
+        "red_cancel_budget_cost": { "label": "Costo budget annullamento RED", "description": "Unità di budget di ricontrollo consumate da un annullamento RED idoneo." },
+        "post_review_window_minutes": { "label": "Finestra di revisione dopo la pubblicazione", "description": "Tempo disponibile per rivedere il Match Potential subito dopo la pubblicazione." },
+        "team_match_update_notification_hours": { "label": "Intervallo aggregazione aggiornamenti match Team", "description": "Intervallo di aggregazione per gli aggiornamenti match Team non legati a milestone." },
+        "availability_recompute_delay_minutes": { "label": "Ritardo ricalcolo disponibilità", "description": "Ritardo dopo l'ultima modifica al calendario prima del ricalcolo differito dei match." }
+      },
+      "units": { "matches": "match", "max_modify_per_pitcall": "modifiche", "daily_recheck_budget": "unità", "red_cancel_budget_cost": "unità", "post_review_window_minutes": "minuti", "team_match_update_notification_hours": "ore", "availability_recompute_delay_minutes": "minuti" },
+      "range": "Consentito: {{min}}–{{max}}",
+      "save_changes": "Salva modifiche",
+      "save_changes_count": "Salva modifiche ({{count}})",
+      "saved": "Regole della piattaforma salvate"
     }
   },
   "pitcalls": {

@@ -218,6 +218,30 @@
       "approve_publish": "Approve & publish",
       "reject": "Reject",
       "edit_dates": "Edit dates"
+    },
+    "platform_rules": {
+      "title": "Platform Rules",
+      "description": "Configuration controls reserved for upcoming platform rules. These values are stored now and are not active in current workflows.",
+      "groups": {
+        "match_potential": "Match Potential",
+        "request_modify": "Request Review & Modify",
+        "notifications": "Notifications",
+        "calendar": "Calendar & Recompute"
+      },
+      "fields": {
+        "strong_match_threshold": { "label": "Strong match threshold", "description": "Number of Full + Partial matches required for a Pit Call to reach STRONG Match Potential." },
+        "max_modify_per_pitcall": { "label": "Maximum modifies per Pit Call", "description": "Maximum number of request edits permitted per Pit Call." },
+        "daily_recheck_budget": { "label": "Team rolling 24h recheck budget", "description": "Maximum shared recheck units available to a Team within a rolling 24-hour window." },
+        "red_cancel_budget_cost": { "label": "RED cancel budget cost", "description": "Recheck-budget units consumed by an eligible RED cancellation." },
+        "post_review_window_minutes": { "label": "Post review window", "description": "Time available to review Match Potential immediately after posting." },
+        "team_match_update_notification_hours": { "label": "Team match update aggregation interval", "description": "Aggregation interval for non-milestone Team match updates." },
+        "availability_recompute_delay_minutes": { "label": "Availability recompute delay", "description": "Delay after the last calendar edit before deferred matching recomputation." }
+      },
+      "units": { "matches": "matches", "max_modify_per_pitcall": "edits", "daily_recheck_budget": "units", "red_cancel_budget_cost": "units", "post_review_window_minutes": "minutes", "team_match_update_notification_hours": "hours", "availability_recompute_delay_minutes": "minutes" },
+      "range": "Allowed: {{min}}–{{max}}",
+      "save_changes": "Save changes",
+      "save_changes_count": "Save changes ({{count}})",
+      "saved": "Platform Rules saved"
     }
   },
   "pitcalls": {
