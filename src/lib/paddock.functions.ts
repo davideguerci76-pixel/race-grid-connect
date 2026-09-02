@@ -956,6 +956,16 @@ export const requestMatchConfirmation = createServerFn({ method: "POST" })
     return row;
   });
 
+/** Team-side: pull back a still-pending Request Confirmation (releases Frozen Green days). */
+export const withdrawMatchConfirmation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("withdraw_match_confirmation" as any, { _engagement_id: data.id });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
 export const declineMatchConfirmation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
