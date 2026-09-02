@@ -642,7 +642,11 @@ export const getMyMatches = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    const rawMatches = (matches ?? []) as any[];
+    // A Pit Call inside its post-review window is invisible to Freelancers:
+    // the Team can still change its mind before the request goes live.
+    const rawMatches = ((matches ?? []) as any[]).filter(
+      (m) => !(isFreelancer && m.request?.status === "pending_review"),
+    );
     const otherIds = Array.from(new Set(rawMatches.map((m) => (isFreelancer ? m.team_id : m.freelancer_id))));
 
     const teamProfilesById = new Map<string, any>();
