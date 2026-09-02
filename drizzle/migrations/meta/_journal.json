@@ -239,6 +239,13 @@
       "when": 1788361188085,
       "tag": "0033_step7_modify_and_red_cancel",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788363156195,
+      "tag": "0034_step7_lock_check_blockers",
+      "breakpoints": true
     }
   ]
 }
