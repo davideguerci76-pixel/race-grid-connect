@@ -281,7 +281,7 @@ function EngagementsPage() {
                     <div className="label-mono mb-1">[PIT CALL]</div>
                     <div className="text-sm font-bold">{req.title}</div>
                     <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {disciplineLabel(req.discipline)} · {req.start_date} → {req.end_date}
+                      {req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)} · {disciplineLabel(req.discipline)} · <PitCallDates request={req} />
                       {detailsUnlocked && (req.budget_min || req.budget_max) && <span> · €{req.budget_min ?? "?"}–{req.budget_max ?? "?"}/{req.budget_unit}</span>}
                     </div>
                     {/* 1-token reveal: unlocks the anonymous Pit Call details. Team identity stays hidden. */}
