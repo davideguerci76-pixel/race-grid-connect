@@ -542,6 +542,57 @@ export type Database = {
           },
         ]
       }
+      hot_partial_state: {
+        Row: {
+          created_at: string
+          freelancer_id: string
+          is_test: boolean
+          missing_days_count: number
+          missing_fingerprint: string
+          notified_at: string | null
+          request_id: string
+          resolved_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          freelancer_id: string
+          is_test?: boolean
+          missing_days_count?: number
+          missing_fingerprint?: string
+          notified_at?: string | null
+          request_id: string
+          resolved_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          freelancer_id?: string
+          is_test?: boolean
+          missing_days_count?: number
+          missing_fingerprint?: string
+          notified_at?: string | null
+          request_id?: string
+          resolved_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hot_partial_state_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hot_partial_state_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_acceptances: {
         Row: {
           accepted_at: string
@@ -2451,6 +2502,11 @@ export type Database = {
         Returns: number
       }
       emit_contact_checks: { Args: never; Returns: number }
+      emit_hot_partial_notifications: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
+      emit_hot_partial_notifications_live: { Args: never; Returns: number }
       emit_pitcall_outcome_notifications: {
         Args: {
           _confirmed_freelancer?: string
@@ -2833,6 +2889,10 @@ export type Database = {
         Args: { _request_id: string }
         Returns: Json
       }
+      request_missing_required_days: {
+        Args: { _freelancer_id: string; _request_id: string }
+        Returns: string[]
+      }
       request_required_days: {
         Args: { _request_id: string }
         Returns: string[]
@@ -2849,6 +2909,7 @@ export type Database = {
       reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
+      run_hot_partial_test: { Args: never; Returns: number }
       run_team_match_notifications_test: { Args: never; Returns: number }
       set_my_rate_location: {
         Args: {
