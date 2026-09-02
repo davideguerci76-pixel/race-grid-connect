@@ -57,7 +57,7 @@ function tr(key: string): string | null {
   return null;
 }
 
-/** Pit Call (request) status: active / paused / closed / completed / filled. */
+/** Pit Call (request) status, including the server-authoritative review window. */
 export function requestStatusLabel(status: string | null | undefined): string {
   if (!status) return "—";
   return tr(`sweep_engage.requests.status.${status}`) ?? humanize(status);
