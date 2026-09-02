@@ -141,6 +141,34 @@
       "when": 1788347148766,
       "tag": "0019_required_days_ssot",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788347903436,
+      "tag": "0020_required_days_ssot_core_consumers",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788347927074,
+      "tag": "0021_required_days_ssot_access_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788347966590,
+      "tag": "0022_required_days_ssot_internal_consumer_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788348103973,
+      "tag": "0023_restore_required_days_ssot_core_definitions",
+      "breakpoints": true
     }
   ]
 }
