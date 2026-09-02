@@ -272,6 +272,69 @@ export const adminUpdateSettings = createServerFn({ method: "POST" })
     return { ok: true, count: data.updates.length };
   });
 
+// ---- V2.3 Platform Rules (configuration knobs only, no consumers yet) ----
+export const PLATFORM_RULE_BOUNDS: Record<string, { min: number; max: number }> = {
+  strong_match_threshold: { min: 1, max: 50 },
+  max_modify_per_pitcall: { min: 0, max: 20 },
+  daily_recheck_budget: { min: 1, max: 100 },
+  red_cancel_budget_cost: { min: 0, max: 20 },
+  post_review_window_minutes: { min: 0, max: 120 },
+  team_match_update_notification_hours: { min: 1, max: 72 },
+  availability_recompute_delay_minutes: { min: 0, max: 60 },
+};
+
+export const PLATFORM_RULE_KEYS = Object.keys(PLATFORM_RULE_BOUNDS);
+
+export const adminUpdatePlatformRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        updates: z
+          .array(
+            z.object({
+              key: z.string().refine((k) => k in PLATFORM_RULE_BOUNDS, { message: "unknown_setting_key" }),
+              value_num: z.number(),
+            }),
+          )
+          .min(1),
+      })
+      .superRefine((val, ctx) => {
+        for (const u of val.updates) {
+          const b = PLATFORM_RULE_BOUNDS[u.key];
+          if (!b) continue;
+          if (!Number.isInteger(u.value_num)) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: `${u.key}: must be an integer` });
+            continue;
+          }
+          if (u.value_num < b.min || u.value_num > b.max) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `${u.key}: must be between ${b.min} and ${b.max}`,
+            });
+          }
+        }
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const nowIso = new Date().toISOString();
+    for (const u of data.updates) {
+      const { data: rows, error } = await supabaseAdmin
+        .from("platform_settings")
+        .update({ value_num: u.value_num, updated_at: nowIso, updated_by: context.userId } as never)
+        .eq("key", u.key)
+        .select("key");
+      if (error) throw new Error(`${u.key}: ${error.message}`);
+      if (!rows || rows.length === 0) throw new Error(`${u.key}: setting not found`);
+    }
+    return { ok: true, count: data.updates.length };
+  });
+
+
+
 // Public reader (auth): any signed-in user can look up current values (e.g. UI hints)
 export const getPlatformSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
