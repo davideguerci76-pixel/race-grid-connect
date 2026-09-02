@@ -152,35 +152,53 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
     const engagements = (data ?? []) as Array<{
       start_date: string;
       end_date: string;
+      covered_days?: string[] | null;
       request?: { start_date?: string | null; end_date?: string | null; season_dates?: string[] | null } | null;
     }>;
-    const requiredByEngagement = engagements.map((r) => {
-      const seasonDates = Array.isArray(r.request?.season_dates) ? r.request?.season_dates : [];
-      if (seasonDates.length) return seasonDates.map((d) => String(d).slice(0, 10));
-      const start = r.request?.start_date ?? r.start_date;
-      const end = r.request?.end_date ?? r.end_date;
-      return daysBetween(start, end);
-    });
-    const allRequired = Array.from(new Set(requiredByEngagement.flat()));
-    const available = new Set<string>();
-    if (allRequired.length) {
-      const { data: availableDays } = await supabase
-        .from("availability")
-        .select("day")
-        .eq("freelancer_id", userId)
-        .in("day", allRequired);
-      for (const row of (availableDays ?? []) as Array<{ day: string }>) {
-        available.add(String(row.day).slice(0, 10));
+
+    // covered_days is the source of truth: for any engagement that carries the
+    // snapshot taken at Request Confirmation, the UI must show exactly those
+    // days as blocked — never recompute from current availability or expand
+    // the start..end range.
+    const out = new Set<string>();
+    const legacy: typeof engagements = [];
+    for (const e of engagements) {
+      const covered = Array.isArray(e.covered_days) ? e.covered_days : null;
+      if (covered && covered.length) {
+        for (const d of covered) out.add(String(d).slice(0, 10));
+      } else {
+        legacy.push(e);
       }
     }
 
-    const out = new Set<string>();
-    engagements.forEach((engagement, index) => {
-      const required = requiredByEngagement[index] ?? [];
-      const worked = required.filter((day) => available.has(day));
-      const daysToBlock = worked.length ? worked : daysBetween(engagement.start_date, engagement.end_date);
-      daysToBlock.forEach((day) => out.add(day));
-    });
+    // Legacy fallback (engagements created before covered_days existed).
+    if (legacy.length) {
+      const requiredByEngagement = legacy.map((r) => {
+        const seasonDates = Array.isArray(r.request?.season_dates) ? r.request?.season_dates : [];
+        if (seasonDates.length) return seasonDates.map((d) => String(d).slice(0, 10));
+        const start = r.request?.start_date ?? r.start_date;
+        const end = r.request?.end_date ?? r.end_date;
+        return daysBetween(start, end);
+      });
+      const allRequired = Array.from(new Set(requiredByEngagement.flat()));
+      const available = new Set<string>();
+      if (allRequired.length) {
+        const { data: availableDays } = await supabase
+          .from("availability")
+          .select("day")
+          .eq("freelancer_id", userId)
+          .in("day", allRequired);
+        for (const row of (availableDays ?? []) as Array<{ day: string }>) {
+          available.add(String(row.day).slice(0, 10));
+        }
+      }
+      legacy.forEach((engagement, index) => {
+        const required = requiredByEngagement[index] ?? [];
+        const worked = required.filter((day) => available.has(day));
+        const daysToBlock = worked.length ? worked : daysBetween(engagement.start_date, engagement.end_date);
+        daysToBlock.forEach((day) => out.add(day));
+      });
+    }
     return Array.from(out);
   });
 
@@ -732,6 +750,7 @@ export const getMyMatches = createServerFn({ method: "GET" })
           const { data: peers } = await supabaseAdmin
             .from("matches")
             .select("request_id, freelancer_id, match_score")
+            .eq("stale", false)
             .in("request_id", revealedReqIds as string[]);
           const byReq = new Map<string, any[]>();
           for (const p of (peers ?? []) as any[]) {
