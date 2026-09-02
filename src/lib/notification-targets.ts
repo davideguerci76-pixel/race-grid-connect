@@ -86,6 +86,13 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
   if (requestId && (kind === "new_matches" || kind === "request_unfilled" || kind === "revealed_by")) {
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };
   }
+
+  // Engagement-scoped alerts deep-link to the specific card. The id is the
+  // stable server-persisted payload value; missing ids fall back to the list.
+  const engagementId = typeof p["engagement_id"] === "string" ? (p["engagement_id"] as string) : null;
+  if (engagementId && base.path === "/dashboard/engagements") {
+    return { ...base, path: `/dashboard/engagements#engagement-${engagementId}` };
+  }
   return base;
 }
 
