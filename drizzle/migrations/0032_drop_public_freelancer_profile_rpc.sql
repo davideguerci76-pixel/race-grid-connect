@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.get_public_freelancer_profile(uuid);

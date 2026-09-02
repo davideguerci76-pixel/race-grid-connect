@@ -225,6 +225,13 @@
       "when": 1788358108988,
       "tag": "0031_public_freelancer_profile_rpc",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788358753944,
+      "tag": "0032_drop_public_freelancer_profile_rpc",
+      "breakpoints": true
     }
   ]
 }
