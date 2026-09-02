@@ -162,6 +162,13 @@
       "when": 1788347966590,
       "tag": "0022_required_days_ssot_internal_consumer_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788348103973,
+      "tag": "0023_restore_required_days_ssot_core_definitions",
+      "breakpoints": true
     }
   ]
 }
