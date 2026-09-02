@@ -1624,6 +1624,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
 
     return {
       request: req,
+      in_review: inReview,
+      review_deadline_at: (req as any).review_deadline_at ?? null,
+      match_potential: ((req as any).initial_match_potential ?? null) as "strong" | "targeted" | "red" | null,
       confirmable_left: Number(confirmableLeft ?? 0),
       items,
       items_partial: itemsPartial,
