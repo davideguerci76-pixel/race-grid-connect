@@ -38,20 +38,7 @@ function FreelancerProfile() {
   });
 
   if (authLoading) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <SiteHeader />
-      <div className="container-page pt-6"><BackButton /></div>
-        <div className="container-page py-16 text-center">
-          <div className="label-mono">[LOCKED]</div>
-          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">Sign in to view freelancer</h1>
-          <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">Sign in / Register</Link>
-        </div>
-        <SiteFooter />
-      </div>
-    );
-  }
+  if (!user) return <PublicFreelancerProfile id={id} />;
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
 
   const { fp, availability } = data;
