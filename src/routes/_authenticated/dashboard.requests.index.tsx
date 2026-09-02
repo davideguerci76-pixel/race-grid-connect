@@ -16,6 +16,7 @@ import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
+import { PitCallDates } from "@/components/championship-dates";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
