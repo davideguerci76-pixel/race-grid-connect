@@ -53,13 +53,20 @@ function EngagementsPage() {
 
   // Deep-link support: /dashboard/engagements#engagement-<id> scrolls to the card
   // once the list has been rendered (data arrives after the initial mount).
+  // The hash comes from the router so an in-app navigation from the Notification
+  // Center re-triggers the scroll even when the page is already mounted.
+  const locationHash = useRouterState({ select: (s) => s.location.hash });
+  const targetEngagementId = locationHash?.startsWith("engagement-")
+    ? locationHash.slice("engagement-".length)
+    : locationHash?.startsWith("#engagement-")
+      ? locationHash.slice("#engagement-".length)
+      : null;
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash;
-    if (!hash.startsWith("#engagement-") || rows.length === 0) return;
-    const el = document.getElementById(hash.slice(1));
+    if (typeof window === "undefined" || !targetEngagementId || rows.length === 0) return;
+    const el = document.getElementById(`engagement-${targetEngagementId}`);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [rows]);
+  }, [rows, targetEngagementId]);
 
   // Do NOT auto-mark all notifications as read on mount — otherwise the bell badge
   // would silently reset before the user has a chance to see it. Users click the
