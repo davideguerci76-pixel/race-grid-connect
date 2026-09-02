@@ -102,6 +102,11 @@
       "calendar_stale_message": "Some of your available dates haven't been reviewed recently. A quick check keeps your availability accurate.",
       "update_calendar": "Review availability",
       "view_engagement": "View engagement",
+      "view_matches": "View matches",
+      "team_first_match": "A freelancer matches your Pit Call.",
+      "team_first_full": "Your Pit Call has its first full match.",
+      "team_strong_reached": "Your Pit Call has reached a strong match result.",
+      "team_match_activity": "There is new matching activity on your Pit Call.",
       "calendar_stale_unconfirmed_message": "We've temporarily stopped using some of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again."
     },
     "push": {
