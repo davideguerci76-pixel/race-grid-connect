@@ -13,6 +13,8 @@ export type PitcallDayCell = {
   count?: number;
   /** Availability declared but not recently reviewed. */
   unconfirmed?: boolean;
+  /** Highlighted as a suggested day (e.g. HOT Partial missing Required Day). */
+  highlighted?: boolean;
   disabled?: boolean;
 };
 
