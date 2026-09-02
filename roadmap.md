@@ -1,0 +1,5 @@
+- [ ] STEP 5: audit current availability recompute paths
+- [ ] STEP 5: implement server-authoritative availability recompute queue and worker
+- [ ] STEP 5: update availability/confirm flows without changing unrelated business logic
+- [ ] STEP 5: run debounce, worker, race, Frozen Green, confirm, and regression tests
+- [ ] STEP 5: report results and stop before STEP 6

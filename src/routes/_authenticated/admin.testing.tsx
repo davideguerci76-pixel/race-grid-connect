@@ -11,6 +11,7 @@ import {
   generateTestDataset,
   getTestEnvironmentStats,
   purgeTestEnvironment,
+  runTestAvailabilityRecomputeQueue,
   runTestCalendarStaleJob,
   runTestEngagementJobs,
 } from "@/lib/testlab.functions";
@@ -113,6 +114,17 @@ function TestingLab() {
     },
     onError: (e) => toastError(e),
   });
+
+  const queueFn = useServerFn(runTestAvailabilityRecomputeQueue);
+  const queueMut = useMutation({
+    mutationFn: () => queueFn(),
+    onSuccess: (r: any) => {
+      toast.success(`Availability recompute queue (TEST): ${r.processed} processed, ${r.pending} still pending`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
 
   const size = PRESET_SIZES[preset];
 
@@ -249,7 +261,15 @@ function TestingLab() {
             onClick={() => calMut.mutate()}
             icon={<Timer className="size-3" />}
           />
+          <SimCard
+            title="Drain availability queue (TEST)"
+            desc="Processes the debounced availability recompute queue for TEST freelancers whose delay has elapsed. LIVE data is never touched."
+            pending={queueMut.isPending}
+            onClick={() => queueMut.mutate()}
+            icon={<Timer className="size-3" />}
+          />
         </div>
+
       </div>
 
 

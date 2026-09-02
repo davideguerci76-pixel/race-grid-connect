@@ -127,6 +127,44 @@ export type Database = {
           },
         ]
       }
+      availability_recompute_queue: {
+        Row: {
+          attempts: number
+          created_at: string
+          due_at: string
+          freelancer_id: string
+          is_test: boolean
+          last_error: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          due_at: string
+          freelancer_id: string
+          is_test?: boolean
+          last_error?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          due_at?: string
+          freelancer_id?: string
+          is_test?: boolean
+          last_error?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_recompute_queue_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_day_notes: {
         Row: {
           busy: boolean
@@ -2150,6 +2188,10 @@ export type Database = {
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
       emit_team_ghosting_reminders: { Args: never; Returns: number }
+      enqueue_availability_recompute: {
+        Args: { _freelancer_id: string; _is_test: boolean }
+        Returns: undefined
+      }
       env_is_test: { Args: never; Returns: boolean }
       extend_match_confirmation: {
         Args: { _engagement_id: string }
@@ -2329,6 +2371,11 @@ export type Database = {
         Args: { _request_id: string }
         Returns: boolean
       }
+      process_availability_recompute_queue: { Args: never; Returns: number }
+      process_availability_recompute_queue_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       process_engagement_deadlines: { Args: never; Returns: number }
       process_engagement_deadlines_env: {
         Args: { _is_test: boolean }
@@ -2346,6 +2393,10 @@ export type Database = {
         Returns: number
       }
       recompute_matches_env: { Args: { _is_test: boolean }; Returns: number }
+      recompute_matches_freelancer_env: {
+        Args: { _freelancer_id: string; _is_test: boolean }
+        Returns: number
+      }
       record_legal_acceptance: {
         Args: { _source?: string; _version: string }
         Returns: string
