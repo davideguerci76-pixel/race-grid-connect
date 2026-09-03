@@ -93,27 +93,19 @@ function TeamProfile() {
   }
 
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
-  if (!data.tp) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <SiteHeader />
-        <div className="container-page py-16 text-center">
-          <div className="label-mono">[NOT FOUND]</div>
-          <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.not_found")}</h1>
-        </div>
-        <SiteFooter />
-      </div>
-    );
-  }
-
   const { tp, requests, fullUnlocked, revealedRequestIds } = data;
   const isOwner = user.id === id;
   const canSeeFull = isOwner || fullUnlocked;
   const contextRequest = revealedReqId ? requests.find((r) => r.id === revealedReqId) : null;
   const hasRequestReveal = revealedReqId ? revealedRequestIds.has(revealedReqId) : false;
-  const canSeeAnything = canSeeFull || hasRequestReveal || (revealedReqId && contextRequest);
+  // Team identity requires an earned disclosure: a paid full reveal, or a reveal
+  // of the specific Pit Call. Merely knowing a request id is not enough.
+  const canSeeAnything = canSeeFull || hasRequestReveal;
 
-  if (!canSeeAnything) {
+  // The team identity row is RLS-gated, so an unauthorised viewer simply gets no
+  // row: render the locked state (with the unlock CTA) rather than "not found".
+  if (!canSeeAnything || !tp) {
+
     return (
       <div className="min-h-screen bg-background text-foreground">
         <SiteHeader />

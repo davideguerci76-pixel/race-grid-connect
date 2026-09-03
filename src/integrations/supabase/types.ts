@@ -2379,6 +2379,7 @@ export type Database = {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
       }
+      can_view_team_identity: { Args: { _team: string }; Returns: boolean }
       cancel_engagement: {
         Args: { _engagement_id: string; _reason?: string }
         Returns: {
@@ -2598,6 +2599,7 @@ export type Database = {
         Returns: number
       }
       emit_contact_checks: { Args: never; Returns: number }
+      emit_contact_checks_env: { Args: { _is_test: boolean }; Returns: number }
       emit_engagement_completed_notifications: {
         Args: { _engagement_id: string }
         Returns: number
@@ -2621,6 +2623,10 @@ export type Database = {
       }
       emit_rating_available_notifications: { Args: never; Returns: number }
       emit_team_ghosting_reminders: { Args: never; Returns: number }
+      emit_team_ghosting_reminders_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       emit_team_match_activity: { Args: never; Returns: number }
       emit_team_match_activity_env: {
         Args: { _is_test: boolean }
@@ -2952,6 +2958,10 @@ export type Database = {
         }[]
       }
       release_ghosted_engagements: { Args: never; Returns: number }
+      release_ghosted_engagements_env: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
       request_confirmable_matches_left: {
         Args: { _request_id: string }
         Returns: number

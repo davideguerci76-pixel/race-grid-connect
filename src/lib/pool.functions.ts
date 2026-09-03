@@ -91,7 +91,8 @@ export const getPoolMemberships = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (rows ?? []).map((r: any) => r.team_id);
     if (!ids.length) return [] as any[];
-    const { data: teams } = await supabase.from("team_profiles").select("user_id, team_name, location").in("user_id", ids);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: teams } = await supabaseAdmin.from("team_profiles").select("user_id, team_name, location").in("user_id", ids);
     const tMap = new Map((teams ?? []).map((t: any) => [t.user_id, t]));
     return (rows ?? []).map((r: any) => ({
       id: r.id,
