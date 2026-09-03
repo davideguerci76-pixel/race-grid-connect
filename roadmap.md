@@ -6,3 +6,5 @@
 - [x] STEP 9: implement HOT Partial missing Required Days recovery without changing matching/scoring
 - [x] STEP 9: integrate anonymous Freelancer notification, calendar month/highlight CTA, and dedup
 - [x] STEP 9: run TEST-only E2E matrix and confirm TEST/LIVE isolation; stop before STEP 10
+- [x] REVIEW03: add the server-side professional relevance threshold authority at 50%
+- [x] REVIEW03: validate ACP bounds, persistence, localization, no-consumer scope, and build/runtime state
