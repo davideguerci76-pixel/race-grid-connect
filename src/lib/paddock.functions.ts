@@ -708,7 +708,8 @@ export const getMyMatches = createServerFn({ method: "GET" })
         const { data: tps } = await supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).in("user_id", otherIds);
         (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
       } else {
-        const { data: fps } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", otherIds);
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: fps } = await supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", otherIds);
         // Rate columns are not Data-API readable; the caller is a party to these
         // matches, so read them server-side and keep the existing gating.
         const { fetchRatesByIds } = await import("@/lib/rates.server");
@@ -1100,12 +1101,13 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const teamIds = Array.from(new Set(rows.map((r) => r.team_id)));
     const freelancerIds = Array.from(new Set(rows.map((r) => r.freelancer_id)));
     const allIds = Array.from(new Set([...teamIds, ...freelancerIds]));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [tpsRes, fpsRes] = await Promise.all([
       teamIds.length
         ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
         : Promise.resolve({ data: [] as any[] } as any),
       freelancerIds.length
-        ? supabase.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, disciplines, skills, bio, travels").in("user_id", freelancerIds)
+        ? supabaseAdmin.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, disciplines, skills, bio, travels").in("user_id", freelancerIds)
         : Promise.resolve({ data: [] as any[] } as any),
     ]);
     const tpMap = new Map(((tpsRes.data ?? []) as any[]).map((r: any) => [r.user_id, r]));
@@ -1403,8 +1405,12 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
+    const [{ data: poolRows }, { data: poolUnlock }] = await Promise.all([
+      supabase.from("team_pool").select("freelancer_id").eq("team_id", userId),
+      supabase.from("pool_search_unlocks").select("id").eq("team_id", userId).eq("request_id", data.request_id).maybeSingle(),
+    ]);
     const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
+    const poolSearchUnlocked = !!poolUnlock;
     // RLS already hides outside-pool matches from the team on pool pit calls; the filter is kept
     // as defence in depth.
     const requestMatches = isPoolRequest
@@ -1515,8 +1521,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const freelancerIds = [...allFull, ...allPartial].map((m: any) => m.freelancer_id);
     const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
     const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
-      supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
+      supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
       supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
     ]);
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
@@ -1569,8 +1576,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const perProfileUnlocked = unlockMap.has(m.id);
       const fp = fpMap.get(m.freelancer_id);
       const inPool = poolSet.has(m.freelancer_id);
-      const poolVisible = isPoolRequest && inPool;
-      const showTech = poolVisible || (tierUnlocked && (topThree || perProfileUnlocked));
+      const poolVisible = isPoolRequest && poolSearchUnlocked && inPool;
+      const showTech = isPoolRequest ? poolVisible : tierUnlocked && (topThree || perProfileUnlocked);
       const blurred = !poolVisible && tierUnlocked && !showTech;
       const poolProfile = poolProfileMap.get(m.freelancer_id);
       const poolContact = poolContactMap.get(m.freelancer_id);
@@ -1660,7 +1667,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         .maybeSingle();
       if (eng) {
         const fid = (eng as any).freelancer_id as string;
-        const { data: hFpRaw } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", fid).maybeSingle();
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: hFpRaw } = await supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", fid).maybeSingle();
         const { fetchRatesByIds: fetchHiredRates } = await import("@/lib/rates.server");
         const hiredRate = (await fetchHiredRates([fid])).get(fid) ?? { day_rate: null, currency: null };
         const hFp = hFpRaw ? { ...(hFpRaw as any), ...hiredRate } : hFpRaw;
