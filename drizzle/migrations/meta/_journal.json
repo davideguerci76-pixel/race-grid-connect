@@ -407,6 +407,13 @@
       "when": 1788437569259,
       "tag": "0057_platform_capacity_warning",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1788438664906,
+      "tag": "0058_capacity_level_search_path_execute_hardening",
+      "breakpoints": true
     }
   ]
 }
