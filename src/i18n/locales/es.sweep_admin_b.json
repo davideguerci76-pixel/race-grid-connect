@@ -230,6 +230,7 @@
       },
       "fields": {
         "strong_match_threshold": { "label": "Umbral de strong match", "description": "Número de matches Full + Partial necesarios para que un Pit Call alcance STRONG Match Potential." },
+        "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Puntuación profesional mínima que PITCALL usa para considerar un Match relevante para reglas proactivas y comerciales seleccionadas. No afecta a la visibilidad del Match." },
         "max_modify_per_pitcall": { "label": "Máximo de modificaciones por Pit Call", "description": "Número máximo de modificaciones permitidas por Pit Call." },
         "daily_recheck_budget": { "label": "Presupuesto Team de revisión en 24 h", "description": "Máximo de unidades compartidas de revisión disponibles para un Team en una ventana móvil de 24 horas." },
         "red_cancel_budget_cost": { "label": "Coste de cancelación RED", "description": "Unidades del presupuesto de revisión consumidas por una cancelación RED elegible." },
@@ -237,7 +238,7 @@
         "team_match_update_notification_hours": { "label": "Intervalo de agregación de actualizaciones de matches del Team", "description": "Intervalo de agregación para actualizaciones de matches del Team que no sean hitos." },
         "availability_recompute_delay_minutes": { "label": "Retraso del recálculo de disponibilidad", "description": "Retraso después de la última edición del calendario antes del recálculo diferido de matches." }
       },
-      "units": { "matches": "matches", "max_modify_per_pitcall": "ediciones", "daily_recheck_budget": "unidades", "red_cancel_budget_cost": "unidades", "post_review_window_minutes": "minutos", "team_match_update_notification_hours": "horas", "availability_recompute_delay_minutes": "minutos" },
+      "units": { "matches": "matches", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "ediciones", "daily_recheck_budget": "unidades", "red_cancel_budget_cost": "unidades", "post_review_window_minutes": "minutos", "team_match_update_notification_hours": "horas", "availability_recompute_delay_minutes": "minutos" }
       "range": "Permitido: {{min}}–{{max}}",
       "save_changes": "Guardar cambios",
       "save_changes_count": "Guardar cambios ({{count}})",
