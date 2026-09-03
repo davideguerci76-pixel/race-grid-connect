@@ -282,7 +282,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location_place_id: z.string().max(255).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
-        mute_availability_opportunities: z.boolean().default(false),
+        mute_availability_opportunities: z.boolean().optional(),
         // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
         experiences: z
           .array(
