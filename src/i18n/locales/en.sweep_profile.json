@@ -109,6 +109,8 @@
       "team_match_activity": "There is new matching activity on your Pit Call.",
       "hot_partial_title": "More opportunities are close",
       "hot_partial_body": "Your calendar is missing {{count}} required day(s). Add the missing days to unlock more opportunities.",
+      "availability_opportunity_title": "A compatible opportunity may be possible",
+      "availability_opportunity_body": "Review your availability for a Pit Call that could become matchable when your calendar is updated.",
       "calendar_stale_unconfirmed_message": "We've temporarily stopped using some of your dates for matching because we can't be sure they're still current. Review them anytime to make them active again."
     },
     "push": {

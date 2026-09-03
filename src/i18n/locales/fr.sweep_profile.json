@@ -109,6 +109,8 @@
       "team_match_activity": "Une nouvelle activité de matching est disponible sur votre Pit Call.",
       "hot_partial_title": "D'autres opportunités sont proches",
       "hot_partial_body": "Il manque {{count}} jour(s) requis dans votre calendrier. Ajoutez-les pour débloquer d'autres opportunités.",
+      "availability_opportunity_title": "Une opportunité compatible est peut-être possible",
+      "availability_opportunity_body": "Vérifiez vos disponibilités pour un Pit Call qui pourrait devenir compatible après la mise à jour de votre calendrier.",
       "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver."
     },
     "push": {

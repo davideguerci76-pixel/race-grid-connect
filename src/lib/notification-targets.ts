@@ -32,6 +32,7 @@ const BASE: Record<string, NotificationTarget> = {
   rating_available: { title: "Rating available", path: "/dashboard/engagements", label: "Leave your rating" },
   rating_unlocked: { title: "Rating unlocked", path: "/dashboard/engagements", label: "See the rating" },
   calendar_stale: { title: "Quick availability check", path: "/dashboard/calendar", label: "Review availability" },
+  availability_opportunity: { title: "Availability opportunity", path: "/dashboard/calendar", label: "Review availability" }
   team_contact_reminder_1: { title: "Reminder: contact your match", path: "/dashboard/engagements", label: "View engagement" },
   team_contact_reminder_2: { title: "Reminder: contact your match", path: "/dashboard/engagements", label: "View engagement" },
   ghosting_released: { title: "Engagement released", path: "/dashboard/engagements", label: "View engagement" },
@@ -66,13 +67,17 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };
   }
 
-  // HOT Partial: the freelancer is only told which of their own days are
-  // missing, never which team or Pit Call asked. Destination is the calendar.
-  if (kind === "new_matches" && p["event"] === "hot_partial") {
+  // Freelancer-only availability alerts never reveal the requesting Team or Pit Call.
+  if (kind === "new_matches" && (p["event"] === "hot_partial" || p["event"] === "availability_opportunity")) {
     const month = typeof p["month"] === "string" ? (p["month"] as string) : null;
+    const days = Array.isArray(p["relevant_days"]) ? p["relevant_days"].filter((day): day is string => typeof day === "string") : [];
+    const search = new URLSearchParams();
+    if (month) search.set("m", month);
+    if (days.length > 0) search.set("days", days.join(","));
+    const query = search.toString();
     return {
-      title: "Missing days on your calendar",
-      path: month ? `/dashboard/calendar?m=${month}` : "/dashboard/calendar",
+      title: p["event"] === "availability_opportunity" ? "Availability opportunity" : "Missing days on your calendar",
+      path: query ? `/dashboard/calendar?${query}` : "/dashboard/calendar",
       label: "Open calendar",
     };
   }
@@ -101,6 +106,10 @@ export function notificationBody(kind: string, payload?: Payload | null): string
   const p = (payload ?? {}) as Payload;
   const message = p["message"];
   if (typeof message === "string" && message.trim()) return message;
+
+  if (p["event"] === "availability_opportunity") {
+    return "A compatible Pit Call may be possible if you update your availability. Review your calendar.";
+  }
 
   if (p["event"] === "hot_partial") {
     const missing = Array.isArray(p["missing_days"]) ? p["missing_days"].length : 0;

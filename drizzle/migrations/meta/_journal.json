@@ -351,6 +351,13 @@
       "when": 1788425378862,
       "tag": "0049_review07_hot_partial_professional_relevance_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1788426071679,
+      "tag": "0050_review08_availability_opportunities",
+      "breakpoints": true
     }
   ]
 }
