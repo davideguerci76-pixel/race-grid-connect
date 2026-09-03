@@ -27,7 +27,7 @@ type Setting = {
 type RuleKey = (typeof PLATFORM_RULE_KEYS)[number];
 
 const GROUPS: { id: "match_potential" | "request_modify" | "notifications" | "calendar"; keys: RuleKey[] }[] = [
-  { id: "match_potential", keys: ["strong_match_threshold"] },
+  { id: "match_potential", keys: ["strong_match_threshold", "professional_relevance_threshold"] },
   {
     id: "request_modify",
     keys: [

@@ -275,6 +275,7 @@ export const adminUpdateSettings = createServerFn({ method: "POST" })
 // ---- V2.3 Platform Rules (configuration knobs only, no consumers yet) ----
 export const PLATFORM_RULE_BOUNDS: Record<string, { min: number; max: number }> = {
   strong_match_threshold: { min: 1, max: 50 },
+  professional_relevance_threshold: { min: 0, max: 100 },
   max_modify_per_pitcall: { min: 0, max: 20 },
   daily_recheck_budget: { min: 1, max: 100 },
   red_cancel_budget_cost: { min: 0, max: 20 },
@@ -282,6 +283,9 @@ export const PLATFORM_RULE_BOUNDS: Record<string, { min: number; max: number }> 
   team_match_update_notification_hours: { min: 1, max: 72 },
   availability_recompute_delay_minutes: { min: 0, max: 60 },
 };
+
+// Business/proactive-action threshold only: it does not determine Match eligibility or visibility.
+// Future consumers must compare the unrounded 0–100 professional score with >= this setting.
 
 export const PLATFORM_RULE_KEYS = Object.keys(PLATFORM_RULE_BOUNDS);
 

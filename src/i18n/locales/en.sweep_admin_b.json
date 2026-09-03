@@ -230,6 +230,7 @@
       },
       "fields": {
         "strong_match_threshold": { "label": "Strong match threshold", "description": "Number of Full + Partial matches required for a Pit Call to reach STRONG Match Potential." },
+        "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Minimum professional score PITCALL uses to consider a Match relevant for selected proactive and commercial rules. This does not affect Match visibility." },
         "max_modify_per_pitcall": { "label": "Maximum modifies per Pit Call", "description": "Maximum number of request edits permitted per Pit Call." },
         "daily_recheck_budget": { "label": "Team rolling 24h recheck budget", "description": "Maximum shared recheck units available to a Team within a rolling 24-hour window." },
         "red_cancel_budget_cost": { "label": "RED cancel budget cost", "description": "Recheck-budget units consumed by an eligible RED cancellation." },
@@ -237,7 +238,7 @@
         "team_match_update_notification_hours": { "label": "Team match update aggregation interval", "description": "Aggregation interval for non-milestone Team match updates." },
         "availability_recompute_delay_minutes": { "label": "Availability recompute delay", "description": "Delay after the last calendar edit before deferred matching recomputation." }
       },
-      "units": { "matches": "matches", "max_modify_per_pitcall": "edits", "daily_recheck_budget": "units", "red_cancel_budget_cost": "units", "post_review_window_minutes": "minutes", "team_match_update_notification_hours": "hours", "availability_recompute_delay_minutes": "minutes" },
+      "units": { "matches": "matches", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "edits", "daily_recheck_budget": "units", "red_cancel_budget_cost": "units", "post_review_window_minutes": "minutes", "team_match_update_notification_hours": "hours", "availability_recompute_delay_minutes": "minutes" },
       "range": "Allowed: {{min}}–{{max}}",
       "save_changes": "Save changes",
       "save_changes_count": "Save changes ({{count}})",
