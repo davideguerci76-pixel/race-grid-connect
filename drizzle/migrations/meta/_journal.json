@@ -330,6 +330,13 @@
       "when": 1788421170616,
       "tag": "0046_add_professional_relevance_threshold",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1788423740648,
+      "tag": "0047_low_professional_relevance_refund",
+      "breakpoints": true
     }
   ]
 }
