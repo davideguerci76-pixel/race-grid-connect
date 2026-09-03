@@ -284,7 +284,7 @@
   },
   "requests": {
     "title": "Le mie Pit Calls",
-    "subtitle": "Una Pit Call per ogni ruolo cercato. 5 token ciascuna.",
+    "subtitle": "Una Pit Call per ogni ruolo cercato. Il costo in token è mostrato prima della conferma.",
     "new": "Nuova Pit Call",
     "empty": "Nessuna Pit Call. Pubblicane una per iniziare a ricevere match.",
     "matches": "Match",

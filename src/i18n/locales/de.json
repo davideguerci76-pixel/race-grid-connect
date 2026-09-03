@@ -272,7 +272,7 @@
   },
   "requests": {
     "title": "Meine Pit Calls",
-    "subtitle": "Eine Pit Call pro Rolle. Je 5 Tokens.",
+    "subtitle": "Eine Pit Call pro Rolle. Die Token-Kosten werden vor der Bestätigung angezeigt.",
     "new": "Neue Pit Call",
     "empty": "Noch keine Pit Calls.",
     "matches": "Matches",

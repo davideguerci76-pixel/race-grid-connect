@@ -272,7 +272,7 @@
   },
   "requests": {
     "title": "Mis Pit Calls",
-    "subtitle": "Una Pit Call por puesto. 5 tokens cada una.",
+    "subtitle": "Una Pit Call por puesto. El coste en tokens se muestra antes de confirmar.",
     "new": "Nueva Pit Call",
     "empty": "Sin Pit Calls. Publica una para empezar.",
     "matches": "Matches",

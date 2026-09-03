@@ -284,7 +284,7 @@
   },
   "requests": {
     "title": "My Pit Calls",
-    "subtitle": "Post one Pit Call per role. 5 tokens each.",
+    "subtitle": "Post one Pit Call per role. Token cost is shown before you confirm.",
     "new": "New Pit Call",
     "empty": "No Pit Calls yet. Post one to start matching freelancers.",
     "matches": "Matches",
