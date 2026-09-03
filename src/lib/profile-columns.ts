@@ -31,7 +31,6 @@ export const FREELANCER_PROFILE_COLUMNS = [
   "location_country",
   "location_place_id",
   "pit_code",
-  "mute_availability_opportunities",
   "is_test",
 ].join(", ");
 

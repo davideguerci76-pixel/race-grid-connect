@@ -68,18 +68,20 @@ function ProfilePage() {
         return { ...p, freelancerProfile: null as any, teamProfile: tpWithVat };
       }
 
-      const [{ data: fp, error: fpError }, phoneRes, coordsRes, rateRes] = await Promise.all([
+      const [{ data: fp, error: fpError }, phoneRes, coordsRes, rateRes, muteRes] = await Promise.all([
         supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", user!.id).maybeSingle(),
         supabase.rpc("my_freelancer_phone"),
         (supabase.rpc as any)("my_profile_coords"),
         (supabase.rpc as any)("my_day_rate"),
+        (supabase.rpc as any)("my_availability_opportunity_mute"),
       ]);
       if (fpError) throw new Error(fpError.message);
       // Phone lives outside the broadly-readable freelancer_profiles columns; merge in owner-only phone data here.
       const phoneRow = Array.isArray(phoneRes?.data) ? phoneRes.data[0] : null;
       const coordsRow = Array.isArray(coordsRes?.data) ? coordsRes.data[0] : null;
-      // day_rate / currency are owner-only: revoked on the Data API, read via RPC.
+      // day_rate / currency and the mute preference are owner-only: read via RPC.
       const rateRow = Array.isArray(rateRes?.data) ? (rateRes.data[0] as any) : null;
+      const muteRow = Array.isArray(muteRes?.data) ? (muteRes.data[0] as any) : null;
       const fpWithPhone = fp
         ? {
             ...(fp as any),
@@ -89,6 +91,7 @@ function ProfilePage() {
             location_lng: coordsRow?.location_lng ?? null,
             day_rate: rateRow?.day_rate ?? null,
             currency: rateRow?.currency ?? null,
+            mute_availability_opportunities: muteRow?.mute_availability_opportunities ?? false,
           }
         : fp;
       return { ...p, freelancerProfile: fpWithPhone, teamProfile: null as any };
