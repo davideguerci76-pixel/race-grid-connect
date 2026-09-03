@@ -873,7 +873,14 @@ function ZeroMatchTrivio({
   onPartial,
   loading,
 }: {
-  quote: { spent: number; hard_count: number; min_pct: number; drop_pct: number; refund_pct: number; refund_full: number; refund_partial: number };
+  quote: {
+    spent: number;
+    refund_pct: number;
+    refund_full: number;
+    refund_partial: number;
+    low_relevance_eligible?: boolean;
+    low_relevance_refund?: number;
+  };
   hasPartials: boolean;
   onWait: () => void;
   onRefund: () => void;
