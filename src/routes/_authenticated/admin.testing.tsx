@@ -14,6 +14,7 @@ import {
   runTestAvailabilityRecomputeQueue,
   runTestCalendarStaleJob,
   runTestEngagementJobs,
+  runTestAntiGhostingJobs,
 } from "@/lib/testlab.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
 import { AdminEnvSwitch, useAdminEnv } from "@/components/admin-env-switch";
@@ -110,6 +111,18 @@ function TestingLab() {
     mutationFn: () => calFn(),
     onSuccess: (r: any) => {
       toast.success(`Calendar-stale job run on TEST: ${r.notifications} notifications emitted`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
+  const ghostFn = useServerFn(runTestAntiGhostingJobs);
+  const ghostMut = useMutation({
+    mutationFn: () => ghostFn(),
+    onSuccess: (r: any) => {
+      toast.success(
+        `Anti-ghosting job run on TEST: ${r.contactChecks} contact checks, ${r.reminders} team reminders, ${r.released} engagements released`,
+      );
       qc.invalidateQueries();
     },
     onError: (e) => toastError(e),
@@ -266,6 +279,13 @@ function TestingLab() {
             desc="Processes the debounced availability recompute queue for TEST freelancers whose delay has elapsed. LIVE data is never touched."
             pending={queueMut.isPending}
             onClick={() => queueMut.mutate()}
+            icon={<Timer className="size-3" />}
+          />
+          <SimCard
+            title="Run anti-ghosting job (TEST)"
+            desc="Runs the real anti-ghosting lifecycle (freelancer contact check, team reminders 1 and 2, auto-release of ghosted engagements) on TEST records only. LIVE data is never touched."
+            pending={ghostMut.isPending}
+            onClick={() => ghostMut.mutate()}
             icon={<Timer className="size-3" />}
           />
         </div>
