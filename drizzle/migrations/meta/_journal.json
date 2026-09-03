@@ -337,6 +337,13 @@
       "when": 1788423740648,
       "tag": "0047_low_professional_relevance_refund",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1788425012048,
+      "tag": "0048_review06_remove_strong_milestone_notification",
+      "breakpoints": true
     }
   ]
 }
