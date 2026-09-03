@@ -223,13 +223,13 @@
       "title": "Regole della piattaforma",
       "description": "Controlli di configurazione riservati alle prossime regole della piattaforma. I valori sono salvati ora, ma non sono attivi nei flussi correnti.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Copertura",
         "request_modify": "Revisione e modifica richiesta",
         "notifications": "Notifiche",
         "calendar": "Calendario e ricalcolo"
       },
       "fields": {
-        "strong_match_threshold": { "label": "Soglia Strong match", "description": "Numero di match Full + Partial necessari perché un Pit Call raggiunga STRONG Match Potential." },
+        "strong_match_threshold": { "label": "Soglia copertura alta", "description": "Numero di match Full + Partial necessari perché un Pit Call raggiunga COPERTURA ALTA. È una soglia quantitativa di copertura, non un punteggio di qualità professionale." },
         "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Punteggio professionale minimo che PITCALL usa per considerare un Match rilevante per regole proattive e commerciali selezionate. Non influisce sulla visibilità del Match." },
         "max_modify_per_pitcall": { "label": "Modifiche massime per Pit Call", "description": "Numero massimo di modifiche consentite per ogni Pit Call." },
         "daily_recheck_budget": { "label": "Budget Team di ricontrollo su 24 ore", "description": "Numero massimo di unità condivise di ricontrollo disponibili per un Team in una finestra mobile di 24 ore." },
