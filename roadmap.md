@@ -14,3 +14,4 @@
 - [x] REVIEW06: verify TEST-only notification invariants, pending-review silence, historical preservation, TEST/LIVE isolation, and zero Project monitoring findings; stop before REVIEW07
 - [x] REVIEW07: gate NORMAL HOT Partial eligibility by server-side professional relevance threshold; preserve Pool, matching visibility, exact missing days, anonymity, CTA, dedup, and TEST/LIVE isolation; stop before REVIEW08
 - [x] REVIEW09: add Freelancer-owned Availability Opportunities mute preference with server-side enforcement; preserve HOT Partial, reminders, matches, engagements, Team notifications, aggregation, dedup, and TEST/LIVE isolation; stop before REVIEW10
+- [x] REVIEW10: preserve Pool behavior and gate Expand by outside-Pool valid Full/Partial matches at the dynamic ACP threshold; verify security, atomicity, and isolation
