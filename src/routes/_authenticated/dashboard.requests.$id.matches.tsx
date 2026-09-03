@@ -873,7 +873,14 @@ function ZeroMatchTrivio({
   onPartial,
   loading,
 }: {
-  quote: { spent: number; hard_count: number; min_pct: number; drop_pct: number; refund_pct: number; refund_full: number; refund_partial: number };
+  quote: {
+    spent: number;
+    refund_pct: number;
+    refund_full: number;
+    refund_partial: number;
+    low_relevance_eligible?: boolean;
+    low_relevance_refund?: number;
+  };
   hasPartials: boolean;
   onWait: () => void;
   onRefund: () => void;
@@ -888,7 +895,7 @@ function ZeroMatchTrivio({
       <p className="mt-1 text-xs text-muted-foreground">
         {t("sweep_engage.request_matches.refund_quote_line", { pct: quote.refund_pct, spent: quote.spent })}
         {" "}{t("sweep_engage.request_matches.refund_quote_equals", { full: quote.refund_full })}
-        {" "}{t("sweep_engage.request_matches.refund_quote_basis", { hard: quote.hard_count, min: quote.min_pct, drop: quote.drop_pct })}
+        {" "}{t("sweep_engage.request_matches.refund_quote_basis")}
       </p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <div className="flex flex-col border border-border bg-card p-4">
