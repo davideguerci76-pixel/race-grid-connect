@@ -238,7 +238,7 @@
         "team_match_update_notification_hours": { "label": "Intervalo de agregación de actualizaciones de matches del Team", "description": "Intervalo de agregación para actualizaciones de matches del Team que no sean hitos." },
         "availability_recompute_delay_minutes": { "label": "Retraso del recálculo de disponibilidad", "description": "Retraso después de la última edición del calendario antes del recálculo diferido de matches." }
       },
-      "units": { "matches": "matches", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "ediciones", "daily_recheck_budget": "unidades", "red_cancel_budget_cost": "unidades", "post_review_window_minutes": "minutos", "team_match_update_notification_hours": "horas", "availability_recompute_delay_minutes": "minutos" }
+      "units": { "matches": "matches", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "ediciones", "daily_recheck_budget": "unidades", "red_cancel_budget_cost": "unidades", "post_review_window_minutes": "minutos", "team_match_update_notification_hours": "horas", "availability_recompute_delay_minutes": "minutos" },
       "range": "Permitido: {{min}}–{{max}}",
       "save_changes": "Guardar cambios",
       "save_changes_count": "Guardar cambios ({{count}})",
