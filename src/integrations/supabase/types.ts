@@ -946,6 +946,33 @@ export type Database = {
           },
         ]
       }
+      platform_capacity_state: {
+        Row: {
+          id: boolean
+          last_checked_at: string | null
+          last_level: string
+          last_notified_at: string | null
+          last_notified_level: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          last_checked_at?: string | null
+          last_level?: string
+          last_notified_at?: string | null
+          last_notified_level?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          last_checked_at?: string | null
+          last_level?: string
+          last_notified_at?: string | null
+          last_notified_level?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           category: string
@@ -2556,6 +2583,7 @@ export type Database = {
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
+      dispatch_platform_capacity_check: { Args: never; Returns: undefined }
       emit_availability_opportunity_notifications: {
         Args: { _is_test: boolean }
         Returns: number
@@ -2855,6 +2883,18 @@ export type Database = {
       notify_no_confirmable_matches: {
         Args: { _request_id: string }
         Returns: boolean
+      }
+      platform_capacity_counts: {
+        Args: never
+        Returns: {
+          active_pit_calls: number
+          total_freelancers: number
+          total_teams: number
+        }[]
+      }
+      platform_capacity_level: {
+        Args: { active_pcs: number; freelancers: number }
+        Returns: string
       }
       process_availability_recompute_queue: { Args: never; Returns: number }
       process_availability_recompute_queue_env: {
