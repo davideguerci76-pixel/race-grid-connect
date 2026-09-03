@@ -229,7 +229,7 @@
         "calendar": "Kalender & Neuberechnung"
       },
       "fields": {
-        "strong_match_threshold": { "label": "Schwellenwert für Strong Match", "description": "Anzahl der Full- und Partial-Matches, die ein Pit Call für STRONG Match Potential benötigt." },
+        "strong_match_threshold": { "label": "Schwellenwert für hohe Abdeckung", "description": "Anzahl der Full- und Partial-Matches, die ein Pit Call für HOHE ABDECKUNG benötigt. Dies ist ein quantitativer Abdeckungsschwellenwert, kein professioneller Qualitätsscore." },
         "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Mindestwert des professionellen Scores, den PITCALL für bestimmte proaktive und kommerzielle Regeln als relevant betrachtet. Die Sichtbarkeit des Matches wird dadurch nicht beeinflusst." },
         "max_modify_per_pitcall": { "label": "Maximale Änderungen pro Pit Call", "description": "Maximale Anzahl zulässiger Änderungen pro Pit Call." },
         "daily_recheck_budget": { "label": "Team-Budget für erneute Prüfung in 24 h", "description": "Maximale Anzahl gemeinsam nutzbarer Einheiten für eine erneute Prüfung innerhalb eines rollierenden 24-Stunden-Fensters." },

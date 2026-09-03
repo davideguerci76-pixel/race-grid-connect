@@ -229,7 +229,7 @@
         "calendar": "Calendar & Recompute"
       },
       "fields": {
-        "strong_match_threshold": { "label": "Strong match threshold", "description": "Number of Full + Partial matches required for a Pit Call to reach STRONG Match Potential." },
+        "strong_match_threshold": { "label": "High coverage threshold", "description": "Number of Full + Partial matches required for a Pit Call to reach HIGH COVERAGE. This is a quantitative coverage threshold, not a professional-quality score." },
         "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Minimum professional score PITCALL uses to consider a Match relevant for selected proactive and commercial rules. This does not affect Match visibility." },
         "max_modify_per_pitcall": { "label": "Maximum modifies per Pit Call", "description": "Maximum number of request edits permitted per Pit Call." },
         "daily_recheck_budget": { "label": "Team rolling 24h recheck budget", "description": "Maximum shared recheck units available to a Team within a rolling 24-hour window." },

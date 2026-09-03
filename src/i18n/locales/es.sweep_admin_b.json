@@ -229,7 +229,7 @@
         "calendar": "Calendario y recálculo"
       },
       "fields": {
-        "strong_match_threshold": { "label": "Umbral de strong match", "description": "Número de matches Full + Partial necesarios para que un Pit Call alcance STRONG Match Potential." },
+        "strong_match_threshold": { "label": "Umbral de cobertura alta", "description": "Número de matches Full + Partial necesarios para que un Pit Call alcance COBERTURA ALTA. Es un umbral cuantitativo de cobertura, no una puntuación de calidad profesional." },
         "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Puntuación profesional mínima que PITCALL usa para considerar un Match relevante para reglas proactivas y comerciales seleccionadas. No afecta a la visibilidad del Match." },
         "max_modify_per_pitcall": { "label": "Máximo de modificaciones por Pit Call", "description": "Número máximo de modificaciones permitidas por Pit Call." },
         "daily_recheck_budget": { "label": "Presupuesto Team de revisión en 24 h", "description": "Máximo de unidades compartidas de revisión disponibles para un Team en una ventana móvil de 24 horas." },
