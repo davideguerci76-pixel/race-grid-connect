@@ -1352,12 +1352,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         partial_banner: null as any,
         refund_quote: {
           spent: 0,
-          hard_count: 0,
-          min_pct: 0,
-          drop_pct: 0,
           refund_pct: 0,
           refund_full: 0,
           refund_partial: 0,
+          low_relevance_eligible: false,
+          low_relevance_refund: 0,
         },
       };
     }
