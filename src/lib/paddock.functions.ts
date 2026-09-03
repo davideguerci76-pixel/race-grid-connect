@@ -1404,12 +1404,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
 
     const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
     const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
+    // RLS already hides outside-pool matches from the team on pool pit calls; the filter is kept
+    // as defence in depth.
     const requestMatches = isPoolRequest
       ? (allMatches ?? []).filter((m: any) => poolSet.has(m.freelancer_id))
       : (allMatches ?? []);
-    const outsidePoolCount = isPoolRequest
-      ? (allMatches ?? []).filter((m: any) => !poolSet.has(m.freelancer_id)).length
-      : 0;
+    let outsidePoolCount = 0;
+    if (isPoolRequest) {
+      // Aggregate-only: no id, score or profile of an outside-pool freelancer leaves the server.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: outsideRows } = await supabaseAdmin
+        .from("matches")
+        .select("freelancer_id")
+        .eq("stale", false)
+        .eq("request_id", data.request_id);
+      outsidePoolCount = ((outsideRows ?? []) as any[]).filter((m) => !poolSet.has(m.freelancer_id)).length;
+    }
 
 
     // Sort by final_score DESC (penalty applied), tiebreak by created_at
