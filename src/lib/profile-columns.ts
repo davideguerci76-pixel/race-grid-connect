@@ -1,12 +1,7 @@
 /**
- * Columns of `freelancer_profiles` readable by authenticated users through the
- * Data API. Precise coordinates (location_lat / location_lng) are intentionally
- * excluded: they stay server-side for matching / SOS / stats, and the owner can
- * read their own via the `my_profile_coords` RPC.
- * `day_rate` / `currency` are likewise excluded: SELECT on those columns is
- * revoked for `anon` / `authenticated`. The owner reads them via the
- * `my_day_rate` RPC, and authorized PITCALL flows read them server-side with
- * the admin client after the existing business-logic gating.
+ * Columns used by authenticated server functions after their business-logic
+ * gates. Generic Data API reads are owner-only; these columns exclude precise
+ * coordinates, rate fields, and the availability-opportunity mute flag.
  */
 export const FREELANCER_PROFILE_COLUMNS = [
   "user_id",

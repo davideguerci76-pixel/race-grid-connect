@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -10,7 +9,7 @@ import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
-import { FREELANCER_PROFILE_COLUMNS } from "@/lib/profile-columns";
+import { getFreelancerProfile } from "@/lib/freelancer-profile.functions";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
@@ -29,11 +28,9 @@ function FreelancerProfile() {
     queryKey: ["freelancer-detail", id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: fpRaw } = await supabase.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).eq("user_id", id).maybeSingle();
-      const fp = fpRaw as any;
-      if (!fp) throw notFound();
-      const { data: availability } = await supabase.from("availability").select("day").eq("freelancer_id", id).gte("day", new Date().toISOString().slice(0, 10)).limit(60);
-      return { fp, availability: availability ?? [] };
+      const result = await getFreelancerProfile({ data: { user_id: id } });
+      if (!result.profile) throw notFound();
+      return { fp: result.profile, availability: result.availability };
     },
   });
 

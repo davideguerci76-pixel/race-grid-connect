@@ -393,6 +393,13 @@
       "when": 1788430563263,
       "tag": "0055_review10_fix_expand_eligibility_read_only",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1788436299779,
+      "tag": "0056_review11b_owner_only_freelancer_profile",
+      "breakpoints": true
     }
   ]
 }
