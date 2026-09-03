@@ -111,6 +111,7 @@
       "hot_partial_body": "In deinem Kalender fehlen {{count}} erforderliche Tage. Füge sie hinzu, um weitere Chancen freizuschalten.",
       "availability_opportunity_title": "Eine passende Chance ist vielleicht möglich",
       "availability_opportunity_body": "Prüfe deine Verfügbarkeit für einen Pit Call, der nach einer Kalenderaktualisierung matchbar werden könnte.",
+      "availability_opportunity_multi_title": "{{count}} Verfügbarkeits-Chancen für dich",
       "calendar_stale_unconfirmed_message": "Wir nutzen einige deiner Tage vorübergehend nicht mehr für das Matching, da wir nicht sicher sein können, ob sie noch aktuell sind. Du kannst sie jederzeit prüfen und wieder aktivieren."
     },
     "push": {
