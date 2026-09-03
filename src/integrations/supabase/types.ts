@@ -2916,6 +2916,10 @@ export type Database = {
         Args: { _request_id: string }
         Returns: number
       }
+      request_expand_eligibility: {
+        Args: { _request_id: string }
+        Returns: boolean
+      }
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {

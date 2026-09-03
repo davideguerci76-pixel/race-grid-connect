@@ -154,7 +154,7 @@ function RequestMatchesPage() {
     Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0 ||
     Boolean((data?.request as any)?.ever_full_matched) ||
     Boolean((data?.request as any)?.ever_partial_matched);
-  const outsidePoolCount = Number((data as any)?.outside_pool_count ?? 0);
+  const expandAvailable = Boolean((data as any)?.expand_available);
   const upgradeCost = Number((data as any)?.upgrade_cost ?? 0);
   const upgradeFn = useServerFn(upgradeRequestToStandard);
   const upgradeMut = useMutation({
@@ -455,13 +455,13 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {isPoolRequest && outsidePoolCount > 0 && (
+            {isPoolRequest && expandAvailable && (
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="min-w-0">
                     <div className="label-mono text-racing-yellow">{t("pool.upgrade_label")}</div>
                     <p className="mt-2 text-sm">
-                      {t("pool.upgrade_desc", { count: outsidePoolCount })}
+                      {t("pool.upgrade_desc")}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t("pool.upgrade_hint", { cost: upgradeCost })}
@@ -469,7 +469,7 @@ function RequestMatchesPage() {
                   </div>
                   <button
                     onClick={async () => {
-                      if (await confirmDialog(t("pool.upgrade_confirm", { cost: upgradeCost, count: outsidePoolCount }))) {
+                      if (await confirmDialog(t("pool.upgrade_confirm", { cost: upgradeCost }))) {
                         upgradeMut.mutate();
                       }
                     }}

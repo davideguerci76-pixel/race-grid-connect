@@ -630,11 +630,8 @@ export const getMyRequests = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = (data ?? []).map((r) => r.id);
     let counts: Record<string, number> = {};
-    let outsideCounts: Record<string, number> = {};
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
-      // Outside-pool matches are hidden from the team by RLS. Counts stay aggregate-only and
-      // are computed server-side over pit calls this team provably owns.
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
         supabaseAdmin.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
@@ -650,9 +647,7 @@ export const getMyRequests = createServerFn({ method: "GET" })
       for (const m of ((matches ?? []) as any[])) {
         const rid = m.request_id as string;
         const isPool = modeById.get(rid) === "pool";
-        if (isPool && !poolSet.has(m.freelancer_id)) {
-          outsideCounts[rid] = (outsideCounts[rid] ?? 0) + 1;
-        } else {
+        if (!isPool || poolSet.has(m.freelancer_id)) {
           counts[rid] = (counts[rid] ?? 0) + 1;
         }
       }
@@ -664,7 +659,6 @@ export const getMyRequests = createServerFn({ method: "GET" })
     return (data ?? []).map((r) => ({
       ...r,
       matches_count: counts[r.id] ?? 0,
-      outside_pool_count: outsideCounts[r.id] ?? 0,
       confirmed_engagement_id: confirmedMap[r.id] ?? null,
     }));
 
@@ -1354,7 +1348,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         per_profile_cost: 0,
         total_matches: 0,
         total_partial_matches: 0,
-        outside_pool_count: 0,
+        expand_available: false,
         upgrade_cost: 0,
         hard_cap: 0,
         partial_banner: null as any,
@@ -1416,16 +1410,14 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const requestMatches = isPoolRequest
       ? (allMatches ?? []).filter((m: any) => poolSet.has(m.freelancer_id))
       : (allMatches ?? []);
-    let outsidePoolCount = 0;
+    let expandAvailable = false;
     if (isPoolRequest) {
-      // Aggregate-only: no id, score or profile of an outside-pool freelancer leaves the server.
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: outsideRows } = await supabaseAdmin
-        .from("matches")
-        .select("freelancer_id")
-        .eq("stale", false)
-        .eq("request_id", data.request_id);
-      outsidePoolCount = ((outsideRows ?? []) as any[]).filter((m) => !poolSet.has(m.freelancer_id)).length;
+      const { data: eligibility, error: eligibilityError } = await supabase.rpc(
+        "request_expand_eligibility" as any,
+        { _request_id: data.request_id },
+      );
+      if (eligibilityError) throw new Error(eligibilityError.message);
+      expandAvailable = Boolean(eligibility);
     }
 
 
@@ -1737,7 +1729,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       per_profile_cost: perProfileCost,
       total_matches: allFull.length,
       total_partial_matches: allPartial.length,
-      outside_pool_count: outsidePoolCount,
+      expand_available: expandAvailable,
       upgrade_cost: isPoolRequest
         ? Math.max(
             0,
