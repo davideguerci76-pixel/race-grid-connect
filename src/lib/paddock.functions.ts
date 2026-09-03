@@ -625,8 +625,11 @@ export const getMyRequests = createServerFn({ method: "GET" })
     let outsideCounts: Record<string, number> = {};
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
+      // Outside-pool matches are hidden from the team by RLS. Counts stay aggregate-only and
+      // are computed server-side over pit calls this team provably owns.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
-        supabase.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
+        supabaseAdmin.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
         supabase
           .from("engagements")
           .select("id, request_id, status")
