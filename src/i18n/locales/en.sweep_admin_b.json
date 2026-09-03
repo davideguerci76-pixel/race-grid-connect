@@ -223,7 +223,7 @@
       "title": "Platform Rules",
       "description": "Configuration controls reserved for upcoming platform rules. These values are stored now and are not active in current workflows.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Coverage"}},{
         "request_modify": "Request Review & Modify",
         "notifications": "Notifications",
         "calendar": "Calendar & Recompute"

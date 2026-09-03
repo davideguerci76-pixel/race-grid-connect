@@ -222,7 +222,7 @@
       "partial_refund_credited": "{{tokens}} token(s) crédités ({{pct}}%). Les matches partiels sont désormais ouverts ci-dessous.",
       "perfect_match_short": "Match parfait",
       "pitcall_preview_title": "APER\u00c7U DU PIT CALL",
-       "pitcall_preview_body": "Le potentiel de match est calcul\u00e9 \u00e0 partir de la demande actuelle. Vous pouvez encore modifier le Pit Call pendant cette fen\u00eatre de v\u00e9rification avant sa visibilit\u00e9 pour les freelances.",
+       "pitcall_preview_body": "La couverture est calculée à partir de la demande et des dates sélectionnées. Vous pouvez encore modifier le Pit Call pendant cette fenêtre de vérification avant sa visibilité pour les freelances.",
        "review_remaining": "V\u00c9RIFICATION RESTANTE",
        "match_potential": "ÉTAT DE LA COUVERTURE",
        "potential_strong": "COUVERTURE ÉLEVÉE",

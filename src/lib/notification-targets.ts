@@ -113,7 +113,7 @@ export function notificationBody(kind: string, payload?: Payload | null): string
     switch (p["event"]) {
       case "team_first_match": return "A freelancer matches your Pit Call.";
       case "team_first_full": return "Your Pit Call has its first full match.";
-      case "team_strong_reached": return "Your Pit Call has reached high coverage.";
+      case "team_strong_reached": return "Your Pit Call has reached a strong match result.";
       case "team_match_activity": return "There is new matching activity on your Pit Call.";
       default: return "New matching activity on your Pit Call.";
     }
