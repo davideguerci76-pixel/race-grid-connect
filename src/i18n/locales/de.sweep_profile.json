@@ -51,6 +51,8 @@
       "location_placeholder": "Mailand, Italien",
       "travels_label": "Verfügbar für Reisen an Rennwochenenden",
       "travels": "Reist",
+      "mute_availability_opportunities": "Verfügbarkeitsvorschläge stummschalten",
+      "mute_availability_opportunities_hint": "Keine Benachrichtigungen mehr zu Pit Calls erhalten, die durch eine Kalenderaktualisierung kompatibel werden könnten.",
       "sub_roles": "Unterrollen",
       "sub_roles_and_level": "Unterrollen & Niveau",
       "motorsport_experience": "Motorsport-Erfahrung",
