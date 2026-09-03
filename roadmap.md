@@ -10,3 +10,5 @@
 - [x] REVIEW03: validate ACP bounds, persistence, localization, no-consumer scope, and build/runtime state
 - [x] REVIEW04: relabel Team-facing Match Potential as coverage without changing internal bands or quantitative semantics
 - [x] REVIEW04: verify localized preview/detail/ACP surfaces and preserve notifications, matching, refunds, HOT Partial, pool, and Expand logic
+- [x] REVIEW04: relabel Team-facing Match Potential as coverage without changing internal bands or quantitative semantics
+- [x] REVIEW04: verify localized preview/detail/ACP surfaces and preserve notifications, matching, refunds, HOT Partial, pool, and Expand logic
