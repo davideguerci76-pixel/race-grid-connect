@@ -223,7 +223,7 @@
       "title": "Règles de la plateforme",
       "description": "Paramètres réservés aux prochaines règles de la plateforme. Ces valeurs sont enregistrées, mais ne sont pas actives dans les flux actuels.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Couverture",
         "request_modify": "Révision et modification de la demande",
         "notifications": "Notifications",
         "calendar": "Calendrier et recalcul"

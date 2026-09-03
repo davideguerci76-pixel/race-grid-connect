@@ -223,7 +223,7 @@
       "title": "Reglas de plataforma",
       "description": "Controles de configuración reservados para próximas reglas de plataforma. Estos valores se guardan ahora, pero no están activos en los flujos actuales.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Cobertura",
         "request_modify": "Revisión y modificación de solicitudes",
         "notifications": "Notificaciones",
         "calendar": "Calendario y recálculo"

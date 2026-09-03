@@ -223,7 +223,7 @@
       "title": "Plattformregeln",
       "description": "Konfigurationswerte für kommende Plattformregeln. Die Werte werden jetzt gespeichert, sind aber in den aktuellen Abläufen nicht aktiv.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Abdeckung",
         "request_modify": "Anfrage prüfen & ändern",
         "notifications": "Benachrichtigungen",
         "calendar": "Kalender & Neuberechnung"

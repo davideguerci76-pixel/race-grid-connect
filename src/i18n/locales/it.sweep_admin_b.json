@@ -223,7 +223,7 @@
       "title": "Regole della piattaforma",
       "description": "Controlli di configurazione riservati alle prossime regole della piattaforma. I valori sono salvati ora, ma non sono attivi nei flussi correnti.",
       "groups": {
-        "match_potential": "Match Potential",
+        "match_potential": "Copertura",
         "request_modify": "Revisione e modifica richiesta",
         "notifications": "Notifiche",
         "calendar": "Calendario e ricalcolo"
