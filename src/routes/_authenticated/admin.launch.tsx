@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
 import { FLAG_KEYS } from "@/lib/flags.functions";
 import { toastError } from "@/lib/errors";
+import { PlatformCapacityCard } from "@/components/admin/platform-capacity-card";
 
 export const Route = createFileRoute("/_authenticated/admin/launch")({
   component: AdminLaunchPage,
@@ -49,6 +50,7 @@ function AdminLaunchPage() {
         <h2 className="text-lg font-black uppercase italic tracking-tighter">{t("sweep_admin_a.launch.title")}</h2>
         <p className="text-[11px] text-muted-foreground">{t("sweep_admin_a.launch.blurb")}</p>
       </div>
+      <PlatformCapacityCard />
       {rows.map((r) => {
         const on = value(r.key, r.fallback);
         return (

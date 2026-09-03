@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicNotificationPushRouteImport } from './routes/api/public/notification-push'
 import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
+import { Route as ApiPublicCapacityAlertRouteImport } from './routes/api/public/capacity-alert'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardTeamCalendarRouteImport } from './routes/_authenticated/dashboard.team-calendar'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
@@ -170,6 +171,11 @@ const ApiPublicNotificationEmailRoute =
     path: '/api/public/notification-email',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCapacityAlertRoute = ApiPublicCapacityAlertRouteImport.update({
+  id: '/api/public/capacity-alert',
+  path: '/api/public/capacity-alert',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
@@ -361,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -408,6 +415,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -459,6 +467,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -510,6 +519,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/team-calendar'
     | '/dashboard/tokens'
+    | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
     | '/admin/'
@@ -557,6 +567,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/team-calendar'
     | '/dashboard/tokens'
+    | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
     | '/admin'
@@ -607,6 +618,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/team-calendar'
     | '/_authenticated/dashboard/tokens'
+    | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
     | '/_authenticated/admin/'
@@ -636,6 +648,7 @@ export interface RootRouteChildren {
   LegalDocRoute: typeof LegalDocRoute
   LegalInfoRoute: typeof LegalInfoRoute
   TeamsIdRoute: typeof TeamsIdRoute
+  ApiPublicCapacityAlertRoute: typeof ApiPublicCapacityAlertRoute
   ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
   ApiPublicNotificationPushRoute: typeof ApiPublicNotificationPushRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -797,6 +810,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/notification-email'
       fullPath: '/api/public/notification-email'
       preLoaderRoute: typeof ApiPublicNotificationEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/capacity-alert': {
+      id: '/api/public/capacity-alert'
+      path: '/api/public/capacity-alert'
+      fullPath: '/api/public/capacity-alert'
+      preLoaderRoute: typeof ApiPublicCapacityAlertRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/tokens': {
@@ -1091,6 +1111,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalDocRoute: LegalDocRoute,
   LegalInfoRoute: LegalInfoRoute,
   TeamsIdRoute: TeamsIdRoute,
+  ApiPublicCapacityAlertRoute: ApiPublicCapacityAlertRoute,
   ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
   ApiPublicNotificationPushRoute: ApiPublicNotificationPushRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
