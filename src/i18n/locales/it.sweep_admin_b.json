@@ -230,6 +230,7 @@
       },
       "fields": {
         "strong_match_threshold": { "label": "Soglia Strong match", "description": "Numero di match Full + Partial necessari perché un Pit Call raggiunga STRONG Match Potential." },
+        "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Punteggio professionale minimo che PITCALL usa per considerare un Match rilevante per regole proattive e commerciali selezionate. Non influisce sulla visibilità del Match." },
         "max_modify_per_pitcall": { "label": "Modifiche massime per Pit Call", "description": "Numero massimo di modifiche consentite per ogni Pit Call." },
         "daily_recheck_budget": { "label": "Budget Team di ricontrollo su 24 ore", "description": "Numero massimo di unità condivise di ricontrollo disponibili per un Team in una finestra mobile di 24 ore." },
         "red_cancel_budget_cost": { "label": "Costo budget annullamento RED", "description": "Unità di budget di ricontrollo consumate da un annullamento RED idoneo." },
@@ -237,7 +238,7 @@
         "team_match_update_notification_hours": { "label": "Intervallo aggregazione aggiornamenti match Team", "description": "Intervallo di aggregazione per gli aggiornamenti match Team non legati a milestone." },
         "availability_recompute_delay_minutes": { "label": "Ritardo ricalcolo disponibilità", "description": "Ritardo dopo l'ultima modifica al calendario prima del ricalcolo differito dei match." }
       },
-      "units": { "matches": "match", "max_modify_per_pitcall": "modifiche", "daily_recheck_budget": "unità", "red_cancel_budget_cost": "unità", "post_review_window_minutes": "minuti", "team_match_update_notification_hours": "ore", "availability_recompute_delay_minutes": "minuti" },
+      "units": { "matches": "match", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "modifiche", "daily_recheck_budget": "unità", "red_cancel_budget_cost": "unità", "post_review_window_minutes": "minuti", "team_match_update_notification_hours": "ore", "availability_recompute_delay_minutes": "minuti" },
       "range": "Consentito: {{min}}–{{max}}",
       "save_changes": "Salva modifiche",
       "save_changes_count": "Salva modifiche ({{count}})",
