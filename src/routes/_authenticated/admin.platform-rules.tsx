@@ -77,7 +77,16 @@ function AdminPlatformRulesPage() {
   );
 
   const mutation = useMutation({
-    mutationFn: () => save({ data: { updates: dirty } }),
+    mutationFn: () => {
+      const updates = dirty.map(({ key, value_num }) => {
+        const b = PLATFORM_RULE_BOUNDS[key];
+        return {
+          key,
+          value_num: b ? Math.min(b.max, Math.max(b.min, Math.round(value_num))) : Math.round(value_num),
+        };
+      });
+      return save({ data: { updates } });
+    },
     onSuccess: () => {
       toast.success(t("sweep_admin_b.platform_rules.saved"));
       queryClient.invalidateQueries({ queryKey: ["admin-platform-rules"] });
@@ -157,7 +166,10 @@ function AdminPlatformRulesPage() {
                         value={value}
                         onChange={(event) => {
                           const next = Number(event.target.value);
-                          setValues((previous) => ({ ...previous, [key]: Number.isFinite(next) ? next : 0 }));
+                          const safe = Number.isFinite(next)
+                            ? Math.min(bounds.max, Math.max(bounds.min, Math.round(next)))
+                            : bounds.min;
+                          setValues((previous) => ({ ...previous, [key]: safe }));
                         }}
                         className="w-24 border border-border bg-background px-3 py-2 text-right font-mono text-sm"
                       />
