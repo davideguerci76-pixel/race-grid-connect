@@ -587,23 +587,29 @@ export const runTestEngagementJobs = createServerFn({ method: "POST" })
        {} as never,
      );
      if (eTeam) throw new Error(eTeam.message);
-     const { data: hotPartialNotifications, error: eHot } = await supabaseAdmin.rpc(
-       "run_hot_partial_test" as never,
-       {} as never,
-     );
-     if (eHot) throw new Error(eHot.message);
-     const { data: completed, error: e2 } = await supabaseAdmin.rpc(
+      const { data: hotPartialNotifications, error: eHot } = await supabaseAdmin.rpc(
+        "run_hot_partial_test" as never,
+        {} as never,
+      );
+      if (eHot) throw new Error(eHot.message);
+      const { data: availabilityOpportunityNotifications, error: eAvailability } = await supabaseAdmin.rpc(
+        "run_availability_opportunity_test" as never,
+        {} as never,
+      );
+      if (eAvailability) throw new Error(eAvailability.message);
+      const { data: completed, error: e2 } = await supabaseAdmin.rpc(
       "complete_expired_engagements_env" as never,
       { _is_test: true } as never,
     );
     if (e2) throw new Error(e2.message);
      return {
-       deadlines: (deadlines as number) ?? 0,
-       completed: (completed as number) ?? 0,
-       reviewActivations: (reviewActivations as number) ?? 0,
-       teamMatchNotifications: (teamMatchNotifications as number) ?? 0,
-       hotPartialNotifications: (hotPartialNotifications as number) ?? 0,
-     };
+        deadlines: (deadlines as number) ?? 0,
+        completed: (completed as number) ?? 0,
+        reviewActivations: (reviewActivations as number) ?? 0,
+        teamMatchNotifications: (teamMatchNotifications as number) ?? 0,
+        hotPartialNotifications: (hotPartialNotifications as number) ?? 0,
+        availabilityOpportunityNotifications: (availabilityOpportunityNotifications as number) ?? 0,
+      };
   });
 
 export const runTestCalendarStaleJob = createServerFn({ method: "POST" })
@@ -633,14 +639,24 @@ export const runTestAvailabilityRecomputeQueue = createServerFn({ method: "POST"
        { _is_test: true } as never,
      );
      if (error) throw new Error(error.message);
-     const { data: hotPartialNotifications, error: eHot } = await supabaseAdmin.rpc(
-       "run_hot_partial_test" as never,
-       {} as never,
-     );
-     if (eHot) throw new Error(eHot.message);
-     const { count } = await (supabaseAdmin.from("availability_recompute_queue" as never) as any)
+      const { data: hotPartialNotifications, error: eHot } = await supabaseAdmin.rpc(
+        "run_hot_partial_test" as never,
+        {} as never,
+      );
+      if (eHot) throw new Error(eHot.message);
+      const { data: availabilityOpportunityNotifications, error: eAvailability } = await supabaseAdmin.rpc(
+        "run_availability_opportunity_test" as never,
+        {} as never,
+      );
+      if (eAvailability) throw new Error(eAvailability.message);
+      const { count } = await (supabaseAdmin.from("availability_recompute_queue" as never) as any)
       .select("*", { count: "exact", head: true })
       .eq("is_test", true);
-     return { processed: (data as number) ?? 0, pending: count ?? 0, hotPartialNotifications: (hotPartialNotifications as number) ?? 0 };
+      return {
+        processed: (data as number) ?? 0,
+        pending: count ?? 0,
+        hotPartialNotifications: (hotPartialNotifications as number) ?? 0,
+        availabilityOpportunityNotifications: (availabilityOpportunityNotifications as number) ?? 0,
+      };
   });
 

@@ -127,6 +127,51 @@ export type Database = {
           },
         ]
       }
+      availability_opportunity_state: {
+        Row: {
+          created_at: string
+          freelancer_id: string
+          is_test: boolean
+          notified_at: string | null
+          reason: string
+          request_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          freelancer_id: string
+          is_test?: boolean
+          notified_at?: string | null
+          reason?: string
+          request_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          freelancer_id?: string
+          is_test?: boolean
+          notified_at?: string | null
+          reason?: string
+          request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_opportunity_state_freelancer_id_fkey"
+            columns: ["freelancer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "availability_opportunity_state_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       availability_recompute_queue: {
         Row: {
           attempts: number
@@ -2508,6 +2553,14 @@ export type Database = {
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
+      emit_availability_opportunity_notifications: {
+        Args: { _is_test: boolean }
+        Returns: number
+      }
+      emit_availability_opportunity_notifications_live: {
+        Args: never
+        Returns: number
+      }
       emit_calendar_stale_notifications: { Args: never; Returns: number }
       emit_calendar_stale_notifications_env: {
         Args: { _is_test: boolean }
@@ -2939,6 +2992,7 @@ export type Database = {
       reveal_request: { Args: { _request_id: string }; Returns: number }
       reveal_reviews: { Args: { _target: string }; Returns: number }
       reveal_team: { Args: { _team_id: string }; Returns: number }
+      run_availability_opportunity_test: { Args: never; Returns: number }
       run_hot_partial_test: { Args: never; Returns: number }
       run_team_match_notifications_test: { Args: never; Returns: number }
       set_my_rate_location: {

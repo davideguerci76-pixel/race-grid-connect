@@ -116,6 +116,7 @@ function NotificationsPage() {
               {(notifications as any[]).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
+                const isAvailabilityOpportunity = n.kind === "new_matches" && n.payload?.event === "availability_opportunity";
                 const isTeamMatch = n.kind === "new_matches" && n.payload?.audience === "team";
                 const info = !isTeamMatch && n.payload?.informational === true;
                 // Stable object id persisted server-side. Never inferred from text.
@@ -179,11 +180,18 @@ function NotificationsPage() {
                       >
                         {t("sweep_profile.notifications.view_matches")}
                       </Link>
-                    ) : n.payload?.event === "hot_partial" ? (
+                    ) : n.payload?.event === "hot_partial" || isAvailabilityOpportunity ? (
                       <Link
                         onClick={markClicked}
                         to="/dashboard/calendar"
-                        search={{ m: String(n.payload?.month ?? ""), days: Array.isArray(n.payload?.missing_days) ? n.payload.missing_days.join(",") : undefined }}
+                        search={{
+                          m: String(n.payload?.month ?? ""),
+                          days: Array.isArray(n.payload?.missing_days)
+                            ? n.payload.missing_days.join(",")
+                            : Array.isArray(n.payload?.relevant_days)
+                              ? n.payload.relevant_days.join(",")
+                              : undefined,
+                        }}
                         className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110"
                       >
                         {t("sweep_profile.notifications.update_calendar")}
@@ -227,6 +235,15 @@ function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => st
 
 function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
   const { t } = useTranslation();
+  if (payload?.event === "availability_opportunity") {
+    return (
+      <div className="grid gap-1">
+        <div className="font-medium">{t("sweep_profile.notifications.availability_opportunity_title")}</div>
+        <div className="text-muted-foreground">{t("sweep_profile.notifications.availability_opportunity_body")}</div>
+      </div>
+    );
+  }
+
   if (payload?.event === "hot_partial") {
     const days = Array.isArray(payload?.missing_days) ? payload.missing_days : [];
     return (
