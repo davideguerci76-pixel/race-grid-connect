@@ -428,6 +428,7 @@ function FreelancerSection({ profile }: { profile: any }) {
     location_place_id: null as string | null,
     bio: "",
     travels: true,
+    mute_availability_opportunities: false,
     experiences: [] as FreelancerExperience[],
     languages: [] as FreelancerLanguage[],
   });
@@ -452,6 +453,7 @@ function FreelancerSection({ profile }: { profile: any }) {
       location_place_id: (profile as any)?.location_place_id ?? null,
       bio: profile?.bio ?? "",
       travels: profile?.travels ?? true,
+      mute_availability_opportunities: profile?.mute_availability_opportunities ?? false,
       experiences: Array.isArray(profile?.experiences)
         ? (profile.experiences as any[])
             .filter((e) => e && typeof e === "object" && typeof e.discipline === "string")
@@ -488,6 +490,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           location_place_id: form.location_place_id,
           bio: form.bio || null,
           travels: form.travels,
+          mute_availability_opportunities: form.mute_availability_opportunities,
           experiences: form.experiences,
           languages: form.languages.map((l) => ({
             code: l.code,
@@ -593,6 +596,20 @@ function FreelancerSection({ profile }: { profile: any }) {
           <input type="checkbox" checked={form.travels} onChange={(e) => setForm({ ...form, travels: e.target.checked })} className="accent-racing-red" />
           <span className="text-sm">{t("sweep_profile.freelancer.travels_label")}</span>
         </label>
+        <div className="border-t border-border pt-3">
+          <label className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              checked={form.mute_availability_opportunities}
+              onChange={(e) => setForm({ ...form, mute_availability_opportunities: e.target.checked })}
+              className="mt-0.5 accent-racing-red"
+            />
+            <span className="text-sm">{t("sweep_profile.freelancer.mute_availability_opportunities")}</span>
+          </label>
+          <p className="mt-1 pl-6 text-xs text-muted-foreground">
+            {t("sweep_profile.freelancer.mute_availability_opportunities_hint")}
+          </p>
+        </div>
         <div className="flex gap-2">
           <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">{t("sweep_profile.common.save")}</button>
           <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">{t("sweep_profile.common.cancel")}</button>
@@ -636,6 +653,10 @@ function FreelancerSection({ profile }: { profile: any }) {
       
       <Row label={t("education.label")} value={educationLabel(profile?.education)} />
       <Row label={t("sweep_profile.freelancer.travels")} value={profile?.travels ? t("sweep_profile.common.yes") : t("sweep_profile.common.no")} />
+      <Row
+        label={t("sweep_profile.freelancer.mute_availability_opportunities")}
+        value={profile?.mute_availability_opportunities ? t("sweep_profile.common.yes") : t("sweep_profile.common.no")}
+      />
       <div>
         <div className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.motorsport_experience")}</div>
         <div className="mt-1 space-y-1">
