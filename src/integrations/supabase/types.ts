@@ -509,6 +509,7 @@ export type Database = {
           location_lng: number | null
           location_place_id: string | null
           location_region: string | null
+          mute_availability_opportunities: boolean
           pit_code: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -538,6 +539,7 @@ export type Database = {
           location_lng?: number | null
           location_place_id?: string | null
           location_region?: string | null
+          mute_availability_opportunities?: boolean
           pit_code?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
@@ -567,6 +569,7 @@ export type Database = {
           location_lng?: number | null
           location_place_id?: string | null
           location_region?: string | null
+          mute_availability_opportunities?: boolean
           pit_code?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
