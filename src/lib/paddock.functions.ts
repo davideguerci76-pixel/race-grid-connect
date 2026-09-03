@@ -625,8 +625,11 @@ export const getMyRequests = createServerFn({ method: "GET" })
     let outsideCounts: Record<string, number> = {};
     let confirmedMap: Record<string, string> = {};
     if (ids.length) {
+      // Outside-pool matches are hidden from the team by RLS. Counts stay aggregate-only and
+      // are computed server-side over pit calls this team provably owns.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
-        supabase.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
+        supabaseAdmin.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
         supabase
           .from("engagements")
           .select("id, request_id, status")
@@ -1401,12 +1404,22 @@ export const getRequestMatches = createServerFn({ method: "GET" })
 
     const { data: poolRows } = await supabase.from("team_pool").select("freelancer_id").eq("team_id", userId);
     const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
+    // RLS already hides outside-pool matches from the team on pool pit calls; the filter is kept
+    // as defence in depth.
     const requestMatches = isPoolRequest
       ? (allMatches ?? []).filter((m: any) => poolSet.has(m.freelancer_id))
       : (allMatches ?? []);
-    const outsidePoolCount = isPoolRequest
-      ? (allMatches ?? []).filter((m: any) => !poolSet.has(m.freelancer_id)).length
-      : 0;
+    let outsidePoolCount = 0;
+    if (isPoolRequest) {
+      // Aggregate-only: no id, score or profile of an outside-pool freelancer leaves the server.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: outsideRows } = await supabaseAdmin
+        .from("matches")
+        .select("freelancer_id")
+        .eq("stale", false)
+        .eq("request_id", data.request_id);
+      outsidePoolCount = ((outsideRows ?? []) as any[]).filter((m) => !poolSet.has(m.freelancer_id)).length;
+    }
 
 
     // Sort by final_score DESC (penalty applied), tiebreak by created_at
@@ -1769,53 +1782,18 @@ export const upgradeRequestToStandard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: req, error: reqErr } = await supabase
-      .from("requests")
-      .select("id, team_id, duration, search_mode")
-      .eq("id", data.request_id)
-      .maybeSingle();
-    if (reqErr) throw new Error(reqErr.message);
-    if (!req) throw new Error("Request not found");
-    if (req.team_id !== userId) throw new Error("Not owner of this request");
-    if ((req as any).search_mode !== "pool") throw new Error("This Pit Call is already a standard search");
+    // Ownership, eligibility, server-side price, balance check, debit and the pool -> standard
+    // transformation all happen inside one locked transaction (idempotent on retry/double-click).
+    const { data: res, error } = await context.supabase.rpc("upgrade_request_to_standard" as any, {
+      _request_id: data.request_id,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(res) ? (res as any[])[0] : (res as any);
+    const cost = Number(row?.tokens_spent ?? 0);
 
-    const { data: settingsRows } = await supabase
-      .from("platform_settings")
-      .select("key, value_num")
-      .in("key", ["cost_request_race_weekend", "cost_request_full_season", "cost_pool_search"]);
-    const settings = new Map((settingsRows ?? []).map((r: any) => [r.key, Number(r.value_num)]));
-    const standardCost =
-      (req as any).duration === "full_season"
-        ? settings.get("cost_request_full_season") ?? 20
-        : settings.get("cost_request_race_weekend") ?? 10;
-    const cost = Math.max(0, Math.round(standardCost - (settings.get("cost_pool_search") ?? 5)));
-
+    // Recompute runs after commit: it is derived state and is re-created by the normal
+    // recompute pipeline (and by the pit call page) if this call fails.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (cost > 0) {
-      const { data: prof } = await supabaseAdmin
-        .from("profiles")
-        .select("token_balance")
-        .eq("id", userId)
-        .maybeSingle();
-      const balance = Number((prof as any)?.token_balance ?? 0);
-      if (balance < cost) throw new Error(`Insufficient tokens: need ${cost} but balance is ${balance}`);
-      const { error: credErr } = await supabaseAdmin.rpc("credit_tokens", {
-        _user_id: userId,
-        _delta: -cost,
-        _reason: "request_post",
-        _ref: data.request_id,
-        _note: "Upgrade My Pool Pit Call to standard search",
-      } as never);
-      if (credErr) throw new Error(credErr.message);
-    }
-
-    const { error: updErr } = await supabaseAdmin
-      .from("requests")
-      .update({ search_mode: "standard", updated_at: new Date().toISOString() } as never)
-      .eq("id", data.request_id);
-    if (updErr) throw new Error(updErr.message);
-
     await supabaseAdmin.rpc("recompute_matches", {
       _freelancer_id: null,
       _request_id: data.request_id,

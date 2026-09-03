@@ -3029,6 +3029,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      team_can_see_match: {
+        Args: { _freelancer: string; _request: string; _team: string }
+        Returns: boolean
+      }
       team_cancellation_stats: {
         Args: { _team_id: string }
         Returns: {
@@ -3125,6 +3129,14 @@ export type Database = {
           tier: number
           tokens_spent: number
           total_matches: number
+        }[]
+      }
+      upgrade_request_to_standard: {
+        Args: { _request_id: string }
+        Returns: {
+          already: boolean
+          balance: number
+          tokens_spent: number
         }[]
       }
       withdraw_match_confirmation: {
