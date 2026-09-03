@@ -157,7 +157,10 @@ function AdminPlatformRulesPage() {
                         value={value}
                         onChange={(event) => {
                           const next = Number(event.target.value);
-                          setValues((previous) => ({ ...previous, [key]: Number.isFinite(next) ? next : 0 }));
+                          const safe = Number.isFinite(next)
+                            ? Math.min(bounds.max, Math.max(bounds.min, Math.round(next)))
+                            : bounds.min;
+                          setValues((previous) => ({ ...previous, [key]: safe }));
                         }}
                         className="w-24 border border-border bg-background px-3 py-2 text-right font-mono text-sm"
                       />
