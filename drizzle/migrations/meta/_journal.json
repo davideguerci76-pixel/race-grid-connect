@@ -323,6 +323,13 @@
       "when": 1788420364750,
       "tag": "0045_fix_expand_advisory_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1788421170616,
+      "tag": "0046_add_professional_relevance_threshold",
+      "breakpoints": true
     }
   ]
 }
