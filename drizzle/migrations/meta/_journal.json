@@ -316,6 +316,13 @@
       "when": 1788419903809,
       "tag": "0044_pool_match_rls_and_atomic_expand",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1788420364750,
+      "tag": "0045_fix_expand_advisory_lock",
+      "breakpoints": true
     }
   ]
 }
