@@ -2823,6 +2823,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      my_availability_opportunity_mute: {
+        Args: never
+        Returns: {
+          mute_availability_opportunities: boolean
+        }[]
+      }
       my_day_rate: {
         Args: never
         Returns: {
@@ -2998,6 +3004,10 @@ export type Database = {
       run_availability_opportunity_test: { Args: never; Returns: number }
       run_hot_partial_test: { Args: never; Returns: number }
       run_team_match_notifications_test: { Args: never; Returns: number }
+      set_availability_opportunity_mute: {
+        Args: { _muted: boolean }
+        Returns: boolean
+      }
       set_my_rate_location: {
         Args: {
           _day_rate: number
