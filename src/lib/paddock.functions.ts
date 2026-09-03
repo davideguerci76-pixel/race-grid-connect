@@ -1743,13 +1743,12 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       hard_cap: hardCap,
       partial_banner: partialBanner,
       refund_quote: {
-        spent,
-        hard_count: hardCount,
-        min_pct: minPct,
-        drop_pct: dropPct,
-        refund_pct: pct,
-        refund_full: refundFull,
-        refund_partial: refundPartial,
+        spent: Number((refundQuote as any)?.spent ?? 0),
+        refund_pct: Number((refundQuote as any)?.refund_pct ?? 0),
+        refund_full: Number((refundQuote as any)?.refund_full ?? 0),
+        refund_partial: Number((refundQuote as any)?.refund_partial ?? 0),
+        low_relevance_eligible: Boolean((refundQuote as any)?.low_relevance_eligible ?? false),
+        low_relevance_refund: Number((refundQuote as any)?.low_relevance_refund ?? 0),
       },
     };
   });
