@@ -344,6 +344,13 @@
       "when": 1788425012048,
       "tag": "0048_review06_remove_strong_milestone_notification",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1788425378862,
+      "tag": "0049_review07_hot_partial_professional_relevance_gate",
+      "breakpoints": true
     }
   ]
 }
