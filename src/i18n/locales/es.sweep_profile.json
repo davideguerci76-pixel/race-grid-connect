@@ -51,6 +51,8 @@
       "location_placeholder": "Milán, Italia",
       "travels_label": "Disponible para viajar en fines de semana de carrera",
       "travels": "Viaja",
+      "mute_availability_opportunities": "Silenciar oportunidades de disponibilidad",
+      "mute_availability_opportunities_hint": "Deja de recibir notificaciones sobre Pit Calls que podrían ser compatibles al actualizar tu calendario.",
       "sub_roles": "Sub-roles",
       "sub_roles_and_level": "Sub-roles y nivel",
       "motorsport_experience": "Experiencia en motorsport",

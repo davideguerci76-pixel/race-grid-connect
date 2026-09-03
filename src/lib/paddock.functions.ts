@@ -282,6 +282,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         location_place_id: z.string().max(255).optional().nullable(),
         bio: z.string().max(1200).optional().nullable(),
         travels: z.boolean(),
+        mute_availability_opportunities: z.boolean().optional(),
         // phone is edited separately via updateMyPhone (stored in owner-only freelancer_contacts)
         experiences: z
           .array(
@@ -340,6 +341,13 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
       { onConflict: "user_id" },
     ).select(FREELANCER_PROFILE_COLUMNS).single();
     if (error) throw new Error(error.message);
+
+    if (data.mute_availability_opportunities !== undefined) {
+      const { error: muteError } = await (context.supabase.rpc as any)("set_availability_opportunity_mute", {
+        _muted: data.mute_availability_opportunities,
+      });
+      if (muteError) throw new Error(muteError.message);
+    }
 
     const { error: sensitiveError } = await (context.supabase.rpc as any)("set_my_rate_location", {
       _day_rate: data.day_rate ?? null,

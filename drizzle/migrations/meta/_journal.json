@@ -365,6 +365,20 @@
       "when": 1788427521167,
       "tag": "0051_review08_2_aggregate_availability_opportunities",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1788429305389,
+      "tag": "0052_review09_mute_availability_opportunities",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1788429437084,
+      "tag": "0053_review09_owner_only_availability_opportunity_mute",
+      "breakpoints": true
     }
   ]
 }
