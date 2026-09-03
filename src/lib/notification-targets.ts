@@ -32,7 +32,7 @@ const BASE: Record<string, NotificationTarget> = {
   rating_available: { title: "Rating available", path: "/dashboard/engagements", label: "Leave your rating" },
   rating_unlocked: { title: "Rating unlocked", path: "/dashboard/engagements", label: "See the rating" },
   calendar_stale: { title: "Quick availability check", path: "/dashboard/calendar", label: "Review availability" },
-  availability_opportunity: { title: "Availability opportunity", path: "/dashboard/calendar", label: "Review availability" }
+  availability_opportunity: { title: "Availability opportunity", path: "/dashboard/calendar", label: "Review availability" },
   team_contact_reminder_1: { title: "Reminder: contact your match", path: "/dashboard/engagements", label: "View engagement" },
   team_contact_reminder_2: { title: "Reminder: contact your match", path: "/dashboard/engagements", label: "View engagement" },
   ghosting_released: { title: "Engagement released", path: "/dashboard/engagements", label: "View engagement" },
