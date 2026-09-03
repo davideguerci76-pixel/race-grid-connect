@@ -1782,53 +1782,18 @@ export const upgradeRequestToStandard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: req, error: reqErr } = await supabase
-      .from("requests")
-      .select("id, team_id, duration, search_mode")
-      .eq("id", data.request_id)
-      .maybeSingle();
-    if (reqErr) throw new Error(reqErr.message);
-    if (!req) throw new Error("Request not found");
-    if (req.team_id !== userId) throw new Error("Not owner of this request");
-    if ((req as any).search_mode !== "pool") throw new Error("This Pit Call is already a standard search");
+    // Ownership, eligibility, server-side price, balance check, debit and the pool -> standard
+    // transformation all happen inside one locked transaction (idempotent on retry/double-click).
+    const { data: res, error } = await context.supabase.rpc("upgrade_request_to_standard" as any, {
+      _request_id: data.request_id,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(res) ? (res as any[])[0] : (res as any);
+    const cost = Number(row?.tokens_spent ?? 0);
 
-    const { data: settingsRows } = await supabase
-      .from("platform_settings")
-      .select("key, value_num")
-      .in("key", ["cost_request_race_weekend", "cost_request_full_season", "cost_pool_search"]);
-    const settings = new Map((settingsRows ?? []).map((r: any) => [r.key, Number(r.value_num)]));
-    const standardCost =
-      (req as any).duration === "full_season"
-        ? settings.get("cost_request_full_season") ?? 20
-        : settings.get("cost_request_race_weekend") ?? 10;
-    const cost = Math.max(0, Math.round(standardCost - (settings.get("cost_pool_search") ?? 5)));
-
+    // Recompute runs after commit: it is derived state and is re-created by the normal
+    // recompute pipeline (and by the pit call page) if this call fails.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (cost > 0) {
-      const { data: prof } = await supabaseAdmin
-        .from("profiles")
-        .select("token_balance")
-        .eq("id", userId)
-        .maybeSingle();
-      const balance = Number((prof as any)?.token_balance ?? 0);
-      if (balance < cost) throw new Error(`Insufficient tokens: need ${cost} but balance is ${balance}`);
-      const { error: credErr } = await supabaseAdmin.rpc("credit_tokens", {
-        _user_id: userId,
-        _delta: -cost,
-        _reason: "request_post",
-        _ref: data.request_id,
-        _note: "Upgrade My Pool Pit Call to standard search",
-      } as never);
-      if (credErr) throw new Error(credErr.message);
-    }
-
-    const { error: updErr } = await supabaseAdmin
-      .from("requests")
-      .update({ search_mode: "standard", updated_at: new Date().toISOString() } as never)
-      .eq("id", data.request_id);
-    if (updErr) throw new Error(updErr.message);
-
     await supabaseAdmin.rpc("recompute_matches", {
       _freelancer_id: null,
       _request_id: data.request_id,
