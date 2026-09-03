@@ -1378,6 +1378,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -1421,6 +1422,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         Insert: {
           activated_at?: string | null
@@ -1436,6 +1438,7 @@ export type Database = {
           end_date: string
           ever_full_matched?: boolean
           ever_partial_matched?: boolean
+          ever_relevant_match?: boolean
           experience_requirements?: Json
           id?: string
           initial_match_potential?: string | null
@@ -1479,6 +1482,7 @@ export type Database = {
           title: string
           travel_required?: boolean
           updated_at?: string
+          was_pool_request?: boolean
         }
         Update: {
           activated_at?: string | null
@@ -1494,6 +1498,7 @@ export type Database = {
           end_date?: string
           ever_full_matched?: boolean
           ever_partial_matched?: boolean
+          ever_relevant_match?: boolean
           experience_requirements?: Json
           id?: string
           initial_match_potential?: string | null
@@ -1537,6 +1542,7 @@ export type Database = {
           title?: string
           travel_required?: boolean
           updated_at?: string
+          was_pool_request?: boolean
         }
         Relationships: [
           {
@@ -2099,6 +2105,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -2142,6 +2149,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         SetofOptions: {
           from: "*"
@@ -2166,6 +2174,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -2209,6 +2218,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         SetofOptions: {
           from: "*"
@@ -2376,6 +2386,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -2419,6 +2430,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         SetofOptions: {
           from: "*"
@@ -2702,6 +2714,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -2745,6 +2758,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         SetofOptions: {
           from: "*"
@@ -2897,6 +2911,18 @@ export type Database = {
         Args: { _freelancer_id: string; _request_id: string }
         Returns: string[]
       }
+      request_refund_quote: {
+        Args: { _request_id: string }
+        Returns: {
+          low_relevance_eligible: boolean
+          low_relevance_refund: number
+          refund_full: number
+          refund_partial: number
+          refund_pct: number
+          spent: number
+          zero_match_refund_full: number
+        }[]
+      }
       request_required_days: {
         Args: { _request_id: string }
         Returns: string[]
@@ -2942,6 +2968,7 @@ export type Database = {
           end_date: string
           ever_full_matched: boolean
           ever_partial_matched: boolean
+          ever_relevant_match: boolean
           experience_requirements: Json
           id: string
           initial_match_potential: string | null
@@ -2985,6 +3012,7 @@ export type Database = {
           title: string
           travel_required: boolean
           updated_at: string
+          was_pool_request: boolean
         }
         SetofOptions: {
           from: "*"

@@ -1352,12 +1352,11 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         partial_banner: null as any,
         refund_quote: {
           spent: 0,
-          hard_count: 0,
-          min_pct: 0,
-          drop_pct: 0,
           refund_pct: 0,
           refund_full: 0,
           refund_partial: 0,
+          low_relevance_eligible: false,
+          low_relevance_refund: 0,
         },
       };
     }
@@ -1703,35 +1702,13 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
-    // ---- Refund quote for zero-match trivio ----
-    const settingsRefund = await supabase
-      .from("platform_settings")
-      .select("key, value_num")
-      .in("key", ["refund_min_pct", "refund_hard_penalty_pct"]);
-    const rSet = new Map((settingsRefund.data ?? []).map((r: any) => [r.key, Number(r.value_num)]));
-    const minPct = rSet.get("refund_min_pct") ?? 20;
-    const dropPct = rSet.get("refund_hard_penalty_pct") ?? 10;
-
-    let hardCount = 0;
-    if ((req as any).role_hard) hardCount += 1;
-    if ((req as any).travel_required) hardCount += 1;
-    hardCount += ((req as any).skills_hard?.length ?? 0);
-    if (((req as any).education?.length ?? 0) > 0) hardCount += 1;
-    if ((req as any).location_relevance === "mandatory") hardCount += 1;
-    for (const l of ((req as any).languages ?? []) as any[]) if (l?.hard) hardCount += 1;
-    for (const e of ((req as any).experience_requirements ?? []) as any[]) if (e?.hard) hardCount += 1;
-
-    const { data: spendRows } = await supabase
-      .from("token_transactions")
-      .select("delta")
-      .eq("user_id", userId)
-      .eq("ref_id", data.request_id)
-      .eq("reason", "request_post");
-    const spent = (spendRows ?? []).reduce((a: number, r: any) => a + (-Number(r.delta) || 0), 0);
-    const pct = Math.max(0, Math.min(100, Math.max(minPct, 100 - hardCount * dropPct)));
-    let refundFull = Math.round((spent * pct) / 100);
-    if (spent > 0 && pct > 0 && refundFull < 1) refundFull = 1;
-    const refundPartial = Math.max(refundFull > 0 ? 1 : 0, Math.round(refundFull / 2));
+    // Refund quote is server-authoritative: the same RPC is used by the close
+    // mutation, so the UI never re-implements policy or reveals its inputs.
+    const { data: quoteRow, error: quoteError } = await supabase.rpc("request_refund_quote" as any, {
+      _request_id: data.request_id,
+    });
+    if (quoteError) throw new Error(quoteError.message);
+    const refundQuote = Array.isArray(quoteRow) ? quoteRow[0] : quoteRow;
 
     // Matches nobody declined / let expire — drives the refund trivio after decline/expiry.
     const { data: confirmableLeft } = await supabase.rpc("request_confirmable_matches_left" as any, {
