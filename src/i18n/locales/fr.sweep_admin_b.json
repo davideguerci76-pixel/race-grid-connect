@@ -221,7 +221,7 @@
     },
     "platform_rules": {
       "title": "Règles de la plateforme",
-      "description": "Paramètres réservés aux prochaines règles de la plateforme. Ces valeurs sont enregistrées, mais ne sont pas actives dans les flux actuels.",
+      "description": "Server-authoritative settings used by PITCALL matching, coverage and platform workflows.",
       "groups": {
         "match_potential": "Couverture",
         "request_modify": "Révision et modification de la demande",
@@ -229,16 +229,49 @@
         "calendar": "Calendrier et recalcul"
       },
       "fields": {
-        "strong_match_threshold": { "label": "Seuil de couverture élevée", "description": "Nombre de matches Full + Partial requis pour qu'un Pit Call atteigne une COUVERTURE ÉLEVÉE. Il s'agit d'un seuil quantitatif de couverture, pas d'un score de qualité professionnelle." },
-        "professional_relevance_threshold": { "label": "Professional Relevance Threshold", "description": "Score professionnel minimal que PITCALL utilise pour considérer un Match comme pertinent pour certaines règles proactives et commerciales. Cela n'affecte pas la visibilité du Match." },
-        "max_modify_per_pitcall": { "label": "Modifications maximales par Pit Call", "description": "Nombre maximal de modifications autorisées pour un Pit Call." },
-        "daily_recheck_budget": { "label": "Budget Team de revérification sur 24 h", "description": "Nombre maximal d'unités partagées de revérification disponibles pour un Team sur une fenêtre glissante de 24 heures." },
-        "red_cancel_budget_cost": { "label": "Coût budget d'annulation RED", "description": "Unités du budget de revérification consommées par une annulation RED éligible." },
-        "post_review_window_minutes": { "label": "Fenêtre de révision après publication", "description": "Temps disponible pour réviser le Match Potential juste après publication." },
-        "team_match_update_notification_hours": { "label": "Intervalle d'agrégation des mises à jour de matches Team", "description": "Intervalle d'agrégation pour les mises à jour de matches Team hors jalon." },
-        "availability_recompute_delay_minutes": { "label": "Délai de recalcul des disponibilités", "description": "Délai après la dernière modification du calendrier avant le recalcul différé des matches." }
+        "strong_match_threshold": {
+          "label": "Seuil de couverture élevée",
+          "description": "Nombre de matches Full + Partial requis pour qu'un Pit Call atteigne une COUVERTURE ÉLEVÉE. Il s'agit d'un seuil quantitatif de couverture, pas d'un score de qualité professionnelle."
+        },
+        "professional_relevance_threshold": {
+          "label": "Professional Relevance Threshold",
+          "description": "Score professionnel minimal que PITCALL utilise pour considérer un Match comme pertinent pour certaines règles proactives et commerciales. Cela n'affecte pas la visibilité du Match."
+        },
+        "max_modify_per_pitcall": {
+          "label": "Modifications maximales par Pit Call",
+          "description": "Nombre maximal de modifications autorisées pour un Pit Call."
+        },
+        "daily_recheck_budget": {
+          "label": "Budget Team de revérification sur 24 h",
+          "description": "Nombre maximal d'unités partagées de revérification disponibles pour un Team sur une fenêtre glissante de 24 heures."
+        },
+        "red_cancel_budget_cost": {
+          "label": "Coût budget d'annulation RED",
+          "description": "Unités du budget de revérification consommées par une annulation RED éligible."
+        },
+        "post_review_window_minutes": {
+          "label": "Fenêtre de révision après publication",
+          "description": "Temps disponible pour réviser le Match Potential juste après publication."
+        },
+        "team_match_update_notification_hours": {
+          "label": "Intervalle d'agrégation des mises à jour de matches Team",
+          "description": "Intervalle d'agrégation pour les mises à jour de matches Team hors jalon."
+        },
+        "availability_recompute_delay_minutes": {
+          "label": "Délai de recalcul des disponibilités",
+          "description": "Délai après la dernière modification du calendrier avant le recalcul différé des matches."
+        }
       },
-      "units": { "matches": "matches", "professional_relevance_threshold": "%", "max_modify_per_pitcall": "modifications", "daily_recheck_budget": "unités", "red_cancel_budget_cost": "unités", "post_review_window_minutes": "minutes", "team_match_update_notification_hours": "heures", "availability_recompute_delay_minutes": "minutes" },
+      "units": {
+        "matches": "matches",
+        "professional_relevance_threshold": "%",
+        "max_modify_per_pitcall": "modifications",
+        "daily_recheck_budget": "unités",
+        "red_cancel_budget_cost": "unités",
+        "post_review_window_minutes": "minutes",
+        "team_match_update_notification_hours": "heures",
+        "availability_recompute_delay_minutes": "minutes"
+      },
       "range": "Autorisé : {{min}}–{{max}}",
       "save_changes": "Enregistrer les modifications",
       "save_changes_count": "Enregistrer les modifications ({{count}})",
