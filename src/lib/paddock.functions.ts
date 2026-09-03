@@ -1236,29 +1236,7 @@ export const submitRating = createServerFn({ method: "POST" })
     return row;
   });
 
-// ---- Tokens (mock purchase for now — Stripe wiring is a follow-up) ----
-export const purchaseTokensDemo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((data: { pack: "small" | "medium" | "large" }) =>
-    z.object({ pack: z.enum(["small", "medium", "large"]) }).parse(data),
-  )
-  .handler(async ({ data, context }) => {
-    const packs = { small: 10, medium: 50, large: 200 };
-    const amount = packs[data.pack];
-    const { userId } = context;
-    // Token balances are never writable from the client: go through the
-    // trusted server-side crediting path only.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: nextBalance, error } = await supabaseAdmin.rpc("credit_tokens", {
-      _user_id: userId,
-      _delta: amount,
-      _reason: "purchase",
-      _note: `Demo pack: ${data.pack}`,
-    } as never);
-    if (error) throw new Error(error.message);
-    return { balance: (nextBalance as number | null) ?? 0, added: amount };
-  });
-
+// ---- Tokens ----
 export const getTokenHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { purchaseTokensDemo, getTokenHistory } from "@/lib/paddock.functions";
+import { getTokenHistory } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
-import { toastError } from "@/lib/errors";
 
 const PACKS = [
   { key: "small" as const, tokens: 10 },
@@ -25,8 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
 function TokensPage() {
   const { t } = useTranslation();
   const { formatDateTime } = useDateFormat();
-  const qc = useQueryClient();
-  const purchase = useServerFn(purchaseTokensDemo);
+  
   const getHistory = useServerFn(getTokenHistory);
   const getSettings = useServerFn(getPlatformSettings);
 
@@ -36,11 +33,6 @@ function TokensPage() {
     (settings as Array<{ key: string; value_num: number }>).find((s) => s.key === "token_price_eur")?.value_num ?? 2,
   );
 
-  const mut = useMutation({
-    mutationFn: (pack: "small" | "medium" | "large") => purchase({ data: { pack } }),
-    onSuccess: (r) => { toast.success(t("sweep_profile.tokens.credited_demo", { count: r.added })); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "sweep_profile.tokens.purchase_failed"),
-  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
