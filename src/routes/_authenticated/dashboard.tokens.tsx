@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
 function TokensPage() {
   const { t } = useTranslation();
   const { formatDateTime } = useDateFormat();
-  const qc = useQueryClient();
+  
   const getHistory = useServerFn(getTokenHistory);
   const getSettings = useServerFn(getPlatformSettings);
 
