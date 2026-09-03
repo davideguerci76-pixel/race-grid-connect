@@ -386,6 +386,13 @@
       "when": 1788430066602,
       "tag": "0054_review10_pool_expand_eligibility",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1788430563263,
+      "tag": "0055_review10_fix_expand_eligibility_read_only",
+      "breakpoints": true
     }
   ]
 }
