@@ -108,7 +108,10 @@ export function notificationBody(kind: string, payload?: Payload | null): string
   if (typeof message === "string" && message.trim()) return message;
 
   if (p["event"] === "availability_opportunity") {
-    return "A compatible Pit Call may be possible if you update your availability. Review your calendar.";
+    const count = typeof p["opportunity_count"] === "number" ? p["opportunity_count"] : 1;
+    return count > 1
+      ? `${count} availability opportunities for you. Check your availability.`
+      : "A compatible Pit Call may be possible if you update your availability. Review your calendar.";
   }
 
   if (p["event"] === "hot_partial") {

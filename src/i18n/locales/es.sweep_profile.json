@@ -111,6 +111,7 @@
       "hot_partial_body": "A tu calendario le faltan {{count}} día(s) requeridos. Añádelos para desbloquear más oportunidades.",
       "availability_opportunity_title": "Podría haber una oportunidad compatible",
       "availability_opportunity_body": "Revisa tu disponibilidad para un Pit Call que podría ser compatible cuando actualices tu calendario.",
+      "availability_opportunity_multi_title": "{{count}} oportunidades de disponibilidad para ti",
       "calendar_stale_unconfirmed_message": "Hemos dejado de usar temporalmente algunas de tus fechas para el matching porque no podemos asegurar que sigan vigentes. Revísalas cuando quieras para reactivarlas."
     },
     "push": {

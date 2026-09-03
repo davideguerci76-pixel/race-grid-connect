@@ -235,11 +235,28 @@ function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => st
 
 function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
   const { t } = useTranslation();
+  const { tag } = useDateFormat();
   if (payload?.event === "availability_opportunity") {
+    // Aggregated payload: each opportunity keeps its own Pit Call's days.
+    const opps: any[] = Array.isArray(payload?.opportunities) ? payload.opportunities : [];
+    const count = typeof payload?.opportunity_count === "number" && payload.opportunity_count > 0
+      ? payload.opportunity_count
+      : Math.max(opps.length, 1);
     return (
       <div className="grid gap-1">
-        <div className="font-medium">{t("sweep_profile.notifications.availability_opportunity_title")}</div>
+        <div className="font-medium">
+          {count > 1
+            ? t("sweep_profile.notifications.availability_opportunity_multi_title", { count })
+            : t("sweep_profile.notifications.availability_opportunity_title")}
+        </div>
         <div className="text-muted-foreground">{t("sweep_profile.notifications.availability_opportunity_body")}</div>
+        {opps.length > 0 && (
+          <ul className="ml-4 list-disc font-mono text-xs text-racing-yellow">
+            {opps.map((o, i) => (
+              <li key={i}>{formatDayRanges(Array.isArray(o?.relevant_days) ? o.relevant_days : [], tag)}</li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   }
@@ -305,4 +322,36 @@ function InformationalMessage({ payload, kind }: { payload: any; kind: string })
       <div className="text-muted-foreground">{t("pmatch.potential_body")}</div>
     </div>
   );
+}
+
+/**
+ * Compresses a Pit Call's own ISO days into short ranges ("Oct 3–6") without
+ * merging across entries. Sparse dates stay separate.
+ */
+function formatDayRanges(days: string[], tag: string): string {
+  const unique = Array.from(new Set(days.filter((d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)))).sort();
+  const monthFmt = new Intl.DateTimeFormat(tag, { month: "short" });
+  const parts: string[] = [];
+  let start: Date | null = null;
+  let prev: Date | null = null;
+  const flush = () => {
+    if (!start || !prev) return;
+    const startMonth = monthFmt.format(start);
+    const prevMonth = monthFmt.format(prev);
+    if (start.getTime() === prev.getTime()) parts.push(`${startMonth} ${start.getUTCDate()}`);
+    else if (startMonth === prevMonth) parts.push(`${startMonth} ${start.getUTCDate()}–${prev.getUTCDate()}`);
+    else parts.push(`${startMonth} ${start.getUTCDate()}–${prevMonth} ${prev.getUTCDate()}`);
+  };
+  for (const d of unique) {
+    const dt = new Date(`${d}T00:00:00Z`);
+    if (prev && dt.getTime() - prev.getTime() === 86_400_000) {
+      prev = dt;
+      continue;
+    }
+    flush();
+    start = dt;
+    prev = dt;
+  }
+  flush();
+  return parts.join(" · ");
 }
