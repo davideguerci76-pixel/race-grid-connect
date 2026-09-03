@@ -342,10 +342,12 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     ).select(FREELANCER_PROFILE_COLUMNS).single();
     if (error) throw new Error(error.message);
 
-    const { error: muteError } = await (context.supabase.rpc as any)("set_availability_opportunity_mute", {
-      _muted: data.mute_availability_opportunities,
-    });
-    if (muteError) throw new Error(muteError.message);
+    if (data.mute_availability_opportunities !== undefined) {
+      const { error: muteError } = await (context.supabase.rpc as any)("set_availability_opportunity_mute", {
+        _muted: data.mute_availability_opportunities,
+      });
+      if (muteError) throw new Error(muteError.message);
+    }
 
     const { error: sensitiveError } = await (context.supabase.rpc as any)("set_my_rate_location", {
       _day_rate: data.day_rate ?? null,
