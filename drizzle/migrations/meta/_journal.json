@@ -414,6 +414,20 @@
       "when": 1788438664906,
       "tag": "0058_capacity_level_search_path_execute_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1788442550193,
+      "tag": "0059_step112_team_identity_gating",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1788442665463,
+      "tag": "0060_step112_antighosting_env_parity",
+      "breakpoints": true
     }
   ]
 }

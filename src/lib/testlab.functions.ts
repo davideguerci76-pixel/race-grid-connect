@@ -660,3 +660,35 @@ export const runTestAvailabilityRecomputeQueue = createServerFn({ method: "POST"
       };
   });
 
+
+/**
+ * Runs the real anti-ghosting lifecycle (freelancer contact check, team reminders
+ * 1 and 2, auto-release of ghosted engagements) scoped to the TEST environment.
+ * Production cron keeps running the LIVE-only wrappers.
+ */
+export const runTestAntiGhostingJobs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: checks, error: e1 } = await supabaseAdmin.rpc(
+      "emit_contact_checks_env" as never,
+      { _is_test: true } as never,
+    );
+    if (e1) throw new Error(e1.message);
+    const { data: reminders, error: e2 } = await supabaseAdmin.rpc(
+      "emit_team_ghosting_reminders_env" as never,
+      { _is_test: true } as never,
+    );
+    if (e2) throw new Error(e2.message);
+    const { data: released, error: e3 } = await supabaseAdmin.rpc(
+      "release_ghosted_engagements_env" as never,
+      { _is_test: true } as never,
+    );
+    if (e3) throw new Error(e3.message);
+    return {
+      contactChecks: (checks as number) ?? 0,
+      reminders: (reminders as number) ?? 0,
+      released: (released as number) ?? 0,
+    };
+  });

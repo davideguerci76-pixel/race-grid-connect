@@ -705,7 +705,11 @@ export const getMyMatches = createServerFn({ method: "GET" })
     const emailsById = new Map<string, string | null>();
     if (otherIds.length) {
       if (isFreelancer) {
-        const { data: tps } = await supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).in("user_id", otherIds);
+        // team_profiles identity is RLS-gated to authorised viewers; this projection
+        // is gated below in code (team_name only after confirmation), so read it
+        // with the service role to keep the existing behaviour intact.
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: tps } = await supabaseAdmin.from("team_profiles").select(TEAM_PROFILE_COLUMNS).in("user_id", otherIds);
         (tps ?? []).forEach((p: any) => teamProfilesById.set(p.user_id, p));
       } else {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1104,7 +1108,7 @@ export const getMyEngagements = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [tpsRes, fpsRes] = await Promise.all([
       teamIds.length
-        ? supabase.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
+        ? supabaseAdmin.from("team_profiles").select("user_id, team_name, team_type, location, website, bio, primary_discipline").in("user_id", teamIds)
         : Promise.resolve({ data: [] as any[] } as any),
       freelancerIds.length
         ? supabaseAdmin.from("freelancer_profiles").select("user_id, headline, role_group, sub_roles, location, disciplines, skills, bio, travels").in("user_id", freelancerIds)
@@ -2066,7 +2070,7 @@ export const getMyOpenSosCalls = createServerFn({ method: "GET" })
     const teamIds = Array.from(new Set(open.map((o: any) => o.sos.team_id)));
     const [reqRes, teamRes] = await Promise.all([
       supabase.from("requests").select("id, title, role, discipline, start_date, end_date, location, circuit").in("id", requestIds),
-      supabase.from("team_profiles").select("user_id, team_name, location").in("user_id", teamIds),
+      (await import("@/integrations/supabase/client.server")).supabaseAdmin.from("team_profiles").select("user_id, team_name, location").in("user_id", teamIds),
     ]);
     const rMap = new Map(((reqRes.data ?? []) as any[]).map((r) => [r.id, r]));
     const tMap = new Map(((teamRes.data ?? []) as any[]).map((r) => [r.user_id, r]));
