@@ -12,3 +12,4 @@
 - [x] REVIEW04: verify localized preview/detail/ACP surfaces and preserve notifications, matching, refunds, HOT Partial, pool, and Expand logic
 - [x] REVIEW06: remove only new Team STRONG REACHED notification emission; preserve First Match, First Full, aggregate, Notification Center, and all prior business flows
 - [x] REVIEW06: verify TEST-only notification invariants, pending-review silence, historical preservation, TEST/LIVE isolation, and zero Project monitoring findings; stop before REVIEW07
+- [x] REVIEW07: gate NORMAL HOT Partial eligibility by server-side professional relevance threshold; preserve Pool, matching visibility, exact missing days, anonymity, CTA, dedup, and TEST/LIVE isolation; stop before REVIEW08
