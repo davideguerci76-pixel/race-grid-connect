@@ -222,7 +222,7 @@
       "partial_refund_credited": "{{tokens}} token(s) credited ({{pct}}%). Partial matches are now open below.",
       "perfect_match_short": "Perfect match",
       "pitcall_preview_title": "PIT CALL PREVIEW",
-       "pitcall_preview_body": "Coverage is calculated from the current request and selected dates. You can still adjust the Pit Call during this review window before it becomes visible to freelancers.",
+      "pitcall_preview_body": "Coverage is calculated from the current request and selected dates. You can still adjust the Pit Call during this review window before it becomes visible to freelancers.",
       "review_remaining": "REVIEW REMAINING",
       "match_potential": "COVERAGE STATUS",
       "potential_strong": "HIGH COVERAGE",
@@ -238,7 +238,7 @@
       "red_cancelled": "Cancelled — {{tokens}} token(s) returned.",
       "red_cancel_failed": "Cancellation not available for this Pit Call",
       "modify_budget_status": "Edits {{used}}/{{max}} · daily recheck budget left: {{left}}",
-       "pitcall_match_confirmed_note": "PitCall — Match confirmed for \"{{title}}\"",
+      "pitcall_match_confirmed_note": "PitCall — Match confirmed for \"{{title}}\"",
       "proportional_note": "Only {{count}} real match(es) in this tier (max {{max}}). Entry fee reduced proportionally from {{full}} to {{cost}} token(s).",
       "rank_tier_locked": "Rank #{{rank}} — tier locked",
       "rank_tier_overlap": "Rank #{{rank}} · tier {{tier}} · {{count}} day(s) of overlap",
@@ -249,7 +249,7 @@
       "refund_credited": "Refund credited: {{tokens}} tokens ({{pct}}%).",
       "refund_failed": "Refund failed",
       "refund_partial_confirm": "Unlock partial matches now and take a HALVED refund of {{partial}} token(s)? You keep browsing partial candidates; if a full match later confirms, no additional refund is granted.",
-      "refund_quote_basis": "Based on {{hard}} hard filter(s) (floor {{min}}%, −{{drop}}% per hard filter).",
+      "refund_quote_basis": "The exact amount reflects how specific this Pit Call was and the outcome it reached.",
       "refund_quote_equals": "= {{full}} token(s).",
       "refund_quote_line": "Refund quote: {{pct}}% of {{spent}} token(s) spent",
       "request_confirmation_button": "Request confirmation",
@@ -296,7 +296,7 @@
         "closed": "closed",
         "completed": "completed",
         "filled": "filled",
-         "pending_review": "under review"
+        "pending_review": "under review"
       },
       "view_matches_confirmed": "{{label}} (1) — Confirmed · Filled"
     }
