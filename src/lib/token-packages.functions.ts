@@ -222,10 +222,18 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
       .select("*");
     if (error) throw new Error(error.message);
     if (!rows || rows.length === 0) {
-      throw new Error(
-        `stale_version: token package "${code}" is at version ${(before as any).version}, expected ${expected_version}`,
-      );
+      // Expected concurrency outcome, not a fault: the write is rejected (no
+      // overwrite, no merge, no retry) and reported as data so the ACP can show
+      // a plain message instead of surfacing a runtime error.
+      return {
+        ok: false as const,
+        conflict: "stale_version" as const,
+        code,
+        current_version: Number((before as any).version),
+        expected_version,
+      };
     }
+
     const after = rows[0];
 
     if (economicChanged) {
@@ -252,5 +260,5 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
       });
     }
 
-    return { ok: true, code, version: after.version };
+    return { ok: true as const, code, version: after.version };
   });

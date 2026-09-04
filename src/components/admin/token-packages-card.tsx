@@ -107,6 +107,21 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
     qc.invalidateQueries({ queryKey: ["token-packages"] });
   };
 
+  const STALE_MESSAGE = "The package was modified by another Admin. Reload and try again.";
+
+  /** Optimistic-lock conflict is data, not a fault: report it and resync. */
+  const handleUpdateResult = (res: unknown, onApplied: () => void) => {
+    const r = res as { ok?: boolean; conflict?: string } | undefined;
+    if (r && r.ok === false && r.conflict === "stale_version") {
+      toast.error(STALE_MESSAGE);
+      setEditing(null);
+      setDraft(null);
+      invalidate();
+      return;
+    }
+    onApplied();
+  };
+
   const saveMut = useMutation({
     mutationFn: async (payload: { draft: Draft; version: number }) =>
       update({
@@ -122,12 +137,13 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
           currency: "EUR" as const,
         },
       }),
-    onSuccess: () => {
-      toast.success("Package saved");
-      setEditing(null);
-      setDraft(null);
-      invalidate();
-    },
+    onSuccess: (res) =>
+      handleUpdateResult(res, () => {
+        toast.success("Package saved");
+        setEditing(null);
+        setDraft(null);
+        invalidate();
+      }),
     onError: (e) => toast.error(friendlyError(e)),
   });
 
@@ -157,12 +173,14 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
   const toggleMut = useMutation({
     mutationFn: async (r: Row) =>
       update({ data: { code: r.code, expected_version: r.version, is_active: !r.is_active } }),
-    onSuccess: () => {
-      toast.success("Package status updated");
-      invalidate();
-    },
+    onSuccess: (res) =>
+      handleUpdateResult(res, () => {
+        toast.success("Package status updated");
+        invalidate();
+      }),
     onError: (e) => toast.error(friendlyError(e)),
   });
+
 
   const issues = useMemo(
     () => (draft ? localIssues(draft, referenceCents, creating) : []),
