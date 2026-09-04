@@ -14,10 +14,11 @@ import {
   adminUpsertOfficialCalendar,
   type AdminCalendar,
 } from "@/lib/admin-calendars.functions";
-import { buildIcsFromEvents, daysToEvents, dateOf, isoOf, parseIcs, expandRange, type CalendarEventItem } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, rangeDayCount, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { useTranslation } from "react-i18next";
 import { toastError } from "@/lib/errors";
+import { confirmDialog } from "@/hooks/use-confirm";
 
 export const Route = createFileRoute("/_authenticated/admin/calendars")({
   component: AdminCalendarsPage,
@@ -83,11 +84,24 @@ function AdminCalendarsPage() {
     onError: fail,
   });
 
+  const limitMessage = (v: CalendarLimitViolation) =>
+    t(
+      v.kind === "events"
+        ? "sweep_admin_b.calendars.ics_too_many_events"
+        : "sweep_admin_b.calendars.ics_too_many_days",
+      { actual: v.actual, limit: v.limit },
+    );
+
   const importIcs = async (file: File) => {
     try {
       const events = parseIcs(await file.text());
       if (!events.length) {
         toast.error(t("sweep_admin_b.calendars.no_events_found"));
+        return;
+      }
+      const violation = checkCalendarLimits({ events });
+      if (violation) {
+        toast.error(limitMessage(violation));
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), discipline: "", season: String(new Date(events[0]!.start).getFullYear()), dates: [], source: "ics" });
@@ -187,6 +201,11 @@ function AdminCalendarsPage() {
                   toast.error(t("sweep_admin_b.calendars.give_official_name"));
                   return;
                 }
+                const violation = checkCalendarLimits({ dates: editing.dates, events: daysToEvents(editing.dates) });
+                if (violation) {
+                  toast.error(limitMessage(violation));
+                  return;
+                }
                 saveMut.mutate({
                   id: editing.id,
                   name: editing.name.trim(),
@@ -249,7 +268,18 @@ function AdminCalendarsPage() {
                 >
                   <Download className="size-3.5" /> {t("sweep_admin_b.calendars.export_ics")}
                 </button>
-                <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
+                <button type="button" className={btn} onClick={async () => {
+                    const approved = c.review_status === "approved";
+                    const ok = await confirmDialog(
+                      t(approved ? "sweep_admin_b.calendars.delete_confirm_body_approved" : "sweep_admin_b.calendars.delete_confirm_body", { name: c.name }),
+                      {
+                        title: t(approved ? "sweep_admin_b.calendars.delete_confirm_title_approved" : "sweep_admin_b.calendars.delete_confirm_title"),
+                        confirmLabel: t("sweep_admin_b.calendars.delete"),
+                        destructive: true,
+                      },
+                    );
+                    if (ok) delMut.mutate(c.id);
+                  }}>
                   <Trash2 className="size-3.5" /> {t("sweep_admin_b.calendars.delete")}
                 </button>
               </div>
@@ -345,7 +375,7 @@ function SubmissionCard({
             <li key={i} className="flex justify-between gap-3 border-b border-border/50 py-1">
               <span>{e.title}</span>
               <span className="text-muted-foreground">
-                {e.start} → {e.end} ({expandRange(e.start, e.end).length}d)
+                {e.start} → {e.end} ({rangeDayCount(e.start, e.end)}d)
               </span>
             </li>
           ))}
