@@ -11,6 +11,15 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("Forbidden: admin only");
 }
 
+/** Admin authority = admin role + the environment (TEST/LIVE) currently selected in the control panel. */
+async function adminScope(context: any) {
+  await assertAdmin(context.supabase, context.userId);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { currentAdminEnv } = await import("@/lib/admin-env.server");
+  const isTest = await currentAdminEnv(supabaseAdmin, context.userId);
+  return { supabaseAdmin, isTest };
+}
+
 export type AdminCalendar = {
   id: string;
   owner_id: string;
@@ -45,14 +54,14 @@ function normalize(row: any, ownerName: string): AdminCalendar {
   };
 }
 
-/** All submissions (pending / approved / rejected) + official platform calendars. */
+/** All submissions (pending / approved / rejected) + official platform calendars, current environment only. */
 export const adminListCalendars = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin, isTest } = await adminScope(context);
     const { data, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
       .select("*")
+      .eq("is_test", isTest)
       .in("review_status", ["pending", "approved", "rejected"])
       .order("submitted_at", { ascending: false, nullsFirst: false })
       .order("updated_at", { ascending: false });
@@ -64,71 +73,38 @@ export const adminListCalendars = createServerFn({ method: "GET" })
     return rows.map((r: any) => normalize(r, names.get(r.owner_id) ?? "Unknown"));
   });
 
-/** Approve (optionally rename) a submitted calendar and credit the reward tokens to its author. */
+/**
+ * Approve (optionally rename) a submitted calendar and credit the reward tokens to its author.
+ * Atomic + environment-checked + idempotent: the DB function locks the row, preserves the original
+ * owner and pays at most one reward through the canonical credit_tokens primitive.
+ */
 export const adminApproveCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ id: z.string().uuid(), name: z.string().min(1).max(120).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: existing, error: readErr } = await (supabaseAdmin.from("user_calendars" as never) as any)
-      .select("*")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (readErr) throw new Error(readErr.message);
-    if (!existing) throw new Error("Calendar not found");
-    const alreadyApproved = existing.review_status === "approved";
-
-    const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
-      .update({
-        review_status: "approved",
-        name: data.name ?? existing.name,
-        reviewed_at: new Date().toISOString(),
-        reviewed_by: context.userId,
-        review_note: null,
-      })
-      .eq("id", data.id)
-      .select("*")
-      .maybeSingle();
+    const { supabaseAdmin } = await adminScope(context);
+    const { data: res, error } = await (supabaseAdmin.rpc as any)("admin_approve_calendar", {
+      _admin_id: context.userId,
+      _calendar_id: data.id,
+      _name: data.name ?? null,
+    });
     if (error) throw new Error(error.message);
-
-    let credited = 0;
-    if (!alreadyApproved && existing.owner_id !== context.userId) {
-      const { data: setting } = await supabaseAdmin.from("platform_settings").select("value_num").eq("key", "reward_calendar_approved").maybeSingle();
-      const reward = Math.round(Number((setting as any)?.value_num ?? 5));
-      if (reward > 0) {
-        const { data: profile } = await supabaseAdmin.from("profiles").select("token_balance").eq("id", existing.owner_id).maybeSingle();
-        const balance = Number((profile as any)?.token_balance ?? 0) + reward;
-        await supabaseAdmin.from("profiles").update({ token_balance: balance }).eq("id", existing.owner_id);
-        await supabaseAdmin.from("token_transactions").insert({
-          user_id: existing.owner_id,
-          delta: reward,
-          reason: "admin_credit",
-          ref_id: existing.id,
-          note: `Calendar approved: ${data.name ?? existing.name}`,
-        } as any);
-        await supabaseAdmin.from("notifications").insert({
-          user_id: existing.owner_id,
-          kind: "tokens_credited",
-          payload: { reason: "calendar_approved", calendar: data.name ?? existing.name, tokens: reward },
-        } as any);
-        credited = reward;
-      }
-    }
-    return { calendar: normalize(row, ""), credited };
+    return { credited: Number((res as any)?.credited ?? 0), already_approved: !!(res as any)?.already_approved };
   });
 
 export const adminRejectCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ id: z.string().uuid(), note: z.string().max(500).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await (supabaseAdmin.from("user_calendars" as never) as any)
+    const { supabaseAdmin, isTest } = await adminScope(context);
+    const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
       .update({ review_status: "rejected", review_note: data.note ?? null, reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("is_test", isTest)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!row) throw new Error("Calendar not found in the current environment");
     return { ok: true };
   });
 
@@ -136,14 +112,24 @@ export const adminRenameCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ id: z.string().uuid(), name: z.string().min(1).max(120) }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await (supabaseAdmin.from("user_calendars" as never) as any).update({ name: data.name }).eq("id", data.id);
+    const { supabaseAdmin, isTest } = await adminScope(context);
+    const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
+      .update({ name: data.name })
+      .eq("id", data.id)
+      .eq("is_test", isTest)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!row) throw new Error("Calendar not found in the current environment");
     return { ok: true };
   });
 
-/** Create/replace an official platform calendar (manual entry or .ics import, admin-owned, approved). */
+/**
+ * Create an official platform calendar, or moderate an existing submission (dates/name/metadata)
+ * and publish it. Moderation NEVER rewrites owner_id or is_test: the original creator keeps
+ * attribution, environment and reward eligibility, and publishing goes through the same
+ * atomic approval path as a direct approve.
+ */
 export const adminUpsertOfficialCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) =>
@@ -160,35 +146,66 @@ export const adminUpsertOfficialCalendar = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const payload = {
-      owner_id: context.userId,
+    const { supabaseAdmin, isTest } = await adminScope(context);
+    const base = {
       name: data.name,
       discipline: data.discipline ?? null,
       season_year: data.season_year ?? null,
       events: data.events,
       dates: [...new Set(data.dates)].sort(),
       source: data.source,
-      review_status: "approved",
-      reviewed_at: new Date().toISOString(),
-      reviewed_by: context.userId,
     };
-    const q = data.id
-      ? (supabaseAdmin.from("user_calendars" as never) as any).update(payload).eq("id", data.id).select("*").maybeSingle()
-      : (supabaseAdmin.from("user_calendars" as never) as any).insert(payload).select("*").maybeSingle();
-    const { data: row, error } = await q;
+
+    if (data.id) {
+      // Moderation edit: content only — owner_id, is_test and review_status are untouched here.
+      const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
+        .update(base)
+        .eq("id", data.id)
+        .eq("is_test", isTest)
+        .select("*")
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!row) throw new Error("Calendar not found in the current environment");
+
+      // Publish through the same atomic approval path (owner preserved, one reward).
+      const { data: res, error: approveErr } = await (supabaseAdmin.rpc as any)("admin_approve_calendar", {
+        _admin_id: context.userId,
+        _calendar_id: data.id,
+        _name: data.name,
+      });
+      if (approveErr) throw new Error(approveErr.message);
+
+      const { data: fresh } = await (supabaseAdmin.from("user_calendars" as never) as any).select("*").eq("id", data.id).maybeSingle();
+      return { ...normalize(fresh ?? row, ""), credited: Number((res as any)?.credited ?? 0) } as AdminCalendar & { credited: number };
+    }
+
+    const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
+      .insert({
+        ...base,
+        owner_id: context.userId,
+        is_test: isTest,
+        review_status: "approved",
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: context.userId,
+      })
+      .select("*")
+      .maybeSingle();
     if (error) throw new Error(error.message);
-    return normalize(row, "Platform");
+    return { ...normalize(row, "Platform"), credited: 0 } as AdminCalendar & { credited: number };
   });
 
 export const adminDeleteCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await (supabaseAdmin.from("user_calendars" as never) as any).delete().eq("id", data.id);
+    const { supabaseAdmin, isTest } = await adminScope(context);
+    const { data: row, error } = await (supabaseAdmin.from("user_calendars" as never) as any)
+      .delete()
+      .eq("id", data.id)
+      .eq("is_test", isTest)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!row) throw new Error("Calendar not found in the current environment");
     return { ok: true };
   });
