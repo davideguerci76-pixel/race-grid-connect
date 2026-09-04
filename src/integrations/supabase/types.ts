@@ -2603,6 +2603,10 @@ export type Database = {
         Args: { _admin: string; _new_price: number }
         Returns: Json
       }
+      attach_token_order_session: {
+        Args: { _order_id: string; _provider: string; _session_id: string }
+        Returns: undefined
+      }
       auto_activate_pending_reviews: { Args: never; Returns: number }
       auto_activate_pending_reviews_env: {
         Args: { _is_test: boolean }
@@ -2664,6 +2668,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancel_token_order: { Args: { _order_id: string }; Returns: undefined }
       classify_match_potential: {
         Args: { _match_count: number }
         Returns: string
@@ -3504,6 +3509,7 @@ export type Database = {
         Args: { _price_cents: number; _token_quantity: number }
         Returns: number
       }
+      token_purchase_allowed: { Args: { _is_test: boolean }; Returns: boolean }
       touch_push_subscription: { Args: { _endpoint: string }; Returns: boolean }
       trigger_sos_call: {
         Args: { _request_id: string }
