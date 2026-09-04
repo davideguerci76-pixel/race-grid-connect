@@ -2338,6 +2338,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_approve_calendar: {
+        Args: { _admin_id: string; _calendar_id: string; _name?: string }
+        Returns: Json
+      }
       admin_set_env: { Args: { _is_test: boolean }; Returns: boolean }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
