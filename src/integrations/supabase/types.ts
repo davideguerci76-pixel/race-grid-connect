@@ -2888,6 +2888,7 @@ export type Database = {
           location_lng: number
         }[]
       }
+      my_protected_days: { Args: { _days: string[] }; Returns: string[] }
       my_team_vat: { Args: never; Returns: string }
       my_token_balance: { Args: never; Returns: number }
       notify_no_confirmable_matches: {

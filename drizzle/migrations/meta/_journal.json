@@ -435,6 +435,13 @@
       "when": 1788506179544,
       "tag": "0061_calendar_publication_env_approval_remediation",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1788508715424,
+      "tag": "0062_protected_days_authority_and_approved_calendar_lock",
+      "breakpoints": true
     }
   ]
 }
