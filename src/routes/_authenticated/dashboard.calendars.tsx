@@ -12,9 +12,10 @@ import { BackButton } from "@/components/back-button";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { deleteCalendar, listMyCalendars, saveCalendar, submitCalendarForReview, type UserCalendar } from "@/lib/calendars.functions";
-import { buildIcsFromEvents, daysToEvents, dateOf, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { toastError } from "@/lib/errors";
+import { confirmDialog } from "@/hooks/use-confirm";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendars")({
   component: ManageCalendarsPage,
@@ -78,11 +79,24 @@ function ManageCalendarsPage() {
     onError: (e) => toastError(e, "sweep_public.dashboard_calendars.toast.submit_failed"),
   });
 
+  const limitMessage = (v: CalendarLimitViolation) =>
+    t(
+      v.kind === "events"
+        ? "sweep_public.dashboard_calendars.toast.ics_too_many_events"
+        : "sweep_public.dashboard_calendars.toast.ics_too_many_days",
+      { actual: v.actual, limit: v.limit },
+    );
+
   const importIcs = async (file: File) => {
     try {
       const events = parseIcs(await file.text());
       if (!events.length) {
         toast.error(t("sweep_public.dashboard_calendars.toast.no_events_in_ics"));
+        return;
+      }
+      const violation = checkCalendarLimits({ events });
+      if (violation) {
+        toast.error(limitMessage(violation));
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), dates: [] });
@@ -166,6 +180,11 @@ function ManageCalendarsPage() {
                     toast.error(t("sweep_public.dashboard_calendars.toast.give_calendar_name"));
                     return;
                   }
+                  const violation = checkCalendarLimits({ dates: editing.dates, events: daysToEvents(editing.dates) });
+                  if (violation) {
+                    toast.error(limitMessage(violation));
+                    return;
+                  }
                   saveMut.mutate({ id: editing.id, name: editing.name.trim(), dates: editing.dates, source: "manual" });
                 }}
                 disabled={saveMut.isPending}
@@ -223,7 +242,17 @@ function ManageCalendarsPage() {
                   </button>
                 )}
                 {c.review_status !== "approved" && (
-                  <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
+                  <button type="button" className={btn} onClick={async () => {
+                      const ok = await confirmDialog(
+                        t("sweep_public.dashboard_calendars.delete_confirm_body", { name: c.name }),
+                        {
+                          title: t("sweep_public.dashboard_calendars.delete_confirm_title"),
+                          confirmLabel: t("sweep_public.dashboard_calendars.delete"),
+                          destructive: true,
+                        },
+                      );
+                      if (ok) delMut.mutate(c.id);
+                    }}>
                     <Trash2 className="size-3.5" /> {t("sweep_public.dashboard_calendars.delete")}
                   </button>
                 )}

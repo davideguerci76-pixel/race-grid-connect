@@ -217,7 +217,13 @@
       "rejection_reason_placeholder": "Motivo del rechazo (opcional)",
       "approve_publish": "Aprobar y publicar",
       "reject": "Rechazar",
-      "edit_dates": "Editar fechas"
+      "edit_dates": "Editar fechas",
+      "ics_too_many_events": "Este .ics contiene {{actual}} eventos — el máximo es {{limit}}. Divide el archivo e impórtalo por partes.",
+      "ics_too_many_days": "Este calendario cubriría {{actual}} días — el máximo es {{limit}}. Reduce el rango de fechas antes de guardar.",
+      "delete_confirm_title": "Eliminar calendario",
+      "delete_confirm_body": "¿Eliminar \"{{name}}\"? Esta acción es irreversible.",
+      "delete_confirm_title_approved": "Eliminar calendario de plataforma",
+      "delete_confirm_body_approved": "\"{{name}}\" es un calendario público de la plataforma. Al eliminarlo dejará de estar disponible para todos los usuarios. Es irreversible."
     },
     "platform_rules": {
       "title": "Reglas de plataforma",
