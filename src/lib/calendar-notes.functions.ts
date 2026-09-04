@@ -95,7 +95,18 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     return out;
   });
 
-/** Create/update/remove a private note. Red days are rejected server-side. */
+/**
+ * Server-authoritative protected days: confirmed engagements + Pit Call frozen days.
+ * The client is never the source of truth for this set.
+ */
+async function protectedDaysFor(supabase: any, days: string[]): Promise<Set<string>> {
+  if (!days.length) return new Set<string>();
+  const { data, error } = await supabase.rpc("my_protected_days", { _days: days });
+  if (error) throw new Error(error.message);
+  return new Set(((data ?? []) as string[]).map((d) => String(d).slice(0, 10)));
+}
+
+/** Create/update/remove a private note. Protected days are rejected server-side. */
 export const setMyDayNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
@@ -112,6 +123,9 @@ export const setMyDayNote = createServerFn({ method: "POST" })
     }
     if (!note) throw new Error("NOTE_REQUIRED");
 
+    const blocked = await protectedDaysFor(supabase, [data.day]);
+    if (blocked.has(data.day)) throw new Error("DAY_PROTECTED");
+
     const { error } = await supabase
       .from("calendar_day_notes")
       .upsert({ freelancer_id: userId, day: data.day, note, busy: data.busy }, { onConflict: "freelancer_id,day" });
@@ -126,8 +140,9 @@ export const setMyDayNote = createServerFn({ method: "POST" })
 
 /**
  * Apply a saved calendar as BUSY.
- * `protectedDays` (red PITCALL days) are never touched. Existing busy notes are
- * reported as conflicts unless `overwrite` is true.
+ * Protected days (confirmed engagements, frozen Pit Call days) are resolved on the
+ * server and never touched. Existing busy notes are reported as conflicts unless
+ * `overwrite` is true.
  */
 export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -136,16 +151,17 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
       .object({
         dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400),
         label: z.string().trim().min(1).max(60),
-        protectedDays: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(800).default([]),
         overwrite: z.boolean().default(false),
       })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const blocked = new Set(data.protectedDays);
-    const targets = [...new Set(data.dates)].filter((d) => !blocked.has(d)).sort();
+    const unique = [...new Set(data.dates)].sort();
+    const blocked = await protectedDaysFor(supabase, unique);
+    const targets = unique.filter((d) => !blocked.has(d));
     if (!targets.length) return { applied: 0, skipped: data.dates.length, conflicts: [] as CalendarDayNote[] };
+
 
     const { data: existing, error: exErr } = await supabase
       .from("calendar_day_notes")
