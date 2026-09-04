@@ -205,9 +205,11 @@ function ManageCalendarsPage() {
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <button type="button" className={btn} onClick={() => setEditing({ id: c.id, name: c.name, dates: c.dates })}>
-                  {t("sweep_public.dashboard_calendars.edit")}
-                </button>
+                {c.review_status !== "approved" && (
+                  <button type="button" className={btn} onClick={() => setEditing({ id: c.id, name: c.name, dates: c.dates })}>
+                    {t("sweep_public.dashboard_calendars.edit")}
+                  </button>
+                )}
                 <button
                   type="button"
                   className={btn}
@@ -220,10 +222,20 @@ function ManageCalendarsPage() {
                     <Send className="size-3.5" /> {t("sweep_public.dashboard_calendars.submit_review")}
                   </button>
                 )}
-                <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
-                  <Trash2 className="size-3.5" /> {t("sweep_public.dashboard_calendars.delete")}
-                </button>
+                {c.review_status !== "approved" && (
+                  <button type="button" className={btn} onClick={() => delMut.mutate(c.id)}>
+                    <Trash2 className="size-3.5" /> {t("sweep_public.dashboard_calendars.delete")}
+                  </button>
+                )}
               </div>
+              {c.review_status === "approved" && (
+                <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {t("sweep_public.dashboard_calendars.approved_readonly", {
+                    defaultValue: "Published as a platform calendar — read-only. Contact PITCALL for corrections.",
+                  })}
+                </p>
+              )}
+
             </div>
           ))}
           {mine.length === 0 && !editing && (
