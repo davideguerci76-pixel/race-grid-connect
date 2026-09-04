@@ -17,10 +17,6 @@ import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    checkout: typeof s["checkout"] === "string" ? (s["checkout"] as string) : undefined,
-    order: typeof s["order"] === "string" ? (s["order"] as string) : undefined,
-  }),
   component: TokensPage,
 });
 
@@ -29,7 +25,12 @@ const eur = (cents: number) => (cents / 100).toFixed(2);
 function TokensPage() {
   const { t } = useTranslation();
   const { formatDateTime } = useDateFormat();
-  const search = useSearch({ from: "/_authenticated/dashboard/tokens" });
+  const rawSearch = useRouterState({ select: (s) => s.location.search }) as Record<string, unknown>;
+  const search = {
+    checkout: typeof rawSearch["checkout"] === "string" ? (rawSearch["checkout"] as string) : undefined,
+    order: typeof rawSearch["order"] === "string" ? (rawSearch["order"] as string) : undefined,
+  };
+
   const queryClient = useQueryClient();
 
   const getHistory = useServerFn(getTokenHistory);
