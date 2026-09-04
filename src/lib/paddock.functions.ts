@@ -1405,12 +1405,12 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const [{ data: poolRows }, { data: poolUnlock }] = await Promise.all([
-      supabase.from("team_pool").select("freelancer_id").eq("team_id", userId),
-      supabase.from("pool_search_unlocks").select("id").eq("team_id", userId).eq("request_id", data.request_id).maybeSingle(),
-    ]);
+    const { data: poolRows } = await supabase
+      .from("team_pool")
+      .select("freelancer_id")
+      .eq("team_id", userId);
     const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
-    const poolSearchUnlocked = !!poolUnlock;
+
     // RLS already hides outside-pool matches from the team on pool pit calls; the filter is kept
     // as defence in depth.
     const requestMatches = isPoolRequest
