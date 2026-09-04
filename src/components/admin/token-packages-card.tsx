@@ -7,28 +7,28 @@ import {
   adminListTokenPackages,
   adminCreateTokenPackage,
   adminUpdateTokenPackage,
-  expectedPriceCents,
+  derivedDiscountPct,
 } from "@/lib/token-packages.functions";
 
-// STEP S2.C — ACP Token Packages management.
-// The server (and a DB trigger) is the authority for economics; this UI only
-// pre-validates obvious mistakes and formats server-computed values.
+// STEP S2.E — ACP Token Packages management.
+// Editable authorities: token quantity, base price, active, sort order, label key.
+// Discount %, nominal value, saving and effective €/token are DERIVED server-side
+// and shown read-only; the nominal token price lives in the settings above.
 
 type Row = {
   code: string;
   label_key: string;
   token_quantity: number;
-  discount_pct: number;
   price_cents: number;
   currency: string;
   sort_order: number;
   version: number;
   is_active: boolean;
-  reference_price_cents: number;
+  nominal_token_price_cents: number;
+  nominal_value_cents: number;
   savings_cents: number;
+  discount_pct: number;
   effective_price_per_token_cents: number;
-  expected_price_cents: number;
-  coherent_with_reference: boolean;
   updated_at: string;
 };
 
@@ -37,14 +37,12 @@ const eur = (cents: number) => (cents / 100).toFixed(2);
 function friendlyError(e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
   if (msg.includes("stale_version")) return "The package was modified by another Admin. Reload and try again.";
-  if (msg.includes("economic_incoherence")) {
-    const m = msg.match(/economic_incoherence:\s*(.*)/);
-    return `Inconsistent pricing — ${m?.[1] ?? "price, quantity and discount do not match the nominal reference."}`;
-  }
   if (msg.includes("code is immutable")) return "The package code cannot be changed after creation.";
   if (msg.includes("duplicate key")) return "A package with this code already exists.";
   if (msg.includes("token_packages_code_format")) return "Code must be 3–40 chars, lowercase letters, digits or underscore.";
   if (msg.includes("cannot be deleted")) return "Packages cannot be deleted — deactivate them instead.";
+  if (msg.includes("Unrecognized key") || msg.includes("unrecognized_keys"))
+    return "Rejected: the discount is derived and cannot be sent by the client.";
   if (msg.includes("Forbidden")) return "Admin only.";
   return msg;
 }
@@ -53,7 +51,6 @@ type Draft = {
   code: string;
   label_key: string;
   token_quantity: number;
-  discount_pct: number;
   price_cents: number;
   sort_order: number;
   is_active: boolean;
@@ -64,27 +61,19 @@ function draftFrom(r: Row): Draft {
     code: r.code,
     label_key: r.label_key,
     token_quantity: r.token_quantity,
-    discount_pct: r.discount_pct,
     price_cents: r.price_cents,
     sort_order: r.sort_order,
     is_active: r.is_active,
   };
 }
 
-function localIssues(d: Draft, refCents: number, isNew: boolean): string[] {
+function localIssues(d: Draft, isNew: boolean): string[] {
   const out: string[] = [];
   if (isNew && !/^[a-z0-9_]{3,40}$/.test(d.code)) out.push("Code must be 3–40 chars: lowercase letters, digits, underscore.");
   if (!d.label_key.trim()) out.push("Label key is required.");
   if (!Number.isInteger(d.token_quantity) || d.token_quantity <= 0) out.push("Token quantity must be a positive integer.");
   if (!Number.isInteger(d.price_cents) || d.price_cents <= 0) out.push("Price must be greater than zero.");
-  if (d.discount_pct < 0 || d.discount_pct > 100) out.push("Discount must be between 0 and 100.");
   if (!Number.isInteger(d.sort_order) || d.sort_order < 0) out.push("Sort order must be zero or a positive integer.");
-  const expected = expectedPriceCents(refCents, d.token_quantity, d.discount_pct);
-  if (d.token_quantity > 0 && d.price_cents !== expected) {
-    out.push(
-      `Inconsistent pricing — ${d.token_quantity} tokens at ${d.discount_pct}% must cost € ${eur(expected)} (nominal € ${eur(refCents)}/token).`,
-    );
-  }
   return out;
 }
 
@@ -132,7 +121,6 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
           sort_order: payload.draft.sort_order,
           is_active: payload.draft.is_active,
           token_quantity: payload.draft.token_quantity,
-          discount_pct: payload.draft.discount_pct,
           price_cents: payload.draft.price_cents,
           currency: "EUR" as const,
         },
@@ -156,7 +144,6 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
           sort_order: d.sort_order,
           is_active: d.is_active,
           token_quantity: d.token_quantity,
-          discount_pct: d.discount_pct,
           price_cents: d.price_cents,
           currency: "EUR" as const,
         },
@@ -181,11 +168,7 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
     onError: (e) => toast.error(friendlyError(e)),
   });
 
-
-  const issues = useMemo(
-    () => (draft ? localIssues(draft, referenceCents, creating) : []),
-    [draft, referenceCents, creating],
-  );
+  const issues = useMemo(() => (draft ? localIssues(draft, creating) : []), [draft, creating]);
 
   const numInput = (value: number, onChange: (n: number) => void, step = "1") => (
     <input
@@ -198,8 +181,13 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
     />
   );
 
-  const editor = (isNew: boolean, version?: number) =>
-    draft && (
+  const editor = (isNew: boolean, version?: number) => {
+    if (!draft) return null;
+    const nominal = referenceCents * (draft.token_quantity > 0 ? draft.token_quantity : 0);
+    const saving = Math.max(0, nominal - draft.price_cents);
+    const pct = derivedDiscountPct(nominal, draft.price_cents);
+    const perToken = draft.token_quantity > 0 ? Math.round(draft.price_cents / draft.token_quantity) : 0;
+    return (
       <div className="mt-3 border border-racing-red/60 bg-racing-red/5 p-3">
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-xs">
@@ -225,10 +213,6 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
             {numInput(draft.token_quantity, (n) => setDraft({ ...draft, token_quantity: Math.round(n) }))}
           </label>
           <label className="flex items-center justify-between gap-2 text-xs">
-            <span className="font-mono uppercase text-muted-foreground">discount %</span>
-            {numInput(draft.discount_pct, (n) => setDraft({ ...draft, discount_pct: n }), "0.01")}
-          </label>
-          <label className="flex items-center justify-between gap-2 text-xs">
             <span className="font-mono uppercase text-muted-foreground">base price €</span>
             {numInput(Number((draft.price_cents / 100).toFixed(2)), (n) =>
               setDraft({ ...draft, price_cents: Math.round(n * 100) }), "0.01")}
@@ -250,12 +234,10 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
           </div>
         </div>
 
-        <div className="mt-2 font-mono text-[11px] text-muted-foreground">
-          expected base price ={" "}
-          <span className="text-foreground">
-            € {eur(expectedPriceCents(referenceCents, draft.token_quantity, draft.discount_pct))}
-          </span>{" "}
-          · nominal € {eur(referenceCents)}/token
+        <div className="mt-2 border border-border/60 bg-secondary/40 p-2 font-mono text-[11px] text-muted-foreground">
+          <div className="mb-1 uppercase tracking-widest text-foreground">derived (read-only)</div>
+          nominal value € {eur(nominal)} · saving € {eur(saving)} · discount {pct}% · € {eur(perToken)}/token
+          <div className="mt-1">nominal token price € {eur(referenceCents)} (settings above)</div>
         </div>
 
         {issues.length > 0 && (
@@ -287,6 +269,7 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
         </div>
       </div>
     );
+  };
 
   return (
     <section className="mt-10">
@@ -294,7 +277,8 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
         <div>
           <div className="text-[11px] font-bold uppercase tracking-widest text-racing-yellow">Token packages</div>
           <div className="text-xs text-muted-foreground">
-            Authoritative commercial terms (tax-exclusive base prices). Packages are never deleted — deactivate them.
+            Authoritative commercial terms (tax-exclusive base prices). Discount % is derived from the nominal token
+            price — never typed in. Packages are never deleted — deactivate them.
           </div>
         </div>
         {!creating && (
@@ -306,8 +290,7 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
                 code: "",
                 label_key: "",
                 token_quantity: 10,
-                discount_pct: 0,
-                price_cents: expectedPriceCents(referenceCents, 10, 0),
+                price_cents: referenceCents * 10,
                 sort_order: 40,
                 is_active: true,
               });
@@ -339,13 +322,9 @@ export function TokenPackagesCard({ referenceCents }: { referenceCents: number }
                     {r.code} · v{r.version} · sort {r.sort_order} · {r.label_key}
                   </div>
                   <div className="mt-1 font-mono text-[11px]">
-                    € {eur(r.price_cents)} base · −{r.discount_pct}% · saving € {eur(r.savings_cents)} · € {eur(r.effective_price_per_token_cents)}/token
+                    € {eur(r.price_cents)} base · nominal € {eur(r.nominal_value_cents)} · saving €{" "}
+                    {eur(r.savings_cents)} · −{r.discount_pct}% · € {eur(r.effective_price_per_token_cents)}/token
                   </div>
-                  {!r.coherent_with_reference && (
-                    <div className="mt-1 font-mono text-[11px] text-racing-red">
-                      Incoherent with nominal reference (expected € {eur(r.expected_price_cents)})
-                    </div>
-                  )}
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <button

@@ -484,6 +484,13 @@
       "when": 1788526505503,
       "tag": "0068_token_packages_economic_consistency",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1788529540118,
+      "tag": "0069_token_packages_derived_discount",
+      "breakpoints": true
     }
   ]
 }
