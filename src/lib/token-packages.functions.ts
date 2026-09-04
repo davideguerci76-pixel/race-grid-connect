@@ -27,6 +27,7 @@ export type TokenPackageDisplay = {
   reference_price_cents: number;
   savings_cents: number;
   effective_price_per_token_cents: number;
+  expected_price_cents: number;
   coherent_with_reference: boolean;
 };
 
@@ -40,12 +41,22 @@ async function referenceTokenPriceCents(supabase: any): Promise<number> {
   return Math.round(eur * 100);
 }
 
+/**
+ * ECONOMIC CONSISTENCY LAW (server authority, mirrored by a DB trigger):
+ *   expected_price_cents = ROUND(nominal_token_price_cents * token_quantity * (100 - discount_pct) / 100)
+ * All arithmetic in integer cents. A package whose price_cents differs from
+ * expected_price_cents cannot be written.
+ */
+export function expectedPriceCents(refCents: number, qty: number, discountPct: number): number {
+  return Math.round((refCents * qty * (100 - discountPct)) / 100);
+}
+
 function derive(row: any, refCents: number): TokenPackageDisplay {
   const qty = Number(row.token_quantity);
   const price = Number(row.price_cents);
   const discount = Number(row.discount_pct);
   const reference = refCents * qty;
-  const expected = Math.round(reference * (1 - discount / 100));
+  const expected = expectedPriceCents(refCents, qty, discount);
   return {
     code: row.code,
     label_key: row.label_key,
@@ -58,9 +69,20 @@ function derive(row: any, refCents: number): TokenPackageDisplay {
     reference_price_cents: reference,
     savings_cents: Math.max(0, reference - price),
     effective_price_per_token_cents: Math.round(price / qty),
+    expected_price_cents: expected,
     coherent_with_reference: expected === price,
   };
 }
+
+function assertCoherent(refCents: number, qty: number, discountPct: number, priceCents: number) {
+  const expected = expectedPriceCents(refCents, qty, discountPct);
+  if (expected !== priceCents) {
+    throw new Error(
+      `economic_incoherence: ${qty} tokens at ${discountPct}% discount must cost ${(expected / 100).toFixed(2)} EUR (received ${(priceCents / 100).toFixed(2)} EUR)`,
+    );
+  }
+}
+
 
 /** Authenticated read of active packages, economic terms resolved server-side. */
 export const listTokenPackages = createServerFn({ method: "GET" })
@@ -122,11 +144,14 @@ export const adminCreateTokenPackage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const refCents = await referenceTokenPriceCents(supabaseAdmin);
+    assertCoherent(refCents, data.token_quantity, data.discount_pct, data.price_cents);
     const { data: row, error } = await (supabaseAdmin.from("token_packages") as any)
       .insert({ ...data, version: 1, updated_by: context.userId })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+
     await logAdminAction(context.userId, null, "token_package_create", {
       code: row.code,
       before: null,
@@ -174,12 +199,21 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
 
     const { code, expected_version, ...patch } = data;
     const economicChanged = (["token_quantity", "price_cents", "discount_pct", "currency", "is_active"] as const).some(
-      (k) => patch[k as keyof typeof patch] !== undefined && Number((patch as any)[k] ?? NaN) !== Number((before as any)[k]) ,
-    ) || (["token_quantity", "price_cents", "discount_pct", "currency", "is_active"] as const).some(
-      (k) => patch[k as keyof typeof patch] !== undefined && (patch as any)[k] !== (before as any)[k],
+      (k) => patch[k as keyof typeof patch] !== undefined && (patch as any)[k] !== (before as any)[k] &&
+        !(typeof (patch as any)[k] === "number" && Number((patch as any)[k]) === Number((before as any)[k])),
+    );
+
+    const refCents = await referenceTokenPriceCents(supabaseAdmin);
+    assertCoherent(
+      refCents,
+      Number(patch.token_quantity ?? (before as any).token_quantity),
+      Number(patch.discount_pct ?? (before as any).discount_pct),
+      Number(patch.price_cents ?? (before as any).price_cents),
     );
 
     const nextVersion = economicChanged ? Number((before as any).version) + 1 : Number((before as any).version);
+
+
 
     const { data: rows, error } = await (supabaseAdmin.from("token_packages") as any)
       .update({ ...patch, version: nextVersion, updated_by: context.userId })

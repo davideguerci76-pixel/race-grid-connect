@@ -46,6 +46,10 @@ function TokensPage() {
                   −{p.discount_pct}% · € {eur(p.savings_cents)}
                 </div>
               )}
+              <div className="mt-1 font-mono text-[11px] text-muted-foreground">
+                € {eur(p.effective_price_per_token_cents)} / token
+              </div>
+
               <button disabled className="mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60">
                 {t("tokens.buy")}
               </button>

@@ -477,6 +477,13 @@
       "when": 1788525223383,
       "tag": "0067_token_packages_grant_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1788526505503,
+      "tag": "0068_token_packages_economic_consistency",
+      "breakpoints": true
     }
   ]
 }

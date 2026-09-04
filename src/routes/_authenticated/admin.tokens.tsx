@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
 import { useTranslation } from "react-i18next";
 import { toastError } from "@/lib/errors";
+import { TokenPackagesCard } from "@/components/admin/token-packages-card";
+
 
 export const Route = createFileRoute("/_authenticated/admin/tokens")({
   component: AdminTokensPage,
@@ -133,7 +135,15 @@ function AdminTokensPage() {
         );
       })}
 
+      <TokenPackagesCard
+        referenceCents={Math.round(
+          (Number(rows.find((r) => r.key === "token_price_eur")?.value_num ?? 2) || 2) * 100,
+        )}
+      />
+
+
       <div className="mt-8 border border-border/60 bg-secondary/40 p-3 text-[11px] text-muted-foreground">
+
         <strong className="text-foreground">{t("sweep_admin_b.tokens.dev_note_label")}</strong> {t("sweep_admin_b.tokens.dev_note_part1")} <code className="font-mono">platform_settings</code> {t("sweep_admin_b.tokens.dev_note_part2")} <code className="font-mono">public.get_setting_num(&#39;key&#39;, default)</code>. {t("sweep_admin_b.tokens.dev_note_part3")}
       </div>
     </div>
