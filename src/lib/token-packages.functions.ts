@@ -133,13 +133,13 @@ export const adminCreateTokenPackage = createServerFn({ method: "POST" })
         is_active: z.boolean().default(true),
         ...economicFields,
       })
+      // Unknown keys (notably a tampered discount_pct) are rejected outright.
+      .strict()
       .parse(data),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const refCents = await referenceTokenPriceCents(supabaseAdmin);
-    assertCoherent(refCents, data.token_quantity, data.discount_pct, data.price_cents);
     const { data: row, error } = await (supabaseAdmin.from("token_packages") as any)
       .insert({ ...data, version: 1, updated_by: context.userId })
       .select("*")
@@ -152,9 +152,10 @@ export const adminCreateTokenPackage = createServerFn({ method: "POST" })
       after: {
         token_quantity: row.token_quantity,
         price_cents: row.price_cents,
-        discount_pct: Number(row.discount_pct),
         currency: row.currency,
         is_active: row.is_active,
+        label_key: row.label_key,
+        sort_order: row.sort_order,
         version: row.version,
       },
     });
@@ -173,10 +174,11 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
         sort_order: z.number().int().min(0).max(10_000).optional(),
         is_active: z.boolean().optional(),
         token_quantity: economicFields.token_quantity.optional(),
-        discount_pct: economicFields.discount_pct.optional(),
         price_cents: economicFields.price_cents.optional(),
         currency: economicFields.currency.optional(),
       })
+      // discount_pct is derived: sending it is a protocol error, not a silent no-op.
+      .strict()
       .parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -192,22 +194,18 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
     if (!before) throw new Error("token package not found");
 
     const { code, expected_version, ...patch } = data;
-    const economicChanged = (["token_quantity", "price_cents", "discount_pct", "currency", "is_active"] as const).some(
-      (k) => patch[k as keyof typeof patch] !== undefined && (patch as any)[k] !== (before as any)[k] &&
-        !(typeof (patch as any)[k] === "number" && Number((patch as any)[k]) === Number((before as any)[k])),
-    );
+    // ROW-LEVEL versioning: any persisted field change bumps version (S2.D F-1).
+    const rowChanged = (
+      ["token_quantity", "price_cents", "currency", "is_active", "label_key", "sort_order"] as const
+    ).some((k) => {
+      const next = (patch as any)[k];
+      if (next === undefined) return false;
+      const prev = (before as any)[k];
+      if (typeof next === "number") return Number(next) !== Number(prev);
+      return next !== prev;
+    });
 
-    const refCents = await referenceTokenPriceCents(supabaseAdmin);
-    assertCoherent(
-      refCents,
-      Number(patch.token_quantity ?? (before as any).token_quantity),
-      Number(patch.discount_pct ?? (before as any).discount_pct),
-      Number(patch.price_cents ?? (before as any).price_cents),
-    );
-
-    const nextVersion = economicChanged ? Number((before as any).version) + 1 : Number((before as any).version);
-
-
+    const nextVersion = rowChanged ? Number((before as any).version) + 1 : Number((before as any).version);
 
     const { data: rows, error } = await (supabaseAdmin.from("token_packages") as any)
       .update({ ...patch, version: nextVersion, updated_by: context.userId })
@@ -230,29 +228,32 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
 
     const after = rows[0];
 
-    if (economicChanged) {
+    if (rowChanged) {
       await logAdminAction(context.userId, null, "token_package_update", {
         code,
         before: {
           token_quantity: (before as any).token_quantity,
           price_cents: (before as any).price_cents,
-          discount_pct: Number((before as any).discount_pct),
           currency: (before as any).currency,
           is_active: (before as any).is_active,
+          label_key: (before as any).label_key,
+          sort_order: (before as any).sort_order,
           version: (before as any).version,
         },
         after: {
           token_quantity: after.token_quantity,
           price_cents: after.price_cents,
-          discount_pct: Number(after.discount_pct),
           currency: after.currency,
           is_active: after.is_active,
+          label_key: after.label_key,
+          sort_order: after.sort_order,
           version: after.version,
         },
         operation:
           (before as any).is_active !== after.is_active ? (after.is_active ? "activate" : "deactivate") : "update",
       });
     }
+
 
     return { ok: true as const, code, version: after.version };
   });
