@@ -463,6 +463,13 @@
       "when": 1788522089218,
       "tag": "0065_fair_deterministic_ranking",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1788525117302,
+      "tag": "0066_token_packages_authority",
+      "breakpoints": true
     }
   ]
 }

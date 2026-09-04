@@ -1951,6 +1951,54 @@ export type Database = {
         }
         Relationships: []
       }
+      token_packages: {
+        Row: {
+          code: string
+          created_at: string
+          currency: string
+          discount_pct: number
+          id: string
+          is_active: boolean
+          label_key: string
+          price_cents: number
+          sort_order: number
+          token_quantity: number
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          currency?: string
+          discount_pct?: number
+          id?: string
+          is_active?: boolean
+          label_key: string
+          price_cents: number
+          sort_order?: number
+          token_quantity: number
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          currency?: string
+          discount_pct?: number
+          id?: string
+          is_active?: boolean
+          label_key?: string
+          price_cents?: number
+          sort_order?: number
+          token_quantity?: number
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
       token_transactions: {
         Row: {
           created_at: string
