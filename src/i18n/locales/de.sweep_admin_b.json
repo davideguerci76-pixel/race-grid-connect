@@ -217,7 +217,13 @@
       "rejection_reason_placeholder": "Ablehnungsgrund (optional)",
       "approve_publish": "Genehmigen & veröffentlichen",
       "reject": "Ablehnen",
-      "edit_dates": "Daten bearbeiten"
+      "edit_dates": "Daten bearbeiten",
+      "ics_too_many_events": "Diese .ics enthält {{actual}} Termine — das Maximum sind {{limit}}. Teile die Datei und importiere sie in Teilen.",
+      "ics_too_many_days": "Dieser Kalender würde {{actual}} Tage umfassen — das Maximum sind {{limit}}. Reduziere den Zeitraum vor dem Speichern.",
+      "delete_confirm_title": "Kalender löschen",
+      "delete_confirm_body": "\"{{name}}\" löschen? Das lässt sich nicht rückgängig machen.",
+      "delete_confirm_title_approved": "Plattform-Kalender löschen",
+      "delete_confirm_body_approved": "\"{{name}}\" ist ein veröffentlichter Plattform-Kalender. Beim Löschen steht er keinem Nutzer mehr zur Verfügung. Nicht rückgängig zu machen."
     },
     "platform_rules": {
       "title": "Plattformregeln",

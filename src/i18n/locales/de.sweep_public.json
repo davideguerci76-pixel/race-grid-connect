@@ -111,9 +111,13 @@
         "submit_failed": "Einreichen fehlgeschlagen",
         "no_events_in_ics": "Keine Ereignisse in dieser .ics-Datei gefunden",
         "could_not_read_ics": "Die .ics-Datei konnte nicht gelesen werden",
-        "give_calendar_name": "Gib deinem Kalender einen Namen"
+        "give_calendar_name": "Gib deinem Kalender einen Namen",
+        "ics_too_many_events": "Diese .ics enthält {{actual}} Termine — das Maximum sind {{limit}}. Teile die Datei und importiere sie in Teilen.",
+        "ics_too_many_days": "Dieser Kalender würde {{actual}} Tage umfassen — das Maximum sind {{limit}}. Reduziere den Zeitraum vor dem Speichern."
       },
-      "approved_readonly": "Als Plattform-Kalender veröffentlicht — schreibgeschützt. Für Korrekturen PITCALL kontaktieren."
+      "approved_readonly": "Als Plattform-Kalender veröffentlicht — schreibgeschützt. Für Korrekturen PITCALL kontaktieren.",
+      "delete_confirm_title": "Kalender löschen",
+      "delete_confirm_body": "\"{{name}}\" löschen? Das lässt sich nicht rückgängig machen."
     },
     "calendar_quick_fill": {
       "default_title": "Schnellfüllung — Logistikregel",

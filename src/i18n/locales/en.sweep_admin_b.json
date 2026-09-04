@@ -217,7 +217,13 @@
       "rejection_reason_placeholder": "Rejection reason (optional)",
       "approve_publish": "Approve & publish",
       "reject": "Reject",
-      "edit_dates": "Edit dates"
+      "edit_dates": "Edit dates",
+      "ics_too_many_events": "This .ics contains {{actual}} events — the maximum is {{limit}}. Split the file and import it in parts.",
+      "ics_too_many_days": "This calendar would cover {{actual}} days — the maximum is {{limit}}. Reduce the date range before saving.",
+      "delete_confirm_title": "Delete calendar",
+      "delete_confirm_body": "Delete \"{{name}}\"? This cannot be undone.",
+      "delete_confirm_title_approved": "Delete platform calendar",
+      "delete_confirm_body_approved": "\"{{name}}\" is a published platform calendar. Deleting it removes it from availability for every user. This cannot be undone."
     },
     "platform_rules": {
       "title": "Platform Rules",
