@@ -1382,6 +1382,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       "cost_request_race_weekend",
       "cost_request_full_season",
       "cost_pool_search",
+      "free_preview_count",
     ];
     const { data: settingsRows } = await supabase
       .from("platform_settings")
@@ -1394,6 +1395,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const tier2Size = settings.get("tier2_size") ?? 10;
     const tier3Size = settings.get("tier3_size") ?? 30;
     const hardCap = settings.get("hard_cap_matches") ?? 50;
+    const freePreviewCount = Math.max(0, settings.get("free_preview_count") ?? 3);
+
 
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
