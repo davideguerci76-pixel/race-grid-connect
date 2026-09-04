@@ -1517,10 +1517,9 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
-    const matchIds = [...allFull, ...allPartial].map((m: any) => m.id);
     const freelancerIds = [...allFull, ...allPartial].map((m: any) => m.freelancer_id);
     const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
-    const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
