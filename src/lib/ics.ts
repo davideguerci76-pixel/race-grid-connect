@@ -29,17 +29,52 @@ export function mondayOf(iso: string): string {
   return isoOf(d);
 }
 
+/** Server-authoritative calendar limits (mirrored from calendars.functions.ts). */
+export const MAX_CALENDAR_EVENTS = 200;
+export const MAX_CALENDAR_DAYS = 400;
+
+/** Exact number of inclusive days in a range — never truncated. */
+export function rangeDayCount(startIso: string, endIso: string): number {
+  const start = dateOf(startIso).getTime();
+  const end = dateOf(endIso).getTime();
+  if (end < start) return 1;
+  return Math.round((end - start) / 86400000) + 1;
+}
+
 export function expandRange(startIso: string, endIso: string): string[] {
   const out: string[] = [];
   let cur = startIso;
   let guard = 0;
-  while (cur <= endIso && guard < 400) {
+  while (cur <= endIso && guard < MAX_CALENDAR_DAYS) {
     out.push(cur);
     cur = addDaysIso(cur, 1);
     guard += 1;
   }
   return out;
 }
+
+export type CalendarLimitViolation =
+  | { kind: "events"; actual: number; limit: number }
+  | { kind: "days"; actual: number; limit: number };
+
+/**
+ * Explicit limit detection so oversized imports fail loudly in the UI instead of
+ * being silently truncated or rejected by the server with an opaque error.
+ */
+export function checkCalendarLimits(input: { events?: CalendarEventItem[]; dates?: string[] }): CalendarLimitViolation | null {
+  const events = input.events ?? [];
+  if (events.length > MAX_CALENDAR_EVENTS) {
+    return { kind: "events", actual: events.length, limit: MAX_CALENDAR_EVENTS };
+  }
+  const dayCount = input.dates
+    ? new Set(input.dates).size
+    : events.reduce((n, e) => n + rangeDayCount(e.start, e.end), 0);
+  if (dayCount > MAX_CALENDAR_DAYS) {
+    return { kind: "days", actual: dayCount, limit: MAX_CALENDAR_DAYS };
+  }
+  return null;
+}
+
 
 function unfold(text: string): string[] {
   const raw = text.replace(/\r\n/g, "\n").split("\n");
