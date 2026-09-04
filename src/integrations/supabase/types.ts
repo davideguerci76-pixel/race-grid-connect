@@ -3312,6 +3312,10 @@ export type Database = {
         }
       }
       team_recheck_budget_left: { Args: { _team_id: string }; Returns: number }
+      token_package_expected_price_cents: {
+        Args: { _discount_pct: number; _token_quantity: number }
+        Returns: number
+      }
       touch_push_subscription: { Args: { _endpoint: string }; Returns: boolean }
       trigger_sos_call: {
         Args: { _request_id: string }
