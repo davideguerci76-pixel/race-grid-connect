@@ -128,6 +128,20 @@ function TokensPage() {
           ))}
         </div>
 
+        {search.checkout === "success" && (
+          <div className="mt-6 border border-racing-yellow/50 bg-card p-4 font-mono text-sm">
+            {(returnedOrder as { status?: string } | null)?.status === "credited"
+              ? `+${(returnedOrder as { token_quantity?: number }).token_quantity} tokens credited.`
+              : "Payment received. Tokens are being credited…"}
+          </div>
+        )}
+        {search.checkout === "cancel" && (
+          <div className="mt-6 border border-border bg-card p-4 font-mono text-sm text-muted-foreground">
+            Checkout cancelled. No payment was taken.
+          </div>
+        )}
+
+
 
 
         <div className="mt-12">
