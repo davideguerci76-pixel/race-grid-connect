@@ -470,6 +470,13 @@
       "when": 1788525117302,
       "tag": "0066_token_packages_authority",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1788525223383,
+      "tag": "0067_token_packages_grant_hardening",
+      "breakpoints": true
     }
   ]
 }
