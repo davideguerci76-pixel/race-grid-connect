@@ -117,7 +117,7 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
           _provider_payment_id: paymentId,
           _amount_collected_cents: amount,
           _tax_amount_cents: (obj["total_details"] as { amount_tax?: number } | undefined)?.amount_tax ?? 0,
-          _payload: event as unknown as Record<string, unknown>,
+          _payload: JSON.parse(body) as unknown as import("@/integrations/supabase/types").Json,
         });
 
         if (error) {
