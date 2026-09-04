@@ -1615,6 +1615,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
         confirmation_requested: confirmationRequested.has(m.freelancer_id),
+        confirmation_closed: confirmationClosed.get(m.freelancer_id) ?? null,
         engagement_id: confirmationRequested.get(m.freelancer_id) ?? null,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,
