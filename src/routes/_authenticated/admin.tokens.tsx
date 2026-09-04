@@ -68,7 +68,6 @@ function AdminTokensPage() {
 
   if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</div>;
   const rows = (data ?? []) as Setting[];
-  const priceEur = values["token_price_eur"] ?? 0;
 
   return (
     <div className="max-w-3xl">
@@ -110,11 +109,9 @@ function AdminTokensPage() {
                       <div className="font-bold">{s.label}</div>
                       <div className="font-mono text-[11px] uppercase text-muted-foreground">{s.key}</div>
                       {s.description && <div className="mt-1 text-xs text-muted-foreground">{s.description}</div>}
-                      {s.key === "token_price_eur" && priceEur > 0 && (
-                        <div className="mt-1 font-mono text-[11px] text-muted-foreground">
-                          {t("sweep_admin_b.tokens.pack_preview", { p10: (priceEur * 10).toFixed(2), p50: (priceEur * 50).toFixed(2), p200: (priceEur * 200).toFixed(2) })}
-                        </div>
-                      )}
+                      {/* S2.B: package prices are authoritative in token_packages.price_cents.
+                          token_price_eur is a nominal reference only — no package preview here. */}
+
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       {isEur && <span className="font-mono text-xs">€</span>}
