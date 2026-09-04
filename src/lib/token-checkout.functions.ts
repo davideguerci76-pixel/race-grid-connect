@@ -76,6 +76,8 @@ export const startTokenCheckout = createServerFn({ method: "POST" })
     const origin = safeOrigin(data.origin);
     const body = new URLSearchParams();
     body.set("mode", "payment");
+    body.set("payment_method_types[0]", "card");
+
     body.set("client_reference_id", order.id);
     body.set("metadata[pitcall_order_id]", order.id);
     body.set("payment_intent_data[metadata][pitcall_order_id]", order.id);
