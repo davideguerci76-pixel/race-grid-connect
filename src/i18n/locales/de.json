@@ -208,6 +208,11 @@
       "admin_credit": "Admin-Gutschrift",
       "admin_debit": "Admin-Abzug",
       "refund": "Erstattung"
+    },
+    "packages": {
+      "tokens_10": "Starter",
+      "tokens_50": "Team",
+      "tokens_200": "Season"
     }
   },
   "engagements": {
