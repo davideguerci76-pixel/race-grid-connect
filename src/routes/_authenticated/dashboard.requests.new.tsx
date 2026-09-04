@@ -328,7 +328,7 @@ function NewRequestPage() {
             <span className="font-bold text-racing-red">{displayCost} tokens</span>
             <span className="ml-auto font-mono text-xs uppercase text-muted-foreground">{t("requests.balance")}:</span>
             <span className={`font-bold ${canAfford ? "text-foreground" : "text-racing-red"}`}>{balance}</span>
-            {!canAfford && <Link to="/dashboard/tokens" search={{}} className="ml-3 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10">{t("requests.top_up")}</Link>}
+            {!canAfford && <Link to="/dashboard/tokens" className="ml-3 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10">{t("requests.top_up")}</Link>}
           </div>
         )}
 
