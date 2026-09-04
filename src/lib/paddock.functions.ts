@@ -1524,8 +1524,14 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
+      // Entitlement is stable per (team, pit call, freelancer): it survives match recomputes.
+      supabase
+        .from("match_unlocks")
+        .select("freelancer_id, free_preview")
+        .eq("team_id", userId)
+        .eq("request_id", data.request_id),
     ]);
+
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     // Request owner (team) — rate stays behind the existing showTech gating below.
     {
