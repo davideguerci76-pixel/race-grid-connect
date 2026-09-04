@@ -1582,17 +1582,32 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // Free previews are granted to the top N candidates OUTSIDE the team pool.
+    // Pool members are always visible and never consume a free slot.
+    const freeByMatchId = new Set<string>();
+    for (const list of [allFull, allPartial]) {
+      let externalRank = 0;
+      for (const m of list as any[]) {
+        if (poolSet.has(m.freelancer_id)) continue;
+        externalRank += 1;
+        if (externalRank <= freePreviewCount) freeByMatchId.add(m.id);
+      }
+    }
+
     const buildItem = (m: any, i: number, scope: "full" | "partial", tierUnlockedSet: Set<number>) => {
       const rank = i + 1;
       const tier = rank <= 10 ? 1 : rank <= 10 + tier2Size ? 2 : 3;
       const tierUnlocked = tier === 1 || tierUnlockedSet.has(tier);
-      const topThree = rank <= 3;
-      const perProfileUnlocked = unlockMap.has(m.id);
       const fp = fpMap.get(m.freelancer_id);
       const inPool = poolSet.has(m.freelancer_id);
-      const poolVisible = isPoolRequest && poolSearchUnlocked && inPool;
-      const showTech = isPoolRequest ? poolVisible : tierUnlocked && (topThree || perProfileUnlocked);
+      const freePreviewSlot = freeByMatchId.has(m.id);
+      const topThree = freePreviewSlot;
+      const perProfileUnlocked = unlockMap.has(m.freelancer_id);
+      // Pool members are part of the team's trusted circle: full details, no tokens, no CTA.
+      const poolVisible = inPool;
+      const showTech = inPool || (!isPoolRequest && tierUnlocked && (freePreviewSlot || perProfileUnlocked));
       const blurred = !poolVisible && tierUnlocked && !showTech;
+
       const poolProfile = poolProfileMap.get(m.freelancer_id);
       const poolContact = poolContactMap.get(m.freelancer_id);
       const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
