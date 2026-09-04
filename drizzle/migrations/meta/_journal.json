@@ -449,6 +449,13 @@
       "when": 1788513664251,
       "tag": "0063_step_11_4a_required_days_internal_and_match_snapshot",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1788520475854,
+      "tag": "0064_stable_unlock_entitlement",
+      "breakpoints": true
     }
   ]
 }

@@ -723,7 +723,7 @@ export type Database = {
           free_preview: boolean
           freelancer_id: string
           id: string
-          match_id: string
+          match_id: string | null
           request_id: string
           team_id: string
           unlocked_at: string
@@ -732,7 +732,7 @@ export type Database = {
           free_preview?: boolean
           freelancer_id: string
           id?: string
-          match_id: string
+          match_id?: string | null
           request_id: string
           team_id: string
           unlocked_at?: string
@@ -741,7 +741,7 @@ export type Database = {
           free_preview?: boolean
           freelancer_id?: string
           id?: string
-          match_id?: string
+          match_id?: string | null
           request_id?: string
           team_id?: string
           unlocked_at?: string
