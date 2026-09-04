@@ -3146,6 +3146,7 @@ export type Database = {
       my_protected_days: { Args: { _days: string[] }; Returns: string[] }
       my_team_vat: { Args: never; Returns: string }
       my_token_balance: { Args: never; Returns: number }
+      my_token_purchase_enabled: { Args: never; Returns: boolean }
       notify_no_confirmable_matches: {
         Args: { _request_id: string }
         Returns: boolean
