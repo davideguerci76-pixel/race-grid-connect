@@ -1427,11 +1427,38 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     }
 
 
-    // Sort by final_score DESC (penalty applied), tiebreak by created_at
+    // Deterministic fair ranking, identical to unlock_match_for_team():
+    // total relevance DESC, then per-criterion contributions ordered by the current ACP weights
+    // (heaviest criterion first), finally freelancer_id ASC as stable technical tie-break.
+    const { data: weightsRow } = await supabase
+      .from("matching_weights")
+      .select("*")
+      .eq("id", true)
+      .maybeSingle();
+    const w: any = weightsRow ?? {};
+    const criteriaOrder = (
+      [
+        ["sub_role", Number(w.sub_role_weight ?? 0)],
+        ["skills", Number(w.skills_weight ?? 0)],
+        ["disciplines", Number(w.disciplines_weight ?? 0)],
+        ["day_rate", Number(w.day_rate_weight ?? 0)],
+        ["languages", Number(w.languages_weight ?? 0)],
+        ["location", Number(w.location_weight ?? 0)],
+        ["education", Number(w.education_weight ?? 0)],
+      ] as [string, number][]
+    )
+      .sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0])))
+      .map(([key]) => key);
+    const contribution = (m: any, key: string) =>
+      Number((m.criteria_contributions ?? {})[key] ?? 0);
     const sortFn = (a: any, b: any) => {
       const ds = Number(b.final_score ?? b.match_score ?? 0) - Number(a.final_score ?? a.match_score ?? 0);
       if (ds !== 0) return ds;
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      for (const key of criteriaOrder) {
+        const dc = contribution(b, key) - contribution(a, key);
+        if (dc !== 0) return dc;
+      }
+      return String(a.freelancer_id).localeCompare(String(b.freelancer_id));
     };
     const allFull = requestMatches.filter((m: any) => !m.is_partial).slice().sort(sortFn).slice(0, hardCap);
     const allPartial = requestMatches.filter((m: any) => m.is_partial).slice().sort(sortFn).slice(0, hardCap);
