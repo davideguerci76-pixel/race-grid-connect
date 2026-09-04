@@ -1634,7 +1634,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         edge_only: m.edge_only !== false,
         missing_criteria: m.missing_criteria ?? [],
         unlocked: showTech,
-        free_preview: poolVisible || topThree || unlockMap.get(m.id)?.free_preview === true,
+        free_preview: poolVisible || freePreviewSlot || unlockMap.get(m.freelancer_id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
         confirmation_requested: confirmationRequested.has(m.freelancer_id),
