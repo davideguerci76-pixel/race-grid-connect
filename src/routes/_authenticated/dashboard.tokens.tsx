@@ -1,11 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getTokenHistory } from "@/lib/paddock.functions";
 import { listTokenPackages } from "@/lib/token-packages.functions";
+import {
+  startTokenCheckout,
+  getTokenPurchaseAvailability,
+  getMyTokenOrderStatus,
+  cancelMyTokenOrder,
+} from "@/lib/token-checkout.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 
@@ -18,12 +25,63 @@ const eur = (cents: number) => (cents / 100).toFixed(2);
 function TokensPage() {
   const { t } = useTranslation();
   const { formatDateTime } = useDateFormat();
+  const rawSearch = useRouterState({ select: (s) => s.location.search }) as Record<string, unknown>;
+  const search = {
+    checkout: typeof rawSearch["checkout"] === "string" ? (rawSearch["checkout"] as string) : undefined,
+    order: typeof rawSearch["order"] === "string" ? (rawSearch["order"] as string) : undefined,
+  };
+
+  const queryClient = useQueryClient();
 
   const getHistory = useServerFn(getTokenHistory);
   const getPackages = useServerFn(listTokenPackages);
+  const getAvailability = useServerFn(getTokenPurchaseAvailability);
+  const startCheckout = useServerFn(startTokenCheckout);
+  const getOrderStatus = useServerFn(getMyTokenOrderStatus);
+  const cancelOrder = useServerFn(cancelMyTokenOrder);
+
+  const [busy, setBusy] = useState<string | null>(null);
 
   const { data: history = [] } = useQuery({ queryKey: ["token-history"], queryFn: () => getHistory() });
   const { data: packages = [] } = useQuery({ queryKey: ["token-packages"], queryFn: () => getPackages() });
+  const { data: availability } = useQuery({
+    queryKey: ["token-purchase-availability"],
+    queryFn: () => getAvailability(),
+  });
+  const purchaseEnabled = availability?.enabled === true;
+
+  // Return page. It only READS the order; crediting is webhook-only.
+  const { data: returnedOrder } = useQuery({
+    queryKey: ["token-order", search.order],
+    enabled: !!search.order && search.checkout === "success",
+    queryFn: () => getOrderStatus({ data: { order_id: search.order! } }),
+    refetchInterval: (q) => ((q.state.data as { status?: string } | null)?.status === "credited" ? false : 3000),
+  });
+
+  useEffect(() => {
+    if (returnedOrder && (returnedOrder as { status?: string }).status === "credited") {
+      void queryClient.invalidateQueries({ queryKey: ["token-history"] });
+    }
+  }, [returnedOrder, queryClient]);
+
+  useEffect(() => {
+    if (search.checkout === "cancel" && search.order) {
+      void cancelOrder({ data: { order_id: search.order } }).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.checkout, search.order]);
+
+  async function onBuy(code: string) {
+    setBusy(code);
+    try {
+      const res = await startCheckout({ data: { package_code: code, origin: window.location.origin } });
+      if (res.ok) window.location.href = res.url;
+      else setBusy(null);
+    } catch {
+      setBusy(null);
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -50,15 +108,40 @@ function TokensPage() {
                 € {eur(p.effective_price_per_token_cents)} / token
               </div>
 
-              <button disabled className="mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60">
+              <button
+                disabled={!purchaseEnabled || busy !== null}
+                onClick={() => void onBuy(p.code)}
+                className={
+                  purchaseEnabled
+                    ? "mt-4 w-full bg-racing-red py-2 text-xs font-bold uppercase tracking-widest text-white disabled:opacity-60"
+                    : "mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60"
+                }
+              >
                 {t("tokens.buy")}
               </button>
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                {t("tokens.buy_soon")}
-              </p>
+              {!purchaseEnabled && (
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  {t("tokens.buy_soon")}
+                </p>
+              )}
+
             </div>
           ))}
         </div>
+
+        {search.checkout === "success" && (
+          <div className="mt-6 border border-racing-yellow/50 bg-card p-4 font-mono text-sm">
+            {(returnedOrder as { status?: string } | null)?.status === "credited"
+              ? `+${(returnedOrder as { token_quantity?: number }).token_quantity} tokens credited.`
+              : "Payment received. Tokens are being credited…"}
+          </div>
+        )}
+        {search.checkout === "cancel" && (
+          <div className="mt-6 border border-border bg-card p-4 font-mono text-sm text-muted-foreground">
+            Checkout cancelled. No payment was taken.
+          </div>
+        )}
+
 
 
 

@@ -519,6 +519,20 @@
       "when": 1788531355181,
       "tag": "0073_token_orders_grant_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1788534364208,
+      "tag": "0074_token_purchase_test_gate",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1788534395234,
+      "tag": "0075_my_token_purchase_enabled",
+      "breakpoints": true
     }
   ]
 }
