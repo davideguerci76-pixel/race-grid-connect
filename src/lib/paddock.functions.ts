@@ -1534,12 +1534,21 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     // One confirmation request per (pit call, freelancer): persisted state for the CTA
     const { data: reqEngagements } = await supabase
       .from("engagements")
-      .select("id, freelancer_id, status")
+      .select("id, freelancer_id, status, cancellation_kind")
       .eq("request_id", data.request_id)
       .eq("team_id", userId)
-      .in("status", ["proposed", "confirmed", "completed"]);
+      .in("status", ["proposed", "confirmed", "completed", "cancelled"]);
     const confirmationRequested = new Map<string, string>(
-      ((reqEngagements ?? []) as any[]).map((e) => [e.freelancer_id, e.id]),
+      ((reqEngagements ?? []) as any[])
+        .filter((e) => e.status !== "cancelled")
+        .map((e) => [e.freelancer_id, e.id]),
+    );
+    // A declined or expired confirmation request is final for that pair: the
+    // server refuses a second one, so the CTA must not be offered again.
+    const confirmationClosed = new Map<string, string>(
+      ((reqEngagements ?? []) as any[])
+        .filter((e) => e.status === "cancelled" && ["freelancer_declined", "expired"].includes(e.cancellation_kind))
+        .map((e) => [e.freelancer_id, e.cancellation_kind as string]),
     );
     const poolFreelancerIds = freelancerIds.filter((id: string) => poolSet.has(id));
     const poolProfileMap = new Map<string, any>();
