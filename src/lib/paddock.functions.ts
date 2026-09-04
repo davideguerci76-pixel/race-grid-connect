@@ -1382,6 +1382,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       "cost_request_race_weekend",
       "cost_request_full_season",
       "cost_pool_search",
+      "free_preview_count",
     ];
     const { data: settingsRows } = await supabase
       .from("platform_settings")
@@ -1394,6 +1395,8 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const tier2Size = settings.get("tier2_size") ?? 10;
     const tier3Size = settings.get("tier3_size") ?? 30;
     const hardCap = settings.get("hard_cap_matches") ?? 50;
+    const freePreviewCount = Math.max(0, settings.get("free_preview_count") ?? 3);
+
 
     const { data: allMatches, error: mErr } = await supabase
       .from("matches")
@@ -1402,12 +1405,12 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .eq("request_id", data.request_id);
     if (mErr) throw new Error(mErr.message);
 
-    const [{ data: poolRows }, { data: poolUnlock }] = await Promise.all([
-      supabase.from("team_pool").select("freelancer_id").eq("team_id", userId),
-      supabase.from("pool_search_unlocks").select("id").eq("team_id", userId).eq("request_id", data.request_id).maybeSingle(),
-    ]);
+    const { data: poolRows } = await supabase
+      .from("team_pool")
+      .select("freelancer_id")
+      .eq("team_id", userId);
     const poolSet = new Set((poolRows ?? []).map((r: any) => r.freelancer_id));
-    const poolSearchUnlocked = !!poolUnlock;
+
     // RLS already hides outside-pool matches from the team on pool pit calls; the filter is kept
     // as defence in depth.
     const requestMatches = isPoolRequest
@@ -1514,15 +1517,20 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
-    const matchIds = [...allFull, ...allPartial].map((m: any) => m.id);
     const freelancerIds = [...allFull, ...allPartial].map((m: any) => m.freelancer_id);
     const idsSafe = freelancerIds.length ? freelancerIds : ["00000000-0000-0000-0000-000000000000"];
-    const midsSafe = matchIds.length ? matchIds : ["00000000-0000-0000-0000-000000000000"];
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: fps }, { data: unlocks }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", idsSafe),
-      supabase.from("match_unlocks").select("match_id, free_preview").eq("team_id", userId).in("match_id", midsSafe),
+      // Entitlement is stable per (team, pit call, freelancer): it survives match recomputes.
+      supabase
+        .from("match_unlocks")
+        .select("freelancer_id, free_preview")
+        .eq("team_id", userId)
+        .eq("request_id", data.request_id),
     ]);
+
     const fpMap = new Map((fps ?? []).map((r: any) => [r.user_id, r]));
     // Request owner (team) — rate stays behind the existing showTech gating below.
     {
@@ -1530,7 +1538,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const rateMap = await fetchRatesByIds(freelancerIds);
       for (const [id, fp] of fpMap) Object.assign(fp as any, rateMap.get(id as string) ?? {});
     }
-    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.freelancer_id, r]));
     // One confirmation request per (pit call, freelancer): persisted state for the CTA
     const { data: reqEngagements } = await supabase
       .from("engagements")
@@ -1574,17 +1582,32 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       }
     }
 
+    // Free previews are granted to the top N candidates OUTSIDE the team pool.
+    // Pool members are always visible and never consume a free slot.
+    const freeByMatchId = new Set<string>();
+    for (const list of [allFull, allPartial]) {
+      let externalRank = 0;
+      for (const m of list as any[]) {
+        if (poolSet.has(m.freelancer_id)) continue;
+        externalRank += 1;
+        if (externalRank <= freePreviewCount) freeByMatchId.add(m.id);
+      }
+    }
+
     const buildItem = (m: any, i: number, scope: "full" | "partial", tierUnlockedSet: Set<number>) => {
       const rank = i + 1;
       const tier = rank <= 10 ? 1 : rank <= 10 + tier2Size ? 2 : 3;
       const tierUnlocked = tier === 1 || tierUnlockedSet.has(tier);
-      const topThree = rank <= 3;
-      const perProfileUnlocked = unlockMap.has(m.id);
       const fp = fpMap.get(m.freelancer_id);
       const inPool = poolSet.has(m.freelancer_id);
-      const poolVisible = isPoolRequest && poolSearchUnlocked && inPool;
-      const showTech = isPoolRequest ? poolVisible : tierUnlocked && (topThree || perProfileUnlocked);
+      const freePreviewSlot = freeByMatchId.has(m.id);
+      const topThree = freePreviewSlot;
+      const perProfileUnlocked = unlockMap.has(m.freelancer_id);
+      // Pool members are part of the team's trusted circle: full details, no tokens, no CTA.
+      const poolVisible = inPool;
+      const showTech = inPool || (!isPoolRequest && tierUnlocked && (freePreviewSlot || perProfileUnlocked));
       const blurred = !poolVisible && tierUnlocked && !showTech;
+
       const poolProfile = poolProfileMap.get(m.freelancer_id);
       const poolContact = poolContactMap.get(m.freelancer_id);
       const legalName = [poolProfile?.first_name, poolProfile?.last_name].filter(Boolean).join(" ").trim();
@@ -1611,7 +1634,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         edge_only: m.edge_only !== false,
         missing_criteria: m.missing_criteria ?? [],
         unlocked: showTech,
-        free_preview: poolVisible || topThree || unlockMap.get(m.id)?.free_preview === true,
+        free_preview: poolVisible || freePreviewSlot || unlockMap.get(m.freelancer_id)?.free_preview === true,
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
         confirmation_requested: confirmationRequested.has(m.freelancer_id),
