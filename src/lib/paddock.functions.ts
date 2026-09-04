@@ -1538,7 +1538,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       const rateMap = await fetchRatesByIds(freelancerIds);
       for (const [id, fp] of fpMap) Object.assign(fp as any, rateMap.get(id as string) ?? {});
     }
-    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.match_id, r]));
+    const unlockMap = new Map((unlocks ?? []).map((r: any) => [r.freelancer_id, r]));
     // One confirmation request per (pit call, freelancer): persisted state for the CTA
     const { data: reqEngagements } = await supabase
       .from("engagements")
