@@ -112,7 +112,8 @@
         "no_events_in_ics": "Aucun événement trouvé dans ce fichier .ics",
         "could_not_read_ics": "Impossible de lire le fichier .ics",
         "give_calendar_name": "Donnez un nom à votre calendrier"
-      }
+      },
+      "approved_readonly": "Publié comme calendrier de la plateforme — lecture seule. Contactez PITCALL pour toute correction."
     },
     "calendar_quick_fill": {
       "default_title": "Remplissage rapide — règle logistique",

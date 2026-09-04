@@ -320,7 +320,7 @@ function CalendarPage() {
 
   const busyMut = useMutation({
     mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) =>
-      applyBusy({ data: { ...vars, protectedDays: [...new Set([...blockedSet, ...engMap.keys()])] } }),
+      applyBusy({ data: vars }),
     onSuccess: (res, vars) => {
       if (res.conflicts.length && !vars.overwrite) {
         setBusyDialog((prev) => (prev ? { ...prev, conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })) } : prev));
