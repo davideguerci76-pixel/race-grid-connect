@@ -88,14 +88,26 @@ export const saveCalendar = createServerFn({ method: "POST" })
       source: data.source,
     };
     if (data.id) {
+      // APPROVED = published platform calendar: read-only for its creator (Admin moderates it).
+      const { data: current, error: readErr } = await (supabase.from("user_calendars" as never) as any)
+        .select("review_status, owner_id")
+        .eq("id", data.id)
+        .eq("owner_id", userId)
+        .maybeSingle();
+      if (readErr) throw new Error(readErr.message);
+      if (!current) throw new Error("Calendar not found");
+      if (current.review_status === "approved") throw new Error("CALENDAR_APPROVED_READONLY");
+
       const { data: row, error } = await (supabase.from("user_calendars" as never) as any)
         .update(payload)
         .eq("id", data.id)
         .eq("owner_id", userId)
+        .neq("review_status", "approved")
         .select("*")
         .maybeSingle();
       if (error) throw new Error(error.message);
-      return row ? normalize(row) : null;
+      if (!row) throw new Error("CALENDAR_APPROVED_READONLY");
+      return normalize(row);
     }
     const { data: row, error } = await (supabase.from("user_calendars" as never) as any).insert(payload).select("*").maybeSingle();
     if (error) throw new Error(error.message);
@@ -106,13 +118,17 @@ export const deleteCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await (context.supabase.from("user_calendars" as never) as any)
+    const { data: rows, error } = await (context.supabase.from("user_calendars" as never) as any)
       .delete()
       .eq("id", data.id)
-      .eq("owner_id", context.userId);
+      .eq("owner_id", context.userId)
+      .neq("review_status", "approved")
+      .select("id");
     if (error) throw new Error(error.message);
+    if (!rows || rows.length === 0) throw new Error("CALENDAR_APPROVED_READONLY");
     return { ok: true };
   });
+
 
 /** Crowdsourcing: submit a personal calendar to the platform for global approval. */
 export const submitCalendarForReview = createServerFn({ method: "POST" })
