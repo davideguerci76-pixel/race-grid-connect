@@ -1,15 +1,26 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getTokenHistory } from "@/lib/paddock.functions";
 import { listTokenPackages } from "@/lib/token-packages.functions";
+import {
+  startTokenCheckout,
+  getTokenPurchaseAvailability,
+  getMyTokenOrderStatus,
+  cancelMyTokenOrder,
+} from "@/lib/token-checkout.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    checkout: typeof s["checkout"] === "string" ? (s["checkout"] as string) : undefined,
+    order: typeof s["order"] === "string" ? (s["order"] as string) : undefined,
+  }),
   component: TokensPage,
 });
 
@@ -18,12 +29,58 @@ const eur = (cents: number) => (cents / 100).toFixed(2);
 function TokensPage() {
   const { t } = useTranslation();
   const { formatDateTime } = useDateFormat();
+  const search = useSearch({ from: "/_authenticated/dashboard/tokens" });
+  const queryClient = useQueryClient();
 
   const getHistory = useServerFn(getTokenHistory);
   const getPackages = useServerFn(listTokenPackages);
+  const getAvailability = useServerFn(getTokenPurchaseAvailability);
+  const startCheckout = useServerFn(startTokenCheckout);
+  const getOrderStatus = useServerFn(getMyTokenOrderStatus);
+  const cancelOrder = useServerFn(cancelMyTokenOrder);
+
+  const [busy, setBusy] = useState<string | null>(null);
 
   const { data: history = [] } = useQuery({ queryKey: ["token-history"], queryFn: () => getHistory() });
   const { data: packages = [] } = useQuery({ queryKey: ["token-packages"], queryFn: () => getPackages() });
+  const { data: availability } = useQuery({
+    queryKey: ["token-purchase-availability"],
+    queryFn: () => getAvailability(),
+  });
+  const purchaseEnabled = availability?.enabled === true;
+
+  // Return page. It only READS the order; crediting is webhook-only.
+  const { data: returnedOrder } = useQuery({
+    queryKey: ["token-order", search.order],
+    enabled: !!search.order && search.checkout === "success",
+    queryFn: () => getOrderStatus({ data: { order_id: search.order! } }),
+    refetchInterval: (q) => ((q.state.data as { status?: string } | null)?.status === "credited" ? false : 3000),
+  });
+
+  useEffect(() => {
+    if (returnedOrder && (returnedOrder as { status?: string }).status === "credited") {
+      void queryClient.invalidateQueries({ queryKey: ["token-history"] });
+    }
+  }, [returnedOrder, queryClient]);
+
+  useEffect(() => {
+    if (search.checkout === "cancel" && search.order) {
+      void cancelOrder({ data: { order_id: search.order } }).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.checkout, search.order]);
+
+  async function onBuy(code: string) {
+    setBusy(code);
+    try {
+      const res = await startCheckout({ data: { package_code: code, origin: window.location.origin } });
+      if (res.ok) window.location.href = res.url;
+      else setBusy(null);
+    } catch {
+      setBusy(null);
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
