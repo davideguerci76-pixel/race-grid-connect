@@ -17,32 +17,31 @@ export const setAvailability = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // PROTECTED DAYS: confirmed engagements and days snapshotted into a pending
+    // Request Confirmation are resolved server-side (DB triggers are the backstop);
+    // they are skipped so the rest of the selection still saves.
+    const unique = [...new Set(data.dates)];
+    const { data: protectedRows, error: pErr } = await (supabase.rpc as any)("my_protected_days", { _days: unique });
+    if (pErr) throw new Error(pErr.message);
+    const blocked = new Set(((protectedRows ?? []) as string[]).map((d) => String(d).slice(0, 10)));
+    const skipped = unique.filter((d) => blocked.has(d));
+    const writable = unique.filter((d) => !blocked.has(d));
+
     if (data.add) {
-      const rows = data.dates.map((d) => ({ freelancer_id: userId, day: d }));
-      const { error } = await supabase.from("availability").upsert(rows, { onConflict: "freelancer_id,day" });
-      if (error) throw new Error(error.message);
-      return { ok: true, skipped: [] as string[] };
+      if (writable.length) {
+        const rows = writable.map((d) => ({ freelancer_id: userId, day: d }));
+        const { error } = await supabase.from("availability").upsert(rows, { onConflict: "freelancer_id,day" });
+        if (error) throw new Error(error.message);
+      }
+      return { ok: true, skipped };
     }
-    // FROZEN GREEN: days snapshotted into a pending Request Confirmation cannot
-    // be removed. The DB trigger is authoritative; here we simply skip them so
-    // the rest of the selection still saves instead of aborting the statement.
-    const { data: pending } = await supabase
-      .from("engagements")
-      .select("covered_days")
-      .eq("freelancer_id", userId)
-      .eq("status", "proposed");
-    const frozen = new Set<string>();
-    for (const row of ((pending ?? []) as Array<{ covered_days: string[] | null }>)) {
-      for (const d of row.covered_days ?? []) frozen.add(String(d).slice(0, 10));
-    }
-    const skipped = data.dates.filter((d) => frozen.has(d));
-    const removable = data.dates.filter((d) => !frozen.has(d));
-    if (removable.length) {
-      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", removable);
+    if (writable.length) {
+      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", writable);
       if (error) throw new Error(error.message);
     }
     return { ok: true, skipped };
   });
+
 
 export const confirmMyCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
