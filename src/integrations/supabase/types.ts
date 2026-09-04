@@ -338,6 +338,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -378,6 +379,7 @@ export type Database = {
           id?: string
           is_test?: boolean
           match_id?: string | null
+          match_snapshot?: Json | null
           no_show?: boolean
           notes?: string | null
           proposed_by: string
@@ -418,6 +420,7 @@ export type Database = {
           id?: string
           is_test?: boolean
           match_id?: string | null
+          match_snapshot?: Json | null
           no_show?: boolean
           notes?: string | null
           proposed_by?: string
@@ -2092,6 +2095,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -2141,6 +2145,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -2383,6 +2388,7 @@ export type Database = {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
       }
+      build_match_snapshot: { Args: { _match_id: string }; Returns: Json }
       can_view_team_identity: { Args: { _team: string }; Returns: boolean }
       cancel_engagement: {
         Args: { _engagement_id: string; _reason?: string }
@@ -2410,6 +2416,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -2563,6 +2570,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -2667,6 +2675,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -2720,6 +2729,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -3001,6 +3011,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -3045,6 +3056,10 @@ export type Database = {
         }[]
       }
       request_required_days: {
+        Args: { _request_id: string }
+        Returns: string[]
+      }
+      request_required_days_internal: {
         Args: { _request_id: string }
         Returns: string[]
       }
@@ -3220,6 +3235,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
@@ -3319,6 +3335,7 @@ export type Database = {
           id: string
           is_test: boolean
           match_id: string | null
+          match_snapshot: Json | null
           no_show: boolean
           notes: string | null
           proposed_by: string
