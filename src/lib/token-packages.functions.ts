@@ -260,5 +260,5 @@ export const adminUpdateTokenPackage = createServerFn({ method: "POST" })
       });
     }
 
-    return { ok: true, code, version: after.version };
+    return { ok: true as const, code, version: after.version };
   });
