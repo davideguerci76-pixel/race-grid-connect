@@ -766,6 +766,7 @@ export type Database = {
       matches: {
         Row: {
           created_at: string
+          criteria_contributions: Json
           edge_only: boolean
           final_score: number
           freelancer_id: string
@@ -788,6 +789,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          criteria_contributions?: Json
           edge_only?: boolean
           final_score?: number
           freelancer_id: string
@@ -810,6 +812,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          criteria_contributions?: Json
           edge_only?: boolean
           final_score?: number
           freelancer_id?: string
@@ -2802,6 +2805,7 @@ export type Database = {
         Args: { _freelancer: string; _required: string[] }
         Returns: boolean
       }
+      match_rank_vector: { Args: { _contrib: Json }; Returns: number[] }
       modify_request: {
         Args: { _payload: Json; _request_id: string }
         Returns: {
