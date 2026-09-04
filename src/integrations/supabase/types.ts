@@ -1951,6 +1951,175 @@ export type Database = {
         }
         Relationships: []
       }
+      token_order_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          order_id: string | null
+          payload: Json
+          processed_at: string | null
+          provider: string
+          provider_event_id: string
+          provider_mode: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          processed_at?: string | null
+          provider: string
+          provider_event_id: string
+          provider_mode: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          order_id?: string | null
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          provider_event_id?: string
+          provider_mode?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "token_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      token_orders: {
+        Row: {
+          amount_collected_cents: number | null
+          base_amount_cents: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string
+          credit_transaction_id: string | null
+          credited_at: string | null
+          currency: string
+          discount_pct: number
+          expired_at: string | null
+          failed_at: string | null
+          id: string
+          is_test: boolean
+          nominal_token_price_cents: number
+          package_code: string
+          package_id: string
+          package_label_key: string
+          package_version: number
+          payment_confirmed_at: string | null
+          provider: string
+          provider_mode: string
+          provider_payment_id: string | null
+          provider_session_id: string | null
+          status: string
+          tax_amount_cents: number | null
+          team_id: string
+          token_quantity: number
+          total_amount_cents: number | null
+          updated_at: string
+        }
+        Insert: {
+          amount_collected_cents?: number | null
+          base_amount_cents: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by: string
+          credit_transaction_id?: string | null
+          credited_at?: string | null
+          currency?: string
+          discount_pct: number
+          expired_at?: string | null
+          failed_at?: string | null
+          id?: string
+          is_test?: boolean
+          nominal_token_price_cents: number
+          package_code: string
+          package_id: string
+          package_label_key: string
+          package_version: number
+          payment_confirmed_at?: string | null
+          provider?: string
+          provider_mode?: string
+          provider_payment_id?: string | null
+          provider_session_id?: string | null
+          status?: string
+          tax_amount_cents?: number | null
+          team_id: string
+          token_quantity: number
+          total_amount_cents?: number | null
+          updated_at?: string
+        }
+        Update: {
+          amount_collected_cents?: number | null
+          base_amount_cents?: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string
+          credit_transaction_id?: string | null
+          credited_at?: string | null
+          currency?: string
+          discount_pct?: number
+          expired_at?: string | null
+          failed_at?: string | null
+          id?: string
+          is_test?: boolean
+          nominal_token_price_cents?: number
+          package_code?: string
+          package_id?: string
+          package_label_key?: string
+          package_version?: number
+          payment_confirmed_at?: string | null
+          provider?: string
+          provider_mode?: string
+          provider_payment_id?: string | null
+          provider_session_id?: string | null
+          status?: string
+          tax_amount_cents?: number | null
+          team_id?: string
+          token_quantity?: number
+          total_amount_cents?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_orders_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_orders_credit_transaction_id_fkey"
+            columns: ["credit_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "token_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_orders_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "token_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_orders_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       token_packages: {
         Row: {
           code: string
@@ -2512,6 +2681,20 @@ export type Database = {
         Returns: number
       }
       confirm_calendar: { Args: never; Returns: string }
+      confirm_token_order_payment: {
+        Args: {
+          _amount_collected_cents: number
+          _event_type: string
+          _order_id: string
+          _payload?: Json
+          _provider: string
+          _provider_event_id: string
+          _provider_mode: string
+          _provider_payment_id: string
+          _tax_amount_cents?: number
+        }
+        Returns: Json
+      }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -2581,6 +2764,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_token_order: { Args: { _package_code: string }; Returns: string }
       credit_tokens: {
         Args: {
           _delta: number
