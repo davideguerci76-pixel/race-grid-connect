@@ -505,6 +505,13 @@
       "when": 1788531263432,
       "tag": "0071_token_orders_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1788531305582,
+      "tag": "0072_fix_confirm_token_order_credit_call",
+      "breakpoints": true
     }
   ]
 }
