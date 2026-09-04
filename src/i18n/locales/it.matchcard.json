@@ -23,6 +23,8 @@
     "contact": "Contatti",
     "criteria_all_ok": "Tutti i criteri soddisfatti",
     "years_short": "anni",
-    "confirmation_requested": "Conferma richiesta"
+    "confirmation_requested": "Conferma richiesta",
+    "confirmation_declined": "Rifiutato dal freelance",
+    "confirmation_expired": "Richiesta di conferma scaduta"
   }
 }

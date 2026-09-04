@@ -1190,8 +1190,24 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const revealedByMe = r.freelancer_id === userId
         ? !!r.match?.revealed_by_freelancer
         : !!r.match?.revealed_by_team;
+      // The engagement shows the match as it was at confirmation-request time:
+      // later profile edits or recomputes must not rewrite the agreed terms.
+      const snap = (r.match_snapshot ?? null) as any;
+      const matchView = r.match
+        ? snap
+          ? {
+              ...r.match,
+              match_score: Number(snap.scores?.skills_score ?? snap.scores?.match_score ?? r.match.match_score ?? 0),
+              is_perfect: snap.scores?.is_perfect ?? r.match.is_perfect,
+              overlap_days: snap.coverage?.overlap_days ?? r.match.overlap_days,
+              missing_criteria: snap.missing_criteria ?? r.match.missing_criteria,
+              from_snapshot: true,
+            }
+          : { ...r.match, from_snapshot: false }
+        : r.match;
       return {
         ...r,
+        match: matchView,
         in_pool: r.team_id === userId ? poolIds.has(r.freelancer_id) : false,
         revealedByMe,
         freelancer: {
@@ -1518,12 +1534,21 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     // One confirmation request per (pit call, freelancer): persisted state for the CTA
     const { data: reqEngagements } = await supabase
       .from("engagements")
-      .select("id, freelancer_id, status")
+      .select("id, freelancer_id, status, cancellation_kind")
       .eq("request_id", data.request_id)
       .eq("team_id", userId)
-      .in("status", ["proposed", "confirmed", "completed"]);
+      .in("status", ["proposed", "confirmed", "completed", "cancelled"]);
     const confirmationRequested = new Map<string, string>(
-      ((reqEngagements ?? []) as any[]).map((e) => [e.freelancer_id, e.id]),
+      ((reqEngagements ?? []) as any[])
+        .filter((e) => e.status !== "cancelled")
+        .map((e) => [e.freelancer_id, e.id]),
+    );
+    // A declined or expired confirmation request is final for that pair: the
+    // server refuses a second one, so the CTA must not be offered again.
+    const confirmationClosed = new Map<string, string>(
+      ((reqEngagements ?? []) as any[])
+        .filter((e) => e.status === "cancelled" && ["freelancer_declined", "expired"].includes(e.cancellation_kind))
+        .map((e) => [e.freelancer_id, e.cancellation_kind as string]),
     );
     const poolFreelancerIds = freelancerIds.filter((id: string) => poolSet.has(id));
     const poolProfileMap = new Map<string, any>();
@@ -1590,6 +1615,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         freelancer_id: m.freelancer_id,
         in_pool: inPool,
         confirmation_requested: confirmationRequested.has(m.freelancer_id),
+        confirmation_closed: confirmationClosed.get(m.freelancer_id) ?? null,
         engagement_id: confirmationRequested.get(m.freelancer_id) ?? null,
         rating: {
           average: ratingAvg.get(m.freelancer_id)?.avg ?? 0,

@@ -686,6 +686,10 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
                 <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-4 py-3 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
                   {t("mcard.confirmation_requested")}
                 </span>
+              ) : match?.confirmation_closed ? (
+                <span className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  {t(match.confirmation_closed === "expired" ? "mcard.confirmation_expired" : "mcard.confirmation_declined")}
+                </span>
               ) : (
                 <button
                   onClick={onConfirm}

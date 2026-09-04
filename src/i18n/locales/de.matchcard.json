@@ -23,6 +23,8 @@
     "contact": "Kontakt",
     "criteria_all_ok": "Alle Kriterien erfüllt",
     "years_short": "J.",
-    "confirmation_requested": "Bestätigung angefragt"
+    "confirmation_requested": "Bestätigung angefragt",
+    "confirmation_declined": "Vom Freelancer abgelehnt",
+    "confirmation_expired": "Bestätigungsanfrage abgelaufen"
   }
 }
