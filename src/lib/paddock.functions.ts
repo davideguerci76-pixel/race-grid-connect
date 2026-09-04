@@ -1190,8 +1190,24 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const revealedByMe = r.freelancer_id === userId
         ? !!r.match?.revealed_by_freelancer
         : !!r.match?.revealed_by_team;
+      // The engagement shows the match as it was at confirmation-request time:
+      // later profile edits or recomputes must not rewrite the agreed terms.
+      const snap = (r.match_snapshot ?? null) as any;
+      const matchView = r.match
+        ? snap
+          ? {
+              ...r.match,
+              match_score: Number(snap.scores?.skills_score ?? snap.scores?.match_score ?? r.match.match_score ?? 0),
+              is_perfect: snap.scores?.is_perfect ?? r.match.is_perfect,
+              overlap_days: snap.coverage?.overlap_days ?? r.match.overlap_days,
+              missing_criteria: snap.missing_criteria ?? r.match.missing_criteria,
+              from_snapshot: true,
+            }
+          : { ...r.match, from_snapshot: false }
+        : r.match;
       return {
         ...r,
+        match: matchView,
         in_pool: r.team_id === userId ? poolIds.has(r.freelancer_id) : false,
         revealedByMe,
         freelancer: {
