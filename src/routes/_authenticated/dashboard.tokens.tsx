@@ -107,12 +107,23 @@ function TokensPage() {
                 € {eur(p.effective_price_per_token_cents)} / token
               </div>
 
-              <button disabled className="mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60">
+              <button
+                disabled={!purchaseEnabled || busy !== null}
+                onClick={() => void onBuy(p.code)}
+                className={
+                  purchaseEnabled
+                    ? "mt-4 w-full bg-racing-red py-2 text-xs font-bold uppercase tracking-widest text-white disabled:opacity-60"
+                    : "mt-4 w-full cursor-not-allowed bg-racing-red/40 py-2 text-xs font-bold uppercase tracking-widest text-white/80 disabled:opacity-60"
+                }
+              >
                 {t("tokens.buy")}
               </button>
-              <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                {t("tokens.buy_soon")}
-              </p>
+              {!purchaseEnabled && (
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  {t("tokens.buy_soon")}
+                </p>
+              )}
+
             </div>
           ))}
         </div>
