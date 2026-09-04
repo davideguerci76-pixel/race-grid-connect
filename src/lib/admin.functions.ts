@@ -263,6 +263,16 @@ export const adminUpdateSettings = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const nowIso = new Date().toISOString();
     for (const u of data.updates) {
+      // S2.E.1: the nominal token price and the package commercial prices must move
+      // together — one atomic DB call rescales packages so each keeps its discount.
+      if (u.key === "token_price_eur") {
+        const { error } = await supabaseAdmin.rpc("admin_set_token_price_eur", {
+          _new_price: u.value_num,
+          _admin: context.userId,
+        } as never);
+        if (error) throw new Error(`${u.key}: ${error.message}`);
+        continue;
+      }
       const { error } = await supabaseAdmin
         .from("platform_settings")
         .update({ value_num: u.value_num, updated_at: nowIso, updated_by: context.userId } as never)

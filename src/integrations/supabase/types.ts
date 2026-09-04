@@ -2430,6 +2430,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_token_price_eur: {
+        Args: { _admin: string; _new_price: number }
+        Returns: Json
+      }
       auto_activate_pending_reviews: { Args: never; Returns: number }
       auto_activate_pending_reviews_env: {
         Args: { _is_test: boolean }
