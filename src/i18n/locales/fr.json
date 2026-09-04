@@ -208,6 +208,11 @@
       "admin_credit": "Crédit admin",
       "admin_debit": "Débit admin",
       "refund": "Remboursement"
+    },
+    "packages": {
+      "tokens_10": "Starter",
+      "tokens_50": "Team",
+      "tokens_200": "Season"
     }
   },
   "engagements": {
