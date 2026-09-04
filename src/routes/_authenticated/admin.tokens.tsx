@@ -68,7 +68,6 @@ function AdminTokensPage() {
 
   if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_b.common.loading")}</div>;
   const rows = (data ?? []) as Setting[];
-  const priceEur = values["token_price_eur"] ?? 0;
 
   return (
     <div className="max-w-3xl">
