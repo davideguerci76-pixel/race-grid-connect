@@ -76,10 +76,15 @@ function TokensPage() {
     setBusy(code);
     try {
       const res = await startCheckout({ data: { package_code: code, origin: window.location.origin } });
-      if (res.ok) window.location.href = res.url;
-      else setBusy(null);
-    } catch {
+      if (res.ok) {
+        window.location.href = res.url;
+        return;
+      }
       setBusy(null);
+      toastWarning(`tokens.errors.${res.reason}`);
+    } catch (err) {
+      setBusy(null);
+      toastError(err);
     }
   }
 
