@@ -33,7 +33,7 @@ function row(r: any, parent?: string | null): TaxonomyEntry {
   };
 }
 
-async function readSnapshot(supabase: any, includeInactive: boolean): Promise<TaxonomySnapshot> {
+export async function readTaxonomySnapshot(supabase: any, includeInactive: boolean): Promise<TaxonomySnapshot> {
   const q = (table: string) => {
     const sel = supabase.from(table).select("*").order("sort_order", { ascending: true });
     return includeInactive ? sel : sel.eq("is_active", true);
@@ -63,22 +63,11 @@ async function readSnapshot(supabase: any, includeInactive: boolean): Promise<Ta
   };
 }
 
-/** Public read: active taxonomy only. Safe for anonymous pages. */
-export const getTaxonomy = createServerFn({ method: "GET" }).handler(async () => {
-  const { createClient } = await import("@supabase/supabase-js");
-  const supabase = createClient(
-    process.env["VITE_SUPABASE_URL"] ?? process.env["SUPABASE_URL"]!,
-    process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_PUBLISHABLE_KEY"]!,
-    { auth: { persistSession: false } },
-  );
-  return readSnapshot(supabase, false);
-});
-
 /** Admin read: includes deactivated entries plus live usage counts. */
 export const adminGetTaxonomy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const snapshot = await readSnapshot(context.supabase, true);
+    const snapshot = await readTaxonomySnapshot(context.supabase, true);
     const { data: usage, error } = await (context.supabase.rpc as any)("admin_taxonomy_usage");
     if (error) throw new Error(error.message);
     return { snapshot, usage: (usage ?? {}) as Record<string, Record<string, number>>, langs: LANGS };
