@@ -22,6 +22,7 @@ import { AppSplash } from "@/components/app-splash";
 import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
 import { OfflineBanner } from "@/components/offline-banner";
 import { ConfirmProvider } from "@/hooks/use-confirm";
+import { TaxonomyBoundary } from "@/lib/use-taxonomy";
 import { normalizeCrash } from "@/lib/errors/normalize";
 import { reportError } from "@/lib/errors/report";
 
@@ -157,7 +158,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ConfirmProvider>
         <OfflineBanner />
-        <Outlet />
+        <TaxonomyBoundary>
+          <Outlet />
+        </TaxonomyBoundary>
         <AppSplash />
         <Toaster theme="dark" position="top-right" />
       </ConfirmProvider>

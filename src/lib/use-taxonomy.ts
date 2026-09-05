@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { readTaxonomySnapshot } from "@/lib/taxonomy-read";
 import {
@@ -43,8 +43,14 @@ function fallbackSnapshot(): TaxonomySnapshot {
 
 export const TAXONOMY_QUERY_KEY = ["taxonomy", "active"] as const;
 
+/**
+ * The full catalogue (active + retired) is fetched: retired entries are still
+ * stored on existing profiles and Pit Calls and must keep their proper name,
+ * while every picker below filters on `is_active` so retired entries can no
+ * longer be chosen.
+ */
 export async function fetchActiveTaxonomy(): Promise<TaxonomySnapshot> {
-  return readTaxonomySnapshot(supabase, false);
+  return readTaxonomySnapshot(supabase, true);
 }
 
 export type TaxonomyView = {
@@ -57,6 +63,27 @@ export type TaxonomyView = {
   disciplines: string[];
   languages: string[];
 };
+
+/**
+ * STEP T3 — app-wide taxonomy boot.
+ *
+ * The registry is a module-level store, so a page that never calls
+ * `useTaxonomy()` used to render database-managed entries through the
+ * hardcoded fallback (a freshly created value appeared as its humanized code).
+ * Mounting this boundary once at the root loads the snapshot for every screen
+ * and re-renders the tree when it arrives. Read-only: no matching, scoring or
+ * stored value is touched.
+ */
+export function TaxonomyBoundary({ children }: { children: ReactNode }) {
+  const { data } = useQuery({
+    queryKey: TAXONOMY_QUERY_KEY,
+    queryFn: fetchActiveTaxonomy,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+  if (data) setTaxonomySnapshot(data);
+  return children as ReactNode;
+}
 
 export function useTaxonomy(): TaxonomyView {
   const { data, isLoading } = useQuery({
@@ -73,7 +100,8 @@ export function useTaxonomy(): TaxonomyView {
   const snapshot = data ?? getTaxonomySnapshot() ?? fallbackSnapshot();
 
   return useMemo(() => {
-    const byOrder = <T extends { sort_order: number }>(rows: T[]) => [...rows].sort((a, b) => a.sort_order - b.sort_order);
+    const byOrder = <T extends { sort_order: number; is_active: boolean }>(rows: T[]) =>
+      [...rows].filter((r) => r.is_active).sort((a, b) => a.sort_order - b.sort_order);
     const roleGroups = byOrder(snapshot.role_groups).map((g) => ({ value: g.code, label: g.labels?.en ?? g.code }));
     const allSkills = byOrder(snapshot.skills).map((s) => s.code);
     return {

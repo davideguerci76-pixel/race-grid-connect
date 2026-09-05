@@ -737,8 +737,8 @@ function NewRequestPage() {
                     onChange={(ev) => setExperienceReqs(experienceReqs.map((r, idx) => idx === i ? { ...r, discipline: ev.target.value } : r))}
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
-                    {DISCIPLINE_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
+                    {tax.disciplines.map((c) => (
+                      <option key={c} value={c}>{disciplineLabel(c)}</option>
                     ))}
                   </select>
                   <select
@@ -771,7 +771,7 @@ function NewRequestPage() {
               type="button"
               onClick={() => {
                 if (experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS) return;
-                setExperienceReqs([...experienceReqs, { discipline: DISCIPLINE_OPTIONS[0].value, min_years: 1, hard: true }]);
+                setExperienceReqs([...experienceReqs, { discipline: tax.disciplines[0] ?? DISCIPLINE_OPTIONS[0].value, min_years: 1, hard: true }]);
               }}
               disabled={experienceReqs.length >= MAX_REQUEST_EXPERIENCE_REQS}
               className="mt-2 border border-racing-red px-3 py-1 text-[11px] font-bold uppercase text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
@@ -795,8 +795,8 @@ function NewRequestPage() {
                     onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
-                    {LANGUAGE_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+                    {(tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value)).map((c) => (
+                      <option key={c} value={c}>{languageLabel(c)}</option>
                     ))}
                   </select>
                   <select
