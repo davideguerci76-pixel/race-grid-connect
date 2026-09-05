@@ -201,6 +201,16 @@
     },
     "buy": "Kaufen",
     "buy_soon": "Token-Käufe werden beim offiziellen Launch verfügbar sein.",
+    "errors": {
+      "purchase_disabled": "Token-Käufe sind derzeit nicht verfügbar.",
+      "package_not_available": "Dieses Paket ist nicht mehr verfügbar.",
+      "provider_unavailable": "Der Zahlungsanbieter ist vorübergehend nicht erreichbar. Bitte versuche es in Kürze erneut."
+    },
+    "checkout": {
+      "credited": "+{{count}} Tokens gutgeschrieben.",
+      "crediting": "Zahlung erhalten. Tokens werden gutgeschrieben…",
+      "cancelled": "Checkout abgebrochen. Es wurde keine Zahlung ausgelöst."
+    },
     "reasons": {
       "signup_bonus": "Willkommensbonus",
       "purchase": "Kauf",

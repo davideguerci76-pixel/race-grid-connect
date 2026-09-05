@@ -201,6 +201,16 @@
     },
     "buy": "Buy",
     "buy_soon": "Token purchases will be available at official launch.",
+    "errors": {
+      "purchase_disabled": "Token purchases are not available right now.",
+      "package_not_available": "This package is no longer available.",
+      "provider_unavailable": "The payment provider is temporarily unavailable. Please try again shortly."
+    },
+    "checkout": {
+      "credited": "+{{count}} tokens credited.",
+      "crediting": "Payment received. Tokens are being credited…",
+      "cancelled": "Checkout cancelled. No payment was taken."
+    },
     "reasons": {
       "signup_bonus": "Signup bonus",
       "purchase": "Purchase",
