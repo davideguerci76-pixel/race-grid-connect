@@ -700,6 +700,7 @@ function FreelancerSection({ profile }: { profile: any }) {
 
 function TeamSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
+  const tax = useTaxonomy();
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveTeamProfile = useServerFn(updateMyTeamProfile);
@@ -809,7 +810,7 @@ function TeamSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">{t("sweep_profile.team.primary_discipline")}</label>
           <select value={form.primary_discipline} onChange={(e) => setForm({ ...form, primary_discipline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm">
             <option value="">{t("sweep_profile.common.select")}</option>
-            {DISCIPLINE_OPTIONS.map((d) => (<option key={d.value} value={d.value}>{d.label}</option>))}
+            {tax.disciplines.map((d) => (<option key={d} value={d}>{disciplineLabel(d)}</option>))}
           </select>
         </div>
         <div>
@@ -984,6 +985,7 @@ function ExperienceEditor({
   onChange: (v: FreelancerExperience[]) => void;
 }) {
   const { t } = useTranslation();
+  const tax = useTaxonomy();
   const canAdd = value.length < MAX_FREELANCER_EXPERIENCES;
   const update = (i: number, patch: Partial<FreelancerExperience>) => {
     const next = value.map((e, idx) => (idx === i ? { ...e, ...patch } : e));
@@ -992,7 +994,7 @@ function ExperienceEditor({
   const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
   const add = () => {
     if (!canAdd) return;
-    onChange([...value, { discipline: DISCIPLINE_OPTIONS[0].value, years: 1 }]);
+    onChange([...value, { discipline: tax.disciplines[0] ?? DISCIPLINE_OPTIONS[0].value, years: 1 }]);
   };
   return (
     <div>
@@ -1012,7 +1014,7 @@ function ExperienceEditor({
               onChange={(ev) => update(i, { discipline: ev.target.value })}
               className="border border-border bg-background px-2 py-1 text-sm"
             >
-              {DISCIPLINE_OPTIONS.map((o) => (
+              {tax.disciplines.map((c) => ({ value: c, label: disciplineLabel(c) })).map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
@@ -1055,6 +1057,7 @@ function LanguagesEditor({
   onChange: (v: FreelancerLanguage[]) => void;
 }) {
   const { t } = useTranslation();
+  const tax = useTaxonomy();
   const canAdd = value.length < MAX_FREELANCER_LANGUAGES;
   const update = (i: number, patch: Partial<FreelancerLanguage>) => {
     onChange(value.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
@@ -1063,7 +1066,8 @@ function LanguagesEditor({
   const add = () => {
     if (!canAdd) return;
     const used = new Set(value.map((l) => l.code));
-    const nextCode = LANGUAGE_OPTIONS.find((o) => !used.has(o.value))?.value ?? "en";
+    const languageCodes = tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value);
+    const nextCode = languageCodes.find((c) => !used.has(c)) ?? "en";
     onChange([...value, { code: nextCode, level: "intermediate" }]);
   };
   return (
@@ -1084,8 +1088,8 @@ function LanguagesEditor({
               onChange={(ev) => update(i, { code: ev.target.value })}
               className="border border-border bg-background px-2 py-1 text-sm"
             >
-              {LANGUAGE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{languageLabel(o.value)}</option>
+              {(tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value)).map((c) => (
+                <option key={c} value={c}>{languageLabel(c)}</option>
               ))}
             </select>
             <select
