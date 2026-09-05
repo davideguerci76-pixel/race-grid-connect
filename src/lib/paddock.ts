@@ -2,6 +2,13 @@
 // Values must match the Postgres enums (freelancer_role, discipline, duration_type).
 // Labels are display-only; translated variants live in src/i18n/locales/*.json.
 import i18n from "@/i18n";
+import { taxonomyFallbackLabel, taxonomyLabel } from "@/lib/taxonomy-registry";
+
+/** Admin-authored label for the active language (T2 taxonomy authority). */
+function dbLabel(kind: "skill" | "discipline" | "language", code: string): string | null {
+  const lang = (i18n?.language || "en").split("-")[0];
+  return taxonomyLabel(kind, code, lang);
+}
 
 
 export type DurationType = "full_season" | "race_weekend" | "test_session";
@@ -168,9 +175,11 @@ const LANGUAGE_MAP = new Map(LANGUAGE_OPTIONS.map((o) => [o.value, o.label]));
 export function languageLabel(code: string | null | undefined, custom?: string | null): string {
   if (!code) return "—";
   if (code === "other") return (custom && custom.trim()) || tryTranslate("languages.other") || "Other";
+  const db = dbLabel("language", code);
+  if (db) return db;
   const t = tryTranslate(`languages.${code}`);
   if (t) return t;
-  return LANGUAGE_MAP.get(code) ?? code;
+  return taxonomyFallbackLabel("language", code) ?? LANGUAGE_MAP.get(code) ?? code;
 }
 export function languageLevelLabel(level: string | null | undefined): string {
   if (!level) return "—";
@@ -297,9 +306,11 @@ function tryTranslate(key: string): string | null {
 
 export function skillLabel(value: string | null | undefined): string {
   if (!value) return "—";
+  const db = dbLabel("skill", value);
+  if (db) return db;
   const t = tryTranslate(`skills.${value}`);
   if (t) return t;
-  return SKILL_MAP.get(value) ?? value.replace(/_/g, " ");
+  return taxonomyFallbackLabel("skill", value) ?? SKILL_MAP.get(value) ?? value.replace(/_/g, " ");
 }
 
 /** Returns SKILL_OPTIONS with labels translated for the current i18n language. */
@@ -317,7 +328,11 @@ export function roleLabel(value: string | null | undefined): string {
 
 export function disciplineLabel(value: string | null | undefined): string {
   if (!value) return "—";
-  return DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
+  const db = dbLabel("discipline", value);
+  if (db) return db;
+  const t = tryTranslate(`disciplines.${value}`);
+  if (t) return t;
+  return taxonomyFallbackLabel("discipline", value) ?? DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
 }
 
 const EDUCATION_MAP = new Map(EDUCATION_OPTIONS.map((o) => [o.value, o.label]));

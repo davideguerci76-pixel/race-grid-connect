@@ -1,3 +1,5 @@
+import i18n from "@/i18n";
+import { taxonomyFallbackLabel, taxonomyLabel } from "@/lib/taxonomy-registry";
 // Motorsport job taxonomy: macro-role (role group) -> sub-roles -> associated skills.
 // Macro-role is a binary hard filter in matching. Sub-role (with level) carries the weight.
 
@@ -162,7 +164,13 @@ const GROUP_MAP = new Map(ROLE_GROUPS.map((g) => [g.value, g]));
 
 export function roleGroupLabel(value: string | null | undefined): string {
   if (!value) return "—";
-  return GROUP_MAP.get(value)?.label ?? value.replace(/_/g, " ");
+  const lang = (i18n?.language || "en").split("-")[0];
+  return (
+    taxonomyLabel("role_group", value, lang) ??
+    taxonomyFallbackLabel("role_group", value) ??
+    GROUP_MAP.get(value)?.label ??
+    value.replace(/_/g, " ")
+  );
 }
 
 const SUB_ROLE_MAP = new Map<string, string>();
@@ -170,7 +178,13 @@ for (const g of ROLE_GROUPS) for (const s of g.subRoles) SUB_ROLE_MAP.set(s.valu
 
 export function subRoleLabel(value: string | null | undefined): string {
   if (!value) return "—";
-  return SUB_ROLE_MAP.get(value) ?? value.replace(/_/g, " ");
+  const lang = (i18n?.language || "en").split("-")[0];
+  return (
+    taxonomyLabel("sub_role", value, lang) ??
+    taxonomyFallbackLabel("sub_role", value) ??
+    SUB_ROLE_MAP.get(value) ??
+    value.replace(/_/g, " ")
+  );
 }
 
 export function subRolesForGroup(group: string | null | undefined): SubRoleOption[] {
