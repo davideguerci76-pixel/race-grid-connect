@@ -43,8 +43,14 @@ function fallbackSnapshot(): TaxonomySnapshot {
 
 export const TAXONOMY_QUERY_KEY = ["taxonomy", "active"] as const;
 
+/**
+ * The full catalogue (active + retired) is fetched: retired entries are still
+ * stored on existing profiles and Pit Calls and must keep their proper name,
+ * while every picker below filters on `is_active` so retired entries can no
+ * longer be chosen.
+ */
 export async function fetchActiveTaxonomy(): Promise<TaxonomySnapshot> {
-  return readTaxonomySnapshot(supabase, false);
+  return readTaxonomySnapshot(supabase, true);
 }
 
 export type TaxonomyView = {
@@ -94,7 +100,8 @@ export function useTaxonomy(): TaxonomyView {
   const snapshot = data ?? getTaxonomySnapshot() ?? fallbackSnapshot();
 
   return useMemo(() => {
-    const byOrder = <T extends { sort_order: number }>(rows: T[]) => [...rows].sort((a, b) => a.sort_order - b.sort_order);
+    const byOrder = <T extends { sort_order: number; is_active: boolean }>(rows: T[]) =>
+      [...rows].filter((r) => r.is_active).sort((a, b) => a.sort_order - b.sort_order);
     const roleGroups = byOrder(snapshot.role_groups).map((g) => ({ value: g.code, label: g.labels?.en ?? g.code }));
     const allSkills = byOrder(snapshot.skills).map((s) => s.code);
     return {
