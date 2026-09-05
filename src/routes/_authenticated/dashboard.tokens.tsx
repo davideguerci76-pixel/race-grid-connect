@@ -15,6 +15,7 @@ import {
 } from "@/lib/token-checkout.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError, toastWarning } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
   component: TokensPage,
@@ -75,10 +76,15 @@ function TokensPage() {
     setBusy(code);
     try {
       const res = await startCheckout({ data: { package_code: code, origin: window.location.origin } });
-      if (res.ok) window.location.href = res.url;
-      else setBusy(null);
-    } catch {
+      if (res.ok) {
+        window.location.href = res.url;
+        return;
+      }
       setBusy(null);
+      toastWarning(`tokens.errors.${res.reason}`);
+    } catch (err) {
+      setBusy(null);
+      toastError(err);
     }
   }
 
@@ -132,13 +138,13 @@ function TokensPage() {
         {search.checkout === "success" && (
           <div className="mt-6 border border-racing-yellow/50 bg-card p-4 font-mono text-sm">
             {(returnedOrder as { status?: string } | null)?.status === "credited"
-              ? `+${(returnedOrder as { token_quantity?: number }).token_quantity} tokens credited.`
-              : "Payment received. Tokens are being credited…"}
+              ? t("tokens.checkout.credited", { count: (returnedOrder as { token_quantity?: number }).token_quantity })
+              : t("tokens.checkout.crediting")}
           </div>
         )}
         {search.checkout === "cancel" && (
           <div className="mt-6 border border-border bg-card p-4 font-mono text-sm text-muted-foreground">
-            Checkout cancelled. No payment was taken.
+            {t("tokens.checkout.cancelled")}
           </div>
         )}
 

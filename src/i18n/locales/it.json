@@ -201,6 +201,16 @@
     },
     "buy": "Acquista",
     "buy_soon": "Gli acquisti di token saranno disponibili al lancio ufficiale.",
+    "errors": {
+      "purchase_disabled": "Gli acquisti di token non sono disponibili al momento.",
+      "package_not_available": "Questo pacchetto non è più disponibile.",
+      "provider_unavailable": "Il provider di pagamento è temporaneamente non disponibile. Riprova a breve."
+    },
+    "checkout": {
+      "credited": "+{{count}} token accreditati.",
+      "crediting": "Pagamento ricevuto. I token sono in fase di accredito…",
+      "cancelled": "Checkout annullato. Nessun pagamento effettuato."
+    },
     "reasons": {
       "signup_bonus": "Bonus iscrizione",
       "purchase": "Acquisto",
