@@ -3870,6 +3870,7 @@ export type Database = {
         | "trophy_trucks"
         | "dakar_rally"
         | "other"
+        | "t3_discipline_zz"
       duration_type: "full_season" | "race_weekend" | "test_session"
       engagement_status: "proposed" | "confirmed" | "completed" | "cancelled"
       freelancer_role:
@@ -4138,6 +4139,7 @@ export const Constants = {
         "trophy_trucks",
         "dakar_rally",
         "other",
+        "t3_discipline_zz",
       ],
       duration_type: ["full_season", "race_weekend", "test_session"],
       engagement_status: ["proposed", "confirmed", "completed", "cancelled"],
