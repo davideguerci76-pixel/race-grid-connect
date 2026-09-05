@@ -17,8 +17,9 @@ import { getPlatformSettings } from "@/lib/admin.functions";
 import { getMyPool } from "@/lib/pool.functions";
 import { PitCallSummary } from "@/components/pitcall-summary";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
+import { useTaxonomy } from "@/lib/use-taxonomy";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, roleGroupLabel, skillsForGroup, subRolesForGroup } from "@/lib/roles";
-import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
+import { DISCIPLINE_OPTIONS, DURATIONS, EDUCATION_OPTIONS, disciplineLabel, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_REQUEST_EXPERIENCE_REQS, MAX_REQUEST_LANGUAGES, SKILL_OPTIONS, educationLabel, languageLabel, languageLevelLabel, skillLabel, type DurationType, type LanguageLevel, type RequestExperienceRequirement, type RequestLanguageRequirement } from "@/lib/paddock";
 import { BackButton } from "@/components/back-button";
 import { CalendarSourcePicker } from "@/components/calendar-source-picker";
 import { dateOf } from "@/lib/ics";
@@ -132,6 +133,7 @@ function NewRequestPage() {
   });
   const [subRoleHard, setSubRoleHard] = useState(false);
   const [showAllSkills, setShowAllSkills] = useState(false);
+  const tax = useTaxonomy();
   const [travelRequired, setTravelRequired] = useState(true);
   const [seasonDates, setSeasonDates] = useState<Date[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -420,7 +422,7 @@ function NewRequestPage() {
               onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_role: "" })}
               className="mt-1 w-full border border-border bg-background px-3 py-2"
             >
-              {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
+              {tax.roleGroups.map((g) => (<option key={g.value} value={g.value}>{roleGroupLabel(g.value)}</option>))}
             </select>
             <p className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
               {t("sweep_engage.new_request.macro_role_hard_filter", { role: roleGroupLabel(form.role_group) })}
@@ -436,7 +438,7 @@ function NewRequestPage() {
                 className="w-full min-w-0 border border-border bg-background px-3 py-2"
               >
                 <option value="">{t("sweep_engage.new_request.any_sub_role")}</option>
-                {subRolesForGroup(form.role_group).map((o) => (
+                {tax.subRolesFor(form.role_group).map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
@@ -463,7 +465,7 @@ function NewRequestPage() {
             label={t("jobs.filters.discipline")}
             value={form.discipline}
             onChange={(v) => setForm({ ...form, discipline: v })}
-            options={DISCIPLINE_OPTIONS}
+            options={tax.disciplines.map((d) => ({ value: d, label: disciplineLabel(d) }))}
           />
 
           <SelectField
@@ -661,7 +663,7 @@ function NewRequestPage() {
               {t("sweep_engage.new_request.skill_cycle_help_prefix")} <span className="font-bold text-yellow-500">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_mid")} <span className="font-bold text-racing-red">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_suffix")}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {(showAllSkills ? SKILL_OPTIONS.map((o) => o.value) : skillsForGroup(form.role_group)).map((sv) => {
+              {(showAllSkills ? tax.allSkills : tax.skillsFor(form.role_group)).map((sv) => {
                 const o = { value: sv };
                 const isSoft = skills.includes(o.value);
                 const isHard = skillsHard.includes(o.value);

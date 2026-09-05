@@ -45,6 +45,7 @@ import { Route as AuthenticatedAdminWikiRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminTokensRouteImport } from './routes/_authenticated/admin.tokens'
 import { Route as AuthenticatedAdminTestingRouteImport } from './routes/_authenticated/admin.testing'
 import { Route as AuthenticatedAdminTeamsRouteImport } from './routes/_authenticated/admin.teams'
+import { Route as AuthenticatedAdminTaxonomyRouteImport } from './routes/_authenticated/admin.taxonomy'
 import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin.reviews'
 import { Route as AuthenticatedAdminPlatformRulesRouteImport } from './routes/_authenticated/admin.platform-rules'
 import { Route as AuthenticatedAdminPitcallsRouteImport } from './routes/_authenticated/admin.pitcalls'
@@ -253,6 +254,12 @@ const AuthenticatedAdminTeamsRoute = AuthenticatedAdminTeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTaxonomyRoute =
+  AuthenticatedAdminTaxonomyRouteImport.update({
+    id: '/taxonomy',
+    path: '/taxonomy',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminReviewsRoute =
   AuthenticatedAdminReviewsRouteImport.update({
     id: '/reviews',
@@ -360,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/admin/platform-rules': typeof AuthenticatedAdminPlatformRulesRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/taxonomy': typeof AuthenticatedAdminTaxonomyRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
@@ -409,6 +417,7 @@ export interface FileRoutesByTo {
   '/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/admin/platform-rules': typeof AuthenticatedAdminPlatformRulesRoute
   '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/taxonomy': typeof AuthenticatedAdminTaxonomyRoute
   '/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/admin/tokens': typeof AuthenticatedAdminTokensRoute
@@ -462,6 +471,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/pitcalls': typeof AuthenticatedAdminPitcallsRoute
   '/_authenticated/admin/platform-rules': typeof AuthenticatedAdminPlatformRulesRoute
   '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/_authenticated/admin/taxonomy': typeof AuthenticatedAdminTaxonomyRoute
   '/_authenticated/admin/teams': typeof AuthenticatedAdminTeamsRoute
   '/_authenticated/admin/testing': typeof AuthenticatedAdminTestingRoute
   '/_authenticated/admin/tokens': typeof AuthenticatedAdminTokensRoute
@@ -515,6 +525,7 @@ export interface FileRouteTypes {
     | '/admin/pitcalls'
     | '/admin/platform-rules'
     | '/admin/reviews'
+    | '/admin/taxonomy'
     | '/admin/teams'
     | '/admin/testing'
     | '/admin/tokens'
@@ -564,6 +575,7 @@ export interface FileRouteTypes {
     | '/admin/pitcalls'
     | '/admin/platform-rules'
     | '/admin/reviews'
+    | '/admin/taxonomy'
     | '/admin/teams'
     | '/admin/testing'
     | '/admin/tokens'
@@ -616,6 +628,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/pitcalls'
     | '/_authenticated/admin/platform-rules'
     | '/_authenticated/admin/reviews'
+    | '/_authenticated/admin/taxonomy'
     | '/_authenticated/admin/teams'
     | '/_authenticated/admin/testing'
     | '/_authenticated/admin/tokens'
@@ -923,6 +936,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTeamsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/taxonomy': {
+      id: '/_authenticated/admin/taxonomy'
+      path: '/taxonomy'
+      fullPath: '/admin/taxonomy'
+      preLoaderRoute: typeof AuthenticatedAdminTaxonomyRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/reviews': {
       id: '/_authenticated/admin/reviews'
       path: '/reviews'
@@ -1032,6 +1052,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPitcallsRoute: typeof AuthenticatedAdminPitcallsRoute
   AuthenticatedAdminPlatformRulesRoute: typeof AuthenticatedAdminPlatformRulesRoute
   AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
+  AuthenticatedAdminTaxonomyRoute: typeof AuthenticatedAdminTaxonomyRoute
   AuthenticatedAdminTeamsRoute: typeof AuthenticatedAdminTeamsRoute
   AuthenticatedAdminTestingRoute: typeof AuthenticatedAdminTestingRoute
   AuthenticatedAdminTokensRoute: typeof AuthenticatedAdminTokensRoute
@@ -1047,6 +1068,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminPitcallsRoute: AuthenticatedAdminPitcallsRoute,
   AuthenticatedAdminPlatformRulesRoute: AuthenticatedAdminPlatformRulesRoute,
   AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
+  AuthenticatedAdminTaxonomyRoute: AuthenticatedAdminTaxonomyRoute,
   AuthenticatedAdminTeamsRoute: AuthenticatedAdminTeamsRoute,
   AuthenticatedAdminTestingRoute: AuthenticatedAdminTestingRoute,
   AuthenticatedAdminTokensRoute: AuthenticatedAdminTokensRoute,

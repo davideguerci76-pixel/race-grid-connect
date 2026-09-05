@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { useTaxonomy } from "@/lib/use-taxonomy";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { setMyLegalName } from "@/lib/identity.functions";
@@ -414,6 +415,7 @@ function FreelancerSection({ profile }: { profile: any }) {
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
   const [editing, setEditing] = useState(false);
   const [showAllSkills, setShowAllSkills] = useState(false);
+  const tax = useTaxonomy();
   const [form, setForm] = useState({
     role_group: "" as string,
     sub_roles: [] as FreelancerSubRole[],
@@ -521,11 +523,11 @@ function FreelancerSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.macro_role")}</label>
           <select
             value={form.role_group}
-            onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_roles: [], skills: [] })}
+            onChange={(e) => setForm({ ...form, role_group: e.target.value, sub_roles: [] })}
             className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="">{t("sweep_profile.freelancer.select_macro_role")}</option>
-            {ROLE_GROUPS.map((g) => (<option key={g.value} value={g.value}>{g.label}</option>))}
+            {tax.roleGroups.map((g) => (<option key={g.value} value={g.value}>{roleGroupLabel(g.value)}</option>))}
           </select>
         </div>
         <SubRolesEditor
@@ -537,7 +539,7 @@ function FreelancerSection({ profile }: { profile: any }) {
           <label className="text-xs text-muted-foreground">{t("sweep_profile.freelancer.headline")}</label>
           <input value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.freelancer.headline_placeholder")} />
         </div>
-        <MultiCheckboxBox label={t("sweep_profile.freelancer.disciplines")} options={DISCIPLINE_OPTIONS} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
+        <MultiCheckboxBox label={t("sweep_profile.freelancer.disciplines")} options={tax.disciplines.map((d) => ({ value: d, label: disciplineLabel(d) }))} value={form.disciplines} onChange={(v) => setForm({ ...form, disciplines: v })} />
         <div>
           <div className="mb-1 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
@@ -554,8 +556,8 @@ function FreelancerSection({ profile }: { profile: any }) {
           <MultiCheckboxBox
             label={t("sweep_profile.freelancer.skills")}
             options={(showAllSkills || !form.role_group
-              ? SKILL_OPTIONS.map((o) => o.value)
-              : skillsForGroup(form.role_group)
+              ? tax.allSkills
+              : tax.skillsFor(form.role_group)
             ).map((v) => ({ value: v, label: skillLabel(v) }))}
             value={form.skills}
             onChange={(v) => setForm({ ...form, skills: v })}
@@ -1128,7 +1130,8 @@ function LanguagesEditor({
 
 function SubRolesEditor({ group, value, onChange }: { group: string; value: FreelancerSubRole[]; onChange: (v: FreelancerSubRole[]) => void }) {
   const { t } = useTranslation();
-  const options = subRolesForGroup(group);
+  const tax = useTaxonomy();
+  const options = tax.subRolesFor(group);
   if (!group) {
     return <div className="border border-border bg-card p-3 text-xs text-muted-foreground">{t("sweep_profile.freelancer.select_macro_role_first")}</div>;
   }

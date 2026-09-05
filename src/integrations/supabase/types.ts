@@ -1754,6 +1754,197 @@ export type Database = {
           },
         ]
       }
+      taxonomy_disciplines: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          labels: Json
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      taxonomy_languages: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          labels: Json
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      taxonomy_role_groups: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          labels: Json
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      taxonomy_skill_role_groups: {
+        Row: {
+          role_group_code: string
+          skill_code: string
+        }
+        Insert: {
+          role_group_code: string
+          skill_code: string
+        }
+        Update: {
+          role_group_code?: string
+          skill_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxonomy_skill_role_groups_role_group_code_fkey"
+            columns: ["role_group_code"]
+            isOneToOne: false
+            referencedRelation: "taxonomy_role_groups"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "taxonomy_skill_role_groups_skill_code_fkey"
+            columns: ["skill_code"]
+            isOneToOne: false
+            referencedRelation: "taxonomy_skills"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      taxonomy_skills: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          labels: Json
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      taxonomy_sub_roles: {
+        Row: {
+          code: string
+          created_at: string
+          is_active: boolean
+          labels: Json
+          role_group_code: string
+          sort_order: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          role_group_code: string
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          is_active?: boolean
+          labels?: Json
+          role_group_code?: string
+          sort_order?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taxonomy_sub_roles_role_group_code_fkey"
+            columns: ["role_group_code"]
+            isOneToOne: false
+            referencedRelation: "taxonomy_role_groups"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       team_match_notification_state: {
         Row: {
           activity_pending: boolean
@@ -2603,6 +2794,23 @@ export type Database = {
         Args: { _admin: string; _new_price: number }
         Returns: Json
       }
+      admin_taxonomy_set_skill_groups: {
+        Args: { p_groups: string[]; p_skill: string }
+        Returns: Json
+      }
+      admin_taxonomy_upsert: {
+        Args: {
+          p_active?: boolean
+          p_code: string
+          p_expected_version?: number
+          p_kind: string
+          p_labels?: Json
+          p_parent?: string
+          p_sort?: number
+        }
+        Returns: Json
+      }
+      admin_taxonomy_usage: { Args: never; Returns: Json }
       attach_token_order_session: {
         Args: { _order_id: string; _provider: string; _session_id: string }
         Returns: undefined
@@ -3444,6 +3652,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      taxonomy_assert_admin: { Args: never; Returns: undefined }
+      taxonomy_normalize_code: { Args: { p: string }; Returns: string }
       team_can_see_match: {
         Args: { _freelancer: string; _request: string; _team: string }
         Returns: boolean

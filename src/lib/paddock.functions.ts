@@ -314,6 +314,32 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
     if (profileError) throw new Error(profileError.message);
     if (profile?.user_type !== "freelancer") throw new Error("This account is not a freelancer profile");
 
+    // T2 taxonomy whitelist. Values already stored on this profile are accepted
+    // as-is (legacy safety); anything new must exist and be active.
+    {
+      const { loadTaxonomyGuard, assertAllowed, assertSubRolesAllowed } = await import("@/lib/taxonomy-guard");
+      const [guard, { data: current }] = await Promise.all([
+        loadTaxonomyGuard(context.supabase),
+        context.supabase
+          .from("freelancer_profiles")
+          .select("role_group, sub_roles, skills")
+          .eq("user_id", context.userId)
+          .maybeSingle(),
+      ]);
+      const prevSubRoles = Array.isArray((current as any)?.sub_roles)
+        ? ((current as any).sub_roles as any[]).map((x) => String(x?.sub_role ?? ""))
+        : [];
+      assertAllowed("macro-role", [data.role_group], guard.roleGroups, [(current as any)?.role_group].filter(Boolean));
+      assertSubRolesAllowed(
+        data.role_group,
+        (data.sub_roles ?? []).map((s) => s.sub_role),
+        guard,
+        prevSubRoles,
+      );
+      assertAllowed("skill", data.skills ?? [], guard.skills, ((current as any)?.skills ?? []) as string[]);
+      assertAllowed("language", (data.languages ?? []).map((l) => l.code), guard.languages);
+    }
+
     // Sensitive columns (day_rate, location_lat/lng) are NOT writable through the
     // Data API upsert: SELECT is revoked on them for `authenticated`, and an
     // ON CONFLICT DO UPDATE requires SELECT on every referenced column.
@@ -512,6 +538,15 @@ export const createRequest = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
+    // T2 taxonomy whitelist: a new Pit Call may only reference active values.
+    {
+      const { loadTaxonomyGuard, assertAllowed, assertSubRolesAllowed } = await import("@/lib/taxonomy-guard");
+      const guard = await loadTaxonomyGuard(context.supabase);
+      assertAllowed("macro-role", [data.role_group], guard.roleGroups);
+      if (data.sub_role) assertSubRolesAllowed(data.role_group, [data.sub_role], guard);
+      assertAllowed("skill", [...(data.skills ?? []), ...(data.skills_hard ?? [])], guard.skills);
+      assertAllowed("language", (data.languages ?? []).map((l: any) => l.code), guard.languages);
+    }
     const payload: Record<string, unknown> = {
       title: data.title,
       role_group: data.role_group,
