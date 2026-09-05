@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { readTaxonomySnapshot } from "@/lib/taxonomy-read";
 import {
@@ -57,6 +57,27 @@ export type TaxonomyView = {
   disciplines: string[];
   languages: string[];
 };
+
+/**
+ * STEP T3 — app-wide taxonomy boot.
+ *
+ * The registry is a module-level store, so a page that never calls
+ * `useTaxonomy()` used to render database-managed entries through the
+ * hardcoded fallback (a freshly created value appeared as its humanized code).
+ * Mounting this boundary once at the root loads the snapshot for every screen
+ * and re-renders the tree when it arrives. Read-only: no matching, scoring or
+ * stored value is touched.
+ */
+export function TaxonomyBoundary({ children }: { children: ReactNode }) {
+  const { data } = useQuery({
+    queryKey: TAXONOMY_QUERY_KEY,
+    queryFn: fetchActiveTaxonomy,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+  if (data) setTaxonomySnapshot(data);
+  return children as ReactNode;
+}
 
 export function useTaxonomy(): TaxonomyView {
   const { data, isLoading } = useQuery({
