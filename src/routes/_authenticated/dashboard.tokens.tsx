@@ -15,6 +15,7 @@ import {
 } from "@/lib/token-checkout.functions";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
+import { toastError, toastWarning } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
   component: TokensPage,
