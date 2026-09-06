@@ -696,7 +696,7 @@ function NewRequestPage() {
                     title={isHard ? t("sweep_engage.new_request.hard_required_tooltip") : isSoft ? t("sweep_engage.new_request.soft_preferred_tooltip") : t("sweep_engage.new_request.not_selected_tooltip")}
                     className={`border px-2 py-1 text-[11px] font-bold transition-colors ${cls}`}
                   >
-                    {skillLabel(o.value)}{isHard ? " ●" : isSoft ? " ○" : ""}
+                    {skillLabel(o.value)}{isRetired ? ` · ${t("sweep_profile.freelancer.retired_value")}` : ""}{isHard ? " ●" : isSoft ? " ○" : ""}
                   </button>
                 );
               })}
