@@ -1,0 +1,28 @@
+{
+  "billing": {
+    "section_title": "Rechnungsdaten",
+    "section_hint": "Optionale Verwaltungsdaten für die künftige Rechnungsstellung. Für die Nutzung von PITCALL nicht erforderlich.",
+    "subject_type": "Art des Rechnungsempfängers",
+    "subject_individual": "Privatperson",
+    "subject_company": "Unternehmen / Organisation",
+    "person_name": "Vor- und Nachname",
+    "company_name": "Firmenname",
+    "country": "Land",
+    "address": "Rechnungsadresse",
+    "city": "Stadt",
+    "postal_code": "Postleitzahl",
+    "region": "Provinz / Bundesland / Region",
+    "tax_id": "USt-IdNr. / Steuernummer",
+    "italy_block": "Nur Italien",
+    "italy_hint": "Optionale Felder, die nur für die italienische E-Rechnung verwendet werden.",
+    "sdi_code": "Codice Destinatario (Italien, optional)",
+    "pec": "PEC (Italien, optional)",
+    "billing_email": "Rechnungs-E-Mail (optional)",
+    "billing_phone": "Rechnungstelefon (optional)",
+    "edit": "Rechnungsdaten bearbeiten",
+    "saved": "Rechnungsdaten gespeichert",
+    "invalid_email": "Ungültige Rechnungs-E-Mail",
+    "invalid_pec": "Ungültige PEC-Adresse",
+    "team_name_locked": "Bei der Kontoerstellung festgelegt — änderbar nur durch den PITCALL-Support."
+  }
+}
