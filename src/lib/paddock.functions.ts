@@ -227,29 +227,18 @@ export const getMyFrozenDates = createServerFn({ method: "GET" })
   });
 
 // ---- Profile saving ----
-// Teams only: the profile "name" is the team name. Freelancers are identified
-// exclusively by their locked legal name (first_name + last_name).
+// Account name is identity, not profile data: freelancers are identified by
+// their locked legal name, teams by the team name defined at signup. Neither
+// can be changed by the account itself — only by PITCALL admin authority.
 export const updateMyDisplayName = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z.object({ display_name: z.string().trim().min(2).max(80) }).parse(data),
   )
-  .handler(async ({ data, context }) => {
-    const { data: me } = await context.supabase
-      .from("profiles")
-      .select("user_type")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if ((me as any)?.user_type === "freelancer") throw new Error("NAME_LOCKED");
-    const { data: row, error } = await context.supabase
-      .from("profiles")
-      .update({ display_name: data.display_name })
-      .eq("id", context.userId)
-      .select("id, display_name, avatar_url, user_type, preferred_language, created_at, updated_at")
-      .single();
-    if (error) throw new Error(error.message);
-    return row;
+  .handler(async () => {
+    throw new Error("NAME_LOCKED");
   });
+
 
 
 export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
