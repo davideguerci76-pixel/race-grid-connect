@@ -589,6 +589,13 @@
       "when": 1788733454808,
       "tag": "0083_billing_details_revoke_anon",
       "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1788734605231,
+      "tag": "0084_sec21_grant_hardening_hook_and_capacity",
+      "breakpoints": true
     }
   ]
 }
