@@ -322,7 +322,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         loadTaxonomyGuard(context.supabase),
         context.supabase
           .from("freelancer_profiles")
-          .select("role_group, sub_roles, skills")
+          .select("role_group, sub_roles, skills, languages")
           .eq("user_id", context.userId)
           .maybeSingle(),
       ]);
