@@ -421,13 +421,6 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z
       .object({
-        team_name: z.string().trim().min(2).max(120),
-        vat_number: z
-          .string()
-          .trim()
-          .min(5)
-          .max(24)
-          .refine((v) => isValidVat(v), "INVALID_VAT"),
         team_type: z.string().max(120).optional().nullable(),
         location: z.string().max(140).optional().nullable(),
         location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
@@ -451,19 +444,11 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
     if (profileError) throw new Error(profileError.message);
     if (profile?.user_type !== "team") throw new Error("This account is not a team profile");
 
-    const initials = data.team_name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((s) => s[0]?.toUpperCase() ?? "")
-      .join("");
-
-    const { data: row, error } = await context.supabase.from("team_profiles").upsert(
+    // Team name is account identity (set at signup, changeable only by PITCALL
+    // admin authority) and VAT moved to the private billing registry: neither is
+    // writable from this mutation.
+    const { data: row, error } = await context.supabase.from("team_profiles").update(
       {
-        user_id: context.userId,
-        team_name: data.team_name,
-        vat_number: normalizeVat(data.vat_number),
-        initials,
         team_type: data.team_type || null,
         location: data.location || null,
         location_lat: data.location_lat ?? null,
@@ -476,11 +461,11 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
         bio: data.bio || null,
         website: data.website || null,
       } as never,
-      { onConflict: "user_id" },
-    ).select("*").single();
+    ).eq("user_id", context.userId).select("*").single();
     if (error) throw new Error(error.message);
     return row;
   });
+
 
 // ---- Requests ----
 export const createRequest = createServerFn({ method: "POST" })
