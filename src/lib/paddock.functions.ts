@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isValidVat, normalizeVat } from "@/lib/vat";
 import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
 // Enums are validated server-side by Postgres; keep TS-side loose to allow the extended taxonomy.
