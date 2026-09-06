@@ -46,6 +46,8 @@ function AdminLayout() {
     { to: "/admin/matching", label: t("sweep_admin_a.tabs.matching") },
     { to: "/admin/taxonomy", label: "Taxonomy" },
     { to: "/admin/tokens", label: t("sweep_admin_a.tabs.tokens") },
+    { to: "/admin/billing", label: "Billing & Payments" },
+
     { to: "/admin/platform-rules", label: t("sweep_admin_a.tabs.platform_rules") },
     { to: "/admin/reviews", label: t("sweep_admin_a.tabs.reviews") },
     { to: "/admin/calendars", label: t("sweep_admin_a.tabs.calendars") },
