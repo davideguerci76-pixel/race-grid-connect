@@ -663,8 +663,14 @@ function NewRequestPage() {
               {t("sweep_engage.new_request.skill_cycle_help_prefix")} <span className="font-bold text-yellow-500">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_mid")} <span className="font-bold text-racing-red">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_suffix")}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {(showAllSkills ? tax.allSkills : tax.skillsFor(form.role_group)).map((sv) => {
+              {(() => {
+                const list = showAllSkills ? tax.allSkills : tax.skillsFor(form.role_group);
+                const selected = [...skills, ...skillsHard];
+                const retained = selected.filter((s) => !tax.allSkills.includes(s) && !list.includes(s));
+                return [...list, ...retained];
+              })().map((sv) => {
                 const o = { value: sv };
+                const isRetired = !tax.allSkills.includes(sv);
                 const isSoft = skills.includes(o.value);
                 const isHard = skillsHard.includes(o.value);
                 const cycle = () => {
@@ -690,7 +696,7 @@ function NewRequestPage() {
                     title={isHard ? t("sweep_engage.new_request.hard_required_tooltip") : isSoft ? t("sweep_engage.new_request.soft_preferred_tooltip") : t("sweep_engage.new_request.not_selected_tooltip")}
                     className={`border px-2 py-1 text-[11px] font-bold transition-colors ${cls}`}
                   >
-                    {skillLabel(o.value)}{isHard ? " ●" : isSoft ? " ○" : ""}
+                    {skillLabel(o.value)}{isRetired ? ` · ${t("sweep_profile.freelancer.retired_value")}` : ""}{isHard ? " ●" : isSoft ? " ○" : ""}
                   </button>
                 );
               })}
@@ -795,9 +801,16 @@ function NewRequestPage() {
                     onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
-                    {(tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value)).map((c) => (
-                      <option key={c} value={c}>{languageLabel(c)}</option>
-                    ))}
+                    {(() => {
+                      const active = tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value);
+                      const retired = active.includes(req.code) ? [] : [req.code];
+                      return [
+                        ...active.map((c) => ({ c, label: languageLabel(c) })),
+                        ...retired.map((c) => ({ c, label: `${languageLabel(c)} · ${t("sweep_profile.freelancer.retired_value")}` })),
+                      ].map(({ c, label }) => (
+                        <option key={c} value={c}>{label}</option>
+                      ));
+                    })()}
                   </select>
                   <select
                     value={req.level}
