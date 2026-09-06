@@ -98,7 +98,14 @@ function AdminTaxonomy() {
         return;
       }
       if (res?.ok === false) {
-        toast.warning(String(res?.reason ?? "Could not save"));
+        const reason = String(res?.reason ?? "");
+        const readable =
+          reason === "invalid_code"
+            ? "Use at least 2 characters: lowercase letters, numbers and underscores only."
+            : reason === "parent_required"
+              ? "Pick the macro-role this sub-role belongs to."
+              : reason || "Could not save";
+        toast.warning(readable);
         return;
       }
       toast.success("Saved");
