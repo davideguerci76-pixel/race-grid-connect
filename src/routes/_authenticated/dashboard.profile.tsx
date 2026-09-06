@@ -666,8 +666,6 @@ function TeamSection({ profile }: { profile: any }) {
   const saveTeamProfile = useServerFn(updateMyTeamProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    team_name: "",
-    vat_number: "",
     team_type: "",
     location: "",
     location_lat: null as number | null,
@@ -684,8 +682,6 @@ function TeamSection({ profile }: { profile: any }) {
   useEffect(() => {
     if (editing) return;
     setForm({
-      team_name: profile?.team_name ?? "",
-      vat_number: (profile as any)?.vat_number ?? "",
       team_type: profile?.team_type ?? "",
       location: profile?.location ?? "",
       location_lat: (profile as any)?.location_lat ?? null,
@@ -703,12 +699,9 @@ function TeamSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      if (!form.team_name.trim()) throw new Error(t("team.name_required"));
-      if (!isValidVat(form.vat_number)) throw new Error(t("team.vat_invalid"));
+      // Team name is account identity: never sent from a team-side mutation.
       return saveTeamProfile({
         data: {
-          team_name: form.team_name,
-          vat_number: form.vat_number,
           team_type: form.team_type || null,
           location: form.location || null,
           location_lat: form.location_lat ?? null,
@@ -737,23 +730,6 @@ function TeamSection({ profile }: { profile: any }) {
   if (editing) {
     return (
       <div className="mt-4 space-y-4">
-        <div>
-          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_name")}</label>
-          <input value={form.team_name} onChange={(e) => setForm({ ...form, team_name: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">{t("team.vat")} <span className="text-racing-red">*</span></label>
-          <input
-            value={form.vat_number}
-            onChange={(e) => setForm({ ...form, vat_number: e.target.value })}
-            placeholder={VAT_PLACEHOLDER}
-            className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm uppercase"
-          />
-          <p className="mt-1 text-[11px] text-muted-foreground">{t("team.vat_hint")}</p>
-          {form.vat_number.trim().length > 0 && !isValidVat(form.vat_number) && (
-            <p className="mt-1 text-[11px] text-racing-red">{t("team.vat_invalid")}</p>
-          )}
-        </div>
         <div>
           <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_type")}</label>
           <input value={form.team_type} onChange={(e) => setForm({ ...form, team_type: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.team.team_type_placeholder")} />
@@ -791,11 +767,7 @@ function TeamSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <Row label={t("team.name")} value={profile?.team_name ?? "—"} bold />
-      <Row label={t("team.vat")} value={(profile as any)?.vat_number ?? "—"} mono />
-      {!(profile as any)?.vat_number && (
-        <p className="border border-racing-red/50 bg-racing-red/10 p-2 text-[11px] text-racing-red">{t("team.vat_required_banner")}</p>
-      )}
+
       <Row label={t("sweep_profile.team.type")} value={profile?.team_type ?? "—"} />
       <Row label={t("sweep_profile.freelancer.location")} value={profile?.location ?? "—"} />
       <Row label={t("sweep_profile.team.discipline")} value={disciplineLabel(profile?.primary_discipline)} mono />
