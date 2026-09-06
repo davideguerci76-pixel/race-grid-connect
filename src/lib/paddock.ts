@@ -330,7 +330,8 @@ export function disciplineLabel(value: string | null | undefined): string {
   if (!value) return "—";
   const db = dbLabel("discipline", value);
   if (db) return db;
-  const t = tryTranslate(`disciplines.${value}`);
+  // Shipped locales store these under `discipline.<code>` (singular).
+  const t = tryTranslate(`discipline.${value}`) ?? tryTranslate(`disciplines.${value}`);
   if (t) return t;
   return taxonomyFallbackLabel("discipline", value) ?? DISCIPLINE_MAP.get(value) ?? value.replace(/_/g, " ");
 }
