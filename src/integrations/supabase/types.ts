@@ -210,6 +210,71 @@ export type Database = {
           },
         ]
       }
+      billing_details: {
+        Row: {
+          address: string | null
+          billing_email: string | null
+          billing_name: string | null
+          billing_phone: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          is_test: boolean
+          pec: string | null
+          postal_code: string | null
+          region: string | null
+          sdi_code: string | null
+          subject_type: string
+          tax_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          billing_email?: string | null
+          billing_name?: string | null
+          billing_phone?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          is_test?: boolean
+          pec?: string | null
+          postal_code?: string | null
+          region?: string | null
+          sdi_code?: string | null
+          subject_type?: string
+          tax_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          billing_email?: string | null
+          billing_name?: string | null
+          billing_phone?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          is_test?: boolean
+          pec?: string | null
+          postal_code?: string | null
+          region?: string | null
+          sdi_code?: string | null
+          subject_type?: string
+          tax_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_details_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_day_notes: {
         Row: {
           busy: boolean
@@ -2190,6 +2255,7 @@ export type Database = {
         Row: {
           amount_collected_cents: number | null
           base_amount_cents: number
+          billing_snapshot: Json | null
           cancelled_at: string | null
           created_at: string
           created_by: string
@@ -2221,6 +2287,7 @@ export type Database = {
         Insert: {
           amount_collected_cents?: number | null
           base_amount_cents: number
+          billing_snapshot?: Json | null
           cancelled_at?: string | null
           created_at?: string
           created_by: string
@@ -2252,6 +2319,7 @@ export type Database = {
         Update: {
           amount_collected_cents?: number | null
           base_amount_cents?: number
+          billing_snapshot?: Json | null
           cancelled_at?: string | null
           created_at?: string
           created_by?: string

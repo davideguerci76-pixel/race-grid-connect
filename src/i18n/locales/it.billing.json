@@ -1,0 +1,28 @@
+{
+  "billing": {
+    "section_title": "Dati di fatturazione",
+    "section_hint": "Dati amministrativi facoltativi per la fatturazione futura. Non sono necessari per usare PITCALL.",
+    "subject_type": "Tipo soggetto",
+    "subject_individual": "Privato / Persona fisica",
+    "subject_company": "Azienda / Organizzazione",
+    "person_name": "Nome e cognome",
+    "company_name": "Ragione sociale",
+    "country": "Paese",
+    "address": "Indirizzo di fatturazione",
+    "city": "Città",
+    "postal_code": "CAP",
+    "region": "Provincia / Regione",
+    "tax_id": "Partita IVA / Codice fiscale",
+    "italy_block": "Solo Italia",
+    "italy_hint": "Campi facoltativi usati solo per la fatturazione elettronica italiana.",
+    "sdi_code": "Codice Destinatario (Italia, facoltativo)",
+    "pec": "PEC (Italia, facoltativa)",
+    "billing_email": "Email di fatturazione (facoltativa)",
+    "billing_phone": "Telefono di fatturazione (facoltativo)",
+    "edit": "Modifica dati di fatturazione",
+    "saved": "Dati di fatturazione salvati",
+    "invalid_email": "Email di fatturazione non valida",
+    "invalid_pec": "Indirizzo PEC non valido",
+    "team_name_locked": "Definito alla creazione dell'account — modificabile solo dal supporto PITCALL."
+  }
+}

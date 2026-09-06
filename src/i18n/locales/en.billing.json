@@ -1,0 +1,28 @@
+{
+  "billing": {
+    "section_title": "Billing details",
+    "section_hint": "Optional administrative data used for future invoicing. Not required to use PITCALL.",
+    "subject_type": "Subject type",
+    "subject_individual": "Private / Individual",
+    "subject_company": "Company / Organisation",
+    "person_name": "First and last name",
+    "company_name": "Legal / company name",
+    "country": "Country",
+    "address": "Billing address",
+    "city": "City",
+    "postal_code": "Postal code / ZIP",
+    "region": "Province / State / Region",
+    "tax_id": "VAT / Tax ID",
+    "italy_block": "Italy only",
+    "italy_hint": "Optional fields used only for Italian electronic invoicing.",
+    "sdi_code": "Codice Destinatario (Italy, optional)",
+    "pec": "PEC (Italy, optional)",
+    "billing_email": "Billing email (optional)",
+    "billing_phone": "Billing phone (optional)",
+    "edit": "Edit billing details",
+    "saved": "Billing details saved",
+    "invalid_email": "Invalid billing email",
+    "invalid_pec": "Invalid PEC address",
+    "team_name_locked": "Defined at account creation — can only be changed by PITCALL support."
+  }
+}

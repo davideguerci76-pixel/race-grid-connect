@@ -1,0 +1,28 @@
+{
+  "billing": {
+    "section_title": "Datos de facturación",
+    "section_hint": "Datos administrativos opcionales para la futura facturación. No son necesarios para usar PITCALL.",
+    "subject_type": "Tipo de sujeto",
+    "subject_individual": "Particular / Persona física",
+    "subject_company": "Empresa / Organización",
+    "person_name": "Nombre y apellidos",
+    "company_name": "Razón social",
+    "country": "País",
+    "address": "Dirección de facturación",
+    "city": "Ciudad",
+    "postal_code": "Código postal",
+    "region": "Provincia / Estado / Región",
+    "tax_id": "NIF / IVA",
+    "italy_block": "Solo Italia",
+    "italy_hint": "Campos opcionales usados solo para la facturación electrónica italiana.",
+    "sdi_code": "Codice Destinatario (Italia, opcional)",
+    "pec": "PEC (Italia, opcional)",
+    "billing_email": "Email de facturación (opcional)",
+    "billing_phone": "Teléfono de facturación (opcional)",
+    "edit": "Editar datos de facturación",
+    "saved": "Datos de facturación guardados",
+    "invalid_email": "Email de facturación no válido",
+    "invalid_pec": "Dirección PEC no válida",
+    "team_name_locked": "Definido al crear la cuenta — solo lo puede cambiar el soporte de PITCALL."
+  }
+}

@@ -13,8 +13,9 @@ import { useTaxonomy } from "@/lib/use-taxonomy";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { setMyLegalName } from "@/lib/identity.functions";
-import { isValidVat, VAT_PLACEHOLDER } from "@/lib/vat";
-import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
+import { BillingDetailsSection } from "@/components/billing-details-section";
+import { updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
+
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { RatingIcons } from "@/components/rating-icons";
 import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
@@ -164,8 +165,13 @@ function ProfilePage() {
         </div>
 
         <div className="mt-8">
+          <BillingDetailsSection />
+        </div>
+
+        <div className="mt-8">
           <PrivacyDataSection />
         </div>
+
       </div>
       <SiteFooter />
     </div>
@@ -245,10 +251,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const { user } = useAuth();
-  const saveDisplayName = useServerFn(updateMyDisplayName);
   const savePhone = useServerFn(updateMyPhone);
-  const [editing, setEditing] = useState(false);
-  const [displayName, setDisplayName] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneDial, setPhoneDial] = useState("+39");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -257,33 +260,12 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const fp = profile?.freelancerProfile;
 
   useEffect(() => {
-    if (!editing && profile) setDisplayName(profile.display_name ?? "");
-  }, [profile, editing]);
-
-  useEffect(() => {
     if (!editingPhone) {
       setPhoneDial(fp?.phone_dial_code ?? "+39");
       setPhoneNumber(fp?.phone_number ?? "");
     }
   }, [fp, editingPhone]);
 
-  const updateMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) throw new Error("Not authenticated");
-      return saveDisplayName({ data: { display_name: displayName } });
-    },
-    onSuccess: (saved) => {
-      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.setQueryData(["profile-summary", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.setQueryData(["dashboard-profile", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
-      qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
-      qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
-      toast.success(t("sweep_profile.common.updated"));
-      setEditing(false);
-    },
-    onError: (e) => toastError(e, "sweep_profile.common.failed"),
-  });
 
   const phoneMutation = useMutation({
     mutationFn: async () => {
@@ -322,38 +304,14 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="ml-2 break-words font-mono uppercase">{profile?.user_type ?? "—"}</span>
         <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
-      {!isFreelancer && (editing ? (
-        <>
-          <div>
-            <label className="text-xs text-muted-foreground">
-              {t("sweep_profile.profile.team_name")}
-            </label>
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-              {t("sweep_profile.common.save")}
-            </button>
-            <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-              {t("sweep_profile.common.cancel")}
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="text-sm">
-            <span className="text-muted-foreground">{t("sweep_profile.profile.team_name")}:</span>
-            <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
-          </div>
-          <button onClick={() => setEditing(true)} className="text-xs text-racing-red hover:underline">
-            {t("sweep_profile.common.edit")}
-          </button>
-        </>
-      ))}
+      {!isFreelancer && (
+        <div className="text-sm">
+          <span className="text-muted-foreground">{t("sweep_profile.profile.team_name")}:</span>
+          <span className="ml-2 break-words font-mono">{profile?.display_name ?? "—"}</span>
+          <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
+        </div>
+      )}
+
 
 
       <div className="text-sm">
@@ -714,8 +672,6 @@ function TeamSection({ profile }: { profile: any }) {
   const saveTeamProfile = useServerFn(updateMyTeamProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    team_name: "",
-    vat_number: "",
     team_type: "",
     location: "",
     location_lat: null as number | null,
@@ -732,8 +688,6 @@ function TeamSection({ profile }: { profile: any }) {
   useEffect(() => {
     if (editing) return;
     setForm({
-      team_name: profile?.team_name ?? "",
-      vat_number: (profile as any)?.vat_number ?? "",
       team_type: profile?.team_type ?? "",
       location: profile?.location ?? "",
       location_lat: (profile as any)?.location_lat ?? null,
@@ -751,12 +705,9 @@ function TeamSection({ profile }: { profile: any }) {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      if (!form.team_name.trim()) throw new Error(t("team.name_required"));
-      if (!isValidVat(form.vat_number)) throw new Error(t("team.vat_invalid"));
+      // Team name is account identity: never sent from a team-side mutation.
       return saveTeamProfile({
         data: {
-          team_name: form.team_name,
-          vat_number: form.vat_number,
           team_type: form.team_type || null,
           location: form.location || null,
           location_lat: form.location_lat ?? null,
@@ -785,23 +736,6 @@ function TeamSection({ profile }: { profile: any }) {
   if (editing) {
     return (
       <div className="mt-4 space-y-4">
-        <div>
-          <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_name")}</label>
-          <input value={form.team_name} onChange={(e) => setForm({ ...form, team_name: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" />
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground">{t("team.vat")} <span className="text-racing-red">*</span></label>
-          <input
-            value={form.vat_number}
-            onChange={(e) => setForm({ ...form, vat_number: e.target.value })}
-            placeholder={VAT_PLACEHOLDER}
-            className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm uppercase"
-          />
-          <p className="mt-1 text-[11px] text-muted-foreground">{t("team.vat_hint")}</p>
-          {form.vat_number.trim().length > 0 && !isValidVat(form.vat_number) && (
-            <p className="mt-1 text-[11px] text-racing-red">{t("team.vat_invalid")}</p>
-          )}
-        </div>
         <div>
           <label className="text-xs text-muted-foreground">{t("sweep_profile.team.team_type")}</label>
           <input value={form.team_type} onChange={(e) => setForm({ ...form, team_type: e.target.value })} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm" placeholder={t("sweep_profile.team.team_type_placeholder")} />
@@ -839,11 +773,7 @@ function TeamSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <Row label={t("team.name")} value={profile?.team_name ?? "—"} bold />
-      <Row label={t("team.vat")} value={(profile as any)?.vat_number ?? "—"} mono />
-      {!(profile as any)?.vat_number && (
-        <p className="border border-racing-red/50 bg-racing-red/10 p-2 text-[11px] text-racing-red">{t("team.vat_required_banner")}</p>
-      )}
+
       <Row label={t("sweep_profile.team.type")} value={profile?.team_type ?? "—"} />
       <Row label={t("sweep_profile.freelancer.location")} value={profile?.location ?? "—"} />
       <Row label={t("sweep_profile.team.discipline")} value={disciplineLabel(profile?.primary_discipline)} mono />
