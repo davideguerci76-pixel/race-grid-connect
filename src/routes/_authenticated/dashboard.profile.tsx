@@ -13,8 +13,9 @@ import { useTaxonomy } from "@/lib/use-taxonomy";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { setMyLegalName } from "@/lib/identity.functions";
-import { isValidVat, VAT_PLACEHOLDER } from "@/lib/vat";
-import { updateMyDisplayName, updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
+import { BillingDetailsSection } from "@/components/billing-details-section";
+import { updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
+
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { RatingIcons } from "@/components/rating-icons";
 import { AnonymousReviewsSection } from "@/components/anonymous-reviews";
