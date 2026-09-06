@@ -34,7 +34,10 @@ export const adminGetTaxonomy = createServerFn({ method: "GET" })
 
 const upsertInput = z.object({
   kind: z.enum(["role_group", "sub_role", "skill", "discipline", "language"]),
-  code: z.string().trim().min(2).max(64),
+  // Kept permissive on purpose: a too-short or symbol-only code is a normal
+  // typing mistake in the ACP, so it must come back as a structured
+  // `invalid_code` answer instead of a thrown validation error.
+  code: z.string().trim().min(1).max(64),
   parent: z.string().trim().max(64).nullable().optional(),
   labels: labelsSchema.optional(),
   sort_order: z.number().int().min(0).max(100000).optional(),
