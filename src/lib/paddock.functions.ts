@@ -435,24 +435,36 @@ export const updateMyTeamProfile = createServerFn({ method: "POST" })
     // Team name is account identity (set at signup, changeable only by PITCALL
     // admin authority) and VAT moved to the private billing registry: neither is
     // writable from this mutation.
-    const { data: row, error } = await context.supabase.from("team_profiles").update(
-      {
-        team_type: data.team_type || null,
-        location: data.location || null,
-        location_lat: data.location_lat ?? null,
-        location_lng: data.location_lng ?? null,
-        location_city: data.location_city ?? null,
-        location_region: data.location_region ?? null,
-        location_country: data.location_country ?? null,
-        location_place_id: data.location_place_id ?? null,
-        primary_discipline: data.primary_discipline || null,
-        bio: data.bio || null,
-        website: data.website || null,
-      } as never,
-    ).eq("user_id", context.userId).select("*").single();
+    const patch = {
+      team_type: data.team_type || null,
+      location: data.location || null,
+      location_lat: data.location_lat ?? null,
+      location_lng: data.location_lng ?? null,
+      location_city: data.location_city ?? null,
+      location_region: data.location_region ?? null,
+      location_country: data.location_country ?? null,
+      location_place_id: data.location_place_id ?? null,
+      primary_discipline: data.primary_discipline || null,
+      bio: data.bio || null,
+      website: data.website || null,
+    };
+    // No RETURNING: team_profiles identity rows are readable only through the
+    // authorised projections, so a `.select()` here would be denied.
+    const { error } = await context.supabase
+      .from("team_profiles")
+      .update(patch as never)
+      .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("team_profiles")
+      .select("*")
+      .eq("user_id", context.userId)
+      .maybeSingle();
     return row;
   });
+
 
 
 // ---- Requests ----
