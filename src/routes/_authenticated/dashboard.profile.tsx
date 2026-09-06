@@ -555,10 +555,18 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <MultiCheckboxBox
             label={t("sweep_profile.freelancer.skills")}
-            options={(showAllSkills || !form.role_group
-              ? tax.allSkills
-              : tax.skillsFor(form.role_group)
-            ).map((v) => ({ value: v, label: skillLabel(v) }))}
+            options={(() => {
+              const list = showAllSkills || !form.role_group ? tax.allSkills : tax.skillsFor(form.role_group);
+              const opts = list.map((v) => ({ value: v, label: skillLabel(v) }));
+              // T3.4 F1 — a retired skill still owned by this profile is absent from
+              // the active catalogue: surface it so it stays readable and removable.
+              // Skills that merely belong to another macro-role are NOT marked.
+              const retained = form.skills.filter((s) => !tax.allSkills.includes(s) && !list.includes(s));
+              return [
+                ...opts,
+                ...retained.map((v) => ({ value: v, label: `${skillLabel(v)} · ${t("sweep_profile.freelancer.retired_value")}` })),
+              ];
+            })()}
             value={form.skills}
             onChange={(v) => setForm({ ...form, skills: v })}
           />
