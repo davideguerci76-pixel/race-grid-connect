@@ -3249,6 +3249,20 @@ export type Database = {
       }
       legacy_role_group: { Args: { _role: string }; Returns: string }
       legacy_sub_role: { Args: { _role: string }; Returns: string }
+      list_shared_calendars: {
+        Args: never
+        Returns: {
+          dates: string[]
+          discipline: string
+          events: Json
+          id: string
+          name: string
+          review_status: string
+          season_year: number
+          source: string
+          updated_at: string
+        }[]
+      }
       market_stats: { Args: never; Returns: Json }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }

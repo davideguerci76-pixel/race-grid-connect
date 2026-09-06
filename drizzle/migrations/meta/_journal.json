@@ -561,6 +561,13 @@
       "when": 1788658650118,
       "tag": "0079_sec1_profile_authority_and_search_path",
       "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1788659844544,
+      "tag": "0080_shared_calendars_hide_submitter_identity",
+      "breakpoints": true
     }
   ]
 }

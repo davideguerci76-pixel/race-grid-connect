@@ -47,18 +47,15 @@ export const listMyCalendars = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const [mine, shared] = await Promise.all([
       (supabase.from("user_calendars" as never) as any).select("*").eq("owner_id", userId).order("updated_at", { ascending: false }),
-      (supabase.from("user_calendars" as never) as any)
-        .select("*")
-        .eq("review_status", "approved")
-        .neq("owner_id", userId)
-        .order("name", { ascending: true }),
+      (supabase as any).rpc("list_shared_calendars"),
     ]);
     if (mine.error) throw new Error(mine.error.message);
     if (shared.error) throw new Error(shared.error.message);
     return {
       mine: (mine.data ?? []).map(normalize),
-      shared: (shared.data ?? []).map(normalize),
+      shared: (shared.data ?? []).map((r: any) => normalize({ ...r, owner_id: "", review_note: null })),
     };
+
   });
 
 export const saveCalendar = createServerFn({ method: "POST" })
