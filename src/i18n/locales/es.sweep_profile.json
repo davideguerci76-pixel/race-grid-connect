@@ -66,7 +66,8 @@
       "add_language": "+ Añadir idioma",
       "add_another_language": "+ Añadir otro idioma",
       "saved": "Perfil de freelancer guardado",
-      "edit_info": "Editar información de freelancer"
+      "edit_info": "Editar información de freelancer",
+      "retired_value": "Ya no disponible"
     },
     "team": {
       "team_name": "Nombre del team",

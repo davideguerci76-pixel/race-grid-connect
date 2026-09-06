@@ -66,7 +66,8 @@
       "add_language": "+ Add language",
       "add_another_language": "+ Add another language",
       "saved": "Freelancer profile saved",
-      "edit_info": "Edit Freelancer Info"
+      "edit_info": "Edit Freelancer Info",
+      "retired_value": "No longer available"
     },
     "team": {
       "team_name": "Team Name",

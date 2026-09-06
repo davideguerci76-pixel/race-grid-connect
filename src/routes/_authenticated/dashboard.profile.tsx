@@ -555,10 +555,18 @@ function FreelancerSection({ profile }: { profile: any }) {
           </div>
           <MultiCheckboxBox
             label={t("sweep_profile.freelancer.skills")}
-            options={(showAllSkills || !form.role_group
-              ? tax.allSkills
-              : tax.skillsFor(form.role_group)
-            ).map((v) => ({ value: v, label: skillLabel(v) }))}
+            options={(() => {
+              const list = showAllSkills || !form.role_group ? tax.allSkills : tax.skillsFor(form.role_group);
+              const opts = list.map((v) => ({ value: v, label: skillLabel(v) }));
+              // T3.4 F1 — a retired skill still owned by this profile is absent from
+              // the active catalogue: surface it so it stays readable and removable.
+              // Skills that merely belong to another macro-role are NOT marked.
+              const retained = form.skills.filter((s) => !tax.allSkills.includes(s) && !list.includes(s));
+              return [
+                ...opts,
+                ...retained.map((v) => ({ value: v, label: `${skillLabel(v)} · ${t("sweep_profile.freelancer.retired_value")}` })),
+              ];
+            })()}
             value={form.skills}
             onChange={(v) => setForm({ ...form, skills: v })}
           />
@@ -1088,9 +1096,19 @@ function LanguagesEditor({
               onChange={(ev) => update(i, { code: ev.target.value })}
               className="border border-border bg-background px-2 py-1 text-sm"
             >
-              {(tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value)).map((c) => (
-                <option key={c} value={c}>{languageLabel(c)}</option>
-              ))}
+              {(() => {
+                const active = tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value);
+                // T3.4 F2 — a retired language already stored on this row stays
+                // listed (marked) so it can be read and removed; it is never
+                // offered to a row that does not already carry it.
+                const retired = active.includes(l.code) ? [] : [l.code];
+                return [
+                  ...active.map((c) => ({ c, label: languageLabel(c) })),
+                  ...retired.map((c) => ({ c, label: `${languageLabel(c)} · ${t("sweep_profile.freelancer.retired_value")}` })),
+                ].map(({ c, label }) => (
+                  <option key={c} value={c}>{label}</option>
+                ));
+              })()}
             </select>
             <select
               value={l.level}

@@ -322,7 +322,7 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         loadTaxonomyGuard(context.supabase),
         context.supabase
           .from("freelancer_profiles")
-          .select("role_group, sub_roles, skills")
+          .select("role_group, sub_roles, skills, languages")
           .eq("user_id", context.userId)
           .maybeSingle(),
       ]);
@@ -337,7 +337,13 @@ export const updateMyFreelancerProfile = createServerFn({ method: "POST" })
         prevSubRoles,
       );
       assertAllowed("skill", data.skills ?? [], guard.skills, ((current as any)?.skills ?? []) as string[]);
-      assertAllowed("language", (data.languages ?? []).map((l) => l.code), guard.languages);
+      // T3.4 F2 — languages follow the same grandfathering rule as skills:
+      // a code already stored on the profile survives a later retirement, so an
+      // unrelated edit (bio, headline, skills) never fails because of it.
+      const prevLanguages = Array.isArray((current as any)?.languages)
+        ? ((current as any).languages as any[]).map((l) => String(l?.code ?? ""))
+        : [];
+      assertAllowed("language", (data.languages ?? []).map((l) => l.code), guard.languages, prevLanguages);
     }
 
     // Sensitive columns (day_rate, location_lat/lng) are NOT writable through the
