@@ -245,10 +245,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const { user } = useAuth();
-  const saveDisplayName = useServerFn(updateMyDisplayName);
   const savePhone = useServerFn(updateMyPhone);
-  const [editing, setEditing] = useState(false);
-  const [displayName, setDisplayName] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneDial, setPhoneDial] = useState("+39");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -257,33 +254,12 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const fp = profile?.freelancerProfile;
 
   useEffect(() => {
-    if (!editing && profile) setDisplayName(profile.display_name ?? "");
-  }, [profile, editing]);
-
-  useEffect(() => {
     if (!editingPhone) {
       setPhoneDial(fp?.phone_dial_code ?? "+39");
       setPhoneNumber(fp?.phone_number ?? "");
     }
   }, [fp, editingPhone]);
 
-  const updateMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) throw new Error("Not authenticated");
-      return saveDisplayName({ data: { display_name: displayName } });
-    },
-    onSuccess: (saved) => {
-      qc.setQueryData(["profile-detail", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.setQueryData(["profile-summary", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.setQueryData(["dashboard-profile", user?.id], (old: any) => (old ? { ...old, ...saved } : old));
-      qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
-      qc.invalidateQueries({ queryKey: ["profile-summary", user?.id] });
-      qc.invalidateQueries({ queryKey: ["dashboard-profile", user?.id] });
-      toast.success(t("sweep_profile.common.updated"));
-      setEditing(false);
-    },
-    onError: (e) => toastError(e, "sweep_profile.common.failed"),
-  });
 
   const phoneMutation = useMutation({
     mutationFn: async () => {
