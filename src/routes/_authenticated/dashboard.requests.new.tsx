@@ -795,9 +795,16 @@ function NewRequestPage() {
                     onChange={(ev) => setLanguageReqs(languageReqs.map((r, idx) => idx === i ? { ...r, code: ev.target.value } : r))}
                     className="border border-border bg-background px-2 py-1 text-sm"
                   >
-                    {(tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value)).map((c) => (
-                      <option key={c} value={c}>{languageLabel(c)}</option>
-                    ))}
+                    {(() => {
+                      const active = tax.languages.length ? tax.languages : LANGUAGE_OPTIONS.map((o) => o.value);
+                      const retired = active.includes(req.code) ? [] : [req.code];
+                      return [
+                        ...active.map((c) => ({ c, label: languageLabel(c) })),
+                        ...retired.map((c) => ({ c, label: `${languageLabel(c)} · ${t("sweep_profile.freelancer.retired_value")}` })),
+                      ].map(({ c, label }) => (
+                        <option key={c} value={c}>{label}</option>
+                      ));
+                    })()}
                   </select>
                   <select
                     value={req.level}
