@@ -322,38 +322,14 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="ml-2 break-words font-mono uppercase">{profile?.user_type ?? "—"}</span>
         <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
-      {!isFreelancer && (editing ? (
-        <>
-          <div>
-            <label className="text-xs text-muted-foreground">
-              {t("sweep_profile.profile.team_name")}
-            </label>
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase text-white">
-              {t("sweep_profile.common.save")}
-            </button>
-            <button onClick={() => setEditing(false)} className="border border-border px-4 py-2 text-xs font-bold uppercase">
-              {t("sweep_profile.common.cancel")}
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="text-sm">
-            <span className="text-muted-foreground">{t("sweep_profile.profile.team_name")}:</span>
-            <span className="ml-2 font-mono">{profile?.display_name ?? "—"}</span>
-          </div>
-          <button onClick={() => setEditing(true)} className="text-xs text-racing-red hover:underline">
-            {t("sweep_profile.common.edit")}
-          </button>
-        </>
-      ))}
+      {!isFreelancer && (
+        <div className="text-sm">
+          <span className="text-muted-foreground">{t("sweep_profile.profile.team_name")}:</span>
+          <span className="ml-2 break-words font-mono">{profile?.display_name ?? "—"}</span>
+          <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
+        </div>
+      )}
+
 
 
       <div className="text-sm">
