@@ -575,6 +575,13 @@
       "when": 1788732765436,
       "tag": "0081_billing_details_and_team_name_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1788733395447,
+      "tag": "0082_fix_team_identity_lock_trigger",
+      "breakpoints": true
     }
   ]
 }
