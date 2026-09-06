@@ -53,6 +53,7 @@ import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminMatchingRouteImport } from './routes/_authenticated/admin.matching'
 import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin.launch'
 import { Route as AuthenticatedAdminCalendarsRouteImport } from './routes/_authenticated/admin.calendars'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin.billing'
 import { Route as AuthenticatedDashboardRequestsIndexRouteImport } from './routes/_authenticated/dashboard.requests.index'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -302,6 +303,12 @@ const AuthenticatedAdminCalendarsRoute =
     path: '/calendars',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedDashboardRequestsIndexRoute =
   AuthenticatedDashboardRequestsIndexRouteImport.update({
     id: '/requests/',
@@ -360,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -410,6 +418,7 @@ export interface FileRoutesByTo {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -464,6 +473,7 @@ export interface FileRoutesById {
   '/legal/$doc': typeof LegalDocRoute
   '/legal/info': typeof LegalInfoRoute
   '/teams/$id': typeof TeamsIdRoute
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/calendars': typeof AuthenticatedAdminCalendarsRoute
   '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/matching': typeof AuthenticatedAdminMatchingRoute
@@ -518,6 +528,7 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
+    | '/admin/billing'
     | '/admin/calendars'
     | '/admin/launch'
     | '/admin/matching'
@@ -568,6 +579,7 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
+    | '/admin/billing'
     | '/admin/calendars'
     | '/admin/launch'
     | '/admin/matching'
@@ -621,6 +633,7 @@ export interface FileRouteTypes {
     | '/legal/$doc'
     | '/legal/info'
     | '/teams/$id'
+    | '/_authenticated/admin/billing'
     | '/_authenticated/admin/calendars'
     | '/_authenticated/admin/launch'
     | '/_authenticated/admin/matching'
@@ -992,6 +1005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCalendarsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/dashboard/requests/': {
       id: '/_authenticated/dashboard/requests/'
       path: '/requests'
@@ -1045,6 +1065,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminCalendarsRoute: typeof AuthenticatedAdminCalendarsRoute
   AuthenticatedAdminLaunchRoute: typeof AuthenticatedAdminLaunchRoute
   AuthenticatedAdminMatchingRoute: typeof AuthenticatedAdminMatchingRoute
@@ -1061,6 +1082,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminCalendarsRoute: AuthenticatedAdminCalendarsRoute,
   AuthenticatedAdminLaunchRoute: AuthenticatedAdminLaunchRoute,
   AuthenticatedAdminMatchingRoute: AuthenticatedAdminMatchingRoute,
