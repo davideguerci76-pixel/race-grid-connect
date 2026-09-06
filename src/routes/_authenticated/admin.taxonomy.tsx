@@ -87,6 +87,11 @@ function AdminTaxonomy() {
         },
       }),
     onSuccess: (res: any) => {
+      if (res?.ok === false && res?.conflict === "code_exists") {
+        toast.warning(`An entry with the code "${res?.code}" already exists. Open it and edit it instead.`);
+        refresh();
+        return;
+      }
       if (res?.ok === false && res?.conflict === "stale_version") {
         toast.warning("This entry changed elsewhere. Reload before saving again.");
         refresh();
