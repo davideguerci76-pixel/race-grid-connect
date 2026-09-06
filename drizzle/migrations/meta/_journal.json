@@ -554,6 +554,13 @@
       "when": 1788656798725,
       "tag": "0078_taxonomy_upsert_code_exists_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1788658650118,
+      "tag": "0079_sec1_profile_authority_and_search_path",
+      "breakpoints": true
     }
   ]
 }
