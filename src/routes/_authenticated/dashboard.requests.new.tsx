@@ -663,8 +663,14 @@ function NewRequestPage() {
               {t("sweep_engage.new_request.skill_cycle_help_prefix")} <span className="font-bold text-yellow-500">{t("sweep_engage.new_request.soft_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_mid")} <span className="font-bold text-racing-red">{t("sweep_engage.new_request.hard_upper")}</span> {t("sweep_engage.new_request.skill_cycle_help_suffix")}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {(showAllSkills ? tax.allSkills : tax.skillsFor(form.role_group)).map((sv) => {
+              {(() => {
+                const list = showAllSkills ? tax.allSkills : tax.skillsFor(form.role_group);
+                const selected = [...skills, ...skillsHard];
+                const retained = selected.filter((s) => !tax.allSkills.includes(s) && !list.includes(s));
+                return [...list, ...retained];
+              })().map((sv) => {
                 const o = { value: sv };
+                const isRetired = !tax.allSkills.includes(sv);
                 const isSoft = skills.includes(o.value);
                 const isHard = skillsHard.includes(o.value);
                 const cycle = () => {
