@@ -165,8 +165,13 @@ function ProfilePage() {
         </div>
 
         <div className="mt-8">
+          <BillingDetailsSection />
+        </div>
+
+        <div className="mt-8">
           <PrivacyDataSection />
         </div>
+
       </div>
       <SiteFooter />
     </div>
