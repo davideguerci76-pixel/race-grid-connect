@@ -146,21 +146,6 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
         }
 
         return Response.json({ received: true, result: data });
-          _provider_event_id: event.id,
-          _event_type: event.type,
-          _provider_payment_id: paymentId,
-          _amount_collected_cents: amount,
-          _tax_amount_cents: (obj["total_details"] as { amount_tax?: number } | undefined)?.amount_tax ?? 0,
-          _payload: JSON.parse(body) as unknown as import("@/integrations/supabase/types").Json,
-        });
-
-        if (error) {
-          console.error(`stripe-webhook: confirm failed for ${orderId}: ${error.message}`);
-          // 500 lets Stripe retry; the RPC is replay-safe.
-          return new Response("processing error", { status: 500 });
-        }
-
-        return Response.json({ received: true, result: data });
       },
     },
   },
