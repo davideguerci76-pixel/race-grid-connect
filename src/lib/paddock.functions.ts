@@ -565,6 +565,7 @@ export const createRequest = createServerFn({ method: "POST" })
       languages: data.languages ?? [],
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
+      idempotency_key: data.idempotency_key ?? null,
       location_lat: data.location_lat ?? null,
       location_lng: data.location_lng ?? null,
       location_city: data.location_city ?? null,
