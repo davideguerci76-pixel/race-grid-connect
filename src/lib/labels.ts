@@ -79,3 +79,15 @@ export function notificationKindLabel(kind: string | null | undefined): string {
 export function roleDisplay(roleGroup?: string | null, subRole?: string | null): string {
   return subRole ? subRoleLabel(subRole) : roleGroupLabel(roleGroup);
 }
+
+/**
+ * Team type. The column is free text, but onboarding/fixtures write known codes
+ * (private_team, manufacturer, engineering_company, service_provider). Codes are
+ * localized; anything else is shown as typed by the team, never snake_case.
+ */
+export function teamTypeLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  const code = value.trim().toLowerCase().replace(/\s+/g, "_");
+  return tr(`team_types.${code}`) ?? (value.includes("_") ? humanize(value) : value);
+}
+

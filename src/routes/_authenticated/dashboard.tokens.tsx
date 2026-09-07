@@ -96,7 +96,14 @@ function TokensPage() {
       <div className="container-page py-12">
         <div className="label-mono">[TOKENS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("tokens.title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("tokens.sub")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {revealCost === null
+            ? "\u00a0"
+            : revealCost === 0
+              ? t("tokens.sub_free")
+              : t("tokens.sub_cost", { count: revealCost })}
+        </p>
+
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {packages.map((p) => (
