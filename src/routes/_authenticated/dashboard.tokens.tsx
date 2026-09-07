@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getTokenHistory } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
+
 import { listTokenPackages } from "@/lib/token-packages.functions";
 import {
   startTokenCheckout,
@@ -40,6 +42,8 @@ function TokensPage() {
   const startCheckout = useServerFn(startTokenCheckout);
   const getOrderStatus = useServerFn(getMyTokenOrderStatus);
   const cancelOrder = useServerFn(cancelMyTokenOrder);
+  const fetchSettings = useServerFn(getPlatformSettings);
+
 
   const [busy, setBusy] = useState<string | null>(null);
 
