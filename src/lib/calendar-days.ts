@@ -8,6 +8,21 @@ export function isoOfUtc(d: Date): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 }
 
+/**
+ * Bulk calendar operations are applied in bounded batches instead of relying on
+ * an implicit "max 400 days" payload cap. Batch writes are set-semantics
+ * (upsert / delete by day), so a retry can never duplicate or double-apply.
+ */
+export const CALENDAR_BATCH_SIZE = 300;
+
+export function chunkDays<T>(items: T[], size = CALENDAR_BATCH_SIZE): T[][] {
+  if (items.length <= size) return items.length ? [items] : [];
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
+}
+
+
 export type CalendarDayState = "none" | "available" | "busy" | "engagement" | "locked";
 
 /**
