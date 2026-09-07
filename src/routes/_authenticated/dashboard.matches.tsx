@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
+import { teamTypeLabel } from "@/lib/labels";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { requestStatusLabel } from "@/lib/labels";
@@ -153,7 +154,7 @@ function MatchesPage() {
         <div className="label-mono">[MATCHES]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("matches.counts_banner", { count: matches.length, who: isFreelancer ? t("nav.teams") : t("nav.freelancers") })}
+          {t(isFreelancer ? "matches.counts_banner_teams" : "matches.counts_banner_freelancers", { count: matches.length })}
         </p>
 
 
@@ -196,7 +197,7 @@ function MatchesPage() {
                         <div className="mt-2 grid gap-1 text-xs">
                           {isFreelancer ? (
                             <>
-                              {cp.team_type && <div><span className="text-muted-foreground">{t("sweep_engage.matches.type_label")}:</span> <span className="font-medium">{cp.team_type}</span></div>}
+                              {cp.team_type && <div><span className="text-muted-foreground">{t("sweep_engage.matches.type_label")}:</span> <span className="font-medium">{teamTypeLabel(cp.team_type)}</span></div>}
                               {cp.location && <div><span className="text-muted-foreground">{t("sweep_engage.matches.location_label")}:</span> <span className="font-medium">{cp.location}</span></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
                               {!isConfirmed && (
