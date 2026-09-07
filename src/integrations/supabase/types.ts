@@ -3311,7 +3311,7 @@ export type Database = {
       }
       flag_rating: {
         Args: { _rating_id: string; _reason: string }
-        Returns: undefined
+        Returns: Json
       }
       freelancer_answer_contact: {
         Args: { _contacted: boolean; _engagement_id: string }
