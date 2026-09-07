@@ -167,7 +167,9 @@ function CalendarPage() {
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
-    const noted = new Set(noteMap.keys());
+    // Only a note with busy = true makes a day Busy. A busy = false note is a
+    // private label (it can sit on an available day, or survive a Replace).
+    const noted = new Set([...noteMap.values()].filter((n) => n.busy).map((n) => n.day));
      const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet, ...hotPartialDays]);
      for (const day of all) {
       const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
@@ -192,9 +194,13 @@ function CalendarPage() {
         });
        } else if (state === "busy") {
          map.set(day, { state, label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
+       } else if (noteMap.has(day)) {
+         // Not available, note with busy = false: neutral day carrying a private label.
+         map.set(day, { state: "none", label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
        } else if (hotPartialDays.has(day)) {
          map.set(day, { state: "none", highlighted: true });
       }
+
     }
     return map;
   }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, hotPartialDays, t]);
