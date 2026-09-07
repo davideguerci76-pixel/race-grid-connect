@@ -68,10 +68,17 @@ export const startTokenCheckout = createServerFn({ method: "POST" })
     // 2. Read back the immutable snapshot (RLS: own order only).
     const { data: order, error: readErr } = await context.supabase
       .from("token_orders")
-      .select("id, package_code, token_quantity, base_amount_cents, currency")
+      .select("id, package_code, token_quantity, base_amount_cents, currency, provider_mode")
       .eq("id", orderId as unknown as string)
       .single();
     if (readErr || !order) throw new Error(readErr?.message ?? "order_not_found");
+
+    // Fail-closed TEST/LIVE guard: the loaded Stripe configuration is TEST-only,
+    // so an order carrying any other provider mode must never reach Stripe.
+    if (order.provider_mode !== "test") {
+      console.error(`token-checkout: provider mode mismatch (order=${order.provider_mode}, key=test)`);
+      return { ok: false, reason: "provider_unavailable" };
+    }
 
     const origin = safeOrigin(data.origin);
     const body = new URLSearchParams();
