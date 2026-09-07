@@ -134,21 +134,16 @@ export const adminSetTokens = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: prof } = await supabaseAdmin.from("profiles").select("token_balance").eq("id", data.user_id).single();
-    const current = prof?.token_balance ?? 0;
-    const delta = data.balance - current;
-    if (delta !== 0) {
-      await supabaseAdmin.from("token_transactions").insert({
-        user_id: data.user_id,
-        delta,
-        reason: delta > 0 ? "admin_credit" : "admin_debit",
-        note: `Admin adjustment by ${context.userId}`,
-      } as never);
-    }
-    const { error } = await supabaseAdmin.from("profiles").update({ token_balance: data.balance } as never).eq("id", data.user_id);
+    // MT09-M1: single atomic, row-locked DB primitive — ledger + balance + audit in one transaction.
+    const { data: res, error } = await supabaseAdmin.rpc("admin_set_token_balance", {
+      _user_id: data.user_id,
+      _balance: data.balance,
+      _admin: context.userId,
+    } as never);
     if (error) throw new Error(error.message);
-    return { ok: true, balance: data.balance };
+    return { ok: true, balance: data.balance, result: res };
   });
+
 
 export const adminSetBlocked = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -228,15 +223,20 @@ export const adminUpdateMatchingWeights = createServerFn({ method: "POST" })
     const total = data.sub_role_weight + data.skills_weight + data.disciplines_weight + data.day_rate_weight + data.languages_weight + data.education_weight + data.location_weight;
     if (Math.abs(total - 100) > 0.01) throw new Error(`Weights must sum to 100 (currently ${total.toFixed(2)})`);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { currentAdminEnv } = await import("@/lib/admin-env.server");
+    // MT09-M2: the recompute environment is derived server-side from the admin's
+    // current environment authority, never from a client-supplied boolean.
+    const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
     const { error } = await supabaseAdmin
       .from("matching_weights")
       .update({ ...data, role_weight: 0, updated_at: new Date().toISOString() } as never)
       .eq("id", true);
     if (error) throw new Error(error.message);
-    // Recompute all matches with new weights
-    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: false } as never);
-    return { ok: true };
+    // Recompute all matches with new weights, in the admin's own environment only
+    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: envIsTest } as never);
+    return { ok: true, env: envIsTest ? "test" : "live" };
   });
+
 
 // ---- Platform / token settings ----
 export const adminListSettings = createServerFn({ method: "GET" })
@@ -261,26 +261,16 @@ export const adminUpdateSettings = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const nowIso = new Date().toISOString();
-    for (const u of data.updates) {
-      // S2.E.1: the nominal token price and the package commercial prices must move
-      // together — one atomic DB call rescales packages so each keeps its discount.
-      if (u.key === "token_price_eur") {
-        const { error } = await supabaseAdmin.rpc("admin_set_token_price_eur", {
-          _new_price: u.value_num,
-          _admin: context.userId,
-        } as never);
-        if (error) throw new Error(`${u.key}: ${error.message}`);
-        continue;
-      }
-      const { error } = await supabaseAdmin
-        .from("platform_settings")
-        .update({ value_num: u.value_num, updated_at: nowIso, updated_by: context.userId } as never)
-        .eq("key", u.key);
-      if (error) throw new Error(`${u.key}: ${error.message}`);
-    }
-    return { ok: true, count: data.updates.length };
+    // MT09-M4: one atomic DB call — whitelist, per-key bounds, all-or-nothing, audited.
+    // token_price_eur still rescales the packages atomically inside the same transaction.
+    const { data: res, error } = await supabaseAdmin.rpc("admin_update_settings", {
+      _updates: data.updates as never,
+      _admin: context.userId,
+    } as never);
+    if (error) throw new Error(error.message);
+    return { ok: true, count: data.updates.length, result: res };
   });
+
 
 // ---- V2.3 Platform Rules (configuration knobs only, no consumers yet) ----
 export const PLATFORM_RULE_BOUNDS: Record<string, { min: number; max: number }> = {

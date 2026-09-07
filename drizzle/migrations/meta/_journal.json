@@ -666,6 +666,13 @@
       "when": 1788793329241,
       "tag": "0094_mt08_admin_alert_env_marker",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1788795433603,
+      "tag": "0095_mt09r_authority_hardening",
+      "breakpoints": true
     }
   ]
 }
