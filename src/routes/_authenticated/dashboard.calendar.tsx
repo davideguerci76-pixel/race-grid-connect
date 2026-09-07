@@ -10,7 +10,16 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, getMyFrozenDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
-import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
+import {
+  getMyDayNotes,
+  getMyEngagementDays,
+  setMyDayNote,
+  applySavedCalendarAsBusy,
+  applyCalendarLabelAsAvailable,
+  restoreMyDayNotes,
+  type CalendarDayNote,
+} from "@/lib/calendar-notes.functions";
+
 import { BackButton } from "@/components/back-button";
 import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
@@ -73,6 +82,9 @@ function CalendarPage() {
   const getEngDays = useServerFn(getMyEngagementDays);
   const saveNote = useServerFn(setMyDayNote);
   const applyBusy = useServerFn(applySavedCalendarAsBusy);
+  const applyLabel = useServerFn(applyCalendarLabelAsAvailable);
+  const restoreNotes = useServerFn(restoreMyDayNotes);
+
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -108,9 +120,20 @@ function CalendarPage() {
   const [month, setMonth] = useState(() => initialMonth(search.m));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
   const [noteDraft, setNoteDraft] = useState("");
-  const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [busyDialog, setBusyDialog] = useState<{
+    kind: "busy" | "available";
+    dates: string[];
+    label: string;
+    conflicts: Array<{ day: string; note: string }>;
+  } | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
+  /**
+   * Single-level undo. `availability` is the whole pre-change availability set;
+   * `notes` (when present) is the exact pre-change note state of the days that a
+   * bulk operation touched ("" = there was no note on that day).
+   */
+  const [undoSnapshot, setUndoSnapshot] = useState<{ availability: string[]; notes: CalendarDayNote[] | null } | null>(null);
+
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
   const hotPartialDays = useMemo(() => new Set((search.days ?? "").split(",").filter(Boolean)), [search.days]);
@@ -144,7 +167,9 @@ function CalendarPage() {
 
   const cells = useMemo(() => {
     const map = new Map<string, PitcallDayCell>();
-    const noted = new Set(noteMap.keys());
+    // Only a note with busy = true makes a day Busy. A busy = false note is a
+    // private label (it can sit on an available day, or survive a Replace).
+    const noted = new Set([...noteMap.values()].filter((n) => n.busy).map((n) => n.day));
      const all = new Set<string>([...engMap.keys(), ...blockedSet, ...availableSet, ...noteMap.keys(), ...frozenSet, ...hotPartialDays]);
      for (const day of all) {
       const state = calendarDayState(day, { available: availableSet, blocked: blockedSet, engagements: engMap, noted });
@@ -169,9 +194,13 @@ function CalendarPage() {
         });
        } else if (state === "busy") {
          map.set(day, { state, label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
+       } else if (noteMap.has(day)) {
+         // Not available, note with busy = false: neutral day carrying a private label.
+         map.set(day, { state: "none", label: noteMap.get(day)?.note ?? null, highlighted: hotPartialDays.has(day) });
        } else if (hotPartialDays.has(day)) {
          map.set(day, { state: "none", highlighted: true });
       }
+
     }
     return map;
   }, [engMap, availableSet, noteMap, unconfirmedSet, blockedSet, frozenSet, hotPartialDays, t]);
@@ -211,7 +240,7 @@ function CalendarPage() {
       if (isUndo) {
         setUndoSnapshot(null);
       } else if (inFlightRef.current === 0) {
-        setUndoSnapshot(previous);
+        setUndoSnapshot({ availability: previous, notes: null });
       }
       inFlightRef.current += 1;
       expectedRef.current = optimistic;
@@ -229,15 +258,30 @@ function CalendarPage() {
     },
   });
 
-  /** Restore the exact pre-change snapshot (protected days always preserved). */
-  const undoLastChange = () => {
+  /**
+   * Restore the exact pre-change snapshot: availability, plus (for bulk Busy)
+   * the previous note state of the touched days only. Protected days are never
+   * part of the snapshot and are never rewritten.
+   */
+  const undoLastChange = async () => {
     if (!undoSnapshot || mutation.isPending) return;
+    const snapshot = undoSnapshot;
+    setUndoSnapshot(null);
+    try {
+      if (snapshot.notes) {
+        await restoreNotes({ data: { entries: snapshot.notes.map((n) => ({ day: n.day, note: n.note, busy: n.busy })) } });
+        qc.invalidateQueries({ queryKey: ["my-day-notes"] });
+      }
+    } catch (e) {
+      toastError(e, "sweep_public.dashboard_calendar.save_failed");
+      return;
+    }
     mutation.mutate(
-      { nextSet: new Set(undoSnapshot.filter((d) => !protectedSet.has(d))), isUndo: true },
+      { nextSet: new Set(snapshot.availability.filter((d) => !protectedSet.has(d))), isUndo: true },
       { onSuccess: () => toast.success(t("pcal.tools.undo_toast", { defaultValue: "Availability restored" })) },
     );
-    setUndoSnapshot(null);
   };
+
 
   /** Drop a stale snapshot when an external refetch really changed the availability. */
   useEffect(() => {
@@ -318,6 +362,12 @@ function CalendarPage() {
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
 
+  /** Pre-change note state of the given days ("" = no note there before). */
+  const noteSnapshotFor = (dates: string[]): CalendarDayNote[] =>
+    dates
+      .filter((d) => !protectedSet.has(d))
+      .map((day) => noteMap.get(day) ?? { day, note: "", busy: false });
+
   const busyMut = useMutation({
     mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) =>
       applyBusy({ data: vars }),
@@ -326,6 +376,10 @@ function CalendarPage() {
         setBusyDialog((prev) => (prev ? { ...prev, conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })) } : prev));
         return;
       }
+      // Bulk Busy joins the single-level undo: availability set before the change
+      // plus the exact previous note state of the days it touched.
+      setUndoSnapshot({ availability: [...(myDays as string[])], notes: noteSnapshotFor(vars.dates) });
+      expectedRef.current = null;
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
@@ -333,6 +387,29 @@ function CalendarPage() {
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
+
+  /** Private label on days that stay AVAILABLE (no availability is removed). */
+  const labelMut = useMutation({
+    mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) => applyLabel({ data: vars }),
+    onSuccess: (res, vars) => {
+      if (res.conflicts.length && !vars.overwrite) {
+        // Reuse the existing conflict dialog even when the flow started from ADD FROM CALENDAR.
+        setBusyDialog({
+          kind: "available",
+          dates: vars.dates,
+          label: vars.label,
+          conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })),
+        });
+
+        return;
+      }
+      setBusyDialog(null);
+      qc.invalidateQueries({ queryKey: ["my-day-notes"] });
+      toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
+    },
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
+  });
+
 
   useEffect(() => {
     setNoteDraft(selected ? (noteMap.get(selected)?.note ?? "") : "");
@@ -542,15 +619,27 @@ function CalendarPage() {
         onOpenChange={setAddOpen}
         currentAvailable={[...availableSet].sort()}
         protectedDays={protectedSet}
-        pending={mutation.isPending || busyMut.isPending}
-        onApplyAvailable={(dates, mode) => (mode === "replace" ? replaceDates(dates) : mergeDates(dates))}
-        onApplyBusy={(dates, label) => setBusyDialog({ dates, label, conflicts: [] })}
+        pending={mutation.isPending || busyMut.isPending || labelMut.isPending}
+        onApplyAvailable={(dates, mode, label) => {
+          if (mode === "replace") replaceDates(dates);
+          else mergeDates(dates);
+          // Optional private label on the days that stay available.
+          if (label) labelMut.mutate({ dates, label, overwrite: false });
+        }}
+        onApplyBusy={(dates, label) => setBusyDialog({ kind: "busy", dates, label, conflicts: [] })}
       />
 
       {busyDialog && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-3">
           <div className="w-full max-w-md min-w-0 border border-border bg-card p-4">
-            <div className="label-mono">[{t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })}]</div>
+            <div className="label-mono">
+              [
+              {busyDialog.kind === "busy"
+                ? t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })
+                : t("pcal.add.available_label", { defaultValue: "Private note used on those days (optional)" })}
+              ]
+            </div>
+
             <input
               value={busyDialog.label}
               maxLength={60}
@@ -558,7 +647,12 @@ function CalendarPage() {
               className="mt-3 w-full min-w-0 border border-border bg-background px-3 py-2 text-sm"
             />
             <p className="mt-2 text-[11px] text-muted-foreground">
-              {t("pcal.busy_hint", { defaultValue: "All editable dates of this calendar turn black with this label. PITCALL dates are never overwritten." })}
+              {busyDialog.kind === "busy"
+                ? t("pcal.busy_hint", { defaultValue: "All editable dates of this calendar turn black with this label. PITCALL dates are never overwritten." })
+                : t("pcal.add.available_label_hint", {
+                    defaultValue:
+                      "Leave it as is, edit it or clear it. If empty, the days stay available with no private note. Never shared with Teams.",
+                  })}
             </p>
             {busyDialog.conflicts.length > 0 && (
               <div className="mt-3 border border-racing-yellow/60 bg-racing-yellow/10 p-3">
@@ -580,10 +674,12 @@ function CalendarPage() {
                 <button
                   type="button"
                   className={btn}
-                  disabled={busyMut.isPending}
+                  disabled={busyMut.isPending || labelMut.isPending}
                   onClick={() => {
                     const skip = new Set(busyDialog.conflicts.map((c) => c.day));
-                    busyMut.mutate({ dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
+                    const vars = { dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true };
+                    if (busyDialog.kind === "busy") busyMut.mutate(vars);
+                    else labelMut.mutate(vars);
                   }}
                 >
                   {t("pcal.keep_existing", { defaultValue: "Keep existing" })}
@@ -592,14 +688,19 @@ function CalendarPage() {
               <button
                 type="button"
                 className="bg-racing-red px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
-                disabled={busyMut.isPending || !busyDialog.label.trim()}
-                onClick={() => busyMut.mutate({ dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 })}
+                disabled={busyMut.isPending || labelMut.isPending || !busyDialog.label.trim()}
+                onClick={() => {
+                  const vars = { dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 };
+                  if (busyDialog.kind === "busy") busyMut.mutate(vars);
+                  else labelMut.mutate(vars);
+                }}
               >
                 {busyDialog.conflicts.length > 0
                   ? t("pcal.overwrite", { defaultValue: "Overwrite" })
                   : t("pcal.apply", { defaultValue: "Apply" })}
               </button>
             </div>
+
           </div>
         </div>
       )}

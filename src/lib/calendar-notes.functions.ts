@@ -195,6 +195,113 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
     return { applied: toWrite.length, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
   });
 
+/**
+ * Apply a calendar label as a private note on days that stay AVAILABLE.
+ * Availability is never removed here (that is the caller's merge/replace job).
+ * Existing notes with a different text are reported as conflicts unless
+ * `overwrite` is true — never silently overwritten.
+ */
+export const applyCalendarLabelAsAvailable = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400),
+        label: z.string().trim().min(1).max(60),
+        overwrite: z.boolean().default(false),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const unique = [...new Set(data.dates)].sort();
+    const blocked = await protectedDaysFor(supabase, unique);
+    const targets = unique.filter((d) => !blocked.has(d));
+    if (!targets.length) return { applied: 0, skipped: data.dates.length, conflicts: [] as CalendarDayNote[] };
+
+    const { data: existing, error: exErr } = await supabase
+      .from("calendar_day_notes")
+      .select("day, note, busy")
+      .eq("freelancer_id", userId)
+      .in("day", targets);
+    if (exErr) throw new Error(exErr.message);
+
+    const conflicts = ((existing ?? []) as any[])
+      .filter((r) => (r.note ?? "") !== data.label)
+      .map((r) => ({ day: String(r.day).slice(0, 10), note: r.note, busy: !!r.busy }));
+
+    if (conflicts.length && !data.overwrite) {
+      return { applied: 0, skipped: data.dates.length - targets.length, conflicts };
+    }
+
+    const conflictDays = new Set(conflicts.map((c) => c.day));
+    const toWrite = data.overwrite ? targets : targets.filter((d) => !conflictDays.has(d));
+    if (!toWrite.length) return { applied: 0, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
+
+    const { error } = await supabase
+      .from("calendar_day_notes")
+      .upsert(
+        toWrite.map((day) => ({ freelancer_id: userId, day, note: data.label, busy: false })),
+        { onConflict: "freelancer_id,day" },
+      );
+    if (error) throw new Error(error.message);
+
+    return { applied: toWrite.length, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
+  });
+
+/**
+ * Undo helper: restore the exact previous note state of a bounded day set.
+ * `note === ""` means "there was no note on that day" → the row is deleted.
+ * Protected days are resolved server-side and never touched.
+ */
+export const restoreMyDayNotes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        entries: z
+          .array(
+            z.object({
+              day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+              note: z.string().max(60),
+              busy: z.boolean().default(false),
+            }),
+          )
+          .max(400),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const days = [...new Set(data.entries.map((e) => e.day))];
+    if (!days.length) return { restored: 0 };
+    const blocked = await protectedDaysFor(supabase, days);
+    const entries = data.entries.filter((e) => !blocked.has(e.day));
+
+    const toDelete = entries.filter((e) => !e.note.trim()).map((e) => e.day);
+    const toWrite = entries.filter((e) => e.note.trim());
+
+    if (toDelete.length) {
+      const { error } = await supabase
+        .from("calendar_day_notes")
+        .delete()
+        .eq("freelancer_id", userId)
+        .in("day", toDelete);
+      if (error) throw new Error(error.message);
+    }
+    if (toWrite.length) {
+      const { error } = await supabase
+        .from("calendar_day_notes")
+        .upsert(
+          toWrite.map((e) => ({ freelancer_id: userId, day: e.day, note: e.note.trim(), busy: e.busy })),
+          { onConflict: "freelancer_id,day" },
+        );
+      if (error) throw new Error(error.message);
+    }
+    return { restored: entries.length };
+  });
+
+
 /** Team calendar: read-only view of confirmed PITCALL engagements. */
 export const getTeamCalendarDays = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

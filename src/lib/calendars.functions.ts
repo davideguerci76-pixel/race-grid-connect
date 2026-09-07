@@ -106,10 +106,48 @@ export const saveCalendar = createServerFn({ method: "POST" })
       if (!row) throw new Error("CALENDAR_APPROVED_READONLY");
       return normalize(row);
     }
-    const { data: row, error } = await (supabase.from("user_calendars" as never) as any).insert(payload).select("*").maybeSingle();
-    if (error) throw new Error(error.message);
-    return row ? normalize(row) : null;
+    // LAW 2 — no two saved calendars of the same owner/environment share a name.
+    // The suffix is resolved server-side and retried on the unique index, so a
+    // double submit can never produce two visually identical calendars.
+    let attemptName = data.name.trim();
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const name = attempt === 0 ? attemptName : await nextFreeName(supabase, userId, attemptName);
+      const { data: row, error } = await (supabase.from("user_calendars" as never) as any)
+        .insert({ ...payload, name })
+        .select("*")
+        .maybeSingle();
+      if (!error) return row ? normalize(row) : null;
+      // 23505 = unique violation on (owner_id, is_test, name): pick the next free suffix.
+      if ((error as any).code !== "23505") throw new Error(error.message);
+      attemptName = name;
+    }
+    throw new Error("CALENDAR_NAME_CONFLICT");
   });
+
+/** Strip a trailing " (N)" so "GT 2027 (2)" and "GT 2027" share the same base. */
+function baseNameOf(name: string): string {
+  return name.replace(/\s*\(\d+\)\s*$/, "").trim() || name.trim();
+}
+
+/**
+ * First free name for this owner/environment: the requested name when free,
+ * otherwise "base (N)" with the lowest free N >= 2 (gaps are filled).
+ */
+async function nextFreeName(supabase: any, userId: string, requested: string): Promise<string> {
+  const base = baseNameOf(requested);
+  const { data, error } = await (supabase.from("user_calendars" as never) as any)
+    .select("name")
+    .eq("owner_id", userId);
+  if (error) throw new Error(error.message);
+  const taken = new Set(((data ?? []) as any[]).map((r) => String(r.name)));
+  if (!taken.has(requested)) return requested;
+  for (let n = 2; n < 1000; n += 1) {
+    const candidate = `${base} (${n})`;
+    if (!taken.has(candidate)) return candidate;
+  }
+  return `${base} (${Date.now()})`;
+}
+
 
 export const deleteCalendar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
