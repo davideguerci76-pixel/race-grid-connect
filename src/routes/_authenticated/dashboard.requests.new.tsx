@@ -299,7 +299,6 @@ function NewRequestPage() {
       qc.invalidateQueries();
       navigate({ to: isModify ? "/dashboard/requests/$id/matches" : searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests", params: isModify && from ? { id: from } : undefined });
     },
-    onError: (e) => toastError(e),
   });
 
 
