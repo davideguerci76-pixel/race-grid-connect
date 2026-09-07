@@ -393,7 +393,14 @@ function CalendarPage() {
     mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) => applyLabel({ data: vars }),
     onSuccess: (res, vars) => {
       if (res.conflicts.length && !vars.overwrite) {
-        setBusyDialog((prev) => (prev ? { ...prev, conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })) } : prev));
+        // Reuse the existing conflict dialog even when the flow started from ADD FROM CALENDAR.
+        setBusyDialog({
+          kind: "available",
+          dates: vars.dates,
+          label: vars.label,
+          conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })),
+        });
+
         return;
       }
       setBusyDialog(null);
