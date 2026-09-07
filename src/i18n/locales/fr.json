@@ -183,10 +183,10 @@
     "empty": "Aucun match pour le moment.",
     "empty_team": "Aucun match. Publiez une Pit Call.",
     "hidden_name": "Révéler pour voir plus d'infos",
-    "reveal_1_token": "R\u00e9v\u00e9ler ({{cost}} jeton)",
-    "reveal_cta_free": "R\u00e9v\u00e9ler \u2014 Gratuit",
-    "reveal_confirm": "D\u00e9penser {{cost}} jeton pour r\u00e9v\u00e9ler {{who}} ?",
-    "reveal_confirm_free": "R\u00e9v\u00e9ler {{who}} gratuitement ?",
+    "reveal_1_token": "Révéler ({{cost}} jeton)",
+    "reveal_cta_free": "Révéler — Gratuit",
+    "reveal_confirm": "Dépenser {{cost}} jeton pour révéler {{who}} ?",
+    "reveal_confirm_free": "Révéler {{who}} gratuitement ?",
     "already_revealed": "Révélé",
     "propose_engagement": "Proposer un engagement",
     "insufficient_tokens": "Jetons insuffisants.",
@@ -1087,6 +1087,7 @@
     "stat_available_short": "Disponibles",
     "stat_busy_short": "Occupés",
     "stat_pitcall_short": "Pitcall",
-    "frozen": "DEMANDÉ"
+    "frozen": "DEMANDÉ",
+    "protected_skipped": "{{count}} jour(s) non modifiés : jours PITCALL confirmés ou verrouillés."
   }
 }

@@ -184,9 +184,9 @@
     "empty_team": "Sin matches. Publica una Pit Call.",
     "hidden_name": "Revela para ver más info",
     "reveal_1_token": "Revelar ({{cost}} token)",
-    "reveal_cta_free": "Revelar \u2014 Gratis",
-    "reveal_confirm": "\u00bfGastar {{cost}} token para revelar {{who}}?",
-    "reveal_confirm_free": "\u00bfRevelar {{who}} gratis?",
+    "reveal_cta_free": "Revelar — Gratis",
+    "reveal_confirm": "¿Gastar {{cost}} token para revelar {{who}}?",
+    "reveal_confirm_free": "¿Revelar {{who}} gratis?",
     "already_revealed": "Revelado",
     "propose_engagement": "Proponer contrato",
     "insufficient_tokens": "Tokens insuficientes.",
@@ -1087,6 +1087,7 @@
     "stat_available_short": "Disponibles",
     "stat_busy_short": "Ocupados",
     "stat_pitcall_short": "Pitcall",
-    "frozen": "SOLICITADO"
+    "frozen": "SOLICITADO",
+    "protected_skipped": "{{count}} día(s) no modificados: días PITCALL confirmados o bloqueados."
   }
 }

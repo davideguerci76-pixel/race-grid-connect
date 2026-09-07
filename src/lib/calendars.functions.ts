@@ -67,8 +67,8 @@ export const saveCalendar = createServerFn({ method: "POST" })
         name: z.string().min(1).max(120),
         discipline: z.string().max(64).nullable().optional(),
         season_year: z.number().int().min(1950).max(2100).nullable().optional(),
-        events: z.array(eventSchema).max(200),
-        dates: z.array(isoDate).max(400),
+        events: z.array(eventSchema).max(1000),
+        dates: z.array(isoDate).max(2000),
         source: z.enum(["manual", "ics"]).default("manual"),
       })
       .parse(data),

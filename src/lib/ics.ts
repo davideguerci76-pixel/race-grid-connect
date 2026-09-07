@@ -29,9 +29,15 @@ export function mondayOf(iso: string): string {
   return isoOf(d);
 }
 
-/** Server-authoritative calendar limits (mirrored from calendars.functions.ts). */
-export const MAX_CALENDAR_EVENTS = 200;
-export const MAX_CALENDAR_DAYS = 400;
+/**
+ * Server-authoritative calendar limits (mirrored from calendars.functions.ts).
+ * These are storage bounds for ONE saved calendar row, not an operation batch
+ * size: bulk availability operations are chunked and are not capped by them.
+ */
+export const MAX_CALENDAR_EVENTS = 1000;
+export const MAX_CALENDAR_DAYS = 2000;
+/** Hard safety bound while expanding a single recurrence rule. */
+export const MAX_RRULE_OCCURRENCES = 400;
 
 /** Exact number of inclusive days in a range — never truncated. */
 export function rangeDayCount(startIso: string, endIso: string): number {
@@ -45,13 +51,16 @@ export function expandRange(startIso: string, endIso: string): string[] {
   const out: string[] = [];
   let cur = startIso;
   let guard = 0;
-  while (cur <= endIso && guard < MAX_CALENDAR_DAYS) {
+  // Guard only protects against a corrupt/inverted range; it must never silently
+  // truncate a legitimate calendar (that is what checkCalendarLimits reports).
+  while (cur <= endIso && guard < MAX_CALENDAR_DAYS * 2) {
     out.push(cur);
     cur = addDaysIso(cur, 1);
     guard += 1;
   }
   return out;
 }
+
 
 export type CalendarLimitViolation =
   | { kind: "events"; actual: number; limit: number }
@@ -89,18 +98,97 @@ function unfold(text: string): string[] {
   return lines;
 }
 
-function parseIcsDate(value: string): string | null {
+/**
+ * PITCALL availability is DAY-LEVEL. A calendar date must survive the import as
+ * the day a human reads on the event, never shifted by a UTC conversion.
+ *  - `VALUE=DATE` (YYYYMMDD) and `TZID=...` date-times: the literal date wins.
+ *  - UTC date-times (trailing `Z`): converted to the reader's local day, so an
+ *    event at 23:00Z stays on its local calendar day instead of slipping back.
+ */
+function parseIcsDate(value: string, key = ""): string | null {
   const v = value.trim();
+  const utc = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(v);
+  if (utc && !/TZID=/i.test(key)) {
+    const ms = Date.UTC(+utc[1]!, +utc[2]! - 1, +utc[3]!, +utc[4]!, +utc[5]!, +utc[6]!);
+    return isoOf(new Date(ms));
+  }
   const m = v.match(/^(\d{4})(\d{2})(\d{2})/);
   if (!m) return null;
   return `${m[1]}-${m[2]}-${m[3]}`;
+}
+
+type RRuleParts = { freq?: string; interval: number; count?: number; until?: string; byday: string[] };
+
+function parseRRule(value: string): RRuleParts | null {
+  const parts: RRuleParts = { interval: 1, byday: [] };
+  for (const chunk of value.trim().split(";")) {
+    const [rawK, rawV] = chunk.split("=");
+    if (!rawK || !rawV) continue;
+    const k = rawK.toUpperCase();
+    const v = rawV.trim();
+    if (k === "FREQ") parts.freq = v.toUpperCase();
+    else if (k === "INTERVAL") parts.interval = Math.max(1, Number(v) || 1);
+    else if (k === "COUNT") parts.count = Math.max(1, Number(v) || 1);
+    else if (k === "UNTIL") parts.until = parseIcsDate(v) ?? undefined;
+    else if (k === "BYDAY") parts.byday = v.toUpperCase().split(",").map((d) => d.trim().replace(/^[+-]?\d+/, ""));
+  }
+  if (!parts.freq) return null;
+  return parts;
+}
+
+const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+/**
+ * Minimal RFC5545 expansion covering the recurrences real motorsport calendars
+ * use: DAILY / WEEKLY (with BYDAY) / MONTHLY / YEARLY, plus INTERVAL, COUNT and
+ * UNTIL. Anything else is left as the single DTSTART occurrence (never silently
+ * partially expanded into a corrupt series).
+ */
+function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{ start: string; end: string }> {
+  const out: Array<{ start: string; end: string }> = [];
+  const push = (s: string) => out.push({ start: s, end: addDaysIso(s, spanDays) });
+  const limit = Math.min(rule.count ?? MAX_RRULE_OCCURRENCES, MAX_RRULE_OCCURRENCES);
+  const until = rule.until ?? null;
+
+  if (rule.freq === "WEEKLY" && rule.byday.length) {
+    const wanted = new Set(rule.byday);
+    let weekStart = mondayOf(start);
+    let weeks = 0;
+    while (out.length < limit && weeks < MAX_RRULE_OCCURRENCES) {
+      for (let i = 0; i < 7 && out.length < limit; i += 1) {
+        const day = addDaysIso(weekStart, i);
+        if (day < start) continue;
+        if (until && day > until) return out;
+        if (wanted.has(WEEKDAY_CODES[dateOf(day).getDay()]!)) push(day);
+      }
+      weekStart = addDaysIso(weekStart, 7 * rule.interval);
+      weeks += 1;
+    }
+    return out;
+  }
+
+  let cursor = start;
+  while (out.length < limit) {
+    if (until && cursor > until) break;
+    push(cursor);
+    if (rule.freq === "DAILY") cursor = addDaysIso(cursor, rule.interval);
+    else if (rule.freq === "WEEKLY") cursor = addDaysIso(cursor, 7 * rule.interval);
+    else if (rule.freq === "MONTHLY" || rule.freq === "YEARLY") {
+      const d = dateOf(cursor);
+      if (rule.freq === "MONTHLY") d.setMonth(d.getMonth() + rule.interval);
+      else d.setFullYear(d.getFullYear() + rule.interval);
+      cursor = isoOf(d);
+    } else break; // unsupported FREQ → single occurrence only
+    if (!until && rule.count === undefined) break; // open-ended rule → do not invent a series
+  }
+  return out;
 }
 
 /** Parse an .ics file into a list of all-day events (inclusive end dates). */
 export function parseIcs(text: string): CalendarEventItem[] {
   const lines = unfold(text);
   const events: CalendarEventItem[] = [];
-  let cur: { title?: string; start?: string; end?: string; dateOnlyEnd?: boolean } | null = null;
+  let cur: { title?: string; start?: string; end?: string; dateOnlyEnd?: boolean; rrule?: RRuleParts | null } | null = null;
 
   for (const line of lines) {
     const upper = line.toUpperCase();
@@ -113,7 +201,16 @@ export function parseIcs(text: string): CalendarEventItem[] {
         let end = cur.end ?? cur.start;
         // DTEND is exclusive for all-day events
         if (cur.dateOnlyEnd && end > cur.start) end = addDaysIso(end, -1);
-        events.push({ title: cur.title?.trim() || "Event", start: cur.start, end: end < cur.start ? cur.start : end });
+        if (end < cur.start) end = cur.start;
+        const title = cur.title?.trim() || "Event";
+        const spanDays = rangeDayCount(cur.start, end) - 1;
+        if (cur.rrule) {
+          for (const occ of expandRRule(cur.start, spanDays, cur.rrule)) {
+            events.push({ title, start: occ.start, end: occ.end });
+          }
+        } else {
+          events.push({ title, start: cur.start, end });
+        }
       }
       cur = null;
       continue;
@@ -123,15 +220,17 @@ export function parseIcs(text: string): CalendarEventItem[] {
     if (idx === -1) continue;
     const key = line.slice(0, idx).toUpperCase();
     const value = line.slice(idx + 1);
-    if (key.startsWith("DTSTART")) cur.start = parseIcsDate(value) ?? undefined;
+    if (key.startsWith("DTSTART")) cur.start = parseIcsDate(value, key) ?? undefined;
     else if (key.startsWith("DTEND")) {
-      cur.end = parseIcsDate(value) ?? undefined;
+      cur.end = parseIcsDate(value, key) ?? undefined;
       cur.dateOnlyEnd = key.includes("VALUE=DATE") || /^\d{8}$/.test(value.trim());
-    } else if (key.startsWith("SUMMARY")) cur.title = value.replace(/\\,/g, ",").replace(/\\n/g, " ");
+    } else if (key.startsWith("RRULE")) cur.rrule = parseRRule(value);
+    else if (key.startsWith("SUMMARY")) cur.title = value.replace(/\\,/g, ",").replace(/\\n/g, " ");
   }
 
   return events.sort((a, b) => a.start.localeCompare(b.start));
 }
+
 
 /** Group a flat list of days into contiguous "events" (rounds). */
 export function daysToEvents(days: string[], namePrefix = "Round"): CalendarEventItem[] {

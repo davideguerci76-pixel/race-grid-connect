@@ -25,7 +25,7 @@ import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
-import { calendarDayState } from "@/lib/calendar-days";
+import { calendarDayState, chunkDays } from "@/lib/calendar-days";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
@@ -222,9 +222,20 @@ function CalendarPage() {
       const target = new Set([...vars.nextSet].filter((d) => !protectedSet.has(d)));
       const toAdd = [...target].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !target.has(d));
-      if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
-      if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
+      // Large operations are sent in bounded, idempotent batches: no implicit
+      // 400-day ceiling, and a retry can never double-apply.
+      const skipped: string[] = [];
+      for (const batch of chunkDays(toAdd)) {
+        const res = await setAvail({ data: { dates: batch, add: true } });
+        skipped.push(...((res?.skipped ?? []) as string[]));
+      }
+      for (const batch of chunkDays(toRemove)) {
+        const res = await setAvail({ data: { dates: batch, add: false } });
+        skipped.push(...((res?.skipped ?? []) as string[]));
+      }
+      return { skipped: [...new Set(skipped)] };
     },
+
     onMutate: async (vars) => {
       const { nextSet, isUndo } = vars;
       const key = ["my-availability", user?.id];
@@ -245,6 +256,20 @@ function CalendarPage() {
       inFlightRef.current += 1;
       expectedRef.current = optimistic;
       return { previous };
+    },
+
+    // Protected days are authoritative server-side and are silently skipped:
+    // tell the user how many days stayed untouched instead of leaving a gap.
+    onSuccess: (res) => {
+      const n = res?.skipped?.length ?? 0;
+      if (n > 0) {
+        toast.info(
+          t("pcal.protected_skipped", {
+            count: n,
+            defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days.",
+          }),
+        );
+      }
     },
 
     onError: (e, _v, context) => {
@@ -384,6 +409,9 @@ function CalendarPage() {
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
       toast.success(t("pcal.busy_applied", { defaultValue: "{{count}} day(s) marked as busy", count: res.applied }));
+      if (res.skipped > 0) {
+        toast.info(t("pcal.protected_skipped", { count: res.skipped, defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days." }));
+      }
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
@@ -411,6 +439,9 @@ function CalendarPage() {
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
+      if (res.skipped > 0) {
+        toast.info(t("pcal.protected_skipped", { count: res.skipped, defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days." }));
+      }
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });

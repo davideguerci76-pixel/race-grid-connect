@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
+import { chunkDays } from "@/lib/calendar-days";
+
 
 // Enums are validated server-side by Postgres; keep TS-side loose to allow the extended taxonomy.
 const disciplineEnum = z.string().min(1).max(64);
@@ -12,7 +14,7 @@ const durationEnum = z.enum(["full_season", "race_weekend", "test_session"]);
 export const setAvailability = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { dates: string[]; add: boolean }) =>
-    z.object({ dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400), add: z.boolean() }).parse(data),
+    z.object({ dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(2000), add: z.boolean() }).parse(data),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -20,26 +22,29 @@ export const setAvailability = createServerFn({ method: "POST" })
     // Request Confirmation are resolved server-side (DB triggers are the backstop);
     // they are skipped so the rest of the selection still saves.
     const unique = [...new Set(data.dates)];
-    const { data: protectedRows, error: pErr } = await (supabase.rpc as any)("my_protected_days", { _days: unique });
-    if (pErr) throw new Error(pErr.message);
-    const blocked = new Set(((protectedRows ?? []) as string[]).map((d) => String(d).slice(0, 10)));
+    const blocked = new Set<string>();
+    for (const batch of chunkDays(unique)) {
+      const { data: protectedRows, error: pErr } = await (supabase.rpc as any)("my_protected_days", { _days: batch });
+      if (pErr) throw new Error(pErr.message);
+      for (const d of (protectedRows ?? []) as string[]) blocked.add(String(d).slice(0, 10));
+    }
     const skipped = unique.filter((d) => blocked.has(d));
     const writable = unique.filter((d) => !blocked.has(d));
 
-    if (data.add) {
-      if (writable.length) {
-        const rows = writable.map((d) => ({ freelancer_id: userId, day: d }));
+    // Batched, set-semantics writes: safe to retry, no duplicates, no silent cap.
+    for (const batch of chunkDays(writable)) {
+      if (data.add) {
+        const rows = batch.map((d) => ({ freelancer_id: userId, day: d }));
         const { error } = await supabase.from("availability").upsert(rows, { onConflict: "freelancer_id,day" });
         if (error) throw new Error(error.message);
+      } else {
+        const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", batch);
+        if (error) throw new Error(error.message);
       }
-      return { ok: true, skipped };
-    }
-    if (writable.length) {
-      const { error } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", writable);
-      if (error) throw new Error(error.message);
     }
     return { ok: true, skipped };
   });
+
 
 
 export const confirmMyCalendar = createServerFn({ method: "POST" })
