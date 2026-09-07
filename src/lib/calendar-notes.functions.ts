@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { daysBetweenIso } from "@/lib/calendar-days";
+import { chunkDays, daysBetweenIso } from "@/lib/calendar-days";
 
 export type CalendarDayNote = { day: string; note: string; busy: boolean };
 
@@ -101,9 +101,13 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
  */
 async function protectedDaysFor(supabase: any, days: string[]): Promise<Set<string>> {
   if (!days.length) return new Set<string>();
-  const { data, error } = await supabase.rpc("my_protected_days", { _days: days });
-  if (error) throw new Error(error.message);
-  return new Set(((data ?? []) as string[]).map((d) => String(d).slice(0, 10)));
+  const out = new Set<string>();
+  for (const batch of chunkDays(days)) {
+    const { data, error } = await supabase.rpc("my_protected_days", { _days: batch });
+    if (error) throw new Error(error.message);
+    for (const d of (data ?? []) as string[]) out.add(String(d).slice(0, 10));
+  }
+  return out;
 }
 
 /** Create/update/remove a private note. Protected days are rejected server-side. */
@@ -149,7 +153,7 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z
       .object({
-        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400),
+        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(2000),
         label: z.string().trim().min(1).max(60),
         overwrite: z.boolean().default(false),
       })
@@ -206,7 +210,7 @@ export const applyCalendarLabelAsAvailable = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     z
       .object({
-        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(400),
+        dates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(2000),
         label: z.string().trim().min(1).max(60),
         overwrite: z.boolean().default(false),
       })
@@ -267,7 +271,7 @@ export const restoreMyDayNotes = createServerFn({ method: "POST" })
               busy: z.boolean().default(false),
             }),
           )
-          .max(400),
+          .max(2000),
       })
       .parse(data),
   )
