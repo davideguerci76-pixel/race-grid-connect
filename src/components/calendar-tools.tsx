@@ -33,11 +33,15 @@ function monthDays(month: Date): string[] {
   return out;
 }
 
-/** Today → same day +6 months (inclusive), as ISO strings. */
-function nextSixMonthsDays(): string[] {
+/** Anchor day (last selected date, or today as fallback) → same day +6 months (inclusive), as ISO strings. */
+function nextSixMonthsDays(anchorIso?: string): string[] {
   const out: string[] = [];
   const d = new Date();
   d.setHours(0, 0, 0, 0);
+  if (anchorIso) {
+    const anchor = new Date(`${anchorIso}T00:00:00`);
+    if (!Number.isNaN(anchor.getTime()) && anchor > d) d.setTime(anchor.getTime());
+  }
   const end = new Date(d);
   end.setMonth(end.getMonth() + 6);
   while (d <= end) {
@@ -77,6 +81,8 @@ export function CalendarTools({
   const [saving, setSaving] = useState(false);
 
   const editable = useMemo(() => currentAvailable.filter((d) => !protectedDays.has(d)), [currentAvailable, protectedDays]);
+  /** "Next 6 months" anchors on the last selected date; falls back to today when nothing is selected. */
+  const sixMonthsAnchor = useMemo(() => editable.reduce<string | undefined>((max, d) => (max === undefined || d > max ? d : max), undefined), [editable]);
   const reshaped = useMemo(() => applyWeekRule(daysToEvents(editable), rule).filter((d) => !protectedDays.has(d)), [editable, rule, protectedDays]);
   const preview = useMemo(() => {
     const cur = new Set(editable);
@@ -135,10 +141,10 @@ export function CalendarTools({
           <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(monthDays(month), "month")}>
             <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_month", { defaultValue: "Deselect month" })}
           </button>
-          <button type="button" className={btn} disabled={pending} onClick={() => bulkSelect(nextSixMonthsDays())}>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkSelect(nextSixMonthsDays(sixMonthsAnchor))}>
             <CalendarCheck className="size-3.5" /> {t("pcal.tools.select_six", { defaultValue: "Select next 6 months" })}
           </button>
-          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(), "six")}>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(sixMonthsAnchor), "six")}>
             <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_six", { defaultValue: "Deselect next 6 months" })}
           </button>
           {canUndo && (
