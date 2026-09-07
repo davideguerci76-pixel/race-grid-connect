@@ -224,7 +224,10 @@
       "reveal_spend": "Enthüllung",
       "admin_credit": "Admin-Gutschrift",
       "admin_debit": "Admin-Abzug",
-      "refund": "Erstattung"
+      "refund": "Erstattung",
+      "request_post": "Pit Call veröffentlicht",
+      "team_reveal_spend": "Team-Enthüllung",
+      "rating_bonus": "Bewertungsbonus"
     },
     "packages": {
       "tokens_10": "Starter",

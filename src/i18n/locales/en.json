@@ -224,7 +224,10 @@
       "reveal_spend": "Reveal",
       "admin_credit": "Admin credit",
       "admin_debit": "Admin debit",
-      "refund": "Refund"
+      "refund": "Refund",
+      "request_post": "Pit Call posted",
+      "team_reveal_spend": "Team reveal",
+      "rating_bonus": "Rating bonus"
     },
     "packages": {
       "tokens_10": "Starter pack",
