@@ -240,7 +240,7 @@ function CalendarPage() {
       if (isUndo) {
         setUndoSnapshot(null);
       } else if (inFlightRef.current === 0) {
-        setUndoSnapshot(previous);
+        setUndoSnapshot({ availability: previous, notes: null });
       }
       inFlightRef.current += 1;
       expectedRef.current = optimistic;
@@ -258,15 +258,30 @@ function CalendarPage() {
     },
   });
 
-  /** Restore the exact pre-change snapshot (protected days always preserved). */
-  const undoLastChange = () => {
+  /**
+   * Restore the exact pre-change snapshot: availability, plus (for bulk Busy)
+   * the previous note state of the touched days only. Protected days are never
+   * part of the snapshot and are never rewritten.
+   */
+  const undoLastChange = async () => {
     if (!undoSnapshot || mutation.isPending) return;
+    const snapshot = undoSnapshot;
+    setUndoSnapshot(null);
+    try {
+      if (snapshot.notes) {
+        await restoreNotes({ data: { entries: snapshot.notes.map((n) => ({ day: n.day, note: n.note, busy: n.busy })) } });
+        qc.invalidateQueries({ queryKey: ["my-day-notes"] });
+      }
+    } catch (e) {
+      toastError(e, "sweep_public.dashboard_calendar.save_failed");
+      return;
+    }
     mutation.mutate(
-      { nextSet: new Set(undoSnapshot.filter((d) => !protectedSet.has(d))), isUndo: true },
+      { nextSet: new Set(snapshot.availability.filter((d) => !protectedSet.has(d))), isUndo: true },
       { onSuccess: () => toast.success(t("pcal.tools.undo_toast", { defaultValue: "Availability restored" })) },
     );
-    setUndoSnapshot(null);
   };
+
 
   /** Drop a stale snapshot when an external refetch really changed the availability. */
   useEffect(() => {
