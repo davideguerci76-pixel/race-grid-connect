@@ -416,6 +416,7 @@ function CalendarPage() {
                   onReshape={(dates) => replaceDates(dates)}
                   pending={mutation.isPending}
                   month={month}
+                  selectedDay={selected}
                   canUndo={!!undoSnapshot}
                   onUndo={undoLastChange}
                 />

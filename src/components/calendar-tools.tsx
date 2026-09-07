@@ -58,6 +58,7 @@ export function CalendarTools({
   onReshape,
   pending,
   month,
+  selectedDay,
   canUndo,
   onUndo,
 }: {
@@ -66,6 +67,7 @@ export function CalendarTools({
   onReshape: (dates: string[]) => void;
   pending?: boolean;
   month: Date;
+  selectedDay?: string | null;
   canUndo?: boolean;
   onUndo?: () => void;
 }) {
@@ -82,7 +84,7 @@ export function CalendarTools({
 
   const editable = useMemo(() => currentAvailable.filter((d) => !protectedDays.has(d)), [currentAvailable, protectedDays]);
   /** "Next 6 months" anchors on the last selected date; falls back to today when nothing is selected. */
-  const sixMonthsAnchor = useMemo(() => editable.reduce<string | undefined>((max, d) => (max === undefined || d > max ? d : max), undefined), [editable]);
+  const sixMonthsAnchor = selectedDay ?? undefined;
   const reshaped = useMemo(() => applyWeekRule(daysToEvents(editable), rule).filter((d) => !protectedDays.has(d)), [editable, rule, protectedDays]);
   const preview = useMemo(() => {
     const cur = new Set(editable);
