@@ -65,6 +65,7 @@ export const startTokenCheckout = createServerFn({ method: "POST" })
     if (error) {
       if (error.message.includes("token_purchase_disabled")) return { ok: false, reason: "purchase_disabled" };
       if (error.message.includes("package_not_available")) return { ok: false, reason: "package_not_available" };
+      if (error.message.includes("too_many_open_orders")) return { ok: false, reason: "too_many_open_orders" };
       throw new Error(error.message);
     }
 
