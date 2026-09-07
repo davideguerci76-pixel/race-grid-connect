@@ -694,7 +694,7 @@ export const deactivateRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("requests").update({ is_active: false }).eq("id", data.id).eq("team_id", context.userId);
+    const { error } = await (context.supabase as any).rpc("deactivate_request", { _id: data.id });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
