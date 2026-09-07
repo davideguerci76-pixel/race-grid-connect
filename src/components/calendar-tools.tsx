@@ -33,11 +33,15 @@ function monthDays(month: Date): string[] {
   return out;
 }
 
-/** Today → same day +6 months (inclusive), as ISO strings. */
-function nextSixMonthsDays(): string[] {
+/** Anchor day (last selected date, or today as fallback) → same day +6 months (inclusive), as ISO strings. */
+function nextSixMonthsDays(anchorIso?: string): string[] {
   const out: string[] = [];
   const d = new Date();
   d.setHours(0, 0, 0, 0);
+  if (anchorIso) {
+    const anchor = new Date(`${anchorIso}T00:00:00`);
+    if (!Number.isNaN(anchor.getTime()) && anchor > d) d.setTime(anchor.getTime());
+  }
   const end = new Date(d);
   end.setMonth(end.getMonth() + 6);
   while (d <= end) {
