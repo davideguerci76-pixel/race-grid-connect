@@ -640,7 +640,12 @@ function CalendarPage() {
               className="mt-3 w-full min-w-0 border border-border bg-background px-3 py-2 text-sm"
             />
             <p className="mt-2 text-[11px] text-muted-foreground">
-              {t("pcal.busy_hint", { defaultValue: "All editable dates of this calendar turn black with this label. PITCALL dates are never overwritten." })}
+              {busyDialog.kind === "busy"
+                ? t("pcal.busy_hint", { defaultValue: "All editable dates of this calendar turn black with this label. PITCALL dates are never overwritten." })
+                : t("pcal.add.available_label_hint", {
+                    defaultValue:
+                      "Leave it as is, edit it or clear it. If empty, the days stay available with no private note. Never shared with Teams.",
+                  })}
             </p>
             {busyDialog.conflicts.length > 0 && (
               <div className="mt-3 border border-racing-yellow/60 bg-racing-yellow/10 p-3">
@@ -662,10 +667,12 @@ function CalendarPage() {
                 <button
                   type="button"
                   className={btn}
-                  disabled={busyMut.isPending}
+                  disabled={busyMut.isPending || labelMut.isPending}
                   onClick={() => {
                     const skip = new Set(busyDialog.conflicts.map((c) => c.day));
-                    busyMut.mutate({ dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true });
+                    const vars = { dates: busyDialog.dates.filter((d) => !skip.has(d)), label: busyDialog.label, overwrite: true };
+                    if (busyDialog.kind === "busy") busyMut.mutate(vars);
+                    else labelMut.mutate(vars);
                   }}
                 >
                   {t("pcal.keep_existing", { defaultValue: "Keep existing" })}
@@ -674,14 +681,19 @@ function CalendarPage() {
               <button
                 type="button"
                 className="bg-racing-red px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
-                disabled={busyMut.isPending || !busyDialog.label.trim()}
-                onClick={() => busyMut.mutate({ dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 })}
+                disabled={busyMut.isPending || labelMut.isPending || !busyDialog.label.trim()}
+                onClick={() => {
+                  const vars = { dates: busyDialog.dates, label: busyDialog.label, overwrite: busyDialog.conflicts.length > 0 };
+                  if (busyDialog.kind === "busy") busyMut.mutate(vars);
+                  else labelMut.mutate(vars);
+                }}
               >
                 {busyDialog.conflicts.length > 0
                   ? t("pcal.overwrite", { defaultValue: "Overwrite" })
                   : t("pcal.apply", { defaultValue: "Apply" })}
               </button>
             </div>
+
           </div>
         </div>
       )}
