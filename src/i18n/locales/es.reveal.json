@@ -1,7 +1,8 @@
 {
   "reveal": {
     "locked_title": "Detalles del Pit Call bloqueados",
-    "locked_body": "Revela por 1 token para desbloquear logística, requisitos y presupuesto de este Pit Call. El equipo permanece anónimo.",
+    "locked_body": "Revela por {{cost}} token para desbloquear log\u00edstica, requisitos y presupuesto de este Pit Call. El equipo permanece an\u00f3nimo.",
+    "locked_body_free": "Revela gratis para desbloquear log\u00edstica, requisitos y presupuesto de este Pit Call. El equipo permanece an\u00f3nimo.",
     "locked_count": "{{count}} detalles adicionales disponibles",
     "unlocked_title": "Pit Call desbloqueado",
     "identity_note": "La identidad del equipo permanece oculta hasta la confirmación",

@@ -13,6 +13,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker, RatingIcons } from "@/components/rating-icons";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { Link, useRouterState } from "@tanstack/react-router";
@@ -137,6 +138,9 @@ function EngagementsPage() {
 
   const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
   const revealFn = useServerFn(revealMatch);
+  const fetchSettings = useServerFn(getPlatformSettings);
+  const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
+  const revealCost = Number((revealSettings as Array<{ key: string; value_num: number }>).find((x) => x.key === "cost_reveal_match")?.value_num ?? 1);
   const revealMut = useMutation({
     mutationFn: (matchId: string) => revealFn({ data: { match_id: matchId } }),
     onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
@@ -299,12 +303,12 @@ function EngagementsPage() {
                         </span>
                         <button
                           onClick={async () => {
-                            if (await confirmDialog(t("matches.reveal_confirm", { who: t("nav.teams") }))) revealMut.mutate(e.match.id);
+                            const who = t("nav.teams"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { cost: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) revealMut.mutate(e.match.id);
                           }}
                           disabled={revealMut.isPending}
                           className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                         >
-                          {t("matches.reveal_1_token")}
+                          {revealCost > 0 ? t("matches.reveal_1_token", { cost: revealCost }) : t("matches.reveal_cta_free")}
                         </button>
                       </div>
                     )}
