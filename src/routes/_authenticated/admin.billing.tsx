@@ -167,12 +167,10 @@ function AdminBillingPage() {
                           <span className="text-muted-foreground">none (no tokens credited by this order)</span>
                         )}
                       </div>
-                      {o.billing_snapshot && (
-                        <details className="mt-2">
-                          <summary className="cursor-pointer text-muted-foreground">Billing snapshot at purchase time</summary>
-                          <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all text-[10px]">{JSON.stringify(o.billing_snapshot, null, 2)}</pre>
-                        </details>
-                      )}
+                      <p className="mt-2 text-[10px] text-muted-foreground">
+                        The billing snapshot taken at purchase time is retained on the order record and is not displayed here.
+                      </p>
+
                     </div>
                   ))}
                 </div>
