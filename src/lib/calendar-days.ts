@@ -13,7 +13,11 @@ export type CalendarDayState = "none" | "available" | "busy" | "engagement" | "l
 /**
  * Pure day-state resolution shared by the full calendar and the dashboard
  * mini-preview. Precedence: engagement (locked > engagement) > blocked >
- * available > noted-busy > none. No I/O, no business logic beyond ordering.
+ * available > busy note > none. No I/O, no business logic beyond ordering.
+ *
+ * `noted` MUST only contain days carrying a private note with `busy = true`.
+ * A private note with `busy = false` is a label, not a Busy state, and must
+ * never turn a day black.
  */
 export function calendarDayState(
   iso: string,
@@ -31,6 +35,7 @@ export function calendarDayState(
   if (opts.noted?.has(iso)) return "busy";
   return "none";
 }
+
 
 export function daysBetweenIso(start: string, end: string): string[] {
   const days: string[] = [];
