@@ -314,11 +314,30 @@ function RequestMatchesPage() {
                       <button onClick={async () => { if (await confirmDialog(t("sweep_engage.request_matches.activate_now_confirm"))) activateMut.mutate(); }} disabled={activateMut.isPending} className="inline-flex items-center gap-2 border border-border px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-60">
                         <Play className="size-3" /> {t("sweep_engage.request_matches.activate_now_button")}
                       </button>
-                      {state.red_cancel_eligible && (
-                        <button onClick={async () => { if (await confirmDialog(t("sweep_engage.request_matches.red_cancel_confirm"))) redCancelMut.mutate(); }} disabled={redCancelMut.isPending} className="inline-flex items-center gap-2 border border-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60">
-                          <Ban className="size-3" /> {t("sweep_engage.request_matches.red_cancel_button")}
-                        </button>
-                      )}
+                      {state.red_cancel_eligible && (() => {
+                        // The CTA mirrors the server quote: it only appears when
+                        // red_cancel_quote() says yes, and it never promises a
+                        // refund the authority would return as zero.
+                        const refundTokens = Number(state.red_cancel_refund_tokens ?? 0);
+                        const noRefund = refundTokens <= 0;
+                        return (
+                          <button
+                            onClick={async () => {
+                              const msg = noRefund
+                                ? t("sweep_engage.request_matches.red_cancel_confirm_no_refund")
+                                : `${t("sweep_engage.request_matches.red_cancel_confirm")} ${t("sweep_engage.request_matches.red_cancel_refund_hint", { tokens: refundTokens })}`;
+                              if (await confirmDialog(msg)) redCancelMut.mutate();
+                            }}
+                            disabled={redCancelMut.isPending}
+                            className="inline-flex items-center gap-2 border border-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60"
+                          >
+                            <Ban className="size-3" />{" "}
+                            {noRefund
+                              ? t("sweep_engage.request_matches.red_cancel_button_no_refund")
+                              : t("sweep_engage.request_matches.red_cancel_button")}
+                          </button>
+                        );
+                      })()}
                       <span className="font-mono text-[10px] uppercase text-muted-foreground">{t("sweep_engage.request_matches.modify_budget_status", { used: state.modify_count ?? 0, max: state.max_modify ?? 3, left: state.budget_left ?? 0 })}</span>
                     </div>
                   );
@@ -336,6 +355,16 @@ function RequestMatchesPage() {
               </p>
               <div className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                 {t("sweep_engage.request_matches.total_matches_summary", { full: data.total_matches, partial: data.total_partial_matches, cap: data.hard_cap })}
+              </div>
+
+              {/* What an unlock actually buys — mirrors the server entitlement exactly. */}
+              <div className="mt-4 border-t border-border pt-3">
+                <div className="label-mono">[{t("sweep_engage.request_matches.unlock_explainer_title")}]</div>
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <li>· {t("sweep_engage.request_matches.unlock_explainer_visible")}</li>
+                  <li className="text-foreground">· {t("sweep_engage.request_matches.unlock_explainer_buys")}</li>
+                  <li>· {t("sweep_engage.request_matches.unlock_explainer_hidden")}</li>
+                </ul>
               </div>
 
               {sosEligible && (
