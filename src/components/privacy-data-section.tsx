@@ -50,7 +50,12 @@ export function PrivacyDataSection() {
           ? t("privacy.delete_blocked", {
               defaultValue: "You still have active engagements. Close or cancel them before deleting your account.",
             })
-          : msg,
+          : msg.includes("DELETION_INCOMPLETE")
+            ? t("privacy.delete_incomplete", {
+                defaultValue:
+                  "Your data has been removed and the account is disabled, but the sign-in identity could not be deleted yet. Try again in a moment.",
+              })
+            : msg,
       );
     } finally {
       setBusy(null);
