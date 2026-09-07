@@ -10,7 +10,16 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PitcallCalendar, CalendarStat, CalendarLegendDot, type PitcallDayCell } from "@/components/pitcall-calendar";
 import { setAvailability, getMyAvailability, getMyBlockedDates, getMyFrozenDates, confirmMyCalendar, getMyCalendarFreshness } from "@/lib/paddock.functions";
-import { getMyDayNotes, getMyEngagementDays, setMyDayNote, applySavedCalendarAsBusy } from "@/lib/calendar-notes.functions";
+import {
+  getMyDayNotes,
+  getMyEngagementDays,
+  setMyDayNote,
+  applySavedCalendarAsBusy,
+  applyCalendarLabelAsAvailable,
+  restoreMyDayNotes,
+  type CalendarDayNote,
+} from "@/lib/calendar-notes.functions";
+
 import { BackButton } from "@/components/back-button";
 import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
