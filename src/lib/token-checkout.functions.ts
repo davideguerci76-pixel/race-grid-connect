@@ -35,7 +35,10 @@ function safeOrigin(origin: string | undefined): string {
 
 export type CheckoutResult =
   | { ok: true; url: string; order_id: string }
-  | { ok: false; reason: "purchase_disabled" | "package_not_available" | "provider_unavailable" };
+  | {
+      ok: false;
+      reason: "purchase_disabled" | "package_not_available" | "provider_unavailable" | "too_many_open_orders";
+    };
 
 export const startTokenCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
