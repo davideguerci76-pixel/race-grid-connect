@@ -82,11 +82,17 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
     };
   }
 
+  // Moderation alerts land on the Admin review queue, already filtered.
+  if (kind === "admin_alert" && p["type"] === "rating_flag") {
+    return { title: "Review reported", path: "/admin/reviews", label: "Open moderation queue" };
+  }
+
   // Informational alerts (potential match, Pit Call filled/closed follow-ups)
   // never grant access to the Pit Call: they land on the notification inbox.
   if (isInformationalNotification(p)) {
     return { ...base, path: "/dashboard/notifications", label: FALLBACK.label };
   }
+
 
   if (requestId && (kind === "new_matches" || kind === "request_unfilled" || kind === "revealed_by")) {
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };
