@@ -82,6 +82,9 @@ function CalendarPage() {
   const getEngDays = useServerFn(getMyEngagementDays);
   const saveNote = useServerFn(setMyDayNote);
   const applyBusy = useServerFn(applySavedCalendarAsBusy);
+  const applyLabel = useServerFn(applyCalendarLabelAsAvailable);
+  const restoreNotes = useServerFn(restoreMyDayNotes);
+
 
   const { data: myDays = [] } = useQuery({
     queryKey: ["my-availability", user?.id],
@@ -117,9 +120,20 @@ function CalendarPage() {
   const [month, setMonth] = useState(() => initialMonth(search.m));
   const [selected, setSelected] = useState<string | null>(() => isoOf(new Date()));
   const [noteDraft, setNoteDraft] = useState("");
-  const [busyDialog, setBusyDialog] = useState<{ dates: string[]; label: string; conflicts: Array<{ day: string; note: string }> } | null>(null);
+  const [busyDialog, setBusyDialog] = useState<{
+    kind: "busy" | "available";
+    dates: string[];
+    label: string;
+    conflicts: Array<{ day: string; note: string }>;
+  } | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [undoSnapshot, setUndoSnapshot] = useState<string[] | null>(null);
+  /**
+   * Single-level undo. `availability` is the whole pre-change availability set;
+   * `notes` (when present) is the exact pre-change note state of the days that a
+   * bulk operation touched ("" = there was no note on that day).
+   */
+  const [undoSnapshot, setUndoSnapshot] = useState<{ availability: string[]; notes: CalendarDayNote[] | null } | null>(null);
+
   const inFlightRef = useRef(0);
   const expectedRef = useRef<string[] | null>(null);
   const hotPartialDays = useMemo(() => new Set((search.days ?? "").split(",").filter(Boolean)), [search.days]);
