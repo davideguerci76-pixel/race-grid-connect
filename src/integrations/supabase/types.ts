@@ -1124,6 +1124,8 @@ export type Database = {
           avatar_url: string | null
           blocked_at: string | null
           created_at: string
+          deleted_at: string | null
+          deletion_state: string | null
           display_name: string
           first_name: string | null
           id: string
@@ -1141,6 +1143,8 @@ export type Database = {
           avatar_url?: string | null
           blocked_at?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deletion_state?: string | null
           display_name: string
           first_name?: string | null
           id: string
@@ -1158,6 +1162,8 @@ export type Database = {
           avatar_url?: string | null
           blocked_at?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deletion_state?: string | null
           display_name?: string
           first_name?: string | null
           id?: string
@@ -3212,6 +3218,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      delete_my_account: { Args: never; Returns: Json }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
       dispatch_platform_capacity_check: { Args: never; Returns: undefined }
@@ -3429,6 +3436,10 @@ export type Database = {
           updated_at: string
         }[]
       }
+      mark_account_identity_deleted: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       market_stats: { Args: never; Returns: Json }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }
@@ -3506,6 +3517,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      my_account_status: {
+        Args: never
+        Returns: {
+          blocked: boolean
+          deleted: boolean
+        }[]
       }
       my_availability_opportunity_mute: {
         Args: never
@@ -3956,6 +3974,7 @@ export type Database = {
           tokens_spent: number
         }[]
       }
+      user_is_blocked: { Args: { _user_id: string }; Returns: boolean }
       withdraw_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
