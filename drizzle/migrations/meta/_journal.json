@@ -603,6 +603,13 @@
       "when": 1788779156022,
       "tag": "0085_user_calendars_unique_name_per_owner_env",
       "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1788784012251,
+      "tag": "0086_pitcall_authority_state_machine_coverage",
+      "breakpoints": true
     }
   ]
 }

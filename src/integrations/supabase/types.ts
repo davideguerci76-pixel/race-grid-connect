@@ -3064,6 +3064,75 @@ export type Database = {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
       }
+      deactivate_request: {
+        Args: { _id: string }
+        Returns: {
+          activated_at: string | null
+          budget_max: number | null
+          budget_min: number | null
+          budget_unit: string
+          circuit: string | null
+          created_at: string
+          currency: string
+          discipline: Database["public"]["Enums"]["discipline"]
+          duration: Database["public"]["Enums"]["duration_type"]
+          education: string[]
+          end_date: string
+          ever_full_matched: boolean
+          ever_partial_matched: boolean
+          ever_relevant_match: boolean
+          experience_requirements: Json
+          id: string
+          initial_match_potential: string | null
+          is_active: boolean
+          is_test: boolean
+          languages: Json
+          last_modified_at: string | null
+          location: string | null
+          location_anchor: string
+          location_city: string | null
+          location_country: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_place_id: string | null
+          location_radius_km: number | null
+          location_region: string | null
+          location_relevance: string
+          match_potential_current: string | null
+          modify_count: number
+          notes: string | null
+          partial_refund_taken: boolean
+          red_cancel_tokens: number | null
+          red_cancelled_at: string | null
+          refund_kind: string | null
+          refund_pct: number | null
+          refund_tokens: number | null
+          review_deadline_at: string | null
+          role: Database["public"]["Enums"]["freelancer_role"] | null
+          role_group: string | null
+          role_hard: boolean
+          search_mode: string | null
+          season_dates: string[] | null
+          skills: string[]
+          skills_hard: string[]
+          start_date: string
+          status: Database["public"]["Enums"]["request_status"]
+          sub_role: string | null
+          sub_role_hard: boolean
+          sub_role_min_level: string
+          team_id: string
+          title: string
+          travel_required: boolean
+          updated_at: string
+          was_pool_request: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       decline_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
