@@ -51,6 +51,17 @@ function TokensPage() {
   });
   const purchaseEnabled = availability?.enabled === true;
 
+  // Reveal cost is never hardcoded here: it mirrors the same ACP authority the
+  // reveal flow itself reads (platform_settings.cost_reveal_match).
+  const { data: settings } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
+  const revealCost = settings
+    ? Number(
+        (settings as Array<{ key: string; value_num: number }>).find((s) => s.key === "cost_reveal_match")
+          ?.value_num ?? 0,
+      )
+    : null;
+
+
   // Return page. It only READS the order; crediting is webhook-only.
   const { data: returnedOrder } = useQuery({
     queryKey: ["token-order", search.order],
