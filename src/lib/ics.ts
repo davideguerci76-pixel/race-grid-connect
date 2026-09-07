@@ -29,9 +29,15 @@ export function mondayOf(iso: string): string {
   return isoOf(d);
 }
 
-/** Server-authoritative calendar limits (mirrored from calendars.functions.ts). */
-export const MAX_CALENDAR_EVENTS = 200;
-export const MAX_CALENDAR_DAYS = 400;
+/**
+ * Server-authoritative calendar limits (mirrored from calendars.functions.ts).
+ * These are storage bounds for ONE saved calendar row, not an operation batch
+ * size: bulk availability operations are chunked and are not capped by them.
+ */
+export const MAX_CALENDAR_EVENTS = 1000;
+export const MAX_CALENDAR_DAYS = 2000;
+/** Hard safety bound while expanding a single recurrence rule. */
+export const MAX_RRULE_OCCURRENCES = 400;
 
 /** Exact number of inclusive days in a range — never truncated. */
 export function rangeDayCount(startIso: string, endIso: string): number {
@@ -45,13 +51,16 @@ export function expandRange(startIso: string, endIso: string): string[] {
   const out: string[] = [];
   let cur = startIso;
   let guard = 0;
-  while (cur <= endIso && guard < MAX_CALENDAR_DAYS) {
+  // Guard only protects against a corrupt/inverted range; it must never silently
+  // truncate a legitimate calendar (that is what checkCalendarLimits reports).
+  while (cur <= endIso && guard < MAX_CALENDAR_DAYS * 2) {
     out.push(cur);
     cur = addDaysIso(cur, 1);
     guard += 1;
   }
   return out;
 }
+
 
 export type CalendarLimitViolation =
   | { kind: "events"; actual: number; limit: number }
