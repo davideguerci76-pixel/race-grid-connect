@@ -107,11 +107,19 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
           return new Response("ignored", { status: 200 });
         }
 
+        // Provider mode is derived from the loaded Stripe configuration and the
+        // event itself — never from the client, never hardcoded downstream.
+        // This endpoint only ever loads a TEST key, and livemode events are
+        // rejected above, so the derived mode is 'test'; any incoherence with
+        // the order's own mode is rejected fail-closed inside the RPC.
+        // livemode === true was already rejected above, so this is TEST by construction.
+        const providerMode = "test" as const;
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin.rpc("confirm_token_order_payment", {
           _order_id: orderId,
           _provider: "stripe",
-          _provider_mode: "test",
+          _provider_mode: providerMode,
           _provider_event_id: event.id,
           _event_type: event.type,
           _provider_payment_id: paymentId,
@@ -121,9 +129,18 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
         });
 
         if (error) {
-          console.error(`stripe-webhook: confirm failed for ${orderId}: ${error.message}`);
-          // 500 lets Stripe retry; the RPC is replay-safe.
+          // TRANSIENT: DB/network/internal failure. Stripe should retry.
+          console.error(`stripe-webhook: transient failure for ${orderId}: ${error.message}`);
           return new Response("processing error", { status: 500 });
+        }
+
+        const verdict = (data ?? {}) as { ok?: boolean; terminal?: boolean; reason?: string };
+        if (verdict.ok === false && verdict.terminal === true) {
+          // TERMINAL: authentic event, permanently incompatible with the order.
+          // Evidence is already persisted; retrying can never succeed, so we
+          // acknowledge to stop the retry loop. No token is ever credited here.
+          console.error(`stripe-webhook: terminal rejection ${verdict.reason} for order ${orderId}`);
+          return Response.json({ received: true, rejected: true, reason: verdict.reason }, { status: 200 });
         }
 
         return Response.json({ received: true, result: data });

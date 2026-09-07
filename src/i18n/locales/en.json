@@ -206,7 +206,8 @@
     "errors": {
       "purchase_disabled": "Token purchases are not available right now.",
       "package_not_available": "This package is no longer available.",
-      "provider_unavailable": "The payment provider is temporarily unavailable. Please try again shortly."
+      "provider_unavailable": "The payment provider is temporarily unavailable. Please try again shortly.",
+      "too_many_open_orders": "You have too many unpaid orders open. Complete or cancel one, then try again."
     },
     "checkout": {
       "credited": "+{{count}} tokens credited.",

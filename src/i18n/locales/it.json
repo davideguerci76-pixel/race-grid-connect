@@ -206,7 +206,8 @@
     "errors": {
       "purchase_disabled": "Gli acquisti di token non sono disponibili al momento.",
       "package_not_available": "Questo pacchetto non è più disponibile.",
-      "provider_unavailable": "Il provider di pagamento è temporaneamente non disponibile. Riprova a breve."
+      "provider_unavailable": "Il provider di pagamento è temporaneamente non disponibile. Riprova a breve.",
+      "too_many_open_orders": "Hai troppi ordini non pagati aperti. Completane o annullane uno, poi riprova."
     },
     "checkout": {
       "credited": "+{{count}} token accreditati.",

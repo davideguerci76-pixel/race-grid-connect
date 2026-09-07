@@ -2227,34 +2227,46 @@ export type Database = {
           created_at: string
           event_type: string
           id: string
+          is_test: boolean | null
           order_id: string | null
+          outcome: string | null
           payload: Json
           processed_at: string | null
           provider: string
           provider_event_id: string
           provider_mode: string
+          provider_payment_id: string | null
+          rejection_reason: string | null
         }
         Insert: {
           created_at?: string
           event_type: string
           id?: string
+          is_test?: boolean | null
           order_id?: string | null
+          outcome?: string | null
           payload?: Json
           processed_at?: string | null
           provider: string
           provider_event_id: string
           provider_mode: string
+          provider_payment_id?: string | null
+          rejection_reason?: string | null
         }
         Update: {
           created_at?: string
           event_type?: string
           id?: string
+          is_test?: boolean | null
           order_id?: string | null
+          outcome?: string | null
           payload?: Json
           processed_at?: string | null
           provider?: string
           provider_event_id?: string
           provider_mode?: string
+          provider_payment_id?: string | null
+          rejection_reason?: string | null
         }
         Relationships: [
           {
@@ -2279,6 +2291,7 @@ export type Database = {
           currency: string
           discount_pct: number
           expired_at: string | null
+          expires_at: string | null
           failed_at: string | null
           id: string
           is_test: boolean
@@ -2292,6 +2305,8 @@ export type Database = {
           provider_mode: string
           provider_payment_id: string | null
           provider_session_id: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
           status: string
           tax_amount_cents: number | null
           team_id: string
@@ -2311,6 +2326,7 @@ export type Database = {
           currency?: string
           discount_pct: number
           expired_at?: string | null
+          expires_at?: string | null
           failed_at?: string | null
           id?: string
           is_test?: boolean
@@ -2324,6 +2340,8 @@ export type Database = {
           provider_mode?: string
           provider_payment_id?: string | null
           provider_session_id?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           status?: string
           tax_amount_cents?: number | null
           team_id: string
@@ -2343,6 +2361,7 @@ export type Database = {
           currency?: string
           discount_pct?: number
           expired_at?: string | null
+          expires_at?: string | null
           failed_at?: string | null
           id?: string
           is_test?: boolean
@@ -2356,6 +2375,8 @@ export type Database = {
           provider_mode?: string
           provider_payment_id?: string | null
           provider_session_id?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           status?: string
           tax_amount_cents?: number | null
           team_id?: string
@@ -3274,6 +3295,10 @@ export type Database = {
         Returns: undefined
       }
       env_is_test: { Args: never; Returns: boolean }
+      expire_abandoned_token_orders: {
+        Args: { _is_test?: boolean }
+        Returns: number
+      }
       extend_match_confirmation: {
         Args: { _engagement_id: string }
         Returns: {
@@ -3924,6 +3949,7 @@ export type Database = {
         Args: { _price_cents: number; _token_quantity: number }
         Returns: number
       }
+      token_provider_mode: { Args: { _is_test: boolean }; Returns: string }
       token_purchase_allowed: { Args: { _is_test: boolean }; Returns: boolean }
       touch_push_subscription: { Args: { _endpoint: string }; Returns: boolean }
       trigger_sos_call: {

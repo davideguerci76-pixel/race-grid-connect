@@ -35,7 +35,10 @@ function safeOrigin(origin: string | undefined): string {
 
 export type CheckoutResult =
   | { ok: true; url: string; order_id: string }
-  | { ok: false; reason: "purchase_disabled" | "package_not_available" | "provider_unavailable" };
+  | {
+      ok: false;
+      reason: "purchase_disabled" | "package_not_available" | "provider_unavailable" | "too_many_open_orders";
+    };
 
 export const startTokenCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -62,16 +65,24 @@ export const startTokenCheckout = createServerFn({ method: "POST" })
     if (error) {
       if (error.message.includes("token_purchase_disabled")) return { ok: false, reason: "purchase_disabled" };
       if (error.message.includes("package_not_available")) return { ok: false, reason: "package_not_available" };
+      if (error.message.includes("too_many_open_orders")) return { ok: false, reason: "too_many_open_orders" };
       throw new Error(error.message);
     }
 
     // 2. Read back the immutable snapshot (RLS: own order only).
     const { data: order, error: readErr } = await context.supabase
       .from("token_orders")
-      .select("id, package_code, token_quantity, base_amount_cents, currency")
+      .select("id, package_code, token_quantity, base_amount_cents, currency, provider_mode")
       .eq("id", orderId as unknown as string)
       .single();
     if (readErr || !order) throw new Error(readErr?.message ?? "order_not_found");
+
+    // Fail-closed TEST/LIVE guard: the loaded Stripe configuration is TEST-only,
+    // so an order carrying any other provider mode must never reach Stripe.
+    if (order.provider_mode !== "test") {
+      console.error(`token-checkout: provider mode mismatch (order=${order.provider_mode}, key=test)`);
+      return { ok: false, reason: "provider_unavailable" };
+    }
 
     const origin = safeOrigin(data.origin);
     const body = new URLSearchParams();
