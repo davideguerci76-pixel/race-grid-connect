@@ -144,7 +144,7 @@ export function CalendarTools({
           <button type="button" className={btn} disabled={pending} onClick={() => bulkSelect(nextSixMonthsDays(sixMonthsAnchor))}>
             <CalendarCheck className="size-3.5" /> {t("pcal.tools.select_six", { defaultValue: "Select next 6 months" })}
           </button>
-          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(), "six")}>
+          <button type="button" className={btn} disabled={pending} onClick={() => bulkDeselect(nextSixMonthsDays(sixMonthsAnchor), "six")}>
             <CalendarX className="size-3.5" /> {t("pcal.tools.deselect_six", { defaultValue: "Deselect next 6 months" })}
           </button>
           {canUndo && (
