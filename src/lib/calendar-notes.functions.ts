@@ -167,14 +167,18 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
     if (!targets.length) return { applied: 0, skipped: data.dates.length, conflicts: [] as CalendarDayNote[] };
 
 
-    const { data: existing, error: exErr } = await supabase
-      .from("calendar_day_notes")
-      .select("day, note, busy")
-      .eq("freelancer_id", userId)
-      .in("day", targets);
-    if (exErr) throw new Error(exErr.message);
+    const existingRows: any[] = [];
+    for (const batch of chunkDays(targets)) {
+      const { data: existing, error: exErr } = await supabase
+        .from("calendar_day_notes")
+        .select("day, note, busy")
+        .eq("freelancer_id", userId)
+        .in("day", batch);
+      if (exErr) throw new Error(exErr.message);
+      existingRows.push(...((existing ?? []) as any[]));
+    }
 
-    const conflicts = ((existing ?? []) as any[])
+    const conflicts = existingRows
       .filter((r) => r.busy && r.note !== data.label)
       .map((r) => ({ day: String(r.day).slice(0, 10), note: r.note, busy: true }));
 
@@ -185,16 +189,18 @@ export const applySavedCalendarAsBusy = createServerFn({ method: "POST" })
     const conflictDays = new Set(conflicts.map((c) => c.day));
     const toWrite = data.overwrite ? targets : targets.filter((d) => !conflictDays.has(d));
 
-    const { error } = await supabase
-      .from("calendar_day_notes")
-      .upsert(
-        toWrite.map((day) => ({ freelancer_id: userId, day, note: data.label, busy: true })),
-        { onConflict: "freelancer_id,day" },
-      );
-    if (error) throw new Error(error.message);
+    for (const batch of chunkDays(toWrite)) {
+      const { error } = await supabase
+        .from("calendar_day_notes")
+        .upsert(
+          batch.map((day) => ({ freelancer_id: userId, day, note: data.label, busy: true })),
+          { onConflict: "freelancer_id,day" },
+        );
+      if (error) throw new Error(error.message);
 
-    const { error: aErr } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", toWrite);
-    if (aErr) throw new Error(aErr.message);
+      const { error: aErr } = await supabase.from("availability").delete().eq("freelancer_id", userId).in("day", batch);
+      if (aErr) throw new Error(aErr.message);
+    }
 
     return { applied: toWrite.length, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
   });
@@ -223,14 +229,18 @@ export const applyCalendarLabelAsAvailable = createServerFn({ method: "POST" })
     const targets = unique.filter((d) => !blocked.has(d));
     if (!targets.length) return { applied: 0, skipped: data.dates.length, conflicts: [] as CalendarDayNote[] };
 
-    const { data: existing, error: exErr } = await supabase
-      .from("calendar_day_notes")
-      .select("day, note, busy")
-      .eq("freelancer_id", userId)
-      .in("day", targets);
-    if (exErr) throw new Error(exErr.message);
+    const existingRows: any[] = [];
+    for (const batch of chunkDays(targets)) {
+      const { data: existing, error: exErr } = await supabase
+        .from("calendar_day_notes")
+        .select("day, note, busy")
+        .eq("freelancer_id", userId)
+        .in("day", batch);
+      if (exErr) throw new Error(exErr.message);
+      existingRows.push(...((existing ?? []) as any[]));
+    }
 
-    const conflicts = ((existing ?? []) as any[])
+    const conflicts = existingRows
       .filter((r) => (r.note ?? "") !== data.label)
       .map((r) => ({ day: String(r.day).slice(0, 10), note: r.note, busy: !!r.busy }));
 
@@ -242,13 +252,15 @@ export const applyCalendarLabelAsAvailable = createServerFn({ method: "POST" })
     const toWrite = data.overwrite ? targets : targets.filter((d) => !conflictDays.has(d));
     if (!toWrite.length) return { applied: 0, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
 
-    const { error } = await supabase
-      .from("calendar_day_notes")
-      .upsert(
-        toWrite.map((day) => ({ freelancer_id: userId, day, note: data.label, busy: false })),
-        { onConflict: "freelancer_id,day" },
-      );
-    if (error) throw new Error(error.message);
+    for (const batch of chunkDays(toWrite)) {
+      const { error } = await supabase
+        .from("calendar_day_notes")
+        .upsert(
+          batch.map((day) => ({ freelancer_id: userId, day, note: data.label, busy: false })),
+          { onConflict: "freelancer_id,day" },
+        );
+      if (error) throw new Error(error.message);
+    }
 
     return { applied: toWrite.length, skipped: data.dates.length - targets.length, conflicts: [] as CalendarDayNote[] };
   });
@@ -285,19 +297,19 @@ export const restoreMyDayNotes = createServerFn({ method: "POST" })
     const toDelete = entries.filter((e) => !e.note.trim()).map((e) => e.day);
     const toWrite = entries.filter((e) => e.note.trim());
 
-    if (toDelete.length) {
+    for (const batch of chunkDays(toDelete)) {
       const { error } = await supabase
         .from("calendar_day_notes")
         .delete()
         .eq("freelancer_id", userId)
-        .in("day", toDelete);
+        .in("day", batch);
       if (error) throw new Error(error.message);
     }
-    if (toWrite.length) {
+    for (const batch of chunkDays(toWrite)) {
       const { error } = await supabase
         .from("calendar_day_notes")
         .upsert(
-          toWrite.map((e) => ({ freelancer_id: userId, day: e.day, note: e.note.trim(), busy: e.busy })),
+          batch.map((e) => ({ freelancer_id: userId, day: e.day, note: e.note.trim(), busy: e.busy })),
           { onConflict: "freelancer_id,day" },
         );
       if (error) throw new Error(error.message);
