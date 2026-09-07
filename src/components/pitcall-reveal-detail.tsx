@@ -45,12 +45,12 @@ function Chips({ items, hard }: { items: string[]; hard?: boolean }) {
 }
 
 /** Locked teaser shown before the 1-token reveal. */
-export function PitCallRevealTeaser({ detailCount }: { detailCount?: number }) {
+export function PitCallRevealTeaser({ detailCount, cost = 1 }: { detailCount?: number; cost?: number }) {
   const { t } = useTranslation();
   return (
     <div className="mt-3 border border-dashed border-border bg-background/40 p-3">
       <div className="label-mono mb-1 flex items-center gap-2 text-muted-foreground"><Lock className="size-3" /> {t("reveal.locked_title")}</div>
-      <p className="text-xs text-muted-foreground">{t("reveal.locked_body")}</p>
+      <p className="text-xs text-muted-foreground">{cost > 0 ? t("reveal.locked_body", { cost }) : t("reveal.locked_body_free")}</p>
       <div className="mt-2 flex flex-wrap gap-1">
         {[t("reveal.logistics"), t("reveal.requirements"), t("reveal.economics")].map((s) => (
           <span key={s} className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground blur-[0.4px]">

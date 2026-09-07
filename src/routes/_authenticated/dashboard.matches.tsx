@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
 import { requestStatusLabel } from "@/lib/labels";
@@ -55,6 +56,11 @@ function MatchesPage() {
   const qc = useQueryClient();
   const getMatches = useServerFn(getMyMatches);
   const reveal = useServerFn(revealMatch);
+  const fetchSettings = useServerFn(getPlatformSettings);
+  const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
+  const revealCost = Number((revealSettings as Array<{ key: string; value_num: number }>).find((x) => x.key === "cost_reveal_match")?.value_num ?? 1);
+  const revealCta = revealCost > 0 ? t("matches.reveal_1_token", { cost: revealCost }) : t("matches.reveal_cta_free");
+  const revealConfirm = revealCost > 0 ? t("matches.reveal_confirm", { cost: revealCost, who: "" }) : null;
   const getRequests = useServerFn(getMyRequests);
   const getEngs = useServerFn(getMyEngagements);
 
@@ -229,7 +235,7 @@ function MatchesPage() {
                         <PitCallDates request={m.request} /> · {m.request?.sub_role ? subRoleLabel(m.request.sub_role) : roleGroupLabel(m.request?.role_group)} · {disciplineLabel(m.request?.discipline)}
                       </div>
                       <div className="mt-1 font-mono text-[10px] text-racing-yellow">{t("sweep_engage.matches.overlap", { count: m.overlap_days })}</div>
-                      {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser />)}
+                      {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser cost={revealCost} />)}
 
                       {isConfirmed && m.request?.start_date && m.request?.end_date && (
                         <div className="mt-3 border-t border-racing-yellow/30 pt-3">
@@ -254,11 +260,11 @@ function MatchesPage() {
                       </span>
                     ) : (
                       <button
-                        onClick={async () => { if (await confirmDialog(t("matches.reveal_confirm", { who: isFreelancer ? t("nav.teams") : t("nav.freelancers") }))) mut.mutate(m.id); }}
+                        onClick={async () => { const who = isFreelancer ? t("nav.teams") : t("nav.freelancers"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { cost: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) mut.mutate(m.id); }}
                         disabled={mut.isPending || matchTaken}
                         className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                       >
-                        {t("matches.reveal_1_token")}
+                        {revealCta}
                       </button>
                     )}
                     {isFreelancer && m.pending_engagement_id && !matchTaken && !isConfirmed && (
