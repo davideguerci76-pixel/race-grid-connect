@@ -53,9 +53,18 @@ export const exportMyData = createServerFn({ method: "POST" })
 
 /**
  * GDPR art. 17 — right to erasure.
- * Removes profile data, contacts, availability and calendars, anonymises the
- * ratings this user wrote about others (which stay valid as platform content)
- * and deletes the auth account. Irreversible.
+ *
+ * Two phases, and only the first one can be transactional:
+ *  1. `delete_my_account()` runs as ONE database transaction: the active
+ *     engagement guard, the removal of owner-private data, the
+ *     de-identification of shared content and the `deleted_at` marker either
+ *     all happen or none of them do. It is advisory-locked and idempotent, so
+ *     a retry never produces a second destructive pass.
+ *  2. Deleting the Auth identity is an external call that cannot join that
+ *     transaction. It runs only AFTER phase 1 committed, so the worst case is
+ *     an identity that still exists but whose profile is already flagged
+ *     deleted+blocked — that account can no longer perform any protected
+ *     action, and calling this function again finishes the job.
  */
 export const deleteMyAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -63,43 +72,21 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    // Block deletion while an engagement is still running: the counterparty has
-    // a legitimate interest in the ongoing booking.
-    const { data: active } = await (supabase as any)
-      .from("engagements")
-      .select("id, status")
-      .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
-      .in("status", ["confirmed", "pending"]);
-    if (active && active.length > 0) throw new Error("ACTIVE_ENGAGEMENTS");
+    const { error: dbError } = await (supabase as any).rpc("delete_my_account");
+    if (dbError) {
+      // Nothing was committed: the transaction rolled back as a whole.
+      throw new Error(dbError.message.includes("ACTIVE_ENGAGEMENTS") ? "ACTIVE_ENGAGEMENTS" : dbError.message);
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (authError) {
+      // No false success: the caller is told the account is disabled but the
+      // sign-in identity still has to be removed, and a retry is safe.
+      throw new Error("DELETION_INCOMPLETE");
+    }
 
-    await supabaseAdmin.from("availability").delete().eq("freelancer_id", userId);
-    await supabaseAdmin.from("user_calendars").delete().eq("owner_id", userId);
-    await supabaseAdmin.from("freelancer_contacts").delete().eq("user_id", userId);
-    await supabaseAdmin.from("freelancer_profiles").delete().eq("user_id", userId);
-    await supabaseAdmin.from("team_profiles").delete().eq("user_id", userId);
-    await supabaseAdmin.from("notifications").delete().eq("user_id", userId);
-    await supabaseAdmin.from("team_pool").delete().eq("freelancer_id", userId);
-
-    // Ratings written by the user stay, stripped of free text.
-    await supabaseAdmin
-      .from("ratings")
-      .update({ comment: null } as never)
-      .eq("from_user_id", userId);
-
-    await supabaseAdmin
-      .from("profiles")
-      .update({
-        display_name: "Deleted user",
-        first_name: null,
-        last_name: null,
-        avatar_url: null,
-        blocked_at: new Date().toISOString(),
-      } as never)
-      .eq("id", userId);
-
-    await supabaseAdmin.auth.admin.deleteUser(userId);
+    await (supabaseAdmin as any).rpc("mark_account_identity_deleted", { _user_id: userId });
 
     return { ok: true };
   });

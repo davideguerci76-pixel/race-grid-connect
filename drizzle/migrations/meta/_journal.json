@@ -673,6 +673,13 @@
       "when": 1788795433603,
       "tag": "0095_mt09r_authority_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1788815976214,
+      "tag": "0096_rem_w1_account_authority",
+      "breakpoints": true
     }
   ]
 }
