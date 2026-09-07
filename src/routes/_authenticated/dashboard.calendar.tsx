@@ -222,9 +222,20 @@ function CalendarPage() {
       const target = new Set([...vars.nextSet].filter((d) => !protectedSet.has(d)));
       const toAdd = [...target].filter((d) => !currentSet.has(d));
       const toRemove = [...currentSet].filter((d) => !target.has(d));
-      if (toAdd.length) await setAvail({ data: { dates: toAdd, add: true } });
-      if (toRemove.length) await setAvail({ data: { dates: toRemove, add: false } });
+      // Large operations are sent in bounded, idempotent batches: no implicit
+      // 400-day ceiling, and a retry can never double-apply.
+      const skipped: string[] = [];
+      for (const batch of chunkDays(toAdd)) {
+        const res = await setAvail({ data: { dates: batch, add: true } });
+        skipped.push(...((res?.skipped ?? []) as string[]));
+      }
+      for (const batch of chunkDays(toRemove)) {
+        const res = await setAvail({ data: { dates: batch, add: false } });
+        skipped.push(...((res?.skipped ?? []) as string[]));
+      }
+      return { skipped: [...new Set(skipped)] };
     },
+
     onMutate: async (vars) => {
       const { nextSet, isUndo } = vars;
       const key = ["my-availability", user?.id];
