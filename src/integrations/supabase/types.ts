@@ -1527,6 +1527,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -1551,6 +1552,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -1587,6 +1590,7 @@ export type Database = {
           ever_relevant_match?: boolean
           experience_requirements?: Json
           id?: string
+          idempotency_key?: string | null
           initial_match_potential?: string | null
           is_active?: boolean
           is_test?: boolean
@@ -1611,6 +1615,8 @@ export type Database = {
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
+          repost_identical?: boolean
+          repost_source_id?: string | null
           review_deadline_at?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
@@ -1647,6 +1653,7 @@ export type Database = {
           ever_relevant_match?: boolean
           experience_requirements?: Json
           id?: string
+          idempotency_key?: string | null
           initial_match_potential?: string | null
           is_active?: boolean
           is_test?: boolean
@@ -1671,6 +1678,8 @@ export type Database = {
           refund_kind?: string | null
           refund_pct?: number | null
           refund_tokens?: number | null
+          repost_identical?: boolean
+          repost_source_id?: string | null
           review_deadline_at?: string | null
           role?: Database["public"]["Enums"]["freelancer_role"] | null
           role_group?: string | null
@@ -2667,6 +2676,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -2691,6 +2701,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -2736,6 +2748,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -2760,6 +2773,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -2995,6 +3010,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -3019,6 +3035,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -3083,6 +3101,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -3107,6 +3126,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -3425,6 +3446,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -3449,6 +3471,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
@@ -3717,6 +3741,7 @@ export type Database = {
           ever_relevant_match: boolean
           experience_requirements: Json
           id: string
+          idempotency_key: string | null
           initial_match_potential: string | null
           is_active: boolean
           is_test: boolean
@@ -3741,6 +3766,8 @@ export type Database = {
           refund_kind: string | null
           refund_pct: number | null
           refund_tokens: number | null
+          repost_identical: boolean
+          repost_source_id: string | null
           review_deadline_at: string | null
           role: Database["public"]["Enums"]["freelancer_role"] | null
           role_group: string | null
