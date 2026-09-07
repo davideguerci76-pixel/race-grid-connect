@@ -190,7 +190,11 @@
     "already_revealed": "Revealed",
     "propose_engagement": "Propose engagement",
     "insufficient_tokens": "You don't have enough tokens.",
-    "counts_banner": "{{count}} {{who}} match your calendar."
+    "counts_banner": "{{count}} {{who}} match your calendar.",
+    "counts_banner_teams_one": "{{count}} Team matches your calendar.",
+    "counts_banner_teams_other": "{{count}} Teams match your calendar.",
+    "counts_banner_freelancers_one": "{{count}} Freelancer matches your Pit Calls.",
+    "counts_banner_freelancers_other": "{{count}} Freelancers match your Pit Calls."
   },
   "tokens": {
     "title": "Tokens",
@@ -226,7 +230,10 @@
       "tokens_10": "Starter pack",
       "tokens_50": "Team pack",
       "tokens_200": "Season pack"
-    }
+    },
+    "sub_free": "Reveal counterparties, unlock introductions. Reveal is free right now.",
+    "sub_cost_one": "Reveal counterparties, unlock introductions. {{count}} token per reveal.",
+    "sub_cost_other": "Reveal counterparties, unlock introductions. {{count}} tokens per reveal."
   },
   "engagements": {
     "title": "Engagements",
@@ -1102,5 +1109,12 @@
     "stat_pitcall_short": "Pitcall",
     "frozen": "REQUESTED",
     "protected_skipped": "{{count}} day(s) were not changed: confirmed PITCALL or locked days."
+  },
+  "team_types": {
+    "private_team": "Private team",
+    "manufacturer": "Manufacturer",
+    "engineering_company": "Engineering company",
+    "service_provider": "Service provider",
+    "racing_team": "Racing team"
   }
 }

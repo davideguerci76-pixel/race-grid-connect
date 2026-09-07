@@ -284,7 +284,14 @@
       "unlocked_tag": "FREIGESCHALTET",
       "view_partial_matches_button": "{{count}} Teil-Match(es) ansehen",
       "zero_matches_subtitle": "Noch entspricht kein Match Ihren Kriterien",
-      "zero_matches_title": "[KEINE MATCHES — WÄHLEN SIE IHREN NÄCHSTEN SCHRITT]"
+      "zero_matches_title": "[KEINE MATCHES — WÄHLEN SIE IHREN NÄCHSTEN SCHRITT]",
+      "red_cancel_button_no_refund": "Pit Call stornieren (keine Erstattung)",
+      "red_cancel_confirm_no_refund": "Post-Identical-Pit-Calls sind nie erstattungsfähig. Trotzdem stornieren, ohne Token-Rückgabe?",
+      "red_cancel_refund_hint": "{{tokens}} Token werden zurückerstattet.",
+      "unlock_explainer_title": "Was 1 Unlock bringt",
+      "unlock_explainer_visible": "Schon jetzt sichtbar, vor dem Unlock: Affinitäts-Score, Rang, abgedeckte Tage und fehlende Daten, nicht erfüllte Anforderungen, Bewertungsschnitt.",
+      "unlock_explainer_buys": "Der Unlock zeigt das vollständige Berufsprofil: Rolle und Unterrollen mit Seniorität, Skills, Disziplinen, Sprachen, Ausbildung, Erfahrung, Stadt, Tagessatz, Reisebereitschaft und Bio.",
+      "unlock_explainer_hidden": "Weiterhin verborgen nach dem Unlock: Name, Foto, E-Mail und Telefon. Sie erscheinen erst, wenn der Freelancer den Match bestätigt."
     },
     "requests": {
       "confirmed_filled": "Bestätigt · Besetzt",

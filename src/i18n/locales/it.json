@@ -190,7 +190,11 @@
     "already_revealed": "Rivelato",
     "propose_engagement": "Proponi ingaggio",
     "insufficient_tokens": "Token insufficienti.",
-    "counts_banner": "{{count}} {{who}} corrispondono al tuo calendario."
+    "counts_banner": "{{count}} {{who}} corrispondono al tuo calendario.",
+    "counts_banner_teams_one": "{{count}} Team compatibile con il tuo calendario.",
+    "counts_banner_teams_other": "{{count}} Team compatibili con il tuo calendario.",
+    "counts_banner_freelancers_one": "{{count}} Freelance compatibile con i tuoi Pit Call.",
+    "counts_banner_freelancers_other": "{{count}} Freelance compatibili con i tuoi Pit Call."
   },
   "tokens": {
     "title": "Token",
@@ -226,7 +230,10 @@
       "tokens_10": "Starter",
       "tokens_50": "Team",
       "tokens_200": "Season"
-    }
+    },
+    "sub_free": "Rivela le controparti, sblocca i contatti. Il Reveal è gratuito in questo momento.",
+    "sub_cost_one": "Rivela le controparti, sblocca i contatti. {{count}} token per reveal.",
+    "sub_cost_other": "Rivela le controparti, sblocca i contatti. {{count}} token per reveal."
   },
   "engagements": {
     "title": "Ingaggi",
@@ -1102,5 +1109,12 @@
     "stat_pitcall_short": "Pitcall",
     "frozen": "RICHIESTO",
     "protected_skipped": "{{count}} giorno/i non modificati: giorni PITCALL confermati o bloccati."
+  },
+  "team_types": {
+    "private_team": "Team privato",
+    "manufacturer": "Costruttore",
+    "engineering_company": "Società di ingegneria",
+    "service_provider": "Fornitore di servizi",
+    "racing_team": "Racing team"
   }
 }

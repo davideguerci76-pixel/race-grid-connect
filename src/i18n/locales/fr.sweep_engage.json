@@ -284,7 +284,14 @@
       "unlocked_tag": "DÉBLOQUÉ",
       "view_partial_matches_button": "Voir {{count}} match(es) partiel(s)",
       "zero_matches_subtitle": "Aucun match ne correspond à vos critères — pour l'instant",
-      "zero_matches_title": "[AUCUN MATCH — CHOISISSEZ VOTRE OPTION]"
+      "zero_matches_title": "[AUCUN MATCH — CHOISISSEZ VOTRE OPTION]",
+      "red_cancel_button_no_refund": "Annuler le Pit Call (sans remboursement)",
+      "red_cancel_confirm_no_refund": "Les Pit Calls Post Identical ne sont jamais remboursables. Annuler quand même, sans retour de tokens ?",
+      "red_cancel_refund_hint": "{{tokens}} token(s) seront restitués.",
+      "unlock_explainer_title": "Ce que donne 1 unlock",
+      "unlock_explainer_visible": "Déjà visible avant l'unlock : score d'affinité, rang, jours couverts et dates manquantes, exigences non satisfaites, moyenne des notes.",
+      "unlock_explainer_buys": "L'unlock révèle le profil professionnel complet : rôle et sous-rôles avec séniorité, compétences, disciplines, langues, formation, expériences, ville, tarif journalier, disponibilité au déplacement et bio.",
+      "unlock_explainer_hidden": "Reste masqué après l'unlock : nom, photo, e-mail et téléphone. Ils apparaissent seulement après confirmation du freelance."
     },
     "requests": {
       "confirmed_filled": "Confirmé · Pourvu",
