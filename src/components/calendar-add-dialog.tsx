@@ -66,7 +66,7 @@ export function CalendarAddDialog({
   onOpenChange: (v: boolean) => void;
   currentAvailable: string[];
   protectedDays: Set<string>;
-  onApplyAvailable: (dates: string[], mode: "merge" | "replace") => void;
+  onApplyAvailable: (dates: string[], mode: "merge" | "replace", label: string) => void;
   onApplyBusy: (dates: string[], label: string) => void;
   pending?: boolean;
 }) {
@@ -237,18 +237,30 @@ export function CalendarAddDialog({
                 {t("pcal.add.mark_busy", { defaultValue: "Mark as busy" })}
               </button>
             </div>
-            {intent === "busy" && (
+            {intent && (
               <div className="mt-3">
-                <label className="label-mono">{t("pcal.add.busy_label", { defaultValue: "Private note used on those days" })}</label>
+                <label className="label-mono">
+                  {intent === "busy"
+                    ? t("pcal.add.busy_label", { defaultValue: "Private note used on those days" })
+                    : t("pcal.add.available_label", { defaultValue: "Private note used on those days (optional)" })}
+                </label>
                 <input
                   value={label}
                   maxLength={60}
                   onChange={(e) => setLabel(e.target.value)}
                   className="mt-1 w-full min-w-0 border border-border bg-background px-3 py-2 text-sm"
                 />
-                <p className="mt-1 text-[11px] text-muted-foreground">{t("pcal.busy_hint")}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {intent === "busy"
+                    ? t("pcal.busy_hint")
+                    : t("pcal.add.available_label_hint", {
+                        defaultValue:
+                          "Leave it as is, edit it or clear it. If empty, the days stay available with no private note. Never shared with Teams.",
+                      })}
+                </p>
               </div>
             )}
+
           </div>
         )}
 
