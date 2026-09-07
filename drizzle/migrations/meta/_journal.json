@@ -624,6 +624,20 @@
       "when": 1788784550241,
       "tag": "0088_stop_recompute_recursion_on_band_update",
       "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1788787695665,
+      "tag": "0089_engagement_insert_server_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1788787709961,
+      "tag": "0090_engagement_insert_authority_role_check_fix",
+      "breakpoints": true
     }
   ]
 }

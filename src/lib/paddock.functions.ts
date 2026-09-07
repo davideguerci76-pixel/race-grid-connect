@@ -1023,34 +1023,11 @@ export const revealMatch = createServerFn({ method: "POST" })
   });
 
 // ---- Engagements ----
-export const proposeEngagement = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((data: unknown) =>
-    z
-      .object({
-        match_id: z.string().uuid(),
-        freelancer_id: z.string().uuid(),
-        team_id: z.string().uuid(),
-        request_id: z.string().uuid().optional().nullable(),
-        start_date: z.string(),
-        end_date: z.string(),
-        fee: z.number().int().min(0).optional().nullable(),
-        notes: z.string().max(500).optional().nullable(),
-      })
-      .parse(data),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    if (userId !== data.freelancer_id && userId !== data.team_id) throw new Error("Not a party to this match");
-    const { data: row, error } = await supabase.from("engagements").insert({ ...data, proposed_by: userId }).select().single();
-    if (error) throw new Error(error.message);
-    await supabase.from("notifications").insert({
-      user_id: userId === data.freelancer_id ? data.team_id : data.freelancer_id,
-      kind: "engagement_proposed",
-      payload: { engagement_id: row.id },
-    });
-    return row;
-  });
+// NOTE: engagements are created exclusively by server-authoritative routines
+// (request_match_confirmation, accept_sos_call, add_pool_member_by_code).
+// Direct client inserts are revoked at database level (MT05-C1).
+
+
 
 export const confirmEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
