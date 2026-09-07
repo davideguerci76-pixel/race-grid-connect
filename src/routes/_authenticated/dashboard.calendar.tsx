@@ -612,15 +612,27 @@ function CalendarPage() {
         onOpenChange={setAddOpen}
         currentAvailable={[...availableSet].sort()}
         protectedDays={protectedSet}
-        pending={mutation.isPending || busyMut.isPending}
-        onApplyAvailable={(dates, mode) => (mode === "replace" ? replaceDates(dates) : mergeDates(dates))}
-        onApplyBusy={(dates, label) => setBusyDialog({ dates, label, conflicts: [] })}
+        pending={mutation.isPending || busyMut.isPending || labelMut.isPending}
+        onApplyAvailable={(dates, mode, label) => {
+          if (mode === "replace") replaceDates(dates);
+          else mergeDates(dates);
+          // Optional private label on the days that stay available.
+          if (label) labelMut.mutate({ dates, label, overwrite: false });
+        }}
+        onApplyBusy={(dates, label) => setBusyDialog({ kind: "busy", dates, label, conflicts: [] })}
       />
 
       {busyDialog && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-3">
           <div className="w-full max-w-md min-w-0 border border-border bg-card p-4">
-            <div className="label-mono">[{t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })}]</div>
+            <div className="label-mono">
+              [
+              {busyDialog.kind === "busy"
+                ? t("pcal.mark_as_busy", { defaultValue: "Mark saved calendar as busy" })
+                : t("pcal.add.available_label", { defaultValue: "Private note used on those days (optional)" })}
+              ]
+            </div>
+
             <input
               value={busyDialog.label}
               maxLength={60}
