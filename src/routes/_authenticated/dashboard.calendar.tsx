@@ -25,7 +25,7 @@ import { CalendarPlus } from "lucide-react";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
-import { calendarDayState } from "@/lib/calendar-days";
+import { calendarDayState, chunkDays } from "@/lib/calendar-days";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
@@ -409,6 +409,9 @@ function CalendarPage() {
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
       toast.success(t("pcal.busy_applied", { defaultValue: "{{count}} day(s) marked as busy", count: res.applied }));
+      if (res.skipped > 0) {
+        toast.info(t("pcal.protected_skipped", { count: res.skipped, defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days." }));
+      }
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
@@ -436,6 +439,9 @@ function CalendarPage() {
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
+      if (res.skipped > 0) {
+        toast.info(t("pcal.protected_skipped", { count: res.skipped, defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days." }));
+      }
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
