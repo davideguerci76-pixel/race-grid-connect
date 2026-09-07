@@ -362,6 +362,12 @@ function CalendarPage() {
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
 
+  /** Pre-change note state of the given days ("" = no note there before). */
+  const noteSnapshotFor = (dates: string[]): CalendarDayNote[] =>
+    dates
+      .filter((d) => !protectedSet.has(d))
+      .map((day) => noteMap.get(day) ?? { day, note: "", busy: false });
+
   const busyMut = useMutation({
     mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) =>
       applyBusy({ data: vars }),
@@ -370,6 +376,10 @@ function CalendarPage() {
         setBusyDialog((prev) => (prev ? { ...prev, conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })) } : prev));
         return;
       }
+      // Bulk Busy joins the single-level undo: availability set before the change
+      // plus the exact previous note state of the days it touched.
+      setUndoSnapshot({ availability: [...(myDays as string[])], notes: noteSnapshotFor(vars.dates) });
+      expectedRef.current = null;
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
@@ -377,6 +387,22 @@ function CalendarPage() {
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
+
+  /** Private label on days that stay AVAILABLE (no availability is removed). */
+  const labelMut = useMutation({
+    mutationFn: (vars: { dates: string[]; label: string; overwrite: boolean }) => applyLabel({ data: vars }),
+    onSuccess: (res, vars) => {
+      if (res.conflicts.length && !vars.overwrite) {
+        setBusyDialog((prev) => (prev ? { ...prev, conflicts: res.conflicts.map((c) => ({ day: c.day, note: c.note })) } : prev));
+        return;
+      }
+      setBusyDialog(null);
+      qc.invalidateQueries({ queryKey: ["my-day-notes"] });
+      toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
+    },
+    onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
+  });
+
 
   useEffect(() => {
     setNoteDraft(selected ? (noteMap.get(selected)?.note ?? "") : "");
