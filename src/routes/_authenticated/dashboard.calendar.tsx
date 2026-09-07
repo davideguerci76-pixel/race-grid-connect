@@ -258,6 +258,20 @@ function CalendarPage() {
       return { previous };
     },
 
+    // Protected days are authoritative server-side and are silently skipped:
+    // tell the user how many days stayed untouched instead of leaving a gap.
+    onSuccess: (res) => {
+      const n = res?.skipped?.length ?? 0;
+      if (n > 0) {
+        toast.info(
+          t("pcal.protected_skipped", {
+            count: n,
+            defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days.",
+          }),
+        );
+      }
+    },
+
     onError: (e, _v, context) => {
       if (context?.previous) qc.setQueryData(["my-availability", user?.id], context.previous);
       setUndoSnapshot(null);
