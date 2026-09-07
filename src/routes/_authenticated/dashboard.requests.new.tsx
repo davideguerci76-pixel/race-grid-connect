@@ -272,11 +272,28 @@ function NewRequestPage() {
     search_mode: searchMode,
   } as never;
 
+  // One publish attempt = one server-side idempotency key. Concurrent or retried
+  // calls of the same attempt collapse into a single Pit Call and a single charge.
+  const attemptKeyRef = useRef<string | null>(null);
+  const nextAttemptKey = () => {
+    if (!attemptKeyRef.current) {
+      attemptKeyRef.current =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+    return attemptKeyRef.current;
+  };
+
   const mut = useMutation({
     mutationFn: () =>
       isModify && from
         ? modify({ data: { request_id: from, patch: requestPayload } })
-        : create({ data: requestPayload }),
+        : create({ data: { ...(requestPayload as object), idempotency_key: nextAttemptKey() } as never }),
+    onError: (e) => {
+      attemptKeyRef.current = null;
+      toastError(e);
+    },
     onSuccess: () => {
       toast.success(t(isModify ? "sweep_engage.new_request.modified" : "requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
