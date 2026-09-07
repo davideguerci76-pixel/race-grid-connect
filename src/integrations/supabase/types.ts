@@ -3636,6 +3636,14 @@ export type Database = {
         Args: { _is_test: boolean }
         Returns: number
       }
+      red_cancel_quote: {
+        Args: { _request_id: string }
+        Returns: {
+          eligible: boolean
+          reason: string
+          refund_tokens: number
+        }[]
+      }
       red_cancel_request: {
         Args: { _request_id: string }
         Returns: {

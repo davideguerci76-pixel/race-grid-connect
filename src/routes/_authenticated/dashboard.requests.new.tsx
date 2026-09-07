@@ -301,8 +301,25 @@ function NewRequestPage() {
     },
   });
 
+  // Role resolution gate: this is a Team-only screen, so nothing Team-specific is
+  // painted until the server has confirmed the account type (a freelancer landing
+  // here is redirected by the effect above and never sees Team copy).
+  if (!profile || profile.user_type !== "team") {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12">
+          <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+          <div className="mt-4 h-10 w-72 animate-pulse rounded bg-muted" />
+          <div className="mt-8 h-64 w-full animate-pulse rounded bg-muted/60" />
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
+
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page pt-6"><BackButton /></div>

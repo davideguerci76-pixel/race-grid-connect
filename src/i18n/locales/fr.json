@@ -190,7 +190,11 @@
     "already_revealed": "Révélé",
     "propose_engagement": "Proposer un engagement",
     "insufficient_tokens": "Jetons insuffisants.",
-    "counts_banner": "{{count}} {{who}} correspondent à votre calendrier."
+    "counts_banner": "{{count}} {{who}} correspondent à votre calendrier.",
+    "counts_banner_teams_one": "{{count}} Team correspond à votre calendrier.",
+    "counts_banner_teams_other": "{{count}} Teams correspondent à votre calendrier.",
+    "counts_banner_freelancers_one": "{{count}} Freelance correspond à vos Pit Calls.",
+    "counts_banner_freelancers_other": "{{count}} Freelances correspondent à vos Pit Calls."
   },
   "tokens": {
     "title": "Jetons",
@@ -220,13 +224,19 @@
       "reveal_spend": "Révélation",
       "admin_credit": "Crédit admin",
       "admin_debit": "Débit admin",
-      "refund": "Remboursement"
+      "refund": "Remboursement",
+      "request_post": "Pit Call publié",
+      "team_reveal_spend": "Révélation équipe",
+      "rating_bonus": "Bonus d'évaluation"
     },
     "packages": {
       "tokens_10": "Starter",
       "tokens_50": "Team",
       "tokens_200": "Season"
-    }
+    },
+    "sub_free": "Révélez les contreparties, débloquez les mises en relation. Le Reveal est gratuit actuellement.",
+    "sub_cost_one": "Révélez les contreparties, débloquez les mises en relation. {{count}} token par reveal.",
+    "sub_cost_other": "Révélez les contreparties, débloquez les mises en relation. {{count}} tokens par reveal."
   },
   "engagements": {
     "title": "Engagements",
@@ -1090,5 +1100,12 @@
     "stat_pitcall_short": "Pitcall",
     "frozen": "DEMANDÉ",
     "protected_skipped": "{{count}} jour(s) non modifiés : jours PITCALL confirmés ou verrouillés."
+  },
+  "team_types": {
+    "private_team": "Équipe privée",
+    "manufacturer": "Constructeur",
+    "engineering_company": "Société d'ingénierie",
+    "service_provider": "Prestataire de services",
+    "racing_team": "Écurie"
   }
 }

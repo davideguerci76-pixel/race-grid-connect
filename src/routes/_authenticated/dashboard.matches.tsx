@@ -11,7 +11,7 @@ import { getMyMatches, revealMatch, getMyRequests, getMyEngagements } from "@/li
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { Eye, Lock, Star } from "lucide-react";
 import { initialsFor, roleLabel, disciplineLabel } from "@/lib/paddock";
-import { requestStatusLabel } from "@/lib/labels";
+import { requestStatusLabel, teamTypeLabel } from "@/lib/labels";
 import { formatCriterion } from "@/lib/criteria-label";
 import { CalendarQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
@@ -87,7 +87,24 @@ function MatchesPage() {
   });
 
 
+  // Never assume a role while it is still loading: the freelancer view below
+  // would otherwise flash for teams on a cold load.
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12">
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+          <div className="mt-4 h-10 w-64 animate-pulse rounded bg-muted" />
+          <div className="mt-8 h-40 w-full animate-pulse rounded bg-muted/60" />
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   if (isTeam) {
+
     const confirmedByReq = new Map<string, any>();
     for (const e of teamEngs as any[]) {
       if (e.status === "confirmed" || e.status === "completed") confirmedByReq.set(e.request_id ?? e.request?.id, e);
@@ -153,7 +170,7 @@ function MatchesPage() {
         <div className="label-mono">[MATCHES]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("matches.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("matches.counts_banner", { count: matches.length, who: isFreelancer ? t("nav.teams") : t("nav.freelancers") })}
+          {t(isFreelancer ? "matches.counts_banner_teams" : "matches.counts_banner_freelancers", { count: matches.length })}
         </p>
 
 
@@ -196,7 +213,7 @@ function MatchesPage() {
                         <div className="mt-2 grid gap-1 text-xs">
                           {isFreelancer ? (
                             <>
-                              {cp.team_type && <div><span className="text-muted-foreground">{t("sweep_engage.matches.type_label")}:</span> <span className="font-medium">{cp.team_type}</span></div>}
+                              {cp.team_type && <div><span className="text-muted-foreground">{t("sweep_engage.matches.type_label")}:</span> <span className="font-medium">{teamTypeLabel(cp.team_type)}</span></div>}
                               {cp.location && <div><span className="text-muted-foreground">{t("sweep_engage.matches.location_label")}:</span> <span className="font-medium">{cp.location}</span></div>}
                               {cp.bio && <div className="mt-2 text-muted-foreground">{cp.bio}</div>}
                               {!isConfirmed && (

@@ -94,7 +94,7 @@ function DashboardHome() {
     })();
   }, [user?.id, profile, qc]);
 
-  const { data: matchesCount = 0 } = useQuery({
+  const { data: matchesCount } = useQuery({
     queryKey: ["matches-count", user?.id],
     enabled: !!user && !!profile,
     queryFn: async () => {
@@ -109,7 +109,7 @@ function DashboardHome() {
 
   // "New matches" = items actually waiting for an action from the current user.
   // Team: matches with no confirmation request sent yet. Freelancer: pending confirmation requests received.
-  const { data: activeMatchesCount = 0 } = useQuery({
+  const { data: activeMatchesCount } = useQuery({
     queryKey: ["pending-action-count", user?.id, profile?.user_type],
     enabled: !!user && !!profile,
     queryFn: async () => {
@@ -150,6 +150,11 @@ function DashboardHome() {
   });
 
   const isTeam = profile?.user_type === "team";
+  // Role resolution is never assumed: until the profile lands, role-specific
+  // cards render as a neutral placeholder instead of defaulting to Team UI.
+  const roleReady = !!profile;
+  // Loading is not zero: counters show a neutral dash until the server answers.
+  const num = (v: number | undefined) => (v === undefined ? "—" : String(v));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -161,7 +166,7 @@ function DashboardHome() {
 
         <InstallAppCard />
 
-        {activeMatchesCount > 0 && (
+        {(activeMatchesCount ?? 0) > 0 && (
           <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
             <div>
               <div className="font-mono text-xs uppercase tracking-widest text-racing-red">{isFreelancer ? t("dashboard.new_free_label") : t("dashboard.new_team_label")}</div>
@@ -208,6 +213,7 @@ function DashboardHome() {
 
         <div className="mt-8 grid gap-4 md:grid-cols-5">
           <DashCard to="/dashboard/profile" icon={User} label={t("nav.profile")} value="→" />
+          {!roleReady && <DashCardSkeleton />}
           {isTeam && (
             <>
               <DashCard to="/dashboard/requests" icon={Briefcase} label={t("requests.title")} value={t("requests.new")} />
@@ -215,30 +221,44 @@ function DashboardHome() {
             </>
           )}
           <DashCard to="/dashboard/calendars" icon={CalendarRange} label={t("sweep_profile.dashboard.manage_calendars")} value="→" />
-          {isFreelancer ? (
+          {!roleReady ? (
+            <DashCardSkeleton />
+          ) : isFreelancer ? (
             <DashCard
               to="/dashboard/matches"
               icon={Users}
               label={t("dashboard.my_matches")}
-            value={
-              activeMatchesCount === 0
-                ? ""
-                : activeMatchesCount === 1
-                  ? t("dashboard.active_match_one")
-                  : t("dashboard.active_match_other", { count: activeMatchesCount })
-            }
+              value={
+                activeMatchesCount === undefined
+                  ? "—"
+                  : activeMatchesCount === 0
+                    ? ""
+                    : activeMatchesCount === 1
+                      ? t("dashboard.active_match_one")
+                      : t("dashboard.active_match_other", { count: activeMatchesCount })
+              }
             />
           ) : (
-            <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={String(activeMatchesCount)} />
+            <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={num(activeMatchesCount)} />
           )}
-          <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={String(profile?.token_balance ?? 0)} />
-          <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={String(matchesCount)} />
+          <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={profile ? String(profile.token_balance) : "—"} />
+          <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={num(matchesCount)} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}
         </div>
 
         <MarketHighlights compact />
       </div>
       <SiteFooter />
+    </div>
+  );
+}
+
+function DashCardSkeleton() {
+  return (
+    <div className="border border-border bg-card p-6" aria-hidden>
+      <div className="size-8 animate-pulse rounded bg-muted" />
+      <div className="mt-4 h-3 w-24 animate-pulse rounded bg-muted" />
+      <div className="mt-2 h-6 w-16 animate-pulse rounded bg-muted" />
     </div>
   );
 }

@@ -1332,23 +1332,31 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           | null,
         // Anti-probing: only limits and eligibility leave the server, never counts.
         modify_state: await (async () => {
-          const [{ data: budgetLeft }, settingsRows] = await Promise.all([
+          const [{ data: budgetLeft }, settingsRows, { data: quoteRows }] = await Promise.all([
             (supabase.rpc as any)("team_recheck_budget_left", { _team_id: userId }),
             supabase.from("platform_settings").select("key, value_num").in("key", ["max_modify_per_pitcall"]),
+            (supabase.rpc as any)("red_cancel_quote", { _request_id: data.request_id }),
           ]);
           const maxModify = Number(
             (settingsRows.data ?? []).find((s: any) => s.key === "max_modify_per_pitcall")?.value_num ?? 3,
           );
           const modifyCount = Number((req as any).modify_count ?? 0);
-          const currentBand = ((req as any).match_potential_current ?? (req as any).initial_match_potential) ?? null;
+          // RED-cancel eligibility is decided by the server (red_cancel_quote mirrors
+          // red_cancel_request exactly); the client never re-derives it from the band.
+          const quote = (Array.isArray(quoteRows) ? quoteRows[0] : quoteRows) as
+            | { eligible?: boolean; reason?: string; refund_tokens?: number }
+            | null;
           return {
             modify_count: modifyCount,
             max_modify: maxModify,
             budget_left: Number(budgetLeft ?? 0),
             can_modify: modifyCount < maxModify && Number(budgetLeft ?? 0) > 0,
-            red_cancel_eligible: currentBand === "red" && !(req as any).red_cancelled_at && !(req as any).refund_kind,
+            red_cancel_eligible: quote?.eligible === true,
+            red_cancel_reason: quote?.reason ?? null,
+            red_cancel_refund_tokens: Number(quote?.refund_tokens ?? 0),
           };
         })(),
+
         confirmable_left: 0,
 
         items: [] as any[],

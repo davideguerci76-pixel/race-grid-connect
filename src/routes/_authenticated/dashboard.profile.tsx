@@ -1,6 +1,7 @@
 import { getMyPitCode } from "@/lib/pool.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { teamTypeLabel } from "@/lib/labels";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -774,7 +775,7 @@ function TeamSection({ profile }: { profile: any }) {
   return (
     <div className="mt-4 space-y-3">
 
-      <Row label={t("sweep_profile.team.type")} value={profile?.team_type ?? "—"} />
+      <Row label={t("sweep_profile.team.type")} value={teamTypeLabel(profile?.team_type)} />
       <Row label={t("sweep_profile.freelancer.location")} value={profile?.location ?? "—"} />
       <Row label={t("sweep_profile.team.discipline")} value={disciplineLabel(profile?.primary_discipline)} mono />
       <div className="text-sm">

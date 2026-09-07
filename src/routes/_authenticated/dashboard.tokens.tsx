@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getTokenHistory } from "@/lib/paddock.functions";
+import { getPlatformSettings } from "@/lib/admin.functions";
+
 import { listTokenPackages } from "@/lib/token-packages.functions";
 import {
   startTokenCheckout,
@@ -40,6 +42,8 @@ function TokensPage() {
   const startCheckout = useServerFn(startTokenCheckout);
   const getOrderStatus = useServerFn(getMyTokenOrderStatus);
   const cancelOrder = useServerFn(cancelMyTokenOrder);
+  const fetchSettings = useServerFn(getPlatformSettings);
+
 
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -50,6 +54,17 @@ function TokensPage() {
     queryFn: () => getAvailability(),
   });
   const purchaseEnabled = availability?.enabled === true;
+
+  // Reveal cost is never hardcoded here: it mirrors the same ACP authority the
+  // reveal flow itself reads (platform_settings.cost_reveal_match).
+  const { data: settings } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
+  const revealCost = settings
+    ? Number(
+        (settings as Array<{ key: string; value_num: number }>).find((s) => s.key === "cost_reveal_match")
+          ?.value_num ?? 0,
+      )
+    : null;
+
 
   // Return page. It only READS the order; crediting is webhook-only.
   const { data: returnedOrder } = useQuery({
@@ -96,7 +111,14 @@ function TokensPage() {
       <div className="container-page py-12">
         <div className="label-mono">[TOKENS]</div>
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("tokens.title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("tokens.sub")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {revealCost === null
+            ? "\u00a0"
+            : revealCost === 0
+              ? t("tokens.sub_free")
+              : t("tokens.sub_cost", { count: revealCost })}
+        </p>
+
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {packages.map((p) => (

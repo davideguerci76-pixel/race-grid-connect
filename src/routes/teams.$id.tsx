@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { teamTypeLabel } from "@/lib/labels";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -143,7 +144,7 @@ function TeamProfile() {
             <div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{tp.team_name}</h1>
               <div className="mt-1 text-sm text-muted-foreground">
-                {tp.team_type ?? t("sweep_public.team_detail.racing_team_default")} · {tp.location ?? "—"}
+                {tp.team_type ? teamTypeLabel(tp.team_type) : t("sweep_public.team_detail.racing_team_default")} · {tp.location ?? "—"}
                 {tp.founded_year ? ` · ${t("sweep_public.team_detail.established", { year: tp.founded_year })}` : ""}
                 {tp.size ? ` · ${tp.size}` : ""}
               </div>
