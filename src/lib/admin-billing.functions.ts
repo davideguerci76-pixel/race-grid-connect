@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertAdmin } from "@/lib/admin-helpers";
+import { assertAdmin, logAdminAction } from "@/lib/admin-helpers";
 
 /**
  * ACP Billing & Payments — administrative view of PITCALL economic activity.
@@ -113,13 +113,21 @@ export const adminGetBillingAccount = createServerFn({ method: "POST" })
     const { currentAdminEnv } = await import("@/lib/admin-env.server");
     const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
 
+    // ACP data minimisation: only the fields an administrator needs to verify a
+    // fiscal identity. Contact channels (billing_email, pec, billing_phone) and
+    // the SDI code are never returned to the admin surface.
+    const BILLING_ADMIN_COLUMNS =
+      "user_id, subject_type, billing_name, country, region, city, postal_code, address, tax_id, updated_at";
+
     const [{ data: profile }, { data: team }, { data: billing }, { data: orders }] = await Promise.all([
       supabaseAdmin.from("profiles").select("id, display_name, user_type, is_test").eq("id", data.user_id).maybeSingle(),
       supabaseAdmin.from("team_profiles").select("team_name").eq("user_id", data.user_id).maybeSingle(),
-      supabaseAdmin.from("billing_details").select("*").eq("user_id", data.user_id).maybeSingle(),
+      supabaseAdmin.from("billing_details").select(BILLING_ADMIN_COLUMNS).eq("user_id", data.user_id).maybeSingle(),
       supabaseAdmin
         .from("token_orders")
-        .select("*")
+        .select(
+          "id, team_id, is_test, status, package_code, package_label_key, token_quantity, currency, base_amount_cents, total_amount_cents, amount_collected_cents, provider, provider_mode, provider_session_id, provider_payment_id, credit_transaction_id, created_at, payment_confirmed_at, credited_at, cancelled_at, failed_at, expired_at",
+        )
         .eq("team_id", data.user_id)
         .eq("is_test", envIsTest)
         .order("created_at", { ascending: false }),
@@ -136,6 +144,13 @@ export const adminGetBillingAccount = createServerFn({ method: "POST" })
       txMap = new Map((txs ?? []).map((t: any) => [t.id, t]));
     }
 
+    // Reading another account's fiscal identity is an auditable administrative act.
+    await logAdminAction(context.userId, data.user_id, "billing_account_viewed", {
+      env_is_test: envIsTest,
+      orders_count: orderRows.length,
+      billing_present: !!billing,
+    });
+
     return {
       env_is_test: envIsTest,
       account: {
@@ -151,3 +166,4 @@ export const adminGetBillingAccount = createServerFn({ method: "POST" })
       })),
     };
   });
+
