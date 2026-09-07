@@ -206,7 +206,8 @@
     "errors": {
       "purchase_disabled": "Token-Käufe sind derzeit nicht verfügbar.",
       "package_not_available": "Dieses Paket ist nicht mehr verfügbar.",
-      "provider_unavailable": "Der Zahlungsanbieter ist vorübergehend nicht erreichbar. Bitte versuche es in Kürze erneut."
+      "provider_unavailable": "Der Zahlungsanbieter ist vorübergehend nicht erreichbar. Bitte versuche es in Kürze erneut.",
+      "too_many_open_orders": "Du hast zu viele unbezahlte Bestellungen offen. Schließe eine ab oder storniere sie und versuche es erneut."
     },
     "checkout": {
       "credited": "+{{count}} Tokens gutgeschrieben.",

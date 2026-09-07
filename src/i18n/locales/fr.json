@@ -206,7 +206,8 @@
     "errors": {
       "purchase_disabled": "L'achat de jetons n'est pas disponible pour le moment.",
       "package_not_available": "Ce pack n'est plus disponible.",
-      "provider_unavailable": "Le prestataire de paiement est temporairement indisponible. Réessayez dans un instant."
+      "provider_unavailable": "Le prestataire de paiement est temporairement indisponible. Réessayez dans un instant.",
+      "too_many_open_orders": "Vous avez trop de commandes impayées en cours. Finalisez-en ou annulez-en une, puis réessayez."
     },
     "checkout": {
       "credited": "+{{count}} jetons crédités.",
