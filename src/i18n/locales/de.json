@@ -183,10 +183,10 @@
     "empty": "Noch keine Matches.",
     "empty_team": "Keine Matches. Pit Call posten.",
     "hidden_name": "Enthüllen für mehr Infos",
-    "reveal_1_token": "Enth\u00fcllen ({{cost}} Token)",
-    "reveal_cta_free": "Enth\u00fcllen \u2014 Kostenlos",
-    "reveal_confirm": "{{cost}} Token ausgeben um {{who}} zu enth\u00fcllen?",
-    "reveal_confirm_free": "{{who}} kostenlos enth\u00fcllen?",
+    "reveal_1_token": "Enthüllen ({{cost}} Token)",
+    "reveal_cta_free": "Enthüllen — Kostenlos",
+    "reveal_confirm": "{{cost}} Token ausgeben um {{who}} zu enthüllen?",
+    "reveal_confirm_free": "{{who}} kostenlos enthüllen?",
     "already_revealed": "Enthüllt",
     "propose_engagement": "Engagement vorschlagen",
     "insufficient_tokens": "Nicht genug Tokens.",
@@ -1087,6 +1087,7 @@
     "stat_available_short": "Verfügbar",
     "stat_busy_short": "Belegt",
     "stat_pitcall_short": "Pitcall",
-    "frozen": "ANGEFRAGT"
+    "frozen": "ANGEFRAGT",
+    "protected_skipped": "{{count}} Tag(e) nicht geändert: bestätigte PITCALL- oder gesperrte Tage."
   }
 }

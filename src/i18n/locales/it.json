@@ -184,7 +184,7 @@
     "empty_team": "Nessun match. Pubblica una Pit Call per trovare freelance.",
     "hidden_name": "Rivela per vedere più info",
     "reveal_1_token": "Rivela ({{cost}} token)",
-    "reveal_cta_free": "Rivela \u2014 Gratis",
+    "reveal_cta_free": "Rivela — Gratis",
     "reveal_confirm": "Spendere {{cost}} token per rivelare {{who}}?",
     "reveal_confirm_free": "Rivelare {{who}} gratuitamente?",
     "already_revealed": "Rivelato",
@@ -1099,6 +1099,7 @@
     "stat_available_short": "Disponibili",
     "stat_busy_short": "Impegnati",
     "stat_pitcall_short": "Pitcall",
-    "frozen": "RICHIESTO"
+    "frozen": "RICHIESTO",
+    "protected_skipped": "{{count}} giorno/i non modificati: giorni PITCALL confermati o bloccati."
   }
 }
