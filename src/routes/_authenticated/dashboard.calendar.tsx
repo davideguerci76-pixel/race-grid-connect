@@ -403,6 +403,11 @@ function CalendarPage() {
 
         return;
       }
+      // Attach the exact pre-change note state of the touched days to the
+      // single-level undo snapshot (the merge/replace mutation created it with
+      // notes: null). "" entries mean "no note before" → Undo deletes a note
+      // created ex novo. Availability part of the snapshot is left untouched.
+      setUndoSnapshot((prev) => (prev ? { ...prev, notes: noteSnapshotFor(vars.dates) } : prev));
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
