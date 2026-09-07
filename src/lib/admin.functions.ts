@@ -223,15 +223,20 @@ export const adminUpdateMatchingWeights = createServerFn({ method: "POST" })
     const total = data.sub_role_weight + data.skills_weight + data.disciplines_weight + data.day_rate_weight + data.languages_weight + data.education_weight + data.location_weight;
     if (Math.abs(total - 100) > 0.01) throw new Error(`Weights must sum to 100 (currently ${total.toFixed(2)})`);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { currentAdminEnv } = await import("@/lib/admin-env.server");
+    // MT09-M2: the recompute environment is derived server-side from the admin's
+    // current environment authority, never from a client-supplied boolean.
+    const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
     const { error } = await supabaseAdmin
       .from("matching_weights")
       .update({ ...data, role_weight: 0, updated_at: new Date().toISOString() } as never)
       .eq("id", true);
     if (error) throw new Error(error.message);
-    // Recompute all matches with new weights
-    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: false } as never);
-    return { ok: true };
+    // Recompute all matches with new weights, in the admin's own environment only
+    await supabaseAdmin.rpc("recompute_matches_env", { _is_test: envIsTest } as never);
+    return { ok: true, env: envIsTest ? "test" : "live" };
   });
+
 
 // ---- Platform / token settings ----
 export const adminListSettings = createServerFn({ method: "GET" })
