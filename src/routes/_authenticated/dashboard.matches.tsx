@@ -87,7 +87,24 @@ function MatchesPage() {
   });
 
 
+  // Never assume a role while it is still loading: the freelancer view below
+  // would otherwise flash for teams on a cold load.
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12">
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+          <div className="mt-4 h-10 w-64 animate-pulse rounded bg-muted" />
+          <div className="mt-8 h-40 w-full animate-pulse rounded bg-muted/60" />
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   if (isTeam) {
+
     const confirmedByReq = new Map<string, any>();
     for (const e of teamEngs as any[]) {
       if (e.status === "confirmed" || e.status === "completed") confirmedByReq.set(e.request_id ?? e.request?.id, e);
