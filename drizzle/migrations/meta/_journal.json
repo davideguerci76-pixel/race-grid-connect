@@ -652,6 +652,20 @@
       "when": 1788790584741,
       "tag": "0092_post_identical_no_refund_and_post_idempotency",
       "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1788793068911,
+      "tag": "0093_mt08_rating_flag_authority_and_notification_immutability_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1788793329241,
+      "tag": "0094_mt08_admin_alert_env_marker",
+      "breakpoints": true
     }
   ]
 }
