@@ -515,6 +515,9 @@ export const createRequest = createServerFn({ method: "POST" })
           .max(6)
           .optional(),
         repost_of: z.string().uuid().optional().nullable(),
+        // One publish attempt = one key. The database collapses concurrent or
+        // retried calls of the same attempt into a single Pit Call and charge.
+        idempotency_key: z.string().min(8).max(100).optional().nullable(),
         location_lat: z.number().finite().min(-90).max(90).optional().nullable(),
         location_lng: z.number().finite().min(-180).max(180).optional().nullable(),
         location_city: z.string().max(120).optional().nullable(),
@@ -562,6 +565,7 @@ export const createRequest = createServerFn({ method: "POST" })
       languages: data.languages ?? [],
       travel_required: data.travel_required ?? true,
       repost_of: data.repost_of ?? null,
+      idempotency_key: data.idempotency_key ?? null,
       location_lat: data.location_lat ?? null,
       location_lng: data.location_lng ?? null,
       location_city: data.location_city ?? null,

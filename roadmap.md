@@ -16,3 +16,6 @@
 - [x] REVIEW09: add Freelancer-owned Availability Opportunities mute preference with server-side enforcement; preserve HOT Partial, reminders, matches, engagements, Team notifications, aggregation, dedup, and TEST/LIVE isolation; stop before REVIEW10
 - [x] REVIEW10: preserve Pool behavior and gate Expand by outside-Pool valid Full/Partial matches at the dynamic ACP threshold; verify security, atomicity, and isolation
 - [x] REVIEW11.B: owner-only RLS on freelancer_profiles, server-side gated profile reads, and Pool identity behind pool_search_unlocks
+- [x] MT-06.R: Post Identical mai rimborsabile (colonna server-authoritative repost_identical)
+- [x] MT-06.R: idempotenza server-authoritative del POST (idempotency_key per tentativo)
+- [x] MT-06.R: evidenza reale refund low-relevance (70% del refund zero-match)

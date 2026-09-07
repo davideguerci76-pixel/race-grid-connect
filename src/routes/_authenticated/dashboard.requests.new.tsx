@@ -3,7 +3,7 @@ import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
@@ -272,17 +272,33 @@ function NewRequestPage() {
     search_mode: searchMode,
   } as never;
 
+  // One publish attempt = one server-side idempotency key. Concurrent or retried
+  // calls of the same attempt collapse into a single Pit Call and a single charge.
+  const attemptKeyRef = useRef<string | null>(null);
+  const nextAttemptKey = () => {
+    if (!attemptKeyRef.current) {
+      attemptKeyRef.current =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+    return attemptKeyRef.current;
+  };
+
   const mut = useMutation({
     mutationFn: () =>
       isModify && from
         ? modify({ data: { request_id: from, patch: requestPayload } })
-        : create({ data: requestPayload }),
+        : create({ data: { ...(requestPayload as object), idempotency_key: nextAttemptKey() } as never }),
+    onError: (e) => {
+      attemptKeyRef.current = null;
+      toastError(e);
+    },
     onSuccess: () => {
       toast.success(t(isModify ? "sweep_engage.new_request.modified" : "requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
       navigate({ to: isModify ? "/dashboard/requests/$id/matches" : searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests", params: isModify && from ? { id: from } : undefined });
     },
-    onError: (e) => toastError(e),
   });
 
 
