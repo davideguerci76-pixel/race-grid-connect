@@ -348,7 +348,7 @@ export function CalendarAddDialog({
                   (intent === "available" && mode === "replace" && preview.removed > 0 && !confirmReplace)
                 }
                 onClick={() => {
-                  if (intent === "available") onApplyAvailable(resultDays, mode);
+                  if (intent === "available") onApplyAvailable(resultDays, mode, label.trim());
                   else onApplyBusy(resultDays, label.trim());
                   close(false);
                 }}
