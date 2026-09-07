@@ -617,6 +617,13 @@
       "when": 1788784377898,
       "tag": "0087_fix_match_potential_trigger_temp_table",
       "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1788784550241,
+      "tag": "0088_stop_recompute_recursion_on_band_update",
+      "breakpoints": true
     }
   ]
 }
