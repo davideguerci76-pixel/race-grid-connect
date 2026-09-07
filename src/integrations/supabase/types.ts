@@ -2873,6 +2873,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_token_balance: {
+        Args: { _admin: string; _balance: number; _user_id: string }
+        Returns: Json
+      }
       admin_set_token_price_eur: {
         Args: { _admin: string; _new_price: number }
         Returns: Json
@@ -2894,6 +2898,10 @@ export type Database = {
         Returns: Json
       }
       admin_taxonomy_usage: { Args: never; Returns: Json }
+      admin_update_settings: {
+        Args: { _admin: string; _updates: Json }
+        Returns: Json
+      }
       attach_token_order_session: {
         Args: { _order_id: string; _provider: string; _session_id: string }
         Returns: undefined
