@@ -134,21 +134,16 @@ export const adminSetTokens = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: prof } = await supabaseAdmin.from("profiles").select("token_balance").eq("id", data.user_id).single();
-    const current = prof?.token_balance ?? 0;
-    const delta = data.balance - current;
-    if (delta !== 0) {
-      await supabaseAdmin.from("token_transactions").insert({
-        user_id: data.user_id,
-        delta,
-        reason: delta > 0 ? "admin_credit" : "admin_debit",
-        note: `Admin adjustment by ${context.userId}`,
-      } as never);
-    }
-    const { error } = await supabaseAdmin.from("profiles").update({ token_balance: data.balance } as never).eq("id", data.user_id);
+    // MT09-M1: single atomic, row-locked DB primitive — ledger + balance + audit in one transaction.
+    const { data: res, error } = await supabaseAdmin.rpc("admin_set_token_balance", {
+      _user_id: data.user_id,
+      _balance: data.balance,
+      _admin: context.userId,
+    } as never);
     if (error) throw new Error(error.message);
-    return { ok: true, balance: data.balance };
+    return { ok: true, balance: data.balance, result: res };
   });
+
 
 export const adminSetBlocked = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
