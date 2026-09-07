@@ -2052,13 +2052,36 @@ export const flagRating = createServerFn({ method: "POST" })
     z.object({ rating_id: z.string().uuid(), reason: z.string().trim().min(10).max(2000) }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.rpc("flag_rating" as any, {
+    const { data: res, error } = await context.supabase.rpc("flag_rating" as any, {
       _rating_id: data.rating_id,
       _reason: data.reason,
     } as any);
     if (error) throw new Error(error.message);
-    return { ok: true };
+    const out = (res ?? {}) as { ok?: boolean; already_reported?: boolean; flag_id?: string; is_test?: boolean };
+
+    // One report => at most one moderation email. Replays return
+    // already_reported and send nothing.
+    if (out.flag_id && !out.already_reported) {
+      try {
+        const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+        await sendTemplateEmail("notification", "info@pitcall.net", {
+          templateData: {
+            title: out.is_test ? "[TEST] Review reported" : "Review reported",
+            message: "A review has been reported and is waiting for moderation.",
+            actionUrl: "https://pitcall.net/admin/reviews",
+            actionLabel: "Open moderation queue",
+          },
+          idempotencyKey: `rating-flag-${out.flag_id}`,
+        });
+      } catch (e) {
+        // Alerting must never break the report itself.
+        console.error("[flagRating] moderation email failed", out.flag_id, e);
+      }
+    }
+
+    return { ok: true, already_reported: !!out.already_reported };
   });
+
 
 export const getRatableEngagements = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
