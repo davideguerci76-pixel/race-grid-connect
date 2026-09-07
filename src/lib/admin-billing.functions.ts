@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { assertAdmin } from "@/lib/admin-helpers";
+import { assertAdmin, logAdminAction } from "@/lib/admin-helpers";
 
 /**
  * ACP Billing & Payments — administrative view of PITCALL economic activity.
