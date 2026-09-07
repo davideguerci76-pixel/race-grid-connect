@@ -680,6 +680,13 @@
       "when": 1788815976214,
       "tag": "0096_rem_w1_account_authority",
       "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1788819894367,
+      "tag": "0097_rem_w3_stripe_failure_lifecycle",
+      "breakpoints": true
     }
   ]
 }
