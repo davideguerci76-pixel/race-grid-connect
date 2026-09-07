@@ -107,11 +107,45 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
           return new Response("ignored", { status: 200 });
         }
 
+        // Provider mode is derived from the loaded Stripe configuration and the
+        // event itself — never from the client, never hardcoded downstream.
+        // This endpoint only ever loads a TEST key, and livemode events are
+        // rejected above, so the derived mode is 'test'; any incoherence with
+        // the order's own mode is rejected fail-closed inside the RPC.
+        const providerMode: "test" | "live" = event.livemode === true ? "live" : "test";
+        if (providerMode !== "test") {
+          return new Response("Live mode is disabled", { status: 400 });
+        }
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin.rpc("confirm_token_order_payment", {
           _order_id: orderId,
           _provider: "stripe",
-          _provider_mode: "test",
+          _provider_mode: providerMode,
+          _provider_event_id: event.id,
+          _event_type: event.type,
+          _provider_payment_id: paymentId,
+          _amount_collected_cents: amount,
+          _tax_amount_cents: (obj["total_details"] as { amount_tax?: number } | undefined)?.amount_tax ?? 0,
+          _payload: JSON.parse(body) as unknown as import("@/integrations/supabase/types").Json,
+        });
+
+        if (error) {
+          // TRANSIENT: DB/network/internal failure. Stripe should retry.
+          console.error(`stripe-webhook: transient failure for ${orderId}: ${error.message}`);
+          return new Response("processing error", { status: 500 });
+        }
+
+        const verdict = (data ?? {}) as { ok?: boolean; terminal?: boolean; reason?: string };
+        if (verdict.ok === false && verdict.terminal === true) {
+          // TERMINAL: authentic event, permanently incompatible with the order.
+          // Evidence is already persisted; retrying can never succeed, so we
+          // acknowledge to stop the retry loop. No token is ever credited here.
+          console.error(`stripe-webhook: terminal rejection ${verdict.reason} for order ${orderId}`);
+          return Response.json({ received: true, rejected: true, reason: verdict.reason }, { status: 200 });
+        }
+
+        return Response.json({ received: true, result: data });
           _provider_event_id: event.id,
           _event_type: event.type,
           _provider_payment_id: paymentId,
