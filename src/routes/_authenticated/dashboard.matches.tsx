@@ -60,7 +60,6 @@ function MatchesPage() {
   const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
   const revealCost = Number((revealSettings as Array<{ key: string; value_num: number }>).find((x) => x.key === "cost_reveal_match")?.value_num ?? 1);
   const revealCta = revealCost > 0 ? t("matches.reveal_1_token", { cost: revealCost }) : t("matches.reveal_cta_free");
-  const revealConfirm = revealCost > 0 ? t("matches.reveal_confirm", { cost: revealCost, who: "" }) : null;
   const getRequests = useServerFn(getMyRequests);
   const getEngs = useServerFn(getMyEngagements);
 
