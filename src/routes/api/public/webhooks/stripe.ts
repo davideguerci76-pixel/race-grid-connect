@@ -112,10 +112,8 @@ export const Route = createFileRoute("/api/public/webhooks/stripe")({
         // This endpoint only ever loads a TEST key, and livemode events are
         // rejected above, so the derived mode is 'test'; any incoherence with
         // the order's own mode is rejected fail-closed inside the RPC.
-        const providerMode: "test" | "live" = event.livemode === true ? "live" : "test";
-        if (providerMode !== "test") {
-          return new Response("Live mode is disabled", { status: 400 });
-        }
+        // livemode === true was already rejected above, so this is TEST by construction.
+        const providerMode = "test" as const;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data, error } = await supabaseAdmin.rpc("confirm_token_order_payment", {
