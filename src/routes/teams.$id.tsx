@@ -10,7 +10,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
-import { Lock } from "lucide-react";
+import { AlertTriangle, CalendarRange, Globe, Lock, MapPin, Users } from "lucide-react";
+import { AlertStrip, CardBody, CardHeader, CardShell, Chip, Chips, Fact, FactGrid, IdentityRow } from "@/components/cards/primitives";
 import { BackButton } from "@/components/back-button";
 import { TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
