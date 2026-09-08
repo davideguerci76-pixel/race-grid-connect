@@ -10,6 +10,8 @@ import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/r
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { getFreelancerProfile } from "@/lib/freelancer-profile.functions";
+import { CalendarCheck, Flag, GraduationCap, MapPin, User } from "lucide-react";
+import { CardBody, CardHeader, CardShell, Chip, Chips, Fact, FactGrid, Section } from "@/components/cards/primitives";
 
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
