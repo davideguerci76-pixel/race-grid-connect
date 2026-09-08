@@ -22,6 +22,7 @@ import {
 
 import { BackButton } from "@/components/back-button";
 import { CalendarPlus } from "lucide-react";
+import { HelpHint } from "@/components/help-hint";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
 import { dateOf, isoOf } from "@/lib/ics";
