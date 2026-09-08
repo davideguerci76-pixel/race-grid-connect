@@ -276,7 +276,7 @@
     "comment_placeholder": "Condividi la tua esperienza...",
     "submit": "Invia valutazione",
     "submitted": "Valutazione inviata",
-    "submitted_bonus": "Valutazione inviata — +1 token in regalo!",
+    "submitted_bonus": "Valutazione inviata — +{{bonus}} token in regalo!",
     "no_ratings": "Nessuna valutazione",
     "double_blind_hint": "Doppio cieco: la tua recensione resta sigillata finché anche l'altra parte non ti valuta, o passano 30 giorni.",
     "opens_on": "Valutazione disponibile dal {{date}}",
@@ -286,7 +286,10 @@
     "punctuality": "Puntualità e affidabilità",
     "stress": "Gestione dello stress",
     "team_overall": "Esperienza complessiva col team",
-    "overall": "Complessivo"
+    "overall": "Complessivo",
+    "submitted_bonus_generic": "Valutazione inviata — token in regalo!",
+    "rate_bonus": "(+{{bonus}} token bonus)",
+    "rate_bonus_generic": "(token bonus)"
   },
   "common": {
     "loading": "Caricamento...",

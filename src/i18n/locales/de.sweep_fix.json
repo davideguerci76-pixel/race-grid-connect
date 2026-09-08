@@ -15,7 +15,7 @@
     "click_to_view": "Klicken, um Bewertungen zu sehen",
     "anonymous": "Anonym",
     "locked_hint": "Freischalten, um die anonymen Bewertungen dieses Profils zu lesen.",
-    "unlock_cta": "Bewertungen freischalten (1 Token)",
+    "unlock_cta": "Bewertungen freischalten ({{cost}} Token)",
     "unlocked_toast": "Bewertungen freigeschaltet",
     "flag_cta": "Melden / Anfechten",
     "flag_title": "Diese Bewertung anfechten",
@@ -32,10 +32,13 @@
     "overall": "Gesamt",
     "punctuality": "Pünktlichkeit",
     "stress": "Stressbewältigung",
-    "submitted_bonus": "Bewertung gesendet — +1 Token geschenkt!",
+    "submitted_bonus": "Bewertung gesendet — +{{bonus}} Token geschenkt!",
     "team_overall": "Gesamtbewertung des Team",
     "technical": "Technische Kompetenz",
-    "visible_now": "Bewertung sichtbar"
+    "visible_now": "Bewertung sichtbar",
+    "submitted_bonus_generic": "Bewertung gesendet — Token geschenkt!",
+    "rate_bonus": "(+{{bonus}} Token Bonus)",
+    "rate_bonus_generic": "(Token Bonus)"
   },
   "engagements": {
     "confirmed_toast": "Engagement bestätigt",

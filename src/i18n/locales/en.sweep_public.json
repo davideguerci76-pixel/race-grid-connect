@@ -18,8 +18,8 @@
       "sign_in_desc": "Team profiles are visible to authenticated members only.",
       "sign_in_button": "Sign in / Register",
       "team_hidden_title": "Team is hidden",
-      "team_hidden_desc": "Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below (5 tokens).",
-      "unlock_full_button": "Unlock full team profile (5 tokens)",
+      "team_hidden_desc": "Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below ({{cost}} tokens).",
+      "unlock_full_button": "Unlock full team profile ({{cost}} tokens)",
       "racing_team_default": "Racing team",
       "established": "Est. {{year}}",
       "active_pit_calls": "Active Pit Calls",
@@ -27,18 +27,18 @@
       "no_active_pit_calls": "No active Pit Calls.",
       "partial_access_title": "[PARTIAL ACCESS]",
       "partial_access_desc": "You unlocked this team for one job posting. Direct contacts and the team's other active Pit Calls are hidden.",
-      "unlock_full_profile_button": "Unlock full profile (5 tokens)",
+      "unlock_full_profile_button": "Unlock full profile ({{cost}} tokens)",
       "cancellation_history": "⚠ CANCELLATION HISTORY",
       "late_cancellation": "{{count}} late cancellation recorded on confirmed matches.",
       "late_cancellation_plural": "{{count}} late cancellations recorded on confirmed matches.",
       "locked_other_pitcalls": "{{count}} other Pit Call(s) from this team are locked. Unlock the full profile to view them.",
       "modal": {
         "title": "[UNLOCK FULL PROFILE]",
-        "heading": "Spend 5 tokens?",
+        "heading": "Spend {{cost}} tokens?",
         "desc": "Unlocks direct contacts (website) and the full list of active Pit Calls from this team. One-time payment for this team.",
         "cancel": "Cancel",
         "unlocking": "Unlocking…",
-        "unlock_button": "Unlock (5 tokens)"
+        "unlock_button": "Unlock ({{cost}} tokens)"
       }
     },
     "teams_index": {
