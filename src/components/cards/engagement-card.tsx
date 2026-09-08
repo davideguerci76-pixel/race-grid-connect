@@ -189,7 +189,8 @@ export function EngagementCard({
           {req && <Fact icon={<Flag />} label={t("cards.role")} value={`${req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)}`} sub={disciplineLabel(req.discipline)} />}
           {!isFreelancer && fp?.location && <Fact icon={<MapPin />} label={t("cards.location")} value={fp.location} />}
           {!isFreelancer && typeof fp?.day_rate === "number" && <Fact icon={<Wallet />} label={t("cards.day_rate")} value={`€${fp.day_rate}/day`} />}
-          <Fact icon={<Wallet />} label={t("cards.budget_ref")} value={`${e.currency ?? ""} ${e.fee ?? "—"}`.trim()} sub={budgetText ?? t("cards.budget_ref_hint")} />
+          {budgetText && <Fact icon={<Wallet />} label={t("reveal.budget")} value={budgetText} />}
+          <Fact icon={<Wallet />} label={t("cards.budget_ref")} value={`${e.currency ?? ""} ${e.fee ?? "—"}`.trim()} sub={t("cards.budget_ref_hint")} />
         </FactGrid>
 
         {/* CONTACT — team side, confirmed/completed (server-authorised) */}
@@ -251,7 +252,7 @@ export function EngagementCard({
                 )}
                 {req.notes && <Section icon={<StickyNote />} title={t("cards.notes")}><p className="text-muted-foreground">{req.notes}</p></Section>}
               </DetailsToggle>
-            ) : detailsUnlocked ? null : null}
+            ) : null}
           </Section>
         )}
 
