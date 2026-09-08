@@ -21,6 +21,21 @@ export function addDaysIso(iso: string, days: number): string {
   return isoOf(d);
 }
 
+/**
+ * Calendar-month arithmetic (not 365 days): the day-of-month is preserved and
+ * clamped to the last day of the target month, so year rollovers, short months
+ * and leap days all land on the date a human expects.
+ */
+export function addMonthsIso(iso: string, months: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const year = y!;
+  const monthIdx = (m ?? 1) - 1 + months;
+  const targetYear = year + Math.floor(monthIdx / 12);
+  const targetMonth = ((monthIdx % 12) + 12) % 12;
+  const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+  return isoOf(new Date(targetYear, targetMonth, Math.min(d ?? 1, lastDay)));
+}
+
 /** Monday of the week containing `iso` (week starts on Monday). */
 export function mondayOf(iso: string): string {
   const d = dateOf(iso);
