@@ -1,6 +1,6 @@
 import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
