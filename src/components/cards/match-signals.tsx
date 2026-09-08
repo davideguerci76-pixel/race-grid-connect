@@ -3,6 +3,7 @@ import { CalendarX, CheckCircle2, CircleDashed, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCriterion } from "@/lib/criteria-label";
 import { Chip, Chips } from "@/components/cards/primitives";
+import { HelpHint } from "@/components/help-hint";
 
 /**
  * Two independent match dimensions, always rendered separately:
@@ -17,8 +18,9 @@ export function RelevanceScore({ pct, perfect = false, size = "lg", className }:
   return (
     <div className={cn("text-right", className)}>
       <div className={cn("font-black italic leading-none tracking-tighter", n, perfect ? "text-racing-yellow" : "text-foreground")}>{pct}%</div>
-      <div className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground">
+      <div className="mt-1 flex items-center justify-end gap-1 font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground">
         {perfect ? t("cards.relevance_perfect") : t("cards.relevance")}
+        <HelpHint titleKey="help.concept.relevance.title" bodyKey="help.concept.relevance.body" size={12} />
       </div>
     </div>
   );
@@ -66,6 +68,7 @@ export function MissingDays({ c, compact = false }: { c: CoverageInput; compact?
         <CalendarX className="size-4" />
         {t(missing === 1 ? "cards.missing_day_one" : "cards.missing_day_other", { count: missing })}
         <span className="font-normal text-muted-foreground">· {gapLabel}</span>
+        <HelpHint titleKey="help.concept.partial_coverage.title" bodyKey="help.concept.partial_coverage.body" size={13} className="text-racing-yellow" />
       </div>
       {c.missingDates.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1">

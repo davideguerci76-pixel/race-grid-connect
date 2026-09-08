@@ -482,7 +482,10 @@ function CalendarPage() {
 
         <div className="mt-6 grid grid-cols-1 gap-3 border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <div className="label-mono">[{t("calendar.freshness_label")}]</div>
+            <div className="flex items-center gap-1">
+              <span className="label-mono">[{t("calendar.freshness_label")}]</span>
+              <HelpHint titleKey="help.concept.stale_calendar.title" bodyKey="help.concept.stale_calendar.body" />
+            </div>
             <div className={`mt-1 font-mono text-xs ${freshTone}`}>
               {lastConfirmed
                 ? t("calendar.last_confirmed", { defaultValue: "Last confirmed {{days}} day(s) ago · {{date}}", days: daysSince, date: formatDate(lastConfirmed) })
