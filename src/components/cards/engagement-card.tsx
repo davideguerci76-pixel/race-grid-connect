@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Award, Ban, CalendarPlus, CalendarRange, CheckCircle2, Clock, Contact, Eye, Flag, Lock, Mail, MapPin, Phone, ShieldCheck, StickyNote, Wallet, XCircle } from "lucide-react";
+import { AlertTriangle, Award, Ban, CalendarPlus, CalendarRange, CalendarX, CheckCircle2, Clock, Contact, Eye, Flag, Lock, Mail, MapPin, Phone, ShieldCheck, StickyNote, Wallet, XCircle } from "lucide-react";
 import { PitCallDates } from "@/components/championship-dates";
+import { useDateFormat } from "@/lib/date-locale";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { disciplineLabel, educationLabel, engagementStatusLabel, languageLabel, languageLevelLabel, skillLabel, teamTypeLabel } from "@/lib/labels";
@@ -48,6 +49,7 @@ export function EngagementCard({
   ratingSlot: ReactNode;
 }) {
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const isFreelancer = userId === e.freelancer_id;
   const other = isFreelancer ? e.team : e.freelancer;
   const iMarked = isFreelancer ? e.freelancer_marked_complete : e.team_marked_complete;
