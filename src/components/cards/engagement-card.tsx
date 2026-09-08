@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Award, Ban, CalendarPlus, CalendarRange, CheckCircle2, Clock, Contact, Eye, Flag, Lock, Mail, MapPin, Phone, ShieldCheck, StickyNote, Wallet, XCircle } from "lucide-react";
+import { AlertTriangle, Award, Ban, CalendarPlus, CalendarRange, CalendarX, CheckCircle2, Clock, Contact, Eye, Flag, Lock, Mail, MapPin, Phone, ShieldCheck, StickyNote, Wallet, XCircle } from "lucide-react";
 import { PitCallDates } from "@/components/championship-dates";
+import { useDateFormat } from "@/lib/date-locale";
 import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { MatchRequestActions, MatchRequestDeadline } from "@/components/match-request-actions";
 import { disciplineLabel, educationLabel, engagementStatusLabel, languageLabel, languageLevelLabel, skillLabel, teamTypeLabel } from "@/lib/labels";
@@ -48,6 +49,7 @@ export function EngagementCard({
   ratingSlot: ReactNode;
 }) {
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const isFreelancer = userId === e.freelancer_id;
   const other = isFreelancer ? e.team : e.freelancer;
   const iMarked = isFreelancer ? e.freelancer_marked_complete : e.team_marked_complete;
@@ -61,7 +63,11 @@ export function EngagementCard({
   const skillsHard: string[] = req?.skills_hard ?? [];
   const languages: any[] = req?.languages ?? [];
   const education: string[] = req?.education ?? [];
-  const missing: any[] = match?.missing_criteria ?? [];
+  // Temporal availability is NOT a preferred requirement: the matching engine emits a
+  // `missing_days` entry inside missing_criteria, which is rendered separately below.
+  const missing: any[] = (match?.missing_criteria ?? []).filter((c: any) => c?.kind !== "missing_days");
+  const coverage = e.coverage ?? null;
+
   // Teams always see their own Pit Call; freelancers must pay the reveal.
   const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
   const status: string = e.status;
@@ -256,12 +262,33 @@ export function EngagementCard({
           </Section>
         )}
 
-        {/* CRITERIA (only when something is missing — legacy behaviour) */}
+        {/* TEMPORAL COVERAGE — independent dimension, snapshot of the engagement */}
+        {coverage && coverage.missing_days > 0 && (
+          <Section icon={<CalendarX />} title={t("cards.coverage_partial")}>
+            <div className="rounded-lg border border-racing-yellow/50 bg-racing-yellow/5 px-3 py-2">
+              <div className="text-[12.5px] font-bold text-racing-yellow">
+                {t("cards.days_of", { covered: coverage.covered_days, required: coverage.required_days })}
+                {" · "}
+                {t(coverage.missing_days === 1 ? "cards.missing_day_one" : "cards.missing_day_other", { count: coverage.missing_days })}
+              </div>
+              <div className="mt-1.5 flex flex-wrap gap-1">
+                {coverage.missing_dates.map((day: string) => (
+                  <time key={day} dateTime={day} className="rounded border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5 font-mono text-[11px] text-racing-yellow">
+                    {formatDate(day + "T00:00:00")}
+                  </time>
+                ))}
+              </div>
+            </div>
+          </Section>
+        )}
+
+        {/* PREFERRED / MANDATORY CRITERIA — never mixed with temporal availability */}
         {missing.length > 0 && (
           <Section icon={<Award />} title={t("sweep_engage.matches.missing_criteria")}>
             <CriteriaOutcome missing={missing} />
           </Section>
         )}
+
 
         {e.notes && <Section icon={<StickyNote />} title={t("cards.notes")}><p className="text-muted-foreground">{e.notes}</p></Section>}
       </CardBody>

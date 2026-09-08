@@ -41,6 +41,7 @@
     "status": "Status",
     "match_of": "Match für „{{title}}“",
     "rank": "Rang",
-    "confirmed_match": "Bestätigtes Match"
+    "confirmed_match": "Bestätigtes Match",
+    "coverage_partial": "Teilweise Verfügbarkeit"
   }
 }
