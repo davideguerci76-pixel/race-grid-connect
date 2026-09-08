@@ -1,6 +1,6 @@
 import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -37,7 +37,7 @@ function RequestMatchesPage() {
   const fetchMatches = useServerFn(getRequestMatches);
   const unlockFn = useServerFn(unlockMatch);
   const unlockTierFn = useServerFn(unlockRequestTier);
-  const partialRef = useRef<HTMLDivElement | null>(null);
+  
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["request-matches", id],
@@ -426,32 +426,11 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {/* FOMO banner */}
-            {data.partial_banner && (
-              <div className="mt-8 border-2 border-racing-red bg-racing-red/5 p-5">
-                <div className="flex items-start gap-3">
-                  <Flame className="mt-1 size-5 shrink-0 text-racing-red" />
-                  <div className="flex-1">
-                    <div className="label-mono text-racing-red">[PARTIAL MATCHES AVAILABLE]</div>
-                    <p className="mt-1 text-sm">
-                      {data.partial_banner.case === "A" ? (
-                        <>
-                          {t("sweep_engage.request_matches.partial_banner_case_a_1")} <span className="font-black text-racing-yellow">{data.partial_banner.best_full_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_2")} <span className="font-black text-racing-yellow">{data.partial_banner.best_partial_skill}%</span>{t("sweep_engage.request_matches.partial_banner_case_a_3")}
-                        </>
-                      ) : (
-                        <>{t("sweep_engage.request_matches.partial_banner_case_b")}</>
-                      )}
-                    </p>
-                    <button
-                      onClick={() => partialRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                      className="mt-3 bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110"
-                    >
-                      {t("sweep_engage.request_matches.view_partial_matches_button", { count: data.partial_banner.partial_count })}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Partial matches are always rendered in their own section below:
+                the old "want to see them?" FOMO banner was removed (STEP 6.9.R.2)
+                because its copy/CTA falsely suggested partials were still hidden.
+                The refund/economic banner (refund_state) is a separate component
+                above and is fully preserved. */}
 
             <div className="mt-8 grid items-start gap-6 md:grid-cols-2">
               <section className="border border-border bg-card p-4">
@@ -469,7 +448,7 @@ function RequestMatchesPage() {
                 )}
               </section>
 
-              <section ref={partialRef} className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
+              <section className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
                 <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-racing-yellow/30 pb-3">
                   <div className="min-w-0">
                     <div className="label-mono truncate text-racing-yellow">[{t("pool.column_partial")}]</div>
