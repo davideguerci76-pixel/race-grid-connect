@@ -303,12 +303,12 @@ function EngagementsPage() {
                         </span>
                         <button
                           onClick={async () => {
-                            const who = t("nav.teams"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { cost: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) revealMut.mutate(e.match.id);
+                            const who = t("nav.teams"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { count: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) revealMut.mutate(e.match.id);
                           }}
                           disabled={revealMut.isPending}
                           className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
                         >
-                          {revealCost > 0 ? t("matches.reveal_1_token", { cost: revealCost }) : t("matches.reveal_cta_free")}
+                          {revealCost > 0 ? t("matches.reveal_1_token", { count: revealCost }) : t("matches.reveal_cta_free")}
                         </button>
                       </div>
                     )}
