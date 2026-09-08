@@ -1339,11 +1339,14 @@ export const getRequestMatches = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
 
     // If the post-review window has elapsed, the request goes live before we read it.
+    // The RED-cancel quote below is evaluated AFTER this call and AFTER the request
+    // row is re-read, so eligibility always reflects the post-activation server state.
     try {
       await (supabase.rpc as any)("activate_request_if_due", { _request_id: data.request_id });
     } catch {
       // Non-fatal: the scheduled activation still covers this request.
     }
+
 
     const { data: req, error: reqErr } = await supabase
       .from("requests")
