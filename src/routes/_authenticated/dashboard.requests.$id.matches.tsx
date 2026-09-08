@@ -455,33 +455,19 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {/* Trivio: no match left to confirm (zero matches, or all declined/expired) */}
-            {(!hasAnyMatches || Number((data as any).confirmable_left ?? 1) === 0) && !requestFilled && !(data.request as any).partial_refund_taken && (
-              <ZeroMatchTrivio
-                quote={(data as any).refund_quote}
-                hasPartials={data.total_partial_matches > 0}
+            {/* Economic panel — rendered strictly from the server economic state. */}
+            {!requestFilled && !inReview && (data as any).refund_state && (
+              <EconomicPanel
+                state={(data as any).refund_state}
                 onWait={() => toast.info(t("sweep_engage.request_matches.search_stays_active"))}
-                onRefund={async () => {
-                  const q = (data as any).refund_quote;
-                  if (await confirmDialog(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
+                onClose={async () => {
+                  const s = (data as any).refund_state;
+                  if (await confirmDialog(t("sweep_engage.request_matches.econ_close_confirm", { tokens: s.best_refund }))) {
                     refundMut.mutate("full");
-                  }
-                }}
-                onPartial={async () => {
-                  const q = (data as any).refund_quote;
-                  if (await confirmDialog(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
-                    refundMut.mutate("partial");
                   }
                 }}
                 loading={refundMut.isPending}
               />
-            )}
-
-            {(data.request as any).partial_refund_taken && (data.request as any).refund_kind === "partial" && (
-              <div className="mt-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4 text-xs text-racing-yellow">
-                <span className="font-mono uppercase tracking-widest">[PARTIAL REFUND COLLECTED]</span>{" "}
-                <span className="ml-2">{t("sweep_engage.request_matches.partial_refund_credited", { tokens: (data.request as any).refund_tokens, pct: (data.request as any).refund_pct })}</span>
-              </div>
             )}
 
             {isPoolRequest && expandAvailable && (
