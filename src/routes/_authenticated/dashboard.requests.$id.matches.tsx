@@ -39,11 +39,12 @@ function RequestMatchesPage() {
   const unlockTierFn = useServerFn(unlockRequestTier);
   
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["request-matches", id],
     queryFn: () => fetchMatches({ data: { request_id: id } }),
     retry: false,
   });
+
 
   const [reviewNow, setReviewNow] = useState(() => Date.now());
   const reviewDeadline = (data as any)?.review_deadline_at ?? null;
@@ -329,6 +330,24 @@ function RequestMatchesPage() {
                           </button>
                         );
                       })()}
+                      {state.red_cancel_quote_available === false && (
+                        // The server could not evaluate red_cancel_quote(). This is NOT a
+                        // legitimate "not eligible": no client-side eligibility or refund is
+                        // derived here — the Team is told the check is temporarily unavailable.
+                        <div className="inline-flex items-center gap-2 border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          <AlertTriangle className="size-3 text-racing-yellow" />
+                          {t("sweep_engage.request_matches.red_cancel_unavailable")}
+                          <button
+                            type="button"
+                            onClick={() => refetch()}
+                            disabled={isFetching}
+                            className="underline underline-offset-2 hover:text-foreground disabled:opacity-60"
+                          >
+                            {t("sweep_engage.request_matches.red_cancel_retry")}
+                          </button>
+                        </div>
+                      )}
+
                       <span className="font-mono text-[10px] uppercase text-muted-foreground">{t("sweep_engage.request_matches.modify_budget_status", { used: state.modify_count ?? 0, max: state.max_modify ?? 3, left: state.budget_left ?? 0 })}</span>
                     </div>
                   );

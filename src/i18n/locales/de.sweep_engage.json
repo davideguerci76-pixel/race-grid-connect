@@ -290,7 +290,9 @@
       "unlock_tier_confirm_reduced": "Stufe {{label}} {{tier}} für {{cost}} Token freischalten? (Reduziert von {{full}} — nur {{count}} echte Matches in dieser Stufe verfügbar.)",
       "unlocked_label": "Freigeschaltet",
       "unlocked_tag": "FREIGESCHALTET",
-      "view_partial_matches_button": "{{count}} Teil-Match(es) ansehen"
+      "view_partial_matches_button": "{{count}} Teil-Match(es) ansehen",
+      "red_cancel_unavailable": "RED-Stornoprüfung vorübergehend nicht verfügbar",
+      "red_cancel_retry": "Erneut versuchen"
     },
     "requests": {
       "confirmed_filled": "Bestätigt · Besetzt",
