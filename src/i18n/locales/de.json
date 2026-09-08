@@ -80,7 +80,7 @@
   },
   "duration": {
     "full_season": "Ganze Saison",
-    "race_weekend": "Rennwochenende",
+    "race_weekend": "Einzelveranstaltung",
     "test_session": "Testsession"
   },
   "role": {

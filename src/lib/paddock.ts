@@ -11,8 +11,11 @@ function dbLabel(kind: "skill" | "discipline" | "language", code: string): strin
 }
 
 
+// `test_session` remains a valid stored/legacy value (DB enum unchanged) so historic
+// Pit Calls keep rendering, but it is no longer selectable for new/edited requests.
 export type DurationType = "full_season" | "race_weekend" | "test_session";
-export const DURATIONS: DurationType[] = ["full_season", "race_weekend", "test_session"];
+export const DURATIONS: DurationType[] = ["full_season", "race_weekend"];
+export const LEGACY_DURATIONS: DurationType[] = ["test_session"];
 
 // Kept for backward compat — now loose strings.
 export type Discipline = string;
