@@ -194,7 +194,11 @@ function EngagementsPage() {
       if (res && res.ok === false && res.already_rated) {
         toast.info(t("rating.submitted"));
       } else {
-        toast.success(t("rating.submitted_bonus"));
+        toast.success(
+          ratingBonus != null
+            ? t("rating.submitted_bonus", { bonus: ratingBonus })
+            : t("rating.submitted_bonus_generic"),
+        );
       }
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
       qc.invalidateQueries();
@@ -275,7 +279,10 @@ function EngagementsPage() {
               }
               return (
                 <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
-                  {t("engagements.rate")} <span className="ml-1 text-[9px]">(+1 token bonus)</span>
+                  {t("engagements.rate")}{" "}
+                  <span className="ml-1 text-[9px]">
+                    {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                  </span>
                 </button>
               );
             })();
