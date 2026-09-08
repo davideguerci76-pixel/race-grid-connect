@@ -293,7 +293,9 @@
       "view_partial_matches_button": "Ver {{count}} match(es) parcial(es)",
       "red_cancel_unavailable": "Comprobación de cancelación RED no disponible temporalmente",
       "red_cancel_retry": "Reintentar",
-      "unlock_details_button_free": "Desbloquear detalles (gratis)"
+      "unlock_details_button_free": "Desbloquear detalles (gratis)",
+      "econ_continue_active_title": "PITCALL SE ACTIVA POR TI",
+      "econ_continue_active_body": "Intentaremos activar nuevos freelancers compatibles con tu solicitud."
     },
     "requests": {
       "confirmed_filled": "Confirmado · Cubierto",

@@ -293,7 +293,9 @@
       "view_partial_matches_button": "View {{count}} partial match(es)",
       "red_cancel_unavailable": "RED cancel check temporarily unavailable",
       "red_cancel_retry": "Retry",
-      "unlock_details_button_free": "Unlock details (free)"
+      "unlock_details_button_free": "Unlock details (free)",
+      "econ_continue_active_title": "PITCALL GOES ACTIVE FOR YOU",
+      "econ_continue_active_body": "We will try to activate new freelancers who match your request."
     },
     "requests": {
       "confirmed_filled": "Confirmed · Filled",
