@@ -1844,6 +1844,26 @@ export const getRequestMatches = createServerFn({ method: "GET" })
         low_relevance_eligible: Boolean((refundQuote as any)?.low_relevance_eligible ?? false),
         low_relevance_refund: Number((refundQuote as any)?.low_relevance_refund ?? 0),
       },
+      refund_state: {
+        state: String(rs?.state ?? "non_refundable") as
+          | "zero_match"
+          | "partial_only"
+          | "full"
+          | "low_relevance"
+          | "non_refundable",
+        spent: Number(rs?.spent ?? 0),
+        refund_pct: Number(rs?.refund_pct ?? 0),
+        zero_match_refund: Number(rs?.zero_match_refund ?? 0),
+        partial_refund: Number(rs?.partial_refund ?? 0),
+        low_relevance_refund: Number(rs?.low_relevance_refund ?? 0),
+        low_relevance_eligible: Boolean(rs?.low_relevance_eligible ?? false),
+        best_refund: Number(rs?.best_refund ?? 0),
+        refund_kind: (rs?.refund_kind ?? null) as "full" | "partial" | "low_relevance" | null,
+        refund_available: Boolean(rs?.refund_available ?? false),
+        closes_request: Boolean(rs?.closes_request ?? false),
+        non_refundable: Boolean(rs?.non_refundable ?? false),
+        reason: (rs?.reason ?? null) as string | null,
+      },
     };
   });
 
