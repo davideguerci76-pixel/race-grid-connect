@@ -1379,6 +1379,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
           low_relevance_eligible: false,
           low_relevance_refund: 0,
         },
+        refund_state: null as any,
       };
     }
 
