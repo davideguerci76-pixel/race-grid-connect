@@ -25,6 +25,7 @@
     "delete_confirm": "Permanently delete",
     "delete_done": "Your account has been deleted.",
     "delete_blocked": "You still have active engagements. Close or cancel them before deleting your account.",
+    "delete_blocked_pitcalls": "You still have open Pit Calls. Close them before deleting your account.",
     "contact": "Data requests"
   }
 }
