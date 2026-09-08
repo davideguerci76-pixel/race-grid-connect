@@ -87,7 +87,7 @@ export function RankPill({ rank, tier }: { rank?: number | string | null; tier?:
   return (
     <span className="inline-flex flex-col items-center rounded-lg border border-racing-yellow/60 px-2.5 py-1 text-center leading-tight text-racing-yellow">
       <b className="text-[15px] font-black">#{rank}</b>
-      <span className="font-mono text-[9px] uppercase tracking-widest">{tier != null ? t("cards.tier_n", { tier }) : t("sweep_engage.matches.rank_label", { defaultValue: "Rank" })}</span>
+      <span className="font-mono text-[9px] uppercase tracking-widest">{tier != null ? t("cards.tier_n", { tier }) : t("cards.rank")}</span>
     </span>
   );
 }

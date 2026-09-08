@@ -39,6 +39,8 @@
     "team": "Equipo",
     "freelancer": "Freelance",
     "status": "Estado",
-    "match_of": "Match para “{{title}}”"
+    "match_of": "Match para “{{title}}”",
+    "rank": "Posición",
+    "confirmed_match": "Match confirmado"
   }
 }

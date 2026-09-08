@@ -54,7 +54,7 @@ export function FreelancerMatchCard({
   if (isConfirmed) {
     tone = "confirmed"; headerTone = "success"; headerTitle = t("sweep_engage.matches.match_confirmed_badge"); headerSub = covDays;
   } else if (pending) {
-    tone = "partial"; headerTone = "warn"; headerTitle = t("engagements.status_proposed", { defaultValue: "Confirmation requested" }); headerSub = <MatchRequestDeadline expiresAt={m.pending_engagement?.expires_at} />;
+    tone = "partial"; headerTone = "warn"; headerTitle = t("mcard.confirmation_requested"); headerSub = <MatchRequestDeadline expiresAt={m.pending_engagement?.expires_at} />;
     headerIcon = <Flag className="size-4" />;
   } else if (matchTaken) {
     tone = "neutral"; headerTone = "muted"; headerTitle = t("sweep_engage.matches.assigned_elsewhere"); headerSub = covDays;

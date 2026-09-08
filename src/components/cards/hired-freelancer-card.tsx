@@ -17,7 +17,7 @@ export function HiredFreelancerCard({ hired, request }: { hired: any; request: a
 
   return (
     <CardShell tone="confirmed" className="mt-6">
-      <CardHeader icon={<CheckCircle2 className="size-4" />} tone="success" title={t("sweep_engage.request_matches.confirmed_match_title", { defaultValue: "Confirmed match" })} subtitle={request?.title} />
+      <CardHeader icon={<CheckCircle2 className="size-4" />} tone="success" title={t("cards.confirmed_match")} subtitle={request?.title} />
       <CardBody>
         <IdentityRow
           avatar={initials}
@@ -45,7 +45,7 @@ export function HiredFreelancerCard({ hired, request }: { hired: any; request: a
           />
           <Fact
             icon={<Phone />}
-            label={t("phone.label", { defaultValue: "Phone" })}
+            label={t("phone.label")}
             value={
               hired?.phone_number ? (
                 <a href={`tel:${tel}`} className="text-racing-red hover:underline">{hired.phone_dial_code} {hired.phone_number}</a>
