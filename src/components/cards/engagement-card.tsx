@@ -185,7 +185,7 @@ export function EngagementCard({
 
         {/* FACTS */}
         <FactGrid cols={4}>
-          <Fact icon={<CalendarRange />} label={t("cards.dates")} value={<span className="font-mono text-[12px]"><PitCallDates request={req} dates={e.covered_days} /></span>} />
+          <Fact icon={<CalendarRange />} label={t("cards.dates")} value={<span className="font-mono text-[12px]">{req ? <PitCallDates request={req} dates={e.covered_days} /> : `${e.start_date} → ${e.end_date}`}</span>} />
           {req && <Fact icon={<Flag />} label={t("cards.role")} value={`${req.sub_role ? subRoleLabel(req.sub_role) : roleGroupLabel(req.role_group)}`} sub={disciplineLabel(req.discipline)} />}
           {!isFreelancer && fp?.location && <Fact icon={<MapPin />} label={t("cards.location")} value={fp.location} />}
           {!isFreelancer && typeof fp?.day_rate === "number" && <Fact icon={<Wallet />} label={t("cards.day_rate")} value={`€${fp.day_rate}/day`} />}
