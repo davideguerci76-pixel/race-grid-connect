@@ -269,7 +269,8 @@ export const getPoolMatches = createServerFn({ method: "GET" })
     if (ids.length) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: profiles }, { data: fps }, { data: ratings }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, first_name, last_name").in("id", ids),
+        // Pool members' names are already authorised for the owning team (same source as getMyPool).
+        supabaseAdmin.from("profiles").select("id, display_name, first_name, last_name").in("id", ids),
         supabaseAdmin.from("freelancer_profiles").select(FREELANCER_PROFILE_COLUMNS).in("user_id", ids),
         supabase.from("ratings").select("to_user_id, stars, overall, unlocked_at").in("to_user_id", ids).not("unlocked_at", "is", null),
       ]);
