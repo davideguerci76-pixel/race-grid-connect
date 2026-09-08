@@ -1,8 +1,9 @@
 {
   "reveal": {
     "locked_title": "Détails du Pit Call verrouillés",
-    "locked_body": "R\u00e9v\u00e9lez pour {{cost}} jeton afin de d\u00e9bloquer logistique, exigences et budget de ce Pit Call. L'\u00e9quipe reste anonyme.",
-    "locked_body_free": "R\u00e9v\u00e9lez gratuitement pour d\u00e9bloquer logistique, exigences et budget de ce Pit Call. L'\u00e9quipe reste anonyme.",
+    "locked_body_one": "Révélez pour {{count}} jeton afin de débloquer logistique, exigences et budget de ce Pit Call. L'équipe reste anonyme.",
+    "locked_body_other": "Révélez pour {{count}} jetons afin de débloquer logistique, exigences et budget de ce Pit Call. L'équipe reste anonyme.",
+    "locked_body_free": "Révélez gratuitement pour débloquer logistique, exigences et budget de ce Pit Call. L'équipe reste anonyme.",
     "locked_count": "{{count}} détails supplémentaires disponibles",
     "unlocked_title": "Pit Call débloqué",
     "identity_note": "L'identité de l'équipe reste masquée jusqu'à confirmation",

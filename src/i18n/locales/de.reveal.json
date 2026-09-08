@@ -1,7 +1,8 @@
 {
   "reveal": {
     "locked_title": "Pit-Call-Details gesperrt",
-    "locked_body": "F\u00fcr {{cost}} Token freischalten: Logistik, Anforderungen und Budget dieses Pit Calls. Das Team bleibt anonym.",
+    "locked_body_one": "Für {{count}} Token freischalten: Logistik, Anforderungen und Budget dieses Pit Calls. Das Team bleibt anonym.",
+    "locked_body_other": "Für {{count}} Token freischalten: Logistik, Anforderungen und Budget dieses Pit Calls. Das Team bleibt anonym.",
     "locked_body_free": "Kostenlos freischalten: Logistik, Anforderungen und Budget dieses Pit Calls. Das Team bleibt anonym.",
     "locked_count": "{{count}} weitere Details verfügbar",
     "unlocked_title": "Pit Call freigeschaltet",

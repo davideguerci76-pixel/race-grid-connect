@@ -1,7 +1,8 @@
 {
   "reveal": {
     "locked_title": "Pit Call details locked",
-    "locked_body": "Reveal for {{cost}} token to unlock logistics, requirements and budget of this Pit Call. The team stays anonymous.",
+    "locked_body_one": "Reveal for {{count}} token to unlock logistics, requirements and budget of this Pit Call. The team stays anonymous.",
+    "locked_body_other": "Reveal for {{count}} tokens to unlock logistics, requirements and budget of this Pit Call. The team stays anonymous.",
     "locked_body_free": "Reveal for free to unlock logistics, requirements and budget of this Pit Call. The team stays anonymous.",
     "locked_count": "{{count}} extra details available",
     "unlocked_title": "Pit Call unlocked",

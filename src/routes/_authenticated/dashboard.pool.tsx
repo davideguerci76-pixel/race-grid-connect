@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,6 +14,8 @@ import { addPoolMemberByCode, getMyPool, getPoolMatches, unlockPoolSearch } from
 import { getMyRequests } from "@/lib/paddock.functions";
 import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { toastError } from "@/lib/errors";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pool")({
   head: () => ({
@@ -32,6 +34,22 @@ export const Route = createFileRoute("/_authenticated/dashboard/pool")({
 function PoolPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Team-only screen: resolve the account type before painting anything.
+  const { data: roleProfile } = useQuery({
+    queryKey: ["pool-role-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () =>
+      (await supabase.from("profiles").select("user_type").eq("id", user!.id).maybeSingle()).data,
+  });
+  const isTeam = roleProfile?.user_type === "team";
+
+  useEffect(() => {
+    if (roleProfile && roleProfile.user_type !== "team") navigate({ to: "/dashboard/calendar" });
+  }, [roleProfile, navigate]);
+
   const listPool = useServerFn(getMyPool);
   const addByCode = useServerFn(addPoolMemberByCode);
   const listRequests = useServerFn(getMyRequests);
@@ -39,8 +57,8 @@ function PoolPage() {
   const [code, setCode] = useState("");
   const [requestId, setRequestId] = useState<string>("");
 
-  const { data: pool = [], isLoading } = useQuery({ queryKey: ["my-pool"], queryFn: () => listPool() });
-  const { data: requests = [] } = useQuery({ queryKey: ["my-requests"], queryFn: () => listRequests() });
+  const { data: pool = [], isLoading } = useQuery({ queryKey: ["my-pool"], queryFn: () => listPool(), enabled: isTeam });
+  const { data: requests = [] } = useQuery({ queryKey: ["my-requests"], queryFn: () => listRequests(), enabled: isTeam });
 
   const addMut = useMutation({
     mutationFn: () => addByCode({ data: { code: code.trim() } }),
@@ -57,6 +75,22 @@ function PoolPage() {
     () => (requests as any[]).filter((r) => r.status === "active" || r.status === "paused"),
     [requests],
   );
+
+  // Role resolution gate: nothing Team-specific is painted until the server has
+  // confirmed the account type (a freelancer landing here is redirected above).
+  if (!isTeam) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <SiteHeader />
+        <div className="container-page py-12">
+          <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+          <div className="mt-4 h-10 w-72 animate-pulse rounded bg-muted" />
+          <div className="mt-8 h-64 w-full animate-pulse rounded bg-muted/60" />
+        </div>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
