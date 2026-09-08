@@ -274,11 +274,14 @@ function InformationalMessage({ payload, kind }: { payload: any; kind: string })
     );
   }
   const outcome = payload?.outcome as string | undefined;
-  const score = Math.round(Number(payload?.score ?? 0));
+  // SCORE TRUTH: a missing score is absent, not 0. Never render a fabricated 0%.
+  const rawScore = payload?.score;
+  const hasScore = rawScore !== null && rawScore !== undefined && Number.isFinite(Number(rawScore));
+  const score = hasScore ? Math.round(Number(rawScore)) : null;
   const criteria = Array.isArray(payload?.criteria) ? payload.criteria : [];
 
   if (outcome === "filled" || kind === "match_taken") {
-    const perfect = score >= 100;
+    const perfect = score !== null && score >= 100;
     return (
       <div className="grid gap-1">
         <div className="font-medium">{t("pmatch.filled_title")}</div>
@@ -289,7 +292,7 @@ function InformationalMessage({ payload, kind }: { payload: any; kind: string })
           </>
         ) : (
           <>
-            <div>{t("pmatch.filled_score", { score })}</div>
+            {score !== null && <div>{t("pmatch.filled_score", { score })}</div>}
             {criteria.length > 0 && (
               <>
                 <div>{t("pmatch.filled_criteria_intro")}</div>
@@ -306,6 +309,7 @@ function InformationalMessage({ payload, kind }: { payload: any; kind: string })
       </div>
     );
   }
+
 
   if (outcome === "closed" || kind === "request_unfilled") {
     return (
