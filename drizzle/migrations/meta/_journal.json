@@ -708,6 +708,13 @@
       "when": 1788826955430,
       "tag": "0100_delete_account_open_pitcalls_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788827083488,
+      "tag": "0101_team_identity_lock_allows_account_deletion",
+      "breakpoints": true
     }
   ]
 }
