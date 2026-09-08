@@ -1219,9 +1219,45 @@ export const getMyEngagements = createServerFn({ method: "GET" })
             }
           : { ...r.match, from_snapshot: false }
         : r.match;
+      // Temporal coverage of the engagement, frozen at confirmation-request time:
+      // `engagements.covered_days` is the server-authoritative, immutable snapshot of
+      // which required Pit Call days this freelancer actually covered. The exact
+      // missing dates are required days MINUS covered days — never recomputed from
+      // the freelancer's current calendar.
+      const reqRow: any = r.request ?? null;
+      let requiredDays: string[] = [];
+      if (reqRow) {
+        const season: string[] = Array.isArray(reqRow.season_dates) ? reqRow.season_dates : [];
+        if (season.length > 0) {
+          requiredDays = Array.from(new Set(season.map((d: string) => String(d).slice(0, 10)))).sort();
+        } else if (reqRow.start_date && reqRow.end_date) {
+          const cur = new Date(reqRow.start_date + "T00:00:00Z");
+          const end = new Date(reqRow.end_date + "T00:00:00Z");
+          while (cur <= end && requiredDays.length < 1000) {
+            requiredDays.push(cur.toISOString().slice(0, 10));
+            cur.setUTCDate(cur.getUTCDate() + 1);
+          }
+        }
+      }
+      const coveredDays: string[] = Array.isArray(r.covered_days)
+        ? r.covered_days.map((d: string) => String(d).slice(0, 10))
+        : [];
+      const hasCoverageSnapshot = coveredDays.length > 0 && requiredDays.length > 0;
+      const missingDates = hasCoverageSnapshot ? requiredDays.filter((d) => !coveredDays.includes(d)) : [];
+      const coverage = hasCoverageSnapshot
+        ? {
+            required_days: requiredDays.length,
+            covered_days: coveredDays.filter((d) => requiredDays.includes(d)).length,
+            missing_days: missingDates.length,
+            missing_dates: missingDates,
+            from_snapshot: true,
+          }
+        : null;
       return {
         ...r,
         match: matchView,
+        coverage,
+
         in_pool: r.team_id === userId ? poolIds.has(r.freelancer_id) : false,
         revealedByMe,
         freelancer: {
