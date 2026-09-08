@@ -185,7 +185,9 @@ export function AnonymousReviewsSection({
           >
             {unlock.isPending
               ? t("common.loading")
-              : t("reviews.unlock_cta", { defaultValue: "Unlock reviews (1 token)" })}
+              : revealReviews != null
+                ? t("reviews.unlock_cta", { cost: revealReviews })
+                : t("reviews.unlock_cta_generic")}
           </button>
         )}
       </div>
@@ -194,10 +196,7 @@ export function AnonymousReviewsSection({
         <div className="flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
           <Lock className="size-4" />
           <span>
-            {t("reviews.locked_hint", {
-              defaultValue:
-                "Individual reviews are hidden. Spend 1 token to read the anonymous review list — authors are never revealed.",
-            })}
+            {t("reviews.locked_hint")}
           </span>
         </div>
       ) : isLoading ? (
