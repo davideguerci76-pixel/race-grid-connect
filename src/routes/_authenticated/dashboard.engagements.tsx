@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { useActionCosts } from "@/hooks/use-action-costs";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -28,6 +29,7 @@ function EngagementsPage() {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const { user } = useAuth();
+  const { ratingBonus } = useActionCosts();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
   const completeFn = useServerFn(markEngagementComplete);
