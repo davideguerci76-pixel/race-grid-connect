@@ -37,7 +37,7 @@ function RequestMatchesPage() {
   const fetchMatches = useServerFn(getRequestMatches);
   const unlockFn = useServerFn(unlockMatch);
   const unlockTierFn = useServerFn(unlockRequestTier);
-  const partialRef = useRef<HTMLDivElement | null>(null);
+  
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["request-matches", id],
@@ -448,7 +448,7 @@ function RequestMatchesPage() {
                 )}
               </section>
 
-              <section ref={partialRef} className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
+              <section className="border border-racing-yellow/40 bg-racing-yellow/5 p-4">
                 <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 border-b border-racing-yellow/30 pb-3">
                   <div className="min-w-0">
                     <div className="label-mono truncate text-racing-yellow">[{t("pool.column_partial")}]</div>
