@@ -23,7 +23,8 @@
     "flag_placeholder": "Beschreiben Sie das Problem (mind. 10 Zeichen)…",
     "flag_submit": "Meldung senden",
     "flag_submitted": "Bewertung gemeldet. Wir prüfen sie.",
-    "flag_pending": "Gemeldet"
+    "flag_pending": "Gemeldet",
+    "unlock_cta_generic": "Bewertungen freischalten"
   },
   "rating": {
     "awaiting_other_party": "Warten auf die Bewertung der anderen Partei",

@@ -23,6 +23,7 @@
     "flag_placeholder": "Describe the issue (min. 10 characters)…",
     "flag_submit": "Submit report",
     "flag_submitted": "Review reported. Our team will review it.",
-    "flag_pending": "Reported"
+    "flag_pending": "Reported",
+    "unlock_cta_generic": "Unlock reviews"
   }
 }

@@ -38,8 +38,13 @@
         "desc": "Débloque les contacts directs (site web) et la liste complète des Pit Calls actifs de ce team. Paiement unique pour ce team.",
         "cancel": "Annuler",
         "unlocking": "Déblocage en cours…",
-        "unlock_button": "Débloquer ({{cost}} tokens)"
-      }
+        "unlock_button": "Débloquer ({{cost}} tokens)",
+        "heading_generic": "Débloquer le profil complet ?",
+        "unlock_button_generic": "Débloquer"
+      },
+      "team_hidden_desc_generic": "Débloquez une offre spécifique depuis le tableau des offres (2 tokens) ou le profil complet du team ci-dessous.",
+      "unlock_full_button_generic": "Débloquer le profil complet du team",
+      "unlock_full_profile_button_generic": "Débloquer le profil complet"
     },
     "teams_index": {
       "racing_team_default": "Team de course",

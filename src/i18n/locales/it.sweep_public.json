@@ -38,8 +38,13 @@
         "desc": "Sblocca i contatti diretti (sito web) e l'elenco completo dei Pit Call attivi di questo team. Pagamento una tantum per questo team.",
         "cancel": "Annulla",
         "unlocking": "Sblocco in corso…",
-        "unlock_button": "Sblocca ({{cost}} token)"
-      }
+        "unlock_button": "Sblocca ({{cost}} token)",
+        "heading_generic": "Sbloccare il profilo completo?",
+        "unlock_button_generic": "Sblocca"
+      },
+      "team_hidden_desc_generic": "Sblocca un annuncio specifico dalla bacheca (2 token) o il profilo completo del team qui sotto.",
+      "unlock_full_button_generic": "Sblocca profilo completo del team",
+      "unlock_full_profile_button_generic": "Sblocca profilo completo"
     },
     "teams_index": {
       "racing_team_default": "Team corse",

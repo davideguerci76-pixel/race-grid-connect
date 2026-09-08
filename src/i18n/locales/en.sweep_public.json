@@ -38,8 +38,13 @@
         "desc": "Unlocks direct contacts (website) and the full list of active Pit Calls from this team. One-time payment for this team.",
         "cancel": "Cancel",
         "unlocking": "Unlocking…",
-        "unlock_button": "Unlock ({{cost}} tokens)"
-      }
+        "unlock_button": "Unlock ({{cost}} tokens)",
+        "heading_generic": "Unlock the full profile?",
+        "unlock_button_generic": "Unlock"
+      },
+      "team_hidden_desc_generic": "Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below.",
+      "unlock_full_button_generic": "Unlock full team profile",
+      "unlock_full_profile_button_generic": "Unlock full profile"
     },
     "teams_index": {
       "racing_team_default": "Racing team",

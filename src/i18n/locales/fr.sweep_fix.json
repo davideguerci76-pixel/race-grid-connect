@@ -23,7 +23,8 @@
     "flag_placeholder": "Décrivez le problème (min. 10 caractères)…",
     "flag_submit": "Envoyer le signalement",
     "flag_submitted": "Avis signalé. Notre équipe va le vérifier.",
-    "flag_pending": "Signalé"
+    "flag_pending": "Signalé",
+    "unlock_cta_generic": "Déverrouiller les avis"
   },
   "rating": {
     "awaiting_other_party": "En attente de l'évaluation de l'autre partie",

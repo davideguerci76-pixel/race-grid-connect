@@ -23,6 +23,7 @@
     "flag_placeholder": "Descrivi il problema (min. 10 caratteri)…",
     "flag_submit": "Invia segnalazione",
     "flag_submitted": "Recensione segnalata. La verificheremo al più presto.",
-    "flag_pending": "Segnalata"
+    "flag_pending": "Segnalata",
+    "unlock_cta_generic": "Sblocca recensioni"
   }
 }

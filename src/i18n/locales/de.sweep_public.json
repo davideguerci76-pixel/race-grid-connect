@@ -38,8 +38,13 @@
         "desc": "Schaltet direkte Kontakte (Website) und die vollständige Liste der aktiven Pit Calls dieses Teams frei. Einmalige Zahlung für dieses Team.",
         "cancel": "Abbrechen",
         "unlocking": "Freischalten…",
-        "unlock_button": "Freischalten ({{cost}} Token)"
-      }
+        "unlock_button": "Freischalten ({{cost}} Token)",
+        "heading_generic": "Vollständiges Profil freischalten?",
+        "unlock_button_generic": "Freischalten"
+      },
+      "team_hidden_desc_generic": "Schalte eine bestimmte Stellenanzeige aus dem Job Board frei (2 Token) oder das vollständige Team-Profil unten.",
+      "unlock_full_button_generic": "Vollständiges Team-Profil freischalten",
+      "unlock_full_profile_button_generic": "Vollständiges Profil freischalten"
     },
     "teams_index": {
       "racing_team_default": "Rennteam",

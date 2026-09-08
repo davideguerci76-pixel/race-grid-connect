@@ -23,7 +23,8 @@
     "flag_placeholder": "Describe el problema (mín. 10 caracteres)…",
     "flag_submit": "Enviar reporte",
     "flag_submitted": "Reseña reportada. Nuestro equipo la revisará.",
-    "flag_pending": "Reportada"
+    "flag_pending": "Reportada",
+    "unlock_cta_generic": "Desbloquear reseñas"
   },
   "rating": {
     "awaiting_other_party": "Esperando la valoración de la otra parte",
