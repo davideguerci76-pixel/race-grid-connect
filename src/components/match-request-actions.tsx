@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { confirmDialog } from "@/hooks/use-confirm";
+import { HelpHint } from "@/components/help-hint";
 import { toastError } from "@/lib/errors";
 import { confirmEngagement, declineMatchConfirmation, extendMatchConfirmation } from "@/lib/paddock.functions";
 

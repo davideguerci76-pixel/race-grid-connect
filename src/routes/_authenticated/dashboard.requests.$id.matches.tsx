@@ -1,4 +1,5 @@
 import { confirmDialog } from "@/hooks/use-confirm";
+import { HelpHint } from "@/components/help-hint";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
