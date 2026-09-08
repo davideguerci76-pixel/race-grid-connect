@@ -74,8 +74,6 @@ export function CandidateMatchCard({
     : null;
   const initials = showIdentity ? String(displayName).split(/\s+/).map((s: string) => s[0]).join("").slice(0, 2).toUpperCase() : null;
 
-  const hasProfileDetails = unlocked && profile && (profile.headline || profile.bio || disciplines.length || skills.length || languages.length || experiences.length || profile.education);
-
   return (
     <CardShell tone={tone}>
       {/* 1 · STATE */}
@@ -198,7 +196,6 @@ export function CandidateMatchCard({
                     </div>
                   </Section>
                 )}
-                {!hasProfileDetails && !hasContacts && null}
                 <Section icon={<Mail />} title={t("mcard.contact")}>
                   {hasContacts ? (
                     <div className="grid gap-1">
