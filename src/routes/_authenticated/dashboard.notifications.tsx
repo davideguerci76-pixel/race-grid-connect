@@ -1,4 +1,5 @@
 import { notificationKindLabel } from "@/lib/labels";
+import { cardBtn } from "@/components/cards/primitives";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -145,7 +146,7 @@ function NotificationsPage() {
                     onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") markClicked(); }}
                     role="button"
                     tabIndex={0}
-                    className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "bg-racing-red/5" : ""}`}
+                    className={`flex flex-wrap items-center justify-between gap-3 px-4 py-3 ${unread ? "border-l-2 border-racing-red bg-racing-red/5" : "border-l-2 border-transparent"}`}
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -168,7 +169,7 @@ function NotificationsPage() {
                       </div>
                     </div>
                     {isStale ? (
-                      <Link onClick={markClicked} to="/dashboard/calendar" className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110">
+                      <Link onClick={markClicked} to="/dashboard/calendar" className={cardBtn.warn}>
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
                     ) : isTeamMatch && n.payload?.request_id ? (
@@ -176,7 +177,7 @@ function NotificationsPage() {
                         onClick={markClicked}
                         to="/dashboard/requests/$id/matches"
                         params={{ id: String(n.payload.request_id) }}
-                        className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                        className={cardBtn.secondary}
                       >
                         {t("sweep_profile.notifications.view_matches")}
                       </Link>
@@ -192,7 +193,7 @@ function NotificationsPage() {
                               ? n.payload.relevant_days.join(",")
                               : undefined,
                         }}
-                        className="border border-racing-yellow bg-racing-yellow/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-racing-yellow hover:brightness-110"
+                        className={cardBtn.warn}
                       >
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>
@@ -201,7 +202,7 @@ function NotificationsPage() {
                         onClick={markClicked}
                         to="/dashboard/engagements"
                         hash={engagementId ? `engagement-${engagementId}` : undefined}
-                        className="border border-border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                        className={cardBtn.secondary}
                       >
                         {t("sweep_profile.notifications.view_engagement")}
                       </Link>
