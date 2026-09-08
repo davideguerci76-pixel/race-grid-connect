@@ -4,15 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Clock, Mail, Phone, Unlock } from "lucide-react";
+import { Unlock } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BackButton } from "@/components/back-button";
-import { PoolBadge } from "@/components/pool-badge";
-import { RatingIcons } from "@/components/rating-icons";
+import { PoolMemberCard } from "@/components/cards/pool-member-card";
+import { CandidateMatchCard } from "@/components/cards/candidate-match-card";
 import { addPoolMemberByCode, getMyPool, getPoolMatches, unlockPoolSearch } from "@/lib/pool.functions";
 import { getMyRequests } from "@/lib/paddock.functions";
-import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { toastError } from "@/lib/errors";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -138,45 +137,7 @@ function PoolPage() {
             </div>
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
-              {(pool as any[]).map((m) => {
-                const phoneLabel = [m.phone_dial_code, m.phone_number].filter(Boolean).join(" ").trim();
-                const telHref = [m.phone_dial_code, m.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
-                return (
-                  <div key={m.id} className="border border-sky-400/40 bg-card p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-lg font-black italic tracking-tighter">{m.name}</div>
-                        {m.headline && <div className="text-xs text-muted-foreground">{m.headline}</div>}
-                        <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                          {m.role_group && roleGroupLabel(m.role_group)}
-                          {m.location && <> · 📍 {m.location}</>}
-                        </div>
-                        <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
-                          {m.source === "code" ? t("pool.source_code") : t("pool.source_engagement")}
-                          {m.pit_code && <> · {m.pit_code}</>}
-                        </div>
-                        <div className="mt-3 grid gap-1 border border-sky-400/30 bg-sky-400/5 p-2 font-mono text-[11px]">
-                          {m.contact_email ? (
-                            <a href={`mailto:${m.contact_email}`} className="flex min-w-0 items-center gap-2 text-racing-red hover:underline">
-                              <Mail className="size-3 shrink-0" /> <span className="truncate">{m.contact_email}</span>
-                            </a>
-                          ) : (
-                            <div className="text-muted-foreground">{t("pool.no_email")}</div>
-                          )}
-                          {m.phone_number ? (
-                            <a href={`tel:${telHref}`} className="flex items-center gap-2 text-racing-red hover:underline">
-                              <Phone className="size-3 shrink-0" /> {phoneLabel || m.phone_number}
-                            </a>
-                          ) : (
-                            <div className="text-muted-foreground">{t("pool.no_phone")}</div>
-                          )}
-                        </div>
-                      </div>
-                      <PoolBadge />
-                    </div>
-                  </div>
-                );
-              })}
+              {(pool as any[]).map((m) => <PoolMemberCard key={m.id} member={m} />)}
             </div>
           )}
         </section>
@@ -272,53 +233,7 @@ function PoolColumn({ title, items, partial = false }: { title: string; items: a
         </div>
       ) : (
         <div className="grid gap-3">
-          {items.map((m) => (
-            <div key={m.match_id} className={`border p-4 ${partial ? "border-racing-yellow/50 bg-racing-yellow/5" : "border-border bg-card"}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className={`text-2xl font-black italic tracking-tighter ${partial ? "text-racing-yellow" : "text-racing-red"}`}>
-                    {Math.round(m.skills_score)}%
-                  </div>
-                  <div className="text-lg font-bold">{m.name}</div>
-                  {m.profile?.headline && <div className="text-xs text-muted-foreground">{m.profile.headline}</div>}
-                  <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                    {m.profile?.role_group && roleGroupLabel(m.profile.role_group)}
-                    {parseSubRoles(m.profile?.sub_roles ?? []).length
-                      ? ` · ${parseSubRoles(m.profile?.sub_roles ?? []).map((sr: any) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}`
-                      : ""}
-                  </div>
-                  {m.profile?.location && (
-                    <div className="font-mono text-[11px] uppercase text-muted-foreground">📍 {m.profile.location}</div>
-                  )}
-                  {partial && (
-                    <div className="mt-2 space-y-2">
-                      <div className="inline-flex items-center gap-2 border border-racing-yellow/60 bg-racing-yellow/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                        <Clock className="size-3" /> {t("pool.missing_days", { count: m.missing_days })}
-                      </div>
-                      {Array.isArray(m.missing_dates) && m.missing_dates.length > 0 && (
-                        <div className="border border-racing-yellow/50 bg-background/60 p-2 font-mono text-[10px] uppercase tracking-widest text-racing-yellow">
-                          <div className="mb-1">{t(m.missing_dates.length === 1 ? "pool.missing_dates_one" : "pool.missing_dates_many")}</div>
-                          <div className="flex flex-wrap gap-1">
-                            {m.missing_dates.map((day: string) => (
-                              <time key={day} dateTime={day} className="border border-racing-yellow/40 bg-racing-yellow/10 px-2 py-0.5">
-                                {day}
-                              </time>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {m.rating?.count > 0 && (
-                    <div className="mt-2">
-                      <RatingIcons variant="wrench" value={m.rating.average} count={m.rating.count} size={14} />
-                    </div>
-                  )}
-                </div>
-                <PoolBadge />
-              </div>
-            </div>
-          ))}
+          {items.map((m) => <CandidateMatchCard key={m.match_id} match={m} mode="pool" />)}
         </div>
       )}
     </div>
