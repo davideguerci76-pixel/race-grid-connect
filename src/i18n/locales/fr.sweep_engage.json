@@ -290,7 +290,9 @@
       "unlock_tier_confirm_reduced": "Débloquer le niveau {{label}} {{tier}} pour {{cost}} token(s) ? (Réduit de {{full}} — seulement {{count}} matches réels disponibles dans ce niveau.)",
       "unlocked_label": "Débloqué",
       "unlocked_tag": "DÉBLOQUÉ",
-      "view_partial_matches_button": "Voir {{count}} match(es) partiel(s)"
+      "view_partial_matches_button": "Voir {{count}} match(es) partiel(s)",
+      "red_cancel_unavailable": "Vérification d'annulation RED temporairement indisponible",
+      "red_cancel_retry": "Réessayer"
     },
     "requests": {
       "confirmed_filled": "Confirmé · Pourvu",
