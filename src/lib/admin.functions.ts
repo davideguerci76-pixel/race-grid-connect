@@ -161,6 +161,7 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
     } else {
       await supabaseAdmin.auth.admin.updateUserById(data.user_id, { ban_duration: "none" });
     }
+    await logAdminAction(context.userId, data.user_id, data.blocked ? "user_blocked" : "user_unblocked", {});
     return { ok: true };
   });
 
@@ -173,6 +174,7 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
     if (error) throw new Error(error.message);
+    await logAdminAction(context.userId, data.user_id, "user_deleted", {});
     return { ok: true };
   });
 
