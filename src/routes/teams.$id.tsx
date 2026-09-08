@@ -35,6 +35,7 @@ function TeamProfile() {
   const { req: revealedReqId } = Route.useSearch();
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
+  const { revealTeamFull } = useActionCosts();
   const qc = useQueryClient();
   const [confirmFull, setConfirmFull] = useState(false);
   const [error, setError] = useState<string | null>(null);
