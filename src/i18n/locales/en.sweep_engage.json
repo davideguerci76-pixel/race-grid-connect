@@ -292,7 +292,8 @@
       "unlocked_tag": "UNLOCKED",
       "view_partial_matches_button": "View {{count}} partial match(es)",
       "red_cancel_unavailable": "RED cancel check temporarily unavailable",
-      "red_cancel_retry": "Retry"
+      "red_cancel_retry": "Retry",
+      "unlock_details_button_free": "Unlock details (free)"
     },
     "requests": {
       "confirmed_filled": "Confirmed · Filled",

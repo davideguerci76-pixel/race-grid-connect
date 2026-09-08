@@ -292,7 +292,8 @@
       "unlocked_tag": "DESBLOQUEADO",
       "view_partial_matches_button": "Ver {{count}} match(es) parcial(es)",
       "red_cancel_unavailable": "Comprobación de cancelación RED no disponible temporalmente",
-      "red_cancel_retry": "Reintentar"
+      "red_cancel_retry": "Reintentar",
+      "unlock_details_button_free": "Desbloquear detalles (gratis)"
     },
     "requests": {
       "confirmed_filled": "Confirmado · Cubierto",

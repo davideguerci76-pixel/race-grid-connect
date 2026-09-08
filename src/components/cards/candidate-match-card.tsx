@@ -22,6 +22,7 @@ import {
   type CardTone,
 } from "@/components/cards/primitives";
 import { CriteriaOutcome, MissingDays, RankPill, RelevanceScore, coverageOf, useCoverageText } from "@/components/cards/match-signals";
+import { HelpHint } from "@/components/help-hint";
 
 /**
  * TEAM-SIDE candidate card (Family 1/2: request matches Full/Partial · Family 12: pool-search results).

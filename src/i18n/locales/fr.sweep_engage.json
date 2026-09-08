@@ -292,7 +292,8 @@
       "unlocked_tag": "DÉBLOQUÉ",
       "view_partial_matches_button": "Voir {{count}} match(es) partiel(s)",
       "red_cancel_unavailable": "Vérification d'annulation RED temporairement indisponible",
-      "red_cancel_retry": "Réessayer"
+      "red_cancel_retry": "Réessayer",
+      "unlock_details_button_free": "Débloquer les détails (gratuit)"
     },
     "requests": {
       "confirmed_filled": "Confirmé · Pourvu",
