@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getUserRatingSummary, getAnonymousReviews, unlockReviews, flagRating } from "@/lib/paddock.functions";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { useActionCosts } from "@/hooks/use-action-costs";
 
 type Variant = "wrench" | "headset";
 
@@ -150,6 +151,7 @@ export function AnonymousReviewsSection({
 }) {
   const { formatDate } = useDateFormat();
   const { t } = useTranslation();
+  const { revealReviews } = useActionCosts();
   const qc = useQueryClient();
   const getReviews = useServerFn(getAnonymousReviews);
   const unlockFn = useServerFn(unlockReviews);
