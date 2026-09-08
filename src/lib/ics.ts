@@ -153,17 +153,26 @@ function parseRRule(value: string): RRuleParts | null {
 
 const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
+/** Safety horizon for a recurrence that declares neither COUNT nor UNTIL. */
+export const UNBOUNDED_RRULE_MAX_MONTHS = 12;
+
 /**
  * Minimal RFC5545 expansion covering the recurrences real motorsport calendars
  * use: DAILY / WEEKLY (with BYDAY) / MONTHLY / YEARLY, plus INTERVAL, COUNT and
  * UNTIL. Anything else is left as the single DTSTART occurrence (never silently
  * partially expanded into a corrupt series).
+ *
+ * A rule with neither COUNT nor UNTIL is temporally infinite; it is expanded up
+ * to 12 calendar months from DTSTART. Rules that declare COUNT or UNTIL keep
+ * their own natural bound and are never extended or shortened by this horizon.
  */
 function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{ start: string; end: string }> {
   const out: Array<{ start: string; end: string }> = [];
   const push = (s: string) => out.push({ start: s, end: addDaysIso(s, spanDays) });
   const limit = Math.min(rule.count ?? MAX_RRULE_OCCURRENCES, MAX_RRULE_OCCURRENCES);
-  const until = rule.until ?? null;
+  const unbounded = rule.count === undefined && !rule.until;
+  const until = rule.until ?? (unbounded ? addMonthsIso(start, UNBOUNDED_RRULE_MAX_MONTHS) : null);
+
 
   if (rule.freq === "WEEKLY" && rule.byday.length) {
     const wanted = new Set(rule.byday);
