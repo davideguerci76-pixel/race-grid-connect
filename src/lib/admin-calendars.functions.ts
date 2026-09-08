@@ -111,6 +111,7 @@ export const adminRejectCalendar = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Calendar not found in the current environment");
+    await logAdminAction(context.userId, null, "calendar_rejected", { calendar_id: data.id, env_is_test: isTest });
     return { ok: true };
   });
 
@@ -213,5 +214,6 @@ export const adminDeleteCalendar = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Calendar not found in the current environment");
+    await logAdminAction(context.userId, null, "calendar_deleted", { calendar_id: data.id, env_is_test: isTest });
     return { ok: true };
   });
