@@ -129,13 +129,31 @@ export const addPoolMemberFromEngagement = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Team: remove a freelancer from my pool. Server-authoritative (owner-only, idempotent,
+ * denied while a genuine active Pool-origin dependency exists). Touches only `team_pool`.
+ */
+export const removePoolMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { freelancer_id: string }) => z.object({ freelancer_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: res, error } = await context.supabase.rpc("remove_pool_member" as any, {
+      _freelancer_id: data.freelancer_id,
+    });
+    if (error) {
+      if (error.message.includes("POOL_ACTIVE_DEPENDENCY")) throw new Error("POOL_ACTIVE_DEPENDENCY");
+      throw new Error(error.message);
+    }
+    return { removed: !!(res as any)?.removed };
+  });
+
 /** Team: pool search cost + unlock state for one pit call */
 export const getPoolSearchState = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((data: { request_id: string }) => z.object({ request_id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const [{ data: setting }, { data: unlock }] = await Promise.all([
+    const [{ data: setting }, { data: unlock }, { data: req }] = await Promise.all([
       supabase.from("platform_settings").select("value_num").eq("key", "cost_pool_search").maybeSingle(),
       supabase
         .from("pool_search_unlocks")
@@ -143,8 +161,11 @@ export const getPoolSearchState = createServerFn({ method: "GET" })
         .eq("team_id", userId)
         .eq("request_id", data.request_id)
         .maybeSingle(),
+      supabase.from("requests").select("search_mode").eq("id", data.request_id).maybeSingle(),
     ]);
-    return { cost: Number((setting as any)?.value_num ?? 5), unlocked: !!unlock };
+    const poolOrigin = (req as any)?.search_mode === "pool";
+    // Standard pit calls already paid their publication: comparing them with My Pool is free.
+    return { cost: Number((setting as any)?.value_num ?? 5), pool_origin: poolOrigin, unlocked: poolOrigin ? !!unlock : true };
   });
 
 export const unlockPoolSearch = createServerFn({ method: "POST" })
@@ -184,13 +205,18 @@ export const getPoolMatches = createServerFn({ method: "GET" })
       supabase.from("team_pool").select("freelancer_id, source").eq("team_id", userId),
     ]);
     const cost = Number((setting as any)?.value_num ?? 5);
-    const unlocked = !!unlock;
+    // Pool unlock economics exist only for Pool-origin pit calls (search_mode='pool').
+    // A standard pit call already paid its publication: the My Pool comparison is free,
+    // no unlock row is required and no CTA/debit is ever offered (server enforces the same law).
+    const poolOrigin = (req as any).search_mode === "pool";
+    const unlocked = poolOrigin ? !!unlock : true;
     const poolIds = (poolRows ?? []).map((r: any) => r.freelancer_id);
 
     if (!poolIds.length) {
       return {
         request: req as any,
         cost,
+        pool_origin: poolOrigin,
         unlocked,
         pool_size: 0,
         items_full: [] as any[],
@@ -304,6 +330,7 @@ export const getPoolMatches = createServerFn({ method: "GET" })
     return {
       request: req as any,
       cost,
+      pool_origin: poolOrigin,
       unlocked,
       pool_size: poolIds.length,
       items_full: full.map(build),

@@ -1112,7 +1112,9 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`)
       .order("start_date", { ascending: false });
     if (error) throw new Error(error.message);
-    const rows = (data ?? []) as any[];
+    // Legacy synthetic rows created by "Add to Pool by code" (notes='pool_manual', no request)
+    // are a pool relationship, not an engagement: never surface them in the Engagement domain.
+    const rows = ((data ?? []) as any[]).filter((r) => !(r.notes === "pool_manual" && r.request_id == null));
     const teamIds = Array.from(new Set(rows.map((r) => r.team_id)));
     const freelancerIds = Array.from(new Set(rows.map((r) => r.freelancer_id)));
     const allIds = Array.from(new Set([...teamIds, ...freelancerIds]));

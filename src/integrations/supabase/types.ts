@@ -3665,6 +3665,7 @@ export type Database = {
         Args: { _is_test: boolean }
         Returns: number
       }
+      remove_pool_member: { Args: { _freelancer_id: string }; Returns: Json }
       request_confirmable_matches_left: {
         Args: { _request_id: string }
         Returns: number

@@ -1,14 +1,22 @@
 import { useTranslation } from "react-i18next";
-import { Hash, Mail, MapPin, Phone, ShieldCheck, Tag } from "lucide-react";
+import { Hash, Mail, MapPin, Phone, ShieldCheck, Tag, UserMinus } from "lucide-react";
 import { PoolBadge } from "@/components/pool-badge";
 import { roleGroupLabel } from "@/lib/roles";
-import { CardBody, CardHeader, CardShell, Fact, FactGrid, IdentityRow } from "@/components/cards/primitives";
+import { ActionRow, CardBody, CardHeader, CardShell, Fact, FactGrid, IdentityRow, cardBtn } from "@/components/cards/primitives";
 
 /**
  * TEAM-SIDE My Pool member card (Family 11). Contacts are already authorised
  * server-side for pool members; absent values are stated, never blanked.
  */
-export function PoolMemberCard({ member }: { member: any }) {
+export function PoolMemberCard({
+  member,
+  onRemove,
+  removing = false,
+}: {
+  member: any;
+  onRemove?: () => void;
+  removing?: boolean;
+}) {
   const { t } = useTranslation();
   const phoneLabel = [member.phone_dial_code, member.phone_number].filter(Boolean).join(" ").trim();
   const telHref = [member.phone_dial_code, member.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
@@ -23,6 +31,13 @@ export function PoolMemberCard({ member }: { member: any }) {
         subtitle={member.source === "code" ? t("pool.source_code") : t("pool.source_engagement")}
         right={<PoolBadge />}
       />
+      {onRemove && (
+        <ActionRow>
+          <button type="button" onClick={onRemove} disabled={removing} className={cardBtn.ghost}>
+            <UserMinus className="size-3.5" /> {t("pool.remove_button")}
+          </button>
+        </ActionRow>
+      )}
       <CardBody>
         <IdentityRow
           avatar={initials}

@@ -10,10 +10,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { BackButton } from "@/components/back-button";
 import { PoolMemberCard } from "@/components/cards/pool-member-card";
 import { CandidateMatchCard } from "@/components/cards/candidate-match-card";
-import { addPoolMemberByCode, getMyPool, getPoolMatches, unlockPoolSearch } from "@/lib/pool.functions";
+import { addPoolMemberByCode, getMyPool, getPoolMatches, removePoolMember, unlockPoolSearch } from "@/lib/pool.functions";
 import { getMyRequests } from "@/lib/paddock.functions";
 import { toastError } from "@/lib/errors";
 import { useAuth } from "@/hooks/use-auth";
+import { confirmDialog } from "@/hooks/use-confirm";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard/pool")({
@@ -51,6 +52,7 @@ function PoolPage() {
 
   const listPool = useServerFn(getMyPool);
   const addByCode = useServerFn(addPoolMemberByCode);
+  const removeMember = useServerFn(removePoolMember);
   const listRequests = useServerFn(getMyRequests);
 
   const [code, setCode] = useState("");
@@ -69,6 +71,27 @@ function PoolPage() {
     },
     onError: (e) => toastError(e, "pool.add_failed"),
   });
+
+  const removeMut = useMutation({
+    mutationFn: (freelancerId: string) => removeMember({ data: { freelancer_id: freelancerId } }),
+    onSuccess: () => {
+      toast.success(t("pool.removed"));
+      qc.invalidateQueries({ queryKey: ["my-pool"] });
+      qc.invalidateQueries({ queryKey: ["pool-matches"] });
+    },
+    onError: (e) => {
+      // Server-side deny: the freelancer is still part of an active My Pool search.
+      if (e instanceof Error && e.message.includes("POOL_ACTIVE_DEPENDENCY")) {
+        toast.warning(t("pool.remove_blocked_active"));
+        return;
+      }
+      toastError(e, "pool.remove_failed");
+    },
+  });
+
+  const askRemove = async (m: any) => {
+    if (await confirmDialog(t("pool.remove_confirm", { name: m.name }), { destructive: true })) removeMut.mutate(m.freelancer_id);
+  };
 
   const openRequests = useMemo(
     () => (requests as any[]).filter((r) => r.status === "active" || r.status === "paused"),
@@ -137,7 +160,14 @@ function PoolPage() {
             </div>
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
-              {(pool as any[]).map((m) => <PoolMemberCard key={m.id} member={m} />)}
+              {(pool as any[]).map((m) => (
+                <PoolMemberCard
+                  key={m.id}
+                  member={m}
+                  onRemove={() => askRemove(m)}
+                  removing={removeMut.isPending && removeMut.variables === m.freelancer_id}
+                />
+              ))}
             </div>
           )}
         </section>
@@ -192,7 +222,8 @@ function PoolSearchResults({ requestId }: { requestId: string }) {
 
   if (isLoading || !data) return <div className="mt-4 text-sm text-muted-foreground">{t("sweep_engage.common.loading")}</div>;
 
-  if (!data.unlocked) {
+  // Locked state exists only for genuine Pool-origin pit calls; standard pit calls are compared for free.
+  if (data.pool_origin && !data.unlocked) {
     return (
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-2 border-sky-400/60 bg-sky-400/5 p-5">
         <div>
@@ -213,10 +244,15 @@ function PoolSearchResults({ requestId }: { requestId: string }) {
   }
 
   return (
-    <div className="mt-6 grid gap-6 md:grid-cols-2">
-      <PoolColumn title={t("pool.column_full")} items={data.items_full} />
-      <PoolColumn title={t("pool.column_partial")} items={data.items_partial} partial />
-    </div>
+    <>
+      {!data.pool_origin && (
+        <p className="mt-3 text-xs text-muted-foreground">{t("pool.standard_free_note")}</p>
+      )}
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <PoolColumn title={t("pool.column_full")} items={data.items_full} />
+        <PoolColumn title={t("pool.column_partial")} items={data.items_partial} partial />
+      </div>
+    </>
   );
 }
 
