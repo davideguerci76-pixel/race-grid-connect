@@ -567,7 +567,11 @@ function EconomicPanel({
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <div className="flex flex-col border border-border bg-card p-4">
           <div className="text-lg font-black uppercase italic">{t("sweep_engage.request_matches.econ_continue_title")}</div>
-          <p className="mt-1 flex-1 text-xs text-muted-foreground">{t("sweep_engage.request_matches.econ_continue_body")}</p>
+          <div className="mt-2 border-l-2 border-racing-yellow bg-racing-yellow/10 px-3 py-2">
+            <div className="label-mono text-racing-yellow">{t("sweep_engage.request_matches.econ_continue_active_title")}</div>
+            <p className="mt-1 text-xs text-foreground">{t("sweep_engage.request_matches.econ_continue_active_body")}</p>
+          </div>
+          <p className="mt-2 flex-1 text-xs text-muted-foreground">{t("sweep_engage.request_matches.econ_continue_body")}</p>
           <button
             onClick={onWait}
             className="mt-3 border border-racing-yellow px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
