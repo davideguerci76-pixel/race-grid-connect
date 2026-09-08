@@ -61,7 +61,11 @@ export function EngagementCard({
   const skillsHard: string[] = req?.skills_hard ?? [];
   const languages: any[] = req?.languages ?? [];
   const education: string[] = req?.education ?? [];
-  const missing: any[] = match?.missing_criteria ?? [];
+  // Temporal availability is NOT a preferred requirement: the matching engine emits a
+  // `missing_days` entry inside missing_criteria, which is rendered separately below.
+  const missing: any[] = (match?.missing_criteria ?? []).filter((c: any) => c?.kind !== "missing_days");
+  const coverage = e.coverage ?? null;
+
   // Teams always see their own Pit Call; freelancers must pay the reveal.
   const detailsUnlocked = !isFreelancer || !!e.revealedByMe;
   const status: string = e.status;
