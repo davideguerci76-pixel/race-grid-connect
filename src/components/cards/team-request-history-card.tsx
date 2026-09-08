@@ -5,7 +5,7 @@ import { PitCallDates } from "@/components/championship-dates";
 import { PoolBadge } from "@/components/pool-badge";
 import { disciplineLabel, roleLabel } from "@/lib/paddock";
 import { requestStatusLabel } from "@/lib/labels";
-import { CardBody, CardHeader, CardShell, Fact, FactGrid, Pill } from "@/components/cards/primitives";
+import { CardBody, CardHeader, CardShell, Fact, FactGrid } from "@/components/cards/primitives";
 
 /**
  * TEAM-SIDE Pit Call history row (Family 9). Whole card links to the results page.
@@ -47,7 +47,6 @@ export function TeamRequestHistoryCard({ request: r, engagement: eng }: { reques
               />
             )}
           </FactGrid>
-          {!eng && !active && <Pill tone="muted">{t("cards.status")}: {requestStatusLabel(r.status)}</Pill>}
         </CardBody>
       </CardShell>
     </Link>
