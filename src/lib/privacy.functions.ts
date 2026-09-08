@@ -75,8 +75,12 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     const { error: dbError } = await (supabase as any).rpc("delete_my_account");
     if (dbError) {
       // Nothing was committed: the transaction rolled back as a whole.
-      throw new Error(dbError.message.includes("ACTIVE_ENGAGEMENTS") ? "ACTIVE_ENGAGEMENTS" : dbError.message);
+      const m = dbError.message as string;
+      if (m.includes("ACTIVE_ENGAGEMENTS")) throw new Error("ACTIVE_ENGAGEMENTS");
+      if (m.includes("OPEN_PIT_CALLS_EXIST")) throw new Error("OPEN_PIT_CALLS_EXIST");
+      throw new Error(m);
     }
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);

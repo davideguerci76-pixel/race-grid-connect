@@ -46,7 +46,12 @@ export function PrivacyDataSection() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Deletion failed";
       toast.error(
-        msg.includes("ACTIVE_ENGAGEMENTS")
+        msg.includes("OPEN_PIT_CALLS_EXIST")
+          ? t("privacy.delete_blocked_pitcalls", {
+              defaultValue:
+                "You still have open Pit Calls. Close them before deleting your account.",
+            })
+          : msg.includes("ACTIVE_ENGAGEMENTS")
           ? t("privacy.delete_blocked", {
               defaultValue: "You still have active engagements. Close or cancel them before deleting your account.",
             })
@@ -57,6 +62,7 @@ export function PrivacyDataSection() {
               })
             : msg,
       );
+
     } finally {
       setBusy(null);
     }

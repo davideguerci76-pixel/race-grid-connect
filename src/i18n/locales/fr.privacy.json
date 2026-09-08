@@ -25,6 +25,7 @@
     "delete_confirm": "Supprimer définitivement",
     "delete_done": "Compte supprimé.",
     "delete_blocked": "Vous avez encore des engagements actifs. Clôturez-les ou annulez-les avant de supprimer votre compte.",
+    "delete_blocked_pitcalls": "Vous avez encore des Pit Calls ouverts. Clôturez-les avant de supprimer votre compte.",
     "contact": "Demandes relatives aux données"
   }
 }

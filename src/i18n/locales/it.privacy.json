@@ -25,6 +25,7 @@
     "delete_confirm": "Elimina definitivamente",
     "delete_done": "Account eliminato.",
     "delete_blocked": "Hai ancora ingaggi attivi. Chiudili o annullali prima di eliminare l'account.",
+    "delete_blocked_pitcalls": "Hai ancora Pit Call aperti. Chiudili prima di eliminare l'account.",
     "contact": "Richieste sui dati"
   }
 }

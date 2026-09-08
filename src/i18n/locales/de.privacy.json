@@ -25,6 +25,7 @@
     "delete_confirm": "Endgültig löschen",
     "delete_done": "Konto gelöscht.",
     "delete_blocked": "Du hast noch aktive Engagements. Schließe oder storniere sie, bevor du dein Konto löschst.",
+    "delete_blocked_pitcalls": "Du hast noch offene Pit Calls. Schließe sie, bevor du dein Konto löschst.",
     "contact": "Datenanfragen"
   }
 }
