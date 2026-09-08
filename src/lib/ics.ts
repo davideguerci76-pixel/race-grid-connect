@@ -171,7 +171,9 @@ function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{
   const push = (s: string) => out.push({ start: s, end: addDaysIso(s, spanDays) });
   const limit = Math.min(rule.count ?? MAX_RRULE_OCCURRENCES, MAX_RRULE_OCCURRENCES);
   const unbounded = rule.count === undefined && !rule.until;
-  const until = rule.until ?? (unbounded ? addMonthsIso(start, UNBOUNDED_RRULE_MAX_MONTHS) : null);
+  // Horizon ends the day before the 12-month anniversary, so a window of exactly
+  // 12 calendar months never spills a 13th-month occurrence (e.g. YEARLY).
+  const until = rule.until ?? (unbounded ? addDaysIso(addMonthsIso(start, UNBOUNDED_RRULE_MAX_MONTHS), -1) : null);
 
 
   if (rule.freq === "WEEKLY" && rule.byday.length) {
