@@ -47,6 +47,12 @@
     "upgrade_done": "Pit Call actualizada a estándar — {{cost}} tokens gastados",
     "upgrade_failed": "Error al actualizar",
     "add_to_my_pool": "AÑADIR A MI POOL",
-    "in_my_pool": "EN MI POOL"
+    "in_my_pool": "EN MI POOL",
+    "remove_button": "Quitar del pool",
+    "remove_confirm": "¿Quitar a {{name}} de tu pool? Solo se elimina la relación Pool: pit calls, matches, contrataciones, valoraciones y tokens no cambian.",
+    "removed": "Freelance eliminado de tu pool",
+    "remove_failed": "No se pudo quitar a este freelance",
+    "remove_blocked_active": "No puedes quitar a este freelance del Pool mientras participa en una búsqueda Pool activa.",
+    "standard_free_note": "Pit call estándar: compararla con tu pool es gratis — no requiere desbloqueo."
   }
 }

@@ -743,6 +743,13 @@
       "when": 1788862498038,
       "tag": "0105_refund_economic_state_machine",
       "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1788869856010,
+      "tag": "0106_0106_pool_provenance_guard_remove_member_no_synthetic_engagement",
+      "breakpoints": true
     }
   ]
 }
