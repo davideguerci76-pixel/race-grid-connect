@@ -39,11 +39,12 @@ function RequestMatchesPage() {
   const unlockTierFn = useServerFn(unlockRequestTier);
   
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["request-matches", id],
     queryFn: () => fetchMatches({ data: { request_id: id } }),
     retry: false,
   });
+
 
   const [reviewNow, setReviewNow] = useState(() => Date.now());
   const reviewDeadline = (data as any)?.review_deadline_at ?? null;
