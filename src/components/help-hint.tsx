@@ -50,7 +50,7 @@ export function HelpHint({
 
   const label = t("help.trigger_label", { defaultValue: "More information" }) as string;
   const title = titleKey ? (t(titleKey) as string) : null;
-  const body = t(bodyKey, values as never) as string;
+  const body = String(t(bodyKey, values as never));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
