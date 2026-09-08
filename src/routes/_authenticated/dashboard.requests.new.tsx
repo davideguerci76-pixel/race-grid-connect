@@ -156,7 +156,9 @@ function NewRequestPage() {
       sub_role: (s.sub_role as string) ?? "",
       sub_role_min_level: (s.sub_role_min_level as "junior" | "intermediate" | "senior") ?? "junior",
       discipline: s.discipline as string,
-      duration: s.duration as DurationType,
+      // Legacy `test_session` sources are normalised in the form only (the historic
+      // record itself is never mutated) so the removed option can't be re-selected.
+      duration: (s.duration === "test_session" ? "race_weekend" : s.duration) as DurationType,
       circuit: s.circuit ?? "",
       location: s.location ?? "",
       start_date: identical || isModify ? (s.start_date ?? "") : "",
