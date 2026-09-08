@@ -701,6 +701,13 @@
       "when": 1788821184704,
       "tag": "0099_red_cancel_quote",
       "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788826955430,
+      "tag": "0100_delete_account_open_pitcalls_guard",
+      "breakpoints": true
     }
   ]
 }
