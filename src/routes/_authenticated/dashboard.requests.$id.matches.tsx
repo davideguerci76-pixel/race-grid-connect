@@ -149,11 +149,6 @@ function RequestMatchesPage() {
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
-  const hasAnyMatches =
-    fullItems.length + partialItems.length > 0 ||
-    Number(data?.total_matches ?? 0) + Number(data?.total_partial_matches ?? 0) > 0 ||
-    Boolean((data?.request as any)?.ever_full_matched) ||
-    Boolean((data?.request as any)?.ever_partial_matched);
   const expandAvailable = Boolean((data as any)?.expand_available);
   const upgradeCost = Number((data as any)?.upgrade_cost ?? 0);
   const upgradeFn = useServerFn(upgradeRequestToStandard);
@@ -455,33 +450,19 @@ function RequestMatchesPage() {
               </div>
             )}
 
-            {/* Trivio: no match left to confirm (zero matches, or all declined/expired) */}
-            {(!hasAnyMatches || Number((data as any).confirmable_left ?? 1) === 0) && !requestFilled && !(data.request as any).partial_refund_taken && (
-              <ZeroMatchTrivio
-                quote={(data as any).refund_quote}
-                hasPartials={data.total_partial_matches > 0}
+            {/* Economic panel — rendered strictly from the server economic state. */}
+            {!requestFilled && !inReview && (data as any).refund_state && (
+              <EconomicPanel
+                state={(data as any).refund_state}
                 onWait={() => toast.info(t("sweep_engage.request_matches.search_stays_active"))}
-                onRefund={async () => {
-                  const q = (data as any).refund_quote;
-                  if (await confirmDialog(t("sweep_engage.request_matches.refund_close_confirm", { full: q.refund_full, pct: q.refund_pct, spent: q.spent }))) {
+                onClose={async () => {
+                  const s = (data as any).refund_state;
+                  if (await confirmDialog(t("sweep_engage.request_matches.econ_close_confirm", { tokens: s.best_refund }))) {
                     refundMut.mutate("full");
-                  }
-                }}
-                onPartial={async () => {
-                  const q = (data as any).refund_quote;
-                  if (await confirmDialog(t("sweep_engage.request_matches.refund_partial_confirm", { partial: q.refund_partial }))) {
-                    refundMut.mutate("partial");
                   }
                 }}
                 loading={refundMut.isPending}
               />
-            )}
-
-            {(data.request as any).partial_refund_taken && (data.request as any).refund_kind === "partial" && (
-              <div className="mt-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4 text-xs text-racing-yellow">
-                <span className="font-mono uppercase tracking-widest">[PARTIAL REFUND COLLECTED]</span>{" "}
-                <span className="ml-2">{t("sweep_engage.request_matches.partial_refund_credited", { tokens: (data.request as any).refund_tokens, pct: (data.request as any).refund_pct })}</span>
-              </div>
             )}
 
             {isPoolRequest && expandAvailable && (
@@ -898,77 +879,99 @@ function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProf
 }
 
 
-function ZeroMatchTrivio({
-  quote,
-  hasPartials,
+type RefundState = {
+  state: "zero_match" | "partial_only" | "full" | "low_relevance" | "non_refundable";
+  spent: number;
+  refund_pct: number;
+  best_refund: number;
+  refund_kind: "full" | "partial" | "low_relevance" | null;
+  refund_available: boolean;
+  non_refundable: boolean;
+  reason: string | null;
+};
+
+/**
+ * Economic options for an active Pit Call. Every amount, eligibility rule and
+ * refund kind comes from the server state machine — nothing is re-derived here.
+ */
+function EconomicPanel({
+  state,
   onWait,
-  onRefund,
-  onPartial,
+  onClose,
   loading,
 }: {
-  quote: {
-    spent: number;
-    refund_pct: number;
-    refund_full: number;
-    refund_partial: number;
-    low_relevance_eligible?: boolean;
-    low_relevance_refund?: number;
-  };
-  hasPartials: boolean;
+  state: RefundState;
   onWait: () => void;
-  onRefund: () => void;
-  onPartial: () => void;
+  onClose: () => void;
   loading: boolean;
 }) {
   const { t } = useTranslation();
+
+  if (state.non_refundable) {
+    return (
+      <div className="mt-6 border border-border bg-card p-4 text-xs text-muted-foreground">
+        <span className="label-mono">{t("sweep_engage.request_matches.econ_post_identical_title")}</span>
+        <p className="mt-2">{t("sweep_engage.request_matches.econ_post_identical_body")}</p>
+      </div>
+    );
+  }
+
+  if (!state.refund_available) {
+    if (state.reason === "already_refunded") {
+      return (
+        <div className="mt-6 border border-racing-yellow/50 bg-racing-yellow/5 p-4 text-xs text-racing-yellow">
+          <span className="font-mono uppercase tracking-widest">{t("sweep_engage.request_matches.econ_refunded_title")}</span>
+        </div>
+      );
+    }
+    return null;
+  }
+
+  const isPartial = state.refund_kind === "partial";
+  const isLowRel = state.refund_kind === "low_relevance";
+  const title = isPartial
+    ? t("sweep_engage.request_matches.econ_partial_title")
+    : isLowRel
+      ? t("sweep_engage.request_matches.econ_lowrel_title")
+      : t("sweep_engage.request_matches.econ_zero_title");
+  const body = isPartial
+    ? t("sweep_engage.request_matches.econ_partial_body", { tokens: state.best_refund })
+    : isLowRel
+      ? t("sweep_engage.request_matches.econ_lowrel_body", { tokens: state.best_refund })
+      : t("sweep_engage.request_matches.econ_zero_body", { tokens: state.best_refund });
+
   return (
     <div className="mt-6 border-2 border-racing-red bg-racing-red/5 p-5">
-      <div className="label-mono text-racing-red">{t("sweep_engage.request_matches.zero_matches_title")}</div>
-      <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("sweep_engage.request_matches.zero_matches_subtitle")}</h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {t("sweep_engage.request_matches.refund_quote_line", { pct: quote.refund_pct, spent: quote.spent })}
-        {" "}{t("sweep_engage.request_matches.refund_quote_equals", { full: quote.refund_full })}
-        {" "}{t("sweep_engage.request_matches.refund_quote_basis")}
-      </p>
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      <div className="label-mono text-racing-red">{title}</div>
+      <p className="mt-2 text-xs text-muted-foreground">{body}</p>
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
         <div className="flex flex-col border border-border bg-card p-4">
-          <div className="label-mono">{t("sweep_engage.request_matches.option_label", { n: 1 })}</div>
-          <div className="text-lg font-black uppercase italic">{t("sweep_engage.request_matches.keep_searching_title")}</div>
-          <p className="mt-1 flex-1 text-xs text-muted-foreground">
-            {t("sweep_engage.request_matches.keep_searching_body")}
-          </p>
-          <button onClick={onWait} className="mt-3 border border-racing-yellow px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10">
-            {t("sweep_engage.request_matches.keep_waiting_button")}
+          <div className="text-lg font-black uppercase italic">{t("sweep_engage.request_matches.econ_continue_title")}</div>
+          <p className="mt-1 flex-1 text-xs text-muted-foreground">{t("sweep_engage.request_matches.econ_continue_body")}</p>
+          <button
+            onClick={onWait}
+            className="mt-3 border border-racing-yellow px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10"
+          >
+            {t("sweep_engage.request_matches.econ_continue_button")}
           </button>
         </div>
         <div className="flex flex-col border border-border bg-card p-4">
-          <div className="label-mono">{t("sweep_engage.request_matches.option_label", { n: 2 })}</div>
-          <div className="text-lg font-black uppercase italic">{t("sweep_engage.request_matches.refund_close_title")}</div>
+          <div className="text-lg font-black uppercase italic">
+            {isPartial
+              ? t("sweep_engage.request_matches.econ_close_partial_title")
+              : t("sweep_engage.request_matches.econ_close_title")}
+          </div>
           <p className="mt-1 flex-1 text-xs text-muted-foreground">
-            {t("sweep_engage.request_matches.refund_close_body", { full: quote.refund_full })}
+            {t("sweep_engage.request_matches.econ_close_body", { tokens: state.best_refund })}
           </p>
           <button
-            onClick={onRefund}
-            disabled={loading || quote.refund_full === 0}
+            onClick={onClose}
+            disabled={loading}
             className="mt-3 bg-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
           >
-            {t("sweep_engage.request_matches.take_and_close_button", { full: quote.refund_full })}
-          </button>
-        </div>
-        <div className={`flex flex-col border p-4 ${hasPartials ? "border-border bg-card" : "border-border/40 bg-secondary/40 opacity-60"}`}>
-          <div className="label-mono">{t("sweep_engage.request_matches.option_label", { n: 3 })}</div>
-          <div className="text-lg font-black uppercase italic">{t("sweep_engage.request_matches.unlock_partials_title")}</div>
-          <p className="mt-1 flex-1 text-xs text-muted-foreground">
-            {hasPartials
-              ? t("sweep_engage.request_matches.unlock_partials_body_has", { partial: quote.refund_partial })
-              : t("sweep_engage.request_matches.unlock_partials_body_none")}
-          </p>
-          <button
-            onClick={onPartial}
-            disabled={loading || !hasPartials || quote.refund_partial === 0}
-            className="mt-3 border border-racing-red px-3 py-2 text-xs font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-40"
-          >
-            {t("sweep_engage.request_matches.take_and_unlock_button", { partial: quote.refund_partial })}
+            {isPartial
+              ? t("sweep_engage.request_matches.econ_close_partial_button", { tokens: state.best_refund })
+              : t("sweep_engage.request_matches.econ_close_button", { tokens: state.best_refund })}
           </button>
         </div>
       </div>
