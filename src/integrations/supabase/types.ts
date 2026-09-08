@@ -3743,6 +3743,24 @@ export type Database = {
           zero_match_refund_full: number
         }[]
       }
+      request_refund_state: {
+        Args: { _request_id: string }
+        Returns: {
+          best_refund: number
+          closes_request: boolean
+          low_relevance_eligible: boolean
+          low_relevance_refund: number
+          non_refundable: boolean
+          partial_refund: number
+          reason: string
+          refund_available: boolean
+          refund_kind: string
+          refund_pct: number
+          spent: number
+          state: string
+          zero_match_refund: number
+        }[]
+      }
       request_required_days: {
         Args: { _request_id: string }
         Returns: string[]
