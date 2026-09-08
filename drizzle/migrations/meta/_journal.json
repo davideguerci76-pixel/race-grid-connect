@@ -715,6 +715,20 @@
       "when": 1788827083488,
       "tag": "0101_team_identity_lock_allows_account_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1788854695683,
+      "tag": "0102_outcome_notification_recipient_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1788854714049,
+      "tag": "0103_pending_review_match_lifecycle",
+      "breakpoints": true
     }
   ]
 }
