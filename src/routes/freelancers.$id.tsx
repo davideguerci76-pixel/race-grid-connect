@@ -45,51 +45,44 @@ function FreelancerProfile() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="border border-border bg-card p-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+        <CardShell tone="neutral">
+          <CardHeader icon={<User className="size-4" />} tone="info" title={t("cards.freelancer")} subtitle={t("cards.profile")} />
+          <CardBody>
             <div>
               <h1 className="text-3xl font-black uppercase italic tracking-tighter">{fp.headline || roleGroupLabel(fp.role_group)}</h1>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {roleGroupLabel(fp.role_group)}{parseSubRoles(fp.sub_roles).length ? ` · ${parseSubRoles(fp.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}` : ""} · {fp.location ?? "—"}
-              </div>
-              {fp.education && (
-                <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                  {educationLabel(fp.education)}
-                </div>
-              )}
               <div className="mt-2"><ProfileRatingBadge userId={id} variant="wrench" isOwner={isOwner} /></div>
+            </div>
+            <FactGrid cols={3}>
+              <Fact
+                icon={<Flag />}
+                label={t("cards.role")}
+                value={roleGroupLabel(fp.role_group)}
+                sub={parseSubRoles(fp.sub_roles).length ? parseSubRoles(fp.sub_roles).map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ") : undefined}
+              />
+              <Fact icon={<MapPin />} label={t("cards.location")} value={fp.location ?? "—"} />
+              {fp.education && <Fact icon={<GraduationCap />} label={t("reveal.education")} value={<span className="text-racing-yellow">{educationLabel(fp.education)}</span>} />}
               {(() => {
                 const ts = (fp as any).calendar_last_confirmed_at ?? (fp as any).calendar_last_updated_at;
                 if (!ts) return null;
                 const d = new Date(ts);
                 const days = Math.floor((Date.now() - d.getTime()) / 86400000);
                 const tone = days < 45 ? "text-[#16a34a]" : days < 90 ? "text-racing-yellow" : "text-muted-foreground";
-                return (
-                  <div className={`mt-2 font-mono text-[11px] uppercase tracking-widest ${tone}`}>
-                    Calendar confirmed {days}d ago · {formatDate(d)}
-                  </div>
-                );
+                return <Fact icon={<CalendarCheck />} label={t("cards.calendar")} value={<span className={tone}>Calendar confirmed {days}d ago</span>} sub={formatDate(d)} />;
               })()}
-            </div>
-          </div>
-          {fp.bio && <p className="mt-3 text-sm text-muted-foreground">{fp.bio}</p>}
-          <div className="mt-6 flex flex-wrap gap-2">
-            {fp.disciplines?.map((d: string) => (
-              <span key={d} className="border border-racing-red/40 bg-racing-red/10 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">
-                {disciplineLabel(d)}
-              </span>
-            ))}
-          </div>
-          {fp.skills && fp.skills.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {fp.skills.map((s: string) => (
-                <span key={s} className="border border-border bg-secondary/40 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                  {skillLabel(s)}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+            </FactGrid>
+            {fp.bio && <p className="text-sm text-muted-foreground">{fp.bio}</p>}
+            {fp.disciplines && fp.disciplines.length > 0 && (
+              <Section title={t("mcard.disciplines")}>
+                <Chips>{fp.disciplines.map((d: string) => <Chip key={d} tone="hard">{disciplineLabel(d)}</Chip>)}</Chips>
+              </Section>
+            )}
+            {fp.skills && fp.skills.length > 0 && (
+              <Section title={t("mcard.skills")}>
+                <Chips>{fp.skills.map((s: string) => <Chip key={s}>{skillLabel(s)}</Chip>)}</Chips>
+              </Section>
+            )}
+          </CardBody>
+        </CardShell>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div className="border border-border bg-card p-6">
