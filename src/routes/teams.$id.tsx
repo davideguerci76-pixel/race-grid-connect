@@ -10,7 +10,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { AnonymousReviewsSection, ProfileRatingBadge } from "@/components/anonymous-reviews";
-import { Lock } from "lucide-react";
+import { AlertTriangle, CalendarRange, Globe, Lock, MapPin, Users } from "lucide-react";
+import { AlertStrip, CardBody, CardHeader, CardShell, Chip, Chips, Fact, FactGrid, IdentityRow } from "@/components/cards/primitives";
 import { BackButton } from "@/components/back-button";
 import { TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
 
@@ -136,39 +137,37 @@ function TeamProfile() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <div className="container-page py-12">
-        <div className="border border-border bg-card p-8">
-          <div className="flex gap-4">
-            <div className="flex size-20 items-center justify-center bg-racing-yellow font-mono text-xl font-black text-carbon">
-              {tp.initials ?? initialsFor(tp.team_name)}
-            </div>
-            <div>
-              <h1 className="text-3xl font-black uppercase italic tracking-tighter">{tp.team_name}</h1>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {tp.team_type ? teamTypeLabel(tp.team_type) : t("sweep_public.team_detail.racing_team_default")} · {tp.location ?? "—"}
-                {tp.founded_year ? ` · ${t("sweep_public.team_detail.established", { year: tp.founded_year })}` : ""}
-                {tp.size ? ` · ${tp.size}` : ""}
-              </div>
-              {tp.primary_discipline && (
-                <span className="mt-2 inline-block border border-racing-red/40 bg-racing-red/10 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-racing-red">
-                  {disciplineLabel(tp.primary_discipline)}
-                </span>
-              )}
-              {canSeeFull && tp.website && (
-                <div className="mt-2 text-xs"><a href={tp.website} target="_blank" rel="noopener" className="text-racing-red hover:underline">{tp.website}</a></div>
-              )}
-              <div className="mt-2"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
-            </div>
-          </div>
-          {tp.bio && <p className="mt-6 text-sm text-muted-foreground">{tp.bio}</p>}
+        <CardShell tone={canSeeFull ? "neutral" : "locked"}>
+          <CardHeader
+            icon={canSeeFull ? <Users className="size-4" /> : <Lock className="size-4" />}
+            tone={canSeeFull ? "info" : "warn"}
+            title={t("cards.team")}
+            subtitle={canSeeFull ? t("cards.profile") : t("sweep_public.team_detail.partial_access_title")}
+          />
           {data.cancelStats && Number(data.cancelStats.count ?? 0) > 0 && (
-            <div className="mt-4 flex items-start gap-2 border border-racing-red/40 bg-racing-red/10 p-3 font-mono text-[11px] text-racing-red">
-              <span className="font-black">{t("sweep_public.team_detail.cancellation_history")}</span>
-              <span>
-                {t(Number(data.cancelStats.count) === 1 ? "sweep_public.team_detail.late_cancellation" : "sweep_public.team_detail.late_cancellation_plural", { count: data.cancelStats.count })}
-              </span>
-            </div>
+            <AlertStrip tone="danger" icon={<AlertTriangle className="size-4" />} title={t("sweep_public.team_detail.cancellation_history")}>
+              {t(Number(data.cancelStats.count) === 1 ? "sweep_public.team_detail.late_cancellation" : "sweep_public.team_detail.late_cancellation_plural", { count: data.cancelStats.count })}
+            </AlertStrip>
           )}
-        </div>
+          <CardBody>
+            <IdentityRow
+              avatar={tp.initials ?? initialsFor(tp.team_name)}
+              avatarTone="warn"
+              name={<h1 className="text-3xl font-black uppercase italic tracking-tighter">{tp.team_name}</h1>}
+              meta={<ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} />}
+            />
+            <FactGrid cols={4}>
+              <Fact icon={<Users />} label={t("cards.team")} value={tp.team_type ? teamTypeLabel(tp.team_type) : t("sweep_public.team_detail.racing_team_default")} sub={tp.size ? String(tp.size) : undefined} />
+              <Fact icon={<MapPin />} label={t("cards.location")} value={tp.location ?? "—"} />
+              {tp.founded_year && <Fact icon={<CalendarRange />} label={t("sweep_public.team_detail.established", { year: tp.founded_year })} value={String(tp.founded_year)} />}
+              {canSeeFull && tp.website && (
+                <Fact icon={<Globe />} label="Web" value={<a href={tp.website} target="_blank" rel="noopener" className="break-all text-racing-red hover:underline">{tp.website}</a>} />
+              )}
+            </FactGrid>
+            {tp.primary_discipline && <Chips><Chip tone="hard">{disciplineLabel(tp.primary_discipline)}</Chip></Chips>}
+            {tp.bio && <p className="text-sm text-muted-foreground">{tp.bio}</p>}
+          </CardBody>
+        </CardShell>
 
         {!canSeeFull && (
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-racing-yellow/40 bg-racing-yellow/5 p-5">
