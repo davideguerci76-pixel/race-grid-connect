@@ -21,6 +21,21 @@ export function addDaysIso(iso: string, days: number): string {
   return isoOf(d);
 }
 
+/**
+ * Calendar-month arithmetic (not 365 days): the day-of-month is preserved and
+ * clamped to the last day of the target month, so year rollovers, short months
+ * and leap days all land on the date a human expects.
+ */
+export function addMonthsIso(iso: string, months: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const year = y!;
+  const monthIdx = (m ?? 1) - 1 + months;
+  const targetYear = year + Math.floor(monthIdx / 12);
+  const targetMonth = ((monthIdx % 12) + 12) % 12;
+  const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+  return isoOf(new Date(targetYear, targetMonth, Math.min(d ?? 1, lastDay)));
+}
+
 /** Monday of the week containing `iso` (week starts on Monday). */
 export function mondayOf(iso: string): string {
   const d = dateOf(iso);
@@ -138,17 +153,28 @@ function parseRRule(value: string): RRuleParts | null {
 
 const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
+/** Safety horizon for a recurrence that declares neither COUNT nor UNTIL. */
+export const UNBOUNDED_RRULE_MAX_MONTHS = 12;
+
 /**
  * Minimal RFC5545 expansion covering the recurrences real motorsport calendars
  * use: DAILY / WEEKLY (with BYDAY) / MONTHLY / YEARLY, plus INTERVAL, COUNT and
  * UNTIL. Anything else is left as the single DTSTART occurrence (never silently
  * partially expanded into a corrupt series).
+ *
+ * A rule with neither COUNT nor UNTIL is temporally infinite; it is expanded up
+ * to 12 calendar months from DTSTART. Rules that declare COUNT or UNTIL keep
+ * their own natural bound and are never extended or shortened by this horizon.
  */
 function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{ start: string; end: string }> {
   const out: Array<{ start: string; end: string }> = [];
   const push = (s: string) => out.push({ start: s, end: addDaysIso(s, spanDays) });
   const limit = Math.min(rule.count ?? MAX_RRULE_OCCURRENCES, MAX_RRULE_OCCURRENCES);
-  const until = rule.until ?? null;
+  const unbounded = rule.count === undefined && !rule.until;
+  // Horizon ends the day before the 12-month anniversary, so a window of exactly
+  // 12 calendar months never spills a 13th-month occurrence (e.g. YEARLY).
+  const until = rule.until ?? (unbounded ? addDaysIso(addMonthsIso(start, UNBOUNDED_RRULE_MAX_MONTHS), -1) : null);
+
 
   if (rule.freq === "WEEKLY" && rule.byday.length) {
     const wanted = new Set(rule.byday);
@@ -179,7 +205,7 @@ function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{
       else d.setFullYear(d.getFullYear() + rule.interval);
       cursor = isoOf(d);
     } else break; // unsupported FREQ → single occurrence only
-    if (!until && rule.count === undefined) break; // open-ended rule → do not invent a series
+    
   }
   return out;
 }
