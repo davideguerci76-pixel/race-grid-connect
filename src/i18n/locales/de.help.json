@@ -1,0 +1,61 @@
+{
+  "help": {
+    "trigger_label": "Mehr Informationen",
+    "concept": {
+      "relevance": {
+        "title": "Fachliche Passung",
+        "body": "Wie gut diese Person zu den bevorzugten Anforderungen des Pit Call passt: Unterrolle und Seniorität, Skills, Sprachen, Ausbildung und Erfahrung. Unabhängig von der Terminabdeckung: Auch bei 100 % kann jemand nur einen Teil des Zeitraums abdecken."
+      },
+      "partial_coverage": {
+        "title": "Teilweise Abdeckung",
+        "body": "Abdeckung betrifft nur Termine, nie die fachliche Qualität. Ein vollständiger Match deckt alle angefragten Tage ab. Ein Teil-Match deckt mindestens die Hälfte, aber nicht alle ab; die hier gelisteten Tage sind die nicht abgedeckten."
+      },
+      "stale_calendar": {
+        "title": "Kalenderaktualität",
+        "body": "Verfügbarkeit, die länger nicht bestätigt wurde, wird nicht mehr fürs Matching genutzt — Teams sehen nur Termine, zu denen Sie kürzlich standen. Eine Bestätigung frischt alle offenen Tage auf einmal auf."
+      },
+      "locked_days": {
+        "title": "Gesperrte Tage",
+        "body": "Tage aus einem bestätigten Engagement oder aus einem von Ihnen zu spät abgesagten Engagement bleiben in Ihrem Kalender gesperrt. Sie können sie weder wieder freigeben noch andere Jobs darauf annehmen."
+      },
+      "expand_outside_pool": {
+        "title": "Außerhalb von My Pool suchen",
+        "body": "Dieser Pit Call wurde nur in Ihrem Pool veröffentlicht. Beim Erweitern werden auch Freelancer außerhalb des Pools durchsucht. Es kostet den auf der Schaltfläche angezeigten Token-Betrag, einmalig."
+      }
+    },
+    "action": {
+      "unlock_details": {
+        "title": "Details freischalten",
+        "body": "Öffnet das vollständige Berufsprofil: Skills, Seniorität, Sprachen, Erfahrung, Tagessatz und Reisebereitschaft. Echter Name und Kontakte erscheinen erst nach der Bestätigung durch den Freelancer. Der auf der Schaltfläche angezeigte Preis ist der exakte Betrag — steht dort kostenlos, wird nichts abgebucht."
+      },
+      "request_confirmation": {
+        "title": "Bestätigung anfragen",
+        "body": "Sendet dem Freelancer eine verbindliche Bestätigungsanfrage. Bei Annahme wird der Pit Call geschlossen, andere offene Vorschläge werden storniert und Kontakte ausgetauscht."
+      },
+      "confirm_match": {
+        "title": "Bestätigen",
+        "body": "Sie nehmen den Job an. Das Engagement gilt als bestätigt, diese Tage werden in Ihrem Kalender gesperrt und Kontakte mit dem Team werden ausgetauscht."
+      },
+      "ask_more_time": {
+        "title": "Mehr Zeit erbitten",
+        "body": "Verschiebt die Frist dieser Anfrage, damit Sie später entscheiden können. Nur kurz vor Fristende verfügbar, begrenzt oft und nie über den Start des Pit Call hinaus."
+      },
+      "decline_match": {
+        "title": "Ablehnen",
+        "body": "Sie lehnen die Anfrage ab. Das Team kann den Job jemand anderem anbieten und Ihre Tage bleiben frei."
+      },
+      "cancel_late": {
+        "title": "Nach der Grace Window absagen",
+        "body": "Die Grace Window ist vorbei, es gilt als späte Absage: Das Engagement wird storniert, das Team benachrichtigt, und diese Tage bleiben in Ihrem Kalender gesperrt — Sie können sie weder freigeben noch andere Jobs darauf annehmen."
+      },
+      "mark_complete": {
+        "title": "Als abgeschlossen markieren",
+        "body": "Bestätigt von Ihrer Seite, dass die Arbeit erledigt wurde. Wenn beide Seiten bestätigen, gilt das Engagement als abgeschlossen."
+      },
+      "confirm_calendar": {
+        "title": "Verfügbarkeit bestätigen",
+        "body": "Bestätigt, dass Ihre offenen Tage weiterhin stimmen, und frischt die Kalenderaktualität auf, damit Ihre Verfügbarkeit weiter fürs Matching genutzt wird."
+      }
+    }
+  }
+}
