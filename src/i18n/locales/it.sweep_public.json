@@ -18,8 +18,8 @@
       "sign_in_desc": "I profili dei team sono visibili solo ai membri autenticati.",
       "sign_in_button": "Accedi / Registrati",
       "team_hidden_title": "Il team è nascosto",
-      "team_hidden_desc": "Sblocca un annuncio specifico dalla bacheca (2 token) o il profilo completo del team qui sotto (5 token).",
-      "unlock_full_button": "Sblocca profilo completo del team (5 token)",
+      "team_hidden_desc": "Sblocca un annuncio specifico dalla bacheca (2 token) o il profilo completo del team qui sotto ({{cost}} token).",
+      "unlock_full_button": "Sblocca profilo completo del team ({{cost}} token)",
       "racing_team_default": "Team corse",
       "established": "Fondato nel {{year}}",
       "active_pit_calls": "Pit Call attivi",
@@ -27,19 +27,24 @@
       "no_active_pit_calls": "Nessun Pit Call attivo.",
       "partial_access_title": "[ACCESSO PARZIALE]",
       "partial_access_desc": "Hai sbloccato questo team per un solo annuncio. Contatti diretti e gli altri Pit Call attivi del team restano nascosti.",
-      "unlock_full_profile_button": "Sblocca profilo completo (5 token)",
+      "unlock_full_profile_button": "Sblocca profilo completo ({{cost}} token)",
       "cancellation_history": "⚠ STORICO CANCELLAZIONI",
       "late_cancellation": "{{count}} cancellazione tardiva registrata su match confermati.",
       "late_cancellation_plural": "{{count}} cancellazioni tardive registrate su match confermati.",
       "locked_other_pitcalls": "{{count}} altri Pit Call di questo team sono bloccati. Sblocca il profilo completo per visualizzarli.",
       "modal": {
         "title": "[SBLOCCA PROFILO COMPLETO]",
-        "heading": "Spendere 5 token?",
+        "heading": "Spendere {{cost}} token?",
         "desc": "Sblocca i contatti diretti (sito web) e l'elenco completo dei Pit Call attivi di questo team. Pagamento una tantum per questo team.",
         "cancel": "Annulla",
         "unlocking": "Sblocco in corso…",
-        "unlock_button": "Sblocca (5 token)"
-      }
+        "unlock_button": "Sblocca ({{cost}} token)",
+        "heading_generic": "Sbloccare il profilo completo?",
+        "unlock_button_generic": "Sblocca"
+      },
+      "team_hidden_desc_generic": "Sblocca un annuncio specifico dalla bacheca (2 token) o il profilo completo del team qui sotto.",
+      "unlock_full_button_generic": "Sblocca profilo completo del team",
+      "unlock_full_profile_button_generic": "Sblocca profilo completo"
     },
     "teams_index": {
       "racing_team_default": "Team corse",

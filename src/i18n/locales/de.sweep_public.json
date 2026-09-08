@@ -18,8 +18,8 @@
       "sign_in_desc": "Team-Profile sind nur für angemeldete Mitglieder sichtbar.",
       "sign_in_button": "Anmelden / Registrieren",
       "team_hidden_title": "Team ist verborgen",
-      "team_hidden_desc": "Schalte eine bestimmte Stellenanzeige aus dem Job Board frei (2 Token) oder das vollständige Team-Profil unten (5 Token).",
-      "unlock_full_button": "Vollständiges Team-Profil freischalten (5 Token)",
+      "team_hidden_desc": "Schalte eine bestimmte Stellenanzeige aus dem Job Board frei (2 Token) oder das vollständige Team-Profil unten ({{cost}} Token).",
+      "unlock_full_button": "Vollständiges Team-Profil freischalten ({{cost}} Token)",
       "racing_team_default": "Rennteam",
       "established": "Gegründet {{year}}",
       "active_pit_calls": "Aktive Pit Calls",
@@ -27,19 +27,24 @@
       "no_active_pit_calls": "Keine aktiven Pit Calls.",
       "partial_access_title": "[TEILWEISER ZUGRIFF]",
       "partial_access_desc": "Du hast dieses Team für eine Stellenanzeige freigeschaltet. Direkte Kontakte und die anderen aktiven Pit Calls des Teams bleiben verborgen.",
-      "unlock_full_profile_button": "Vollständiges Profil freischalten (5 Token)",
+      "unlock_full_profile_button": "Vollständiges Profil freischalten ({{cost}} Token)",
       "cancellation_history": "⚠ STORNIERUNGSVERLAUF",
       "late_cancellation": "{{count}} verspätete Stornierung bei bestätigten Matches erfasst.",
       "late_cancellation_plural": "{{count}} verspätete Stornierungen bei bestätigten Matches erfasst.",
       "locked_other_pitcalls": "{{count}} weitere Pit Call(s) dieses Teams sind gesperrt. Schalte das vollständige Profil frei, um sie zu sehen.",
       "modal": {
         "title": "[VOLLSTÄNDIGES PROFIL FREISCHALTEN]",
-        "heading": "5 Token ausgeben?",
+        "heading": "{{cost}} Token ausgeben?",
         "desc": "Schaltet direkte Kontakte (Website) und die vollständige Liste der aktiven Pit Calls dieses Teams frei. Einmalige Zahlung für dieses Team.",
         "cancel": "Abbrechen",
         "unlocking": "Freischalten…",
-        "unlock_button": "Freischalten (5 Token)"
-      }
+        "unlock_button": "Freischalten ({{cost}} Token)",
+        "heading_generic": "Vollständiges Profil freischalten?",
+        "unlock_button_generic": "Freischalten"
+      },
+      "team_hidden_desc_generic": "Schalte eine bestimmte Stellenanzeige aus dem Job Board frei (2 Token) oder das vollständige Team-Profil unten.",
+      "unlock_full_button_generic": "Vollständiges Team-Profil freischalten",
+      "unlock_full_profile_button_generic": "Vollständiges Profil freischalten"
     },
     "teams_index": {
       "racing_team_default": "Rennteam",

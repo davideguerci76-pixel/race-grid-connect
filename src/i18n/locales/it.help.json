@@ -1,0 +1,61 @@
+{
+  "help": {
+    "trigger_label": "Maggiori informazioni",
+    "concept": {
+      "relevance": {
+        "title": "Pertinenza professionale",
+        "body": "Quanto questa persona corrisponde ai requisiti preferiti della Pit Call: sotto-ruolo e seniority, competenze, lingue, formazione ed esperienza. È indipendente dalla copertura delle date: una persona al 100% può comunque coprire solo una parte del periodo."
+      },
+      "partial_coverage": {
+        "title": "Copertura parziale",
+        "body": "La copertura riguarda solo le date, mai la qualità professionale. Un match completo copre tutti i giorni richiesti. Un match parziale ne copre almeno la metà ma non tutti; i giorni elencati qui sono quelli non coperti."
+      },
+      "stale_calendar": {
+        "title": "Aggiornamento del calendario",
+        "body": "Una disponibilità che non viene confermata da tempo smette di essere usata per il matching, così i team vedono solo date su cui ti sei esposto di recente. La conferma aggiorna tutti i giorni aperti in una volta."
+      },
+      "locked_days": {
+        "title": "Giorni bloccati",
+        "body": "I giorni legati a un ingaggio confermato, o a un ingaggio che hai annullato in ritardo, restano bloccati nel tuo calendario. Non puoi renderli di nuovo disponibili né accettare altri lavori in quelle date."
+      },
+      "expand_outside_pool": {
+        "title": "Cerca fuori dal My Pool",
+        "body": "Questa Pit Call è stata pubblicata solo nel tuo Pool. Ampliandola la ricerca include anche freelance esterni al Pool. Costa i token indicati sul pulsante, addebitati una sola volta."
+      }
+    },
+    "action": {
+      "unlock_details": {
+        "title": "Sblocca dettagli",
+        "body": "Apre il profilo professionale completo del candidato: competenze, seniority, lingue, esperienza, tariffa giornaliera e disponibilità a viaggiare. Nome reale e contatti compaiono solo dopo la conferma del freelance. Il costo mostrato sul pulsante è esattamente quello addebitato: se indica gratis, non viene addebitato nulla."
+      },
+      "request_confirmation": {
+        "title": "Richiedi conferma",
+        "body": "Invia al freelance una richiesta di conferma vincolante. Se accetta, la Pit Call viene chiusa, le altre proposte in sospeso vengono annullate e i contatti vengono scambiati."
+      },
+      "confirm_match": {
+        "title": "Conferma",
+        "body": "Accetti il lavoro. L'ingaggio diventa confermato, quei giorni vengono bloccati nel tuo calendario e i contatti vengono scambiati con il team."
+      },
+      "ask_more_time": {
+        "title": "Chiedi più tempo",
+        "body": "Sposta in avanti la scadenza della richiesta per decidere più tardi. È disponibile solo vicino alla scadenza, un numero limitato di volte e mai oltre l'inizio della Pit Call."
+      },
+      "decline_match": {
+        "title": "Rifiuta",
+        "body": "Rifiuti la richiesta. Il team può proporre il lavoro a qualcun altro e i tuoi giorni restano liberi."
+      },
+      "cancel_late": {
+        "title": "Annulla dopo la grace window",
+        "body": "La grace window è scaduta, quindi è un annullamento tardivo: l'ingaggio viene annullato, il team viene avvisato e quei giorni restano bloccati nel tuo calendario — non puoi renderli disponibili né accettare altri lavori in quelle date."
+      },
+      "mark_complete": {
+        "title": "Segna come completato",
+        "body": "Conferma dalla tua parte che il lavoro è stato svolto. Quando entrambe le parti confermano, l'ingaggio risulta completato."
+      },
+      "confirm_calendar": {
+        "title": "Conferma disponibilità",
+        "body": "Ci dice che i tuoi giorni aperti sono ancora corretti e aggiorna la freschezza del calendario, così la tua disponibilità continua a essere usata per il matching."
+      }
+    }
+  }
+}

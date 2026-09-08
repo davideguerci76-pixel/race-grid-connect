@@ -1,0 +1,61 @@
+{
+  "help": {
+    "trigger_label": "Plus d'informations",
+    "concept": {
+      "relevance": {
+        "title": "Pertinence professionnelle",
+        "body": "À quel point cette personne correspond aux exigences préférées de la Pit Call : sous-rôle et séniorité, compétences, langues, formation et expérience. C'est indépendant de la couverture des dates : quelqu'un à 100 % peut ne couvrir qu'une partie de la période."
+      },
+      "partial_coverage": {
+        "title": "Couverture partielle",
+        "body": "La couverture concerne uniquement les dates, jamais la qualité professionnelle. Un match complet couvre tous les jours demandés. Un match partiel en couvre au moins la moitié mais pas tous ; les jours listés ici sont ceux non couverts."
+      },
+      "stale_calendar": {
+        "title": "Fraîcheur du calendrier",
+        "body": "Une disponibilité non confirmée depuis longtemps cesse d'être utilisée pour le matching : les teams ne voient que des dates que vous avez récemment assumées. Confirmer met à jour tous les jours ouverts d'un coup."
+      },
+      "locked_days": {
+        "title": "Jours bloqués",
+        "body": "Les jours liés à un engagement confirmé, ou à un engagement que vous avez annulé tardivement, restent bloqués dans votre calendrier. Vous ne pouvez plus les rendre disponibles ni accepter un autre travail sur ces dates."
+      },
+      "expand_outside_pool": {
+        "title": "Chercher hors de My Pool",
+        "body": "Cette Pit Call a été publiée uniquement dans votre Pool. En l'élargissant, la recherche inclut aussi des freelances hors du Pool. Cela coûte le montant de tokens affiché sur le bouton, débité une seule fois."
+      }
+    },
+    "action": {
+      "unlock_details": {
+        "title": "Débloquer les détails",
+        "body": "Ouvre le profil professionnel complet du candidat : compétences, séniorité, langues, expérience, tarif journalier et mobilité. Le nom réel et les contacts n'apparaissent qu'après la confirmation du freelance. Le coût affiché sur le bouton est le montant exact débité : s'il indique gratuit, rien n'est débité."
+      },
+      "request_confirmation": {
+        "title": "Demander confirmation",
+        "body": "Envoie au freelance une demande de confirmation engageante. S'il accepte, la Pit Call est clôturée, les autres propositions en attente sont annulées et les contacts sont échangés."
+      },
+      "confirm_match": {
+        "title": "Confirmer",
+        "body": "Vous acceptez la mission. L'engagement devient confirmé, ces jours sont bloqués dans votre calendrier et les contacts sont échangés avec le team."
+      },
+      "ask_more_time": {
+        "title": "Demander plus de temps",
+        "body": "Repousse l'échéance de cette demande pour décider plus tard. Disponible seulement à l'approche de l'échéance, un nombre limité de fois, et jamais au-delà du début de la Pit Call."
+      },
+      "decline_match": {
+        "title": "Refuser",
+        "body": "Vous refusez la demande. Le team peut proposer la mission à quelqu'un d'autre et vos jours restent libres."
+      },
+      "cancel_late": {
+        "title": "Annuler après la grace window",
+        "body": "La grace window est passée : c'est donc une annulation tardive. L'engagement est annulé, le team est prévenu et ces jours restent bloqués dans votre calendrier — vous ne pouvez ni les rendre disponibles ni accepter une autre mission dessus."
+      },
+      "mark_complete": {
+        "title": "Marquer comme terminé",
+        "body": "Confirme de votre côté que la mission a été réalisée. Quand les deux parties confirment, l'engagement est marqué terminé."
+      },
+      "confirm_calendar": {
+        "title": "Confirmer la disponibilité",
+        "body": "Indique que vos jours ouverts sont toujours exacts et rafraîchit la fraîcheur de votre calendrier, pour que votre disponibilité continue d'être utilisée dans le matching."
+      }
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "help": {
+    "trigger_label": "More information",
+    "concept": {
+      "relevance": {
+        "title": "Professional relevance",
+        "body": "How well this person matches the preferred requirements of the Pit Call — sub-role and seniority, skills, languages, education and experience. It is independent from date coverage: a 100% relevant person can still cover only part of your dates."
+      },
+      "partial_coverage": {
+        "title": "Partial coverage",
+        "body": "Coverage is about dates only, never about professional fit. A full match covers every requested day. A partial match covers at least half of the requested days but not all of them; the days listed here are the ones not covered."
+      },
+      "stale_calendar": {
+        "title": "Calendar freshness",
+        "body": "Availability that has not been confirmed for a while stops being used for matching, so teams only see dates you have recently stood behind. Confirming refreshes every open day at once."
+      },
+      "locked_days": {
+        "title": "Locked days",
+        "body": "Days tied to a confirmed engagement, or to an engagement you cancelled late, stay blocked in your calendar. You cannot make them available again or take another job on them."
+      },
+      "expand_outside_pool": {
+        "title": "Search outside My Pool",
+        "body": "This Pit Call was published to your Pool only. Expanding it also searches freelancers outside your Pool. It uses the token amount shown on the button, charged once."
+      }
+    },
+    "action": {
+      "unlock_details": {
+        "title": "Unlock details",
+        "body": "Opens the full professional profile of this candidate: skills, seniority, languages, experience, day rate and travel. Real name and contacts appear only after the freelancer confirms the match. The cost shown on the button is the exact amount charged — when it says free, nothing is charged."
+      },
+      "request_confirmation": {
+        "title": "Request confirmation",
+        "body": "Sends this freelancer a binding confirmation request. If they accept, the Pit Call is closed, other pending proposals are cancelled and contacts are exchanged."
+      },
+      "confirm_match": {
+        "title": "Confirm",
+        "body": "Accepts the job. The engagement becomes confirmed, those days are blocked in your calendar and contacts are exchanged with the team."
+      },
+      "ask_more_time": {
+        "title": "Ask for more time",
+        "body": "Pushes back the deadline of this request so you can decide later. It is available only close to the deadline, a limited number of times, and never past the start of the Pit Call."
+      },
+      "decline_match": {
+        "title": "Decline",
+        "body": "Turns down this request. The team can propose the job to someone else and your days stay free."
+      },
+      "cancel_late": {
+        "title": "Cancel after the grace window",
+        "body": "The grace window has passed, so this counts as a late cancellation: the engagement is cancelled, the team is notified, and those days stay blocked in your calendar — you cannot make them available or take another job on them."
+      },
+      "mark_complete": {
+        "title": "Mark as completed",
+        "body": "Confirms on your side that the job was done. When both parties confirm, the engagement is marked completed."
+      },
+      "confirm_calendar": {
+        "title": "Confirm availability",
+        "body": "Tells us your open days are still accurate and refreshes your calendar freshness, so your availability keeps being used for matching."
+      }
+    }
+  }
+}

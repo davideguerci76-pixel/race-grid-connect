@@ -18,8 +18,8 @@
       "sign_in_desc": "Les profils de team ne sont visibles que par les membres authentifiés.",
       "sign_in_button": "Se connecter / S'inscrire",
       "team_hidden_title": "Le team est masqué",
-      "team_hidden_desc": "Débloquez une offre spécifique depuis le tableau des offres (2 tokens) ou le profil complet du team ci-dessous (5 tokens).",
-      "unlock_full_button": "Débloquer le profil complet du team (5 tokens)",
+      "team_hidden_desc": "Débloquez une offre spécifique depuis le tableau des offres (2 tokens) ou le profil complet du team ci-dessous ({{cost}} tokens).",
+      "unlock_full_button": "Débloquer le profil complet du team ({{cost}} tokens)",
       "racing_team_default": "Team de course",
       "established": "Fondée en {{year}}",
       "active_pit_calls": "Pit Calls actifs",
@@ -27,19 +27,24 @@
       "no_active_pit_calls": "Aucun Pit Call actif.",
       "partial_access_title": "[ACCÈS PARTIEL]",
       "partial_access_desc": "Vous avez débloqué ce team pour une seule offre. Les contacts directs et les autres Pit Calls actifs du team restent masqués.",
-      "unlock_full_profile_button": "Débloquer le profil complet (5 tokens)",
+      "unlock_full_profile_button": "Débloquer le profil complet ({{cost}} tokens)",
       "cancellation_history": "⚠ HISTORIQUE DES ANNULATIONS",
       "late_cancellation": "{{count}} annulation tardive enregistrée sur des matches confirmés.",
       "late_cancellation_plural": "{{count}} annulations tardives enregistrées sur des matches confirmés.",
       "locked_other_pitcalls": "{{count}} autre(s) Pit Call(s) de ce team sont verrouillés. Débloquez le profil complet pour les voir.",
       "modal": {
         "title": "[DÉBLOQUER LE PROFIL COMPLET]",
-        "heading": "Dépenser 5 tokens ?",
+        "heading": "Dépenser {{cost}} tokens ?",
         "desc": "Débloque les contacts directs (site web) et la liste complète des Pit Calls actifs de ce team. Paiement unique pour ce team.",
         "cancel": "Annuler",
         "unlocking": "Déblocage en cours…",
-        "unlock_button": "Débloquer (5 tokens)"
-      }
+        "unlock_button": "Débloquer ({{cost}} tokens)",
+        "heading_generic": "Débloquer le profil complet ?",
+        "unlock_button_generic": "Débloquer"
+      },
+      "team_hidden_desc_generic": "Débloquez une offre spécifique depuis le tableau des offres (2 tokens) ou le profil complet du team ci-dessous.",
+      "unlock_full_button_generic": "Débloquer le profil complet du team",
+      "unlock_full_profile_button_generic": "Débloquer le profil complet"
     },
     "teams_index": {
       "racing_team_default": "Team de course",

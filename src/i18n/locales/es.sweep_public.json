@@ -18,8 +18,8 @@
       "sign_in_desc": "Los perfiles de team solo son visibles para miembros autenticados.",
       "sign_in_button": "Iniciar sesión / Registrarse",
       "team_hidden_title": "El team está oculto",
-      "team_hidden_desc": "Desbloquea una oferta específica desde el tablón de empleo (2 tokens) o el perfil completo del team a continuación (5 tokens).",
-      "unlock_full_button": "Desbloquear perfil completo del team (5 tokens)",
+      "team_hidden_desc": "Desbloquea una oferta específica desde el tablón de empleo (2 tokens) o el perfil completo del team a continuación ({{cost}} tokens).",
+      "unlock_full_button": "Desbloquear perfil completo del team ({{cost}} tokens)",
       "racing_team_default": "Team de carreras",
       "established": "Fundado en {{year}}",
       "active_pit_calls": "Pit Calls activos",
@@ -27,19 +27,24 @@
       "no_active_pit_calls": "No hay Pit Calls activos.",
       "partial_access_title": "[ACCESO PARCIAL]",
       "partial_access_desc": "Desbloqueaste este team para una sola oferta. Los contactos directos y los demás Pit Calls activos del team permanecen ocultos.",
-      "unlock_full_profile_button": "Desbloquear perfil completo (5 tokens)",
+      "unlock_full_profile_button": "Desbloquear perfil completo ({{cost}} tokens)",
       "cancellation_history": "⚠ HISTORIAL DE CANCELACIONES",
       "late_cancellation": "{{count}} cancelación tardía registrada en matches confirmados.",
       "late_cancellation_plural": "{{count}} cancelaciones tardías registradas en matches confirmados.",
       "locked_other_pitcalls": "{{count}} otro(s) Pit Call(s) de este team están bloqueados. Desbloquea el perfil completo para verlos.",
       "modal": {
         "title": "[DESBLOQUEAR PERFIL COMPLETO]",
-        "heading": "¿Gastar 5 tokens?",
+        "heading": "¿Gastar {{cost}} tokens?",
         "desc": "Desbloquea los contactos directos (sitio web) y la lista completa de Pit Calls activos de este team. Pago único para este team.",
         "cancel": "Cancelar",
         "unlocking": "Desbloqueando…",
-        "unlock_button": "Desbloquear (5 tokens)"
-      }
+        "unlock_button": "Desbloquear ({{cost}} tokens)",
+        "heading_generic": "¿Desbloquear el perfil completo?",
+        "unlock_button_generic": "Desbloquear"
+      },
+      "team_hidden_desc_generic": "Desbloquea una oferta específica desde el tablón de empleo (2 tokens) o el perfil completo del team a continuación.",
+      "unlock_full_button_generic": "Desbloquear perfil completo del team",
+      "unlock_full_profile_button_generic": "Desbloquear perfil completo"
     },
     "teams_index": {
       "racing_team_default": "Team de carreras",

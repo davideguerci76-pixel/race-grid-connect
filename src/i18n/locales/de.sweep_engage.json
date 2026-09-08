@@ -292,7 +292,8 @@
       "unlocked_tag": "FREIGESCHALTET",
       "view_partial_matches_button": "{{count}} Teil-Match(es) ansehen",
       "red_cancel_unavailable": "RED-Stornoprüfung vorübergehend nicht verfügbar",
-      "red_cancel_retry": "Erneut versuchen"
+      "red_cancel_retry": "Erneut versuchen",
+      "unlock_details_button_free": "Details freischalten (kostenlos)"
     },
     "requests": {
       "confirmed_filled": "Bestätigt · Besetzt",

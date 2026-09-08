@@ -1,4 +1,5 @@
 import { confirmDialog } from "@/hooks/use-confirm";
+import { HelpHint } from "@/components/help-hint";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -422,7 +423,10 @@ function RequestMatchesPage() {
               <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="min-w-0">
-                    <div className="label-mono text-racing-yellow">{t("pool.upgrade_label")}</div>
+                    <div className="flex items-center gap-1">
+                      <span className="label-mono text-racing-yellow">{t("pool.upgrade_label")}</span>
+                      <HelpHint titleKey="help.concept.expand_outside_pool.title" bodyKey="help.concept.expand_outside_pool.body" />
+                    </div>
                     <p className="mt-2 text-sm">
                       {t("pool.upgrade_desc")}
                     </p>

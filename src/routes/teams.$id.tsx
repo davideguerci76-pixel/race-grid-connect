@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useActionCosts } from "@/hooks/use-action-costs";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { initialsFor, disciplineLabel, skillLabel } from "@/lib/paddock";
@@ -35,6 +36,7 @@ function TeamProfile() {
   const { req: revealedReqId } = Route.useSearch();
   const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
+  const { revealTeamFull } = useActionCosts();
   const qc = useQueryClient();
   const [confirmFull, setConfirmFull] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,16 +118,16 @@ function TeamProfile() {
             <div className="label-mono">[LOCKED]</div>
             <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.team_hidden_title")}</h1>
             <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
-            <p className="mt-2 text-sm text-muted-foreground">{t("sweep_public.team_detail.team_hidden_desc")}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{revealTeamFull != null ? t("sweep_public.team_detail.team_hidden_desc", { cost: revealTeamFull }) : t("sweep_public.team_detail.team_hidden_desc_generic")}</p>
             <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {t("sweep_public.team_detail.unlock_full_button")}
+              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_button_generic")}
             </button>
           </div>
           <div className="mx-auto mt-10 max-w-2xl">
             <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
           </div>
         </div>
-        {confirmFull && <ConfirmModal onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+        {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
         <SiteFooter />
       </div>
     );
@@ -178,7 +180,7 @@ function TeamProfile() {
               </p>
             </div>
             <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {t("sweep_public.team_detail.unlock_full_profile_button")}
+              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_profile_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_profile_button_generic")}
             </button>
           </div>
         )}
@@ -219,19 +221,19 @@ function TeamProfile() {
           <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
         </div>
       </div>
-      {confirmFull && <ConfirmModal onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+      {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
       <SiteFooter />
     </div>
   );
 }
 
-function ConfirmModal({ onCancel, onConfirm, pending, error }: { onCancel: () => void; onConfirm: () => void; pending: boolean; error: string | null }) {
+function ConfirmModal({ cost, onCancel, onConfirm, pending, error }: { cost: number | null; onCancel: () => void; onConfirm: () => void; pending: boolean; error: string | null }) {
   const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => !pending && onCancel()}>
       <div className="w-full max-w-md border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
         <div className="label-mono">{t("sweep_public.team_detail.modal.title")}</div>
-        <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.modal.heading")}</h2>
+        <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{cost != null ? t("sweep_public.team_detail.modal.heading", { cost }) : t("sweep_public.team_detail.modal.heading_generic")}</h2>
         <p className="mt-3 text-sm text-muted-foreground">
           {t("sweep_public.team_detail.modal.desc")}
         </p>
@@ -241,7 +243,7 @@ function ConfirmModal({ onCancel, onConfirm, pending, error }: { onCancel: () =>
             {t("sweep_public.team_detail.modal.cancel")}
           </button>
           <button type="button" onClick={onConfirm} disabled={pending} className="bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60">
-            {pending ? t("sweep_public.team_detail.modal.unlocking") : t("sweep_public.team_detail.modal.unlock_button")}
+            {pending ? t("sweep_public.team_detail.modal.unlocking") : cost != null ? t("sweep_public.team_detail.modal.unlock_button", { cost }) : t("sweep_public.team_detail.modal.unlock_button_generic")}
           </button>
         </div>
       </div>

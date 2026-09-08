@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getUserRatingSummary, getAnonymousReviews, unlockReviews, flagRating } from "@/lib/paddock.functions";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { useActionCosts } from "@/hooks/use-action-costs";
 
 type Variant = "wrench" | "headset";
 
@@ -150,6 +151,7 @@ export function AnonymousReviewsSection({
 }) {
   const { formatDate } = useDateFormat();
   const { t } = useTranslation();
+  const { revealReviews } = useActionCosts();
   const qc = useQueryClient();
   const getReviews = useServerFn(getAnonymousReviews);
   const unlockFn = useServerFn(unlockReviews);
@@ -185,7 +187,9 @@ export function AnonymousReviewsSection({
           >
             {unlock.isPending
               ? t("common.loading")
-              : t("reviews.unlock_cta", { defaultValue: "Unlock reviews (1 token)" })}
+              : revealReviews != null
+                ? t("reviews.unlock_cta", { cost: revealReviews })
+                : t("reviews.unlock_cta_generic")}
           </button>
         )}
       </div>
@@ -194,10 +198,7 @@ export function AnonymousReviewsSection({
         <div className="flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
           <Lock className="size-4" />
           <span>
-            {t("reviews.locked_hint", {
-              defaultValue:
-                "Individual reviews are hidden. Spend 1 token to read the anonymous review list — authors are never revealed.",
-            })}
+            {t("reviews.locked_hint")}
           </span>
         </div>
       ) : isLoading ? (

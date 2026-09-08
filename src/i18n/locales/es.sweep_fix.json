@@ -15,7 +15,7 @@
     "click_to_view": "Haz clic para ver las reseñas",
     "anonymous": "Anónimo",
     "locked_hint": "Desbloquea para leer las reseñas anónimas recibidas por este perfil.",
-    "unlock_cta": "Desbloquear reseñas (1 token)",
+    "unlock_cta": "Desbloquear reseñas ({{cost}} token)",
     "unlocked_toast": "Reseñas desbloqueadas",
     "flag_cta": "Reportar / Impugnar",
     "flag_title": "Impugnar esta reseña",
@@ -23,7 +23,8 @@
     "flag_placeholder": "Describe el problema (mín. 10 caracteres)…",
     "flag_submit": "Enviar reporte",
     "flag_submitted": "Reseña reportada. Nuestro equipo la revisará.",
-    "flag_pending": "Reportada"
+    "flag_pending": "Reportada",
+    "unlock_cta_generic": "Desbloquear reseñas"
   },
   "rating": {
     "awaiting_other_party": "Esperando la valoración de la otra parte",
@@ -32,10 +33,13 @@
     "overall": "Global",
     "punctuality": "Puntualidad",
     "stress": "Gestión del estrés",
-    "submitted_bonus": "Valoración enviada — ¡+1 token de regalo!",
+    "submitted_bonus": "Valoración enviada — ¡+{{bonus}} token de regalo!",
     "team_overall": "Valoración global del team",
     "technical": "Habilidad técnica",
-    "visible_now": "Reseña visible"
+    "visible_now": "Reseña visible",
+    "submitted_bonus_generic": "¡Valoración enviada — token de regalo!",
+    "rate_bonus": "(+{{bonus}} token de bonus)",
+    "rate_bonus_generic": "(token de bonus)"
   },
   "engagements": {
     "confirmed_toast": "Engagement confirmado",

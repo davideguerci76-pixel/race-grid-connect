@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { useActionCosts } from "@/hooks/use-action-costs";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -28,6 +29,7 @@ function EngagementsPage() {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const { user } = useAuth();
+  const { ratingBonus } = useActionCosts();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
   const completeFn = useServerFn(markEngagementComplete);
@@ -194,7 +196,11 @@ function EngagementsPage() {
       if (res && res.ok === false && res.already_rated) {
         toast.info(t("rating.submitted"));
       } else {
-        toast.success(t("rating.submitted_bonus"));
+        toast.success(
+          ratingBonus != null
+            ? t("rating.submitted_bonus", { bonus: ratingBonus })
+            : t("rating.submitted_bonus_generic"),
+        );
       }
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
       qc.invalidateQueries();
@@ -275,7 +281,10 @@ function EngagementsPage() {
               }
               return (
                 <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
-                  {t("engagements.rate")} <span className="ml-1 text-[9px]">(+1 token bonus)</span>
+                  {t("engagements.rate")}{" "}
+                  <span className="ml-1 text-[9px]">
+                    {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                  </span>
                 </button>
               );
             })();

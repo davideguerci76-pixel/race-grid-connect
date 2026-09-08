@@ -276,7 +276,7 @@
     "comment_placeholder": "Share your experience...",
     "submit": "Submit rating",
     "submitted": "Rating submitted",
-    "submitted_bonus": "Rating submitted — +1 token bonus awarded!",
+    "submitted_bonus": "Rating submitted — +{{bonus}} token bonus awarded!",
     "no_ratings": "No ratings yet",
     "double_blind_hint": "Double-blind: your review stays sealed until the other party rates you, or 30 days pass.",
     "opens_on": "Rating opens on {{date}}",
@@ -286,7 +286,10 @@
     "punctuality": "Punctuality & reliability",
     "stress": "Stress management",
     "team_overall": "Overall team experience",
-    "overall": "Overall"
+    "overall": "Overall",
+    "submitted_bonus_generic": "Rating submitted — token bonus awarded!",
+    "rate_bonus": "(+{{bonus}} token bonus)",
+    "rate_bonus_generic": "(token bonus)"
   },
   "common": {
     "loading": "Loading...",

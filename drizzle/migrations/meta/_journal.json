@@ -757,6 +757,13 @@
       "when": 1788873896541,
       "tag": "0107_red_cancel_quote_ambiguous_reason_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1788878115935,
+      "tag": "0108_freelancer_late_cancel_keeps_days_blocked",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { confirmDialog } from "@/hooks/use-confirm";
+import { HelpHint } from "@/components/help-hint";
 import { toastError } from "@/lib/errors";
 import { confirmEngagement, declineMatchConfirmation, extendMatchConfirmation } from "@/lib/paddock.functions";
 
@@ -98,21 +99,27 @@ export function MatchRequestActions({
 
   return (
     <>
-      <button
-        onClick={async () => { if (await confirmDialog(t("sweep_engage.matches.confirm_match_prompt"))) confirmMut.mutate(); }}
-        disabled={busy}
-        className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
-      >
-        {t("engagements.confirm")}
-      </button>
-      <button
-        onClick={() => extendMut.mutate()}
-        disabled={busy || !canExtend}
-        title={!canExtend ? t("engagements.ask_more_time_hint") : undefined}
-        className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-40"
-      >
-        {t("engagements.ask_more_time")}
-      </button>
+      <span className="inline-flex items-center gap-1">
+        <button
+          onClick={async () => { if (await confirmDialog(t("sweep_engage.matches.confirm_match_prompt"))) confirmMut.mutate(); }}
+          disabled={busy}
+          className="bg-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-60"
+        >
+          {t("engagements.confirm")}
+        </button>
+        <HelpHint titleKey="help.action.confirm_match.title" bodyKey="help.action.confirm_match.body" />
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <button
+          onClick={() => extendMut.mutate()}
+          disabled={busy || !canExtend}
+          title={!canExtend ? t("engagements.ask_more_time_hint") : undefined}
+          className="border border-border px-4 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-40"
+        >
+          {t("engagements.ask_more_time")}
+        </button>
+        <HelpHint titleKey="help.action.ask_more_time.title" bodyKey="help.action.ask_more_time.body" />
+      </span>
       <button
         onClick={async () => { if (await confirmDialog(t("engagements.decline_confirm"))) declineMut.mutate(); }}
         disabled={busy}

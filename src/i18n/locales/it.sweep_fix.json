@@ -15,7 +15,7 @@
     "click_to_view": "Clicca per vedere le recensioni",
     "anonymous": "Anonimo",
     "locked_hint": "Sblocca per leggere le recensioni anonime ricevute da questo profilo.",
-    "unlock_cta": "Sblocca recensioni (1 token)",
+    "unlock_cta": "Sblocca recensioni ({{cost}} token)",
     "unlocked_toast": "Recensioni sbloccate",
     "flag_cta": "Segnala / Contesta",
     "flag_title": "Contesta questa recensione",
@@ -23,6 +23,7 @@
     "flag_placeholder": "Descrivi il problema (min. 10 caratteri)…",
     "flag_submit": "Invia segnalazione",
     "flag_submitted": "Recensione segnalata. La verificheremo al più presto.",
-    "flag_pending": "Segnalata"
+    "flag_pending": "Segnalata",
+    "unlock_cta_generic": "Sblocca recensioni"
   }
 }

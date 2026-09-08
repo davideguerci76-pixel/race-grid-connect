@@ -15,7 +15,7 @@
     "click_to_view": "Click to view reviews",
     "anonymous": "Anonymous",
     "locked_hint": "Unlock to read the anonymous reviews received by this profile.",
-    "unlock_cta": "Unlock reviews (1 token)",
+    "unlock_cta": "Unlock reviews ({{cost}} token)",
     "unlocked_toast": "Reviews unlocked",
     "flag_cta": "Report / Contest",
     "flag_title": "Contest this review",
@@ -23,6 +23,7 @@
     "flag_placeholder": "Describe the issue (min. 10 characters)…",
     "flag_submit": "Submit report",
     "flag_submitted": "Review reported. Our team will review it.",
-    "flag_pending": "Reported"
+    "flag_pending": "Reported",
+    "unlock_cta_generic": "Unlock reviews"
   }
 }

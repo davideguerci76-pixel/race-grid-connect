@@ -11,6 +11,7 @@ import {
   ActionRow, AlertStrip, CardBody, CardFooter, CardHeader, CardShell, Chip, Chips, DetailsToggle, Fact, FactGrid, IdentityRow, Section, StatusChip, cardBtn, type CardTone, type StateTone,
 } from "@/components/cards/primitives";
 import { CriteriaOutcome, RelevanceScore } from "@/components/cards/match-signals";
+import { HelpHint } from "@/components/help-hint";
 
 type Actions = {
   onReveal: () => void;
@@ -119,10 +120,18 @@ export function EngagementCard({
           </button>
         )}
         {isConfirmed && !iMarked && !isFreelancer && (
-          <button type="button" onClick={actions.onComplete} className={cardBtn.dark}>{t("engagements.mark_complete")}</button>
+          <span className="inline-flex items-center gap-1">
+            <button type="button" onClick={actions.onComplete} className={cardBtn.dark}>{t("engagements.mark_complete")}</button>
+            <HelpHint titleKey="help.action.mark_complete.title" bodyKey="help.action.mark_complete.body" />
+          </span>
         )}
         {isConfirmed && (
-          <button type="button" onClick={() => actions.onCancel(inGrace)} className={inGrace ? cardBtn.ghost : cardBtn.danger}>{cancelLabel}</button>
+          <span className="inline-flex items-center gap-1">
+            <button type="button" onClick={() => actions.onCancel(inGrace)} className={inGrace ? cardBtn.ghost : cardBtn.danger}>{cancelLabel}</button>
+            {!inGrace && isFreelancer && (
+              <HelpHint titleKey="help.action.cancel_late.title" bodyKey="help.action.cancel_late.body" />
+            )}
+          </span>
         )}
         {!isFreelancer && isCompleted && (
           e.in_pool || actions.locallyPooled ? (

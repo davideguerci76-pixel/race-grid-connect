@@ -22,6 +22,7 @@ import {
   type CardTone,
 } from "@/components/cards/primitives";
 import { CriteriaOutcome, MissingDays, RankPill, RelevanceScore, coverageOf, useCoverageText } from "@/components/cards/match-signals";
+import { HelpHint } from "@/components/help-hint";
 
 /**
  * TEAM-SIDE candidate card (Family 1/2: request matches Full/Partial · Family 12: pool-search results).
@@ -94,9 +95,15 @@ export function CandidateMatchCard({
       {mode === "request" && (
         <ActionRow>
           {blurred && (
-            <button type="button" onClick={onUnlock} disabled={loading} className={cardBtn.secondary}>
-              <Unlock className="size-3.5" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
-            </button>
+            <span className="inline-flex items-center gap-1">
+              <button type="button" onClick={onUnlock} disabled={loading} className={cardBtn.secondary}>
+                <Unlock className="size-3.5" />{" "}
+                {perProfileCost > 0
+                  ? t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })
+                  : t("sweep_engage.request_matches.unlock_details_button_free")}
+              </button>
+              <HelpHint titleKey="help.action.unlock_details.title" bodyKey="help.action.unlock_details.body" />
+            </span>
           )}
           {match?.unlocked && !requestFilled && (
             match?.confirmation_requested ? (
@@ -104,9 +111,12 @@ export function CandidateMatchCard({
             ) : match?.confirmation_closed ? (
               <StatusChip tone="muted">{t(match.confirmation_closed === "expired" ? "mcard.confirmation_expired" : "mcard.confirmation_declined")}</StatusChip>
             ) : (
-              <button type="button" onClick={onConfirm} disabled={loading} className={cardBtn.primary}>
-                {t("sweep_engage.request_matches.request_confirmation_button")}
-              </button>
+              <span className="inline-flex items-center gap-1">
+                <button type="button" onClick={onConfirm} disabled={loading} className={cardBtn.primary}>
+                  {t("sweep_engage.request_matches.request_confirmation_button")}
+                </button>
+                <HelpHint titleKey="help.action.request_confirmation.title" bodyKey="help.action.request_confirmation.body" />
+              </span>
             )
           )}
           {requestFilled && <StatusChip tone="warn">{t("sweep_engage.request_matches.match_already_assigned")}</StatusChip>}
