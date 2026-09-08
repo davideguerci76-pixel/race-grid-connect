@@ -2,7 +2,7 @@ import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
-import { disciplineLabel, educationLabel, engagementStatusLabel, languageLabel, languageLevelLabel, skillLabel } from "@/lib/labels";
+import { disciplineLabel, educationLabel, engagementStatusLabel, languageLabel, languageLevelLabel, skillLabel, teamTypeLabel } from "@/lib/labels";
 import { formatCriterion } from "@/lib/criteria-label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -254,7 +254,7 @@ function EngagementsPage() {
                     </div>
                     {isFreelancer && tp && (
                       <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {tp.team_type && <span>{tp.team_type}</span>}
+                        {tp.team_type && <span>{teamTypeLabel(tp.team_type)}</span>}
                         {tp.location && <span> · {tp.location}</span>}
                         {tp.primary_discipline && <span> · {disciplineLabel(tp.primary_discipline)}</span>}
                       </div>
