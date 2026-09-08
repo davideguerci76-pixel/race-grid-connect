@@ -18,6 +18,7 @@ import { BackButton } from "@/components/back-button";
 import { PoolBadge } from "@/components/pool-badge";
 import { PitCallSummary } from "@/components/pitcall-summary";
 import { CandidateMatchCard, LockedCandidateCard } from "@/components/cards/candidate-match-card";
+import { HiredFreelancerCard } from "@/components/cards/hired-freelancer-card";
 
 import { toastError } from "@/lib/errors";
 
@@ -232,7 +233,7 @@ function RequestMatchesPage() {
               ) : (
                 <div className="grid gap-3">
                   {tierItems.map((m) => (
-                    <MatchCard
+                    <CandidateMatchCard
                       key={m.match_id}
                       match={m}
                       perProfileCost={data!.per_profile_cost}
@@ -387,69 +388,7 @@ function RequestMatchesPage() {
             </div>
 
 
-            {data.hired && (
-              <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
-                <div className="label-mono text-racing-yellow">[CONFIRMED MATCH]</div>
-                <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
-                      {data.hired.display_name?.slice(0, 2) ?? "?"}
-                    </div>
-                    <div>
-                      <div className="text-2xl font-black italic tracking-tighter">{data.hired.display_name}</div>
-                      {data.hired.headline && <div className="text-sm text-muted-foreground">{data.hired.headline}</div>}
-                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {data.hired.role_group && <>{roleGroupLabel(data.hired.role_group)}</>}
-                        {data.hired.location && <> · 📍 {data.hired.location}</>}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="min-w-[240px] space-y-1 font-mono text-xs">
-                    <div className="label-mono">[CONTACT]</div>
-                    {data.hired.contact_email ? (
-                      <a href={`mailto:${data.hired.contact_email}`} className="flex items-center gap-2 text-racing-red hover:underline">
-                        <Mail className="size-3" /> {data.hired.contact_email}
-                      </a>
-                    ) : <div className="text-muted-foreground">{t("sweep_engage.request_matches.no_email_on_file")}</div>}
-                    {data.hired.phone_number ? (
-                      <a href={`tel:${(data.hired.phone_dial_code ?? "")}${data.hired.phone_number}`} className="flex items-center gap-2 text-racing-red hover:underline">
-                        <Phone className="size-3" /> {data.hired.phone_dial_code} {data.hired.phone_number}
-                      </a>
-                    ) : <div className="text-muted-foreground">{t("sweep_engage.request_matches.no_phone_on_file")}</div>}
-                  </div>
-                </div>
-
-                <div className="mt-4 border-t border-racing-yellow/30 pt-4">
-                  <div className="label-mono mb-2 text-racing-yellow">[QUICK ACTIONS]</div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div>
-                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_engage.request_matches.add_match_dates_to_calendar")}</div>
-                      <CalendarQuickButtons
-                        event={{
-                          title: `Match — ${data.request.title}`,
-                          startDate: data.request.start_date,
-                          endDate: data.request.end_date,
-                          location: data.request.location ?? data.request.circuit ?? null,
-                          description: `${roleGroupLabel(data.request.role_group)}${data.request.sub_role ? ` · ${subRoleLabel(data.request.sub_role)}` : ""} · ${disciplineLabel(data.request.discipline)}\nFreelancer: ${data.hired.display_name ?? ""}${data.hired.contact_email ? `\nEmail: ${data.hired.contact_email}` : ""}${data.hired.phone_number ? `\nPhone: ${data.hired.phone_dial_code ?? ""} ${data.hired.phone_number}` : ""}`,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_engage.request_matches.save_freelancer_contact")}</div>
-                      <ContactQuickButtons
-                        contact={{
-                          fullName: data.hired.display_name ?? t("sweep_engage.matches.freelancer_fallback"),
-                          email: data.hired.contact_email ?? null,
-                          phone: data.hired.phone_number ? `${data.hired.phone_dial_code ?? ""}${data.hired.phone_number}`.replace(/\s+/g, "") : null,
-                          title: data.hired.role_group ? roleGroupLabel(data.hired.role_group) : null,
-                          notes: t("sweep_engage.request_matches.pitcall_match_confirmed_note", { title: data.request.title }),
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {data.hired && <HiredFreelancerCard hired={data.hired} request={data.request} />}
 
             {/* Economic panel — rendered strictly from the server economic state. */}
             {!requestFilled && !inReview && (data as any).refund_state && (
