@@ -11,6 +11,7 @@ import {
   ActionRow, AlertStrip, CardBody, CardFooter, CardHeader, CardShell, Chip, Chips, DetailsToggle, Fact, FactGrid, IdentityRow, Section, StatusChip, cardBtn, type CardTone, type StateTone,
 } from "@/components/cards/primitives";
 import { CriteriaOutcome, RelevanceScore } from "@/components/cards/match-signals";
+import { HelpHint } from "@/components/help-hint";
 
 type Actions = {
   onReveal: () => void;
