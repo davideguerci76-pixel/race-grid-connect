@@ -203,7 +203,7 @@ function expandRRule(start: string, spanDays: number, rule: RRuleParts): Array<{
       else d.setFullYear(d.getFullYear() + rule.interval);
       cursor = isoOf(d);
     } else break; // unsupported FREQ → single occurrence only
-    if (!until && rule.count === undefined) break; // open-ended rule → do not invent a series
+    
   }
   return out;
 }
