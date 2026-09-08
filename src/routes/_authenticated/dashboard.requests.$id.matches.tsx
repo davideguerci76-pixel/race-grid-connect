@@ -2,21 +2,17 @@ import { confirmDialog } from "@/hooks/use-confirm";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RatingIcons } from "@/components/rating-icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Lock, Unlock, Mail, Phone, ArrowLeft, AlertTriangle, EyeOff, Clock, Flame, Pencil, Play, Ban } from "lucide-react";
+import { Unlock, ArrowLeft, AlertTriangle, Flame, Pencil, Play, Ban } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getRequestMatches, unlockMatch, requestMatchConfirmation, unlockRequestTier, triggerSosCall, refundAndCloseRequest, upgradeRequestToStandard, activateRequestNow, redCancelRequest } from "@/lib/paddock.functions";
-import { disciplineLabel, educationLabel, skillLabel } from "@/lib/paddock";
-import { formatCriterion } from "@/lib/criteria-label";
-import { levelLabel, parseSubRoles, roleGroupLabel, subRoleLabel } from "@/lib/roles";
-import { CalendarQuickButtons, ContactQuickButtons } from "@/components/match-quick-actions";
 import { BackButton } from "@/components/back-button";
-import { PoolBadge } from "@/components/pool-badge";
 import { PitCallSummary } from "@/components/pitcall-summary";
+import { CandidateMatchCard, LockedCandidateCard } from "@/components/cards/candidate-match-card";
+import { HiredFreelancerCard } from "@/components/cards/hired-freelancer-card";
 
 import { toastError } from "@/lib/errors";
 
@@ -225,13 +221,13 @@ function RequestMatchesPage() {
               {isLocked ? (
                 <div className="grid gap-3">
                   {Array.from({ length: tierInfo.real_count ?? 0 }).map((_, i) => (
-                    <TierPlaceholder key={i} rank={(tierInfo.tier === 2 ? 11 : 11 + ((Array.isArray(tiers) ? tiers : []).find((x) => x?.tier === 2)?.size ?? 10)) + i} />
+                    <LockedCandidateCard key={i} rank={(tierInfo.tier === 2 ? 11 : 11 + ((Array.isArray(tiers) ? tiers : []).find((x) => x?.tier === 2)?.size ?? 10)) + i} />
                   ))}
                 </div>
               ) : (
                 <div className="grid gap-3">
                   {tierItems.map((m) => (
-                    <MatchCard
+                    <CandidateMatchCard
                       key={m.match_id}
                       match={m}
                       perProfileCost={data!.per_profile_cost}
@@ -386,69 +382,7 @@ function RequestMatchesPage() {
             </div>
 
 
-            {data.hired && (
-              <div className="mt-6 border-2 border-racing-yellow bg-racing-yellow/5 p-5">
-                <div className="label-mono text-racing-yellow">[CONFIRMED MATCH]</div>
-                <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-14 items-center justify-center border border-racing-yellow bg-secondary font-black uppercase">
-                      {data.hired.display_name?.slice(0, 2) ?? "?"}
-                    </div>
-                    <div>
-                      <div className="text-2xl font-black italic tracking-tighter">{data.hired.display_name}</div>
-                      {data.hired.headline && <div className="text-sm text-muted-foreground">{data.hired.headline}</div>}
-                      <div className="mt-1 font-mono text-[11px] uppercase text-muted-foreground">
-                        {data.hired.role_group && <>{roleGroupLabel(data.hired.role_group)}</>}
-                        {data.hired.location && <> · 📍 {data.hired.location}</>}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="min-w-[240px] space-y-1 font-mono text-xs">
-                    <div className="label-mono">[CONTACT]</div>
-                    {data.hired.contact_email ? (
-                      <a href={`mailto:${data.hired.contact_email}`} className="flex items-center gap-2 text-racing-red hover:underline">
-                        <Mail className="size-3" /> {data.hired.contact_email}
-                      </a>
-                    ) : <div className="text-muted-foreground">{t("sweep_engage.request_matches.no_email_on_file")}</div>}
-                    {data.hired.phone_number ? (
-                      <a href={`tel:${(data.hired.phone_dial_code ?? "")}${data.hired.phone_number}`} className="flex items-center gap-2 text-racing-red hover:underline">
-                        <Phone className="size-3" /> {data.hired.phone_dial_code} {data.hired.phone_number}
-                      </a>
-                    ) : <div className="text-muted-foreground">{t("sweep_engage.request_matches.no_phone_on_file")}</div>}
-                  </div>
-                </div>
-
-                <div className="mt-4 border-t border-racing-yellow/30 pt-4">
-                  <div className="label-mono mb-2 text-racing-yellow">[QUICK ACTIONS]</div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div>
-                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_engage.request_matches.add_match_dates_to_calendar")}</div>
-                      <CalendarQuickButtons
-                        event={{
-                          title: `Match — ${data.request.title}`,
-                          startDate: data.request.start_date,
-                          endDate: data.request.end_date,
-                          location: data.request.location ?? data.request.circuit ?? null,
-                          description: `${roleGroupLabel(data.request.role_group)}${data.request.sub_role ? ` · ${subRoleLabel(data.request.sub_role)}` : ""} · ${disciplineLabel(data.request.discipline)}\nFreelancer: ${data.hired.display_name ?? ""}${data.hired.contact_email ? `\nEmail: ${data.hired.contact_email}` : ""}${data.hired.phone_number ? `\nPhone: ${data.hired.phone_dial_code ?? ""} ${data.hired.phone_number}` : ""}`,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t("sweep_engage.request_matches.save_freelancer_contact")}</div>
-                      <ContactQuickButtons
-                        contact={{
-                          fullName: data.hired.display_name ?? t("sweep_engage.matches.freelancer_fallback"),
-                          email: data.hired.contact_email ?? null,
-                          phone: data.hired.phone_number ? `${data.hired.phone_dial_code ?? ""}${data.hired.phone_number}`.replace(/\s+/g, "") : null,
-                          title: data.hired.role_group ? roleGroupLabel(data.hired.role_group) : null,
-                          notes: t("sweep_engage.request_matches.pitcall_match_confirmed_note", { title: data.request.title }),
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {data.hired && <HiredFreelancerCard hired={data.hired} request={data.request} />}
 
             {/* Economic panel — rendered strictly from the server economic state. */}
             {!requestFilled && !inReview && (data as any).refund_state && (
@@ -561,322 +495,6 @@ function RequestMatchesPage() {
   );
 }
 
-function TierPlaceholder({ rank }: { rank: number }) {
-  const { t } = useTranslation();
-  return (
-    <div className="relative overflow-hidden border border-dashed border-border bg-card p-5">
-      <div className="pointer-events-none select-none blur-md">
-        <div className="text-3xl font-black italic tracking-tighter text-muted-foreground">??% Match</div>
-        <div className="mt-2 h-4 w-40 bg-secondary" />
-        <div className="mt-2 h-3 w-64 bg-secondary" />
-      </div>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex items-center gap-2 border border-border bg-background/80 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground backdrop-blur">
-          <EyeOff className="size-3" /> {t("sweep_engage.request_matches.rank_tier_locked", { rank })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Chip({ children, tone = "default" }: { children: React.ReactNode; tone?: "default" | "hard" }) {
-  return (
-    <span
-      className={`rounded-md border px-2.5 py-1 text-[13px] leading-none ${
-        tone === "hard"
-          ? "border-racing-red/70 bg-racing-red/10 font-semibold text-racing-red"
-          : "border-border bg-secondary text-foreground"
-      }`}
-    >
-      {children}
-    </span>
-  );
-}
-
-function DetailBlock({ title, children, wide = false }: { title: string; children: React.ReactNode; wide?: boolean }) {
-  return (
-    <div className={wide ? "@xl:col-span-2" : ""}>
-      <h4 className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">{title}</h4>
-      {children}
-    </div>
-  );
-}
-
-function MatchCard({ match, onUnlock, onConfirm, loading, requestFilled, perProfileCost }: { match: any; onUnlock: () => void; onConfirm: () => void; loading: boolean; requestFilled: boolean; perProfileCost: number }) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const pct = Math.round(Number(match?.skills_score ?? match?.match_score ?? 0));
-  const perfect = !!match?.is_perfect;
-  const blurred = !!match?.blurred;
-  const isPartial = !!match?.is_partial;
-  const edgeOnly = match?.edge_only !== false;
-  const profile = match?.profile ?? null;
-  const missingCriteria = Array.isArray(match?.missing_criteria) ? match.missing_criteria : [];
-  const missingDates = Array.isArray(match?.missing_dates) ? match.missing_dates.filter((d: unknown) => typeof d === "string") : [];
-  const subRoles = parseSubRoles(profile?.sub_roles);
-  const disciplines = Array.isArray(profile?.disciplines) ? profile.disciplines : [];
-  const skills = Array.isArray(profile?.skills) ? profile.skills : [];
-  const languages = Array.isArray(profile?.languages) ? profile.languages : [];
-  const experiences = Array.isArray(profile?.experiences) ? profile.experiences : [];
-  const showIdentity = typeof profile?.display_name === "string" && profile.display_name.trim().length > 0;
-  const phoneLabel = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join(" ").trim();
-  const telHref = [profile?.phone_dial_code, profile?.phone_number].filter(Boolean).join("").replace(/\s+/g, "");
-  const gapLabel = edgeOnly ? t("sweep_engage.request_matches.gap_edge_only") : t("sweep_engage.request_matches.gap_central");
-
-  const hardMissing = missingCriteria.filter((c: any) => c?.hard);
-  const softMissing = missingCriteria.filter((c: any) => !c?.hard);
-
-  const scoreColor = perfect ? "text-racing-yellow" : isPartial ? "text-racing-red" : "text-foreground";
-  const labelColor = perfect ? "text-racing-yellow" : isPartial ? "text-racing-red" : "text-success";
-  const stateLabel = perfect
-    ? t("mcard.label_perfect")
-    : isPartial
-      ? t("mcard.label_partial")
-      : t("mcard.label_full");
-  const cardBorder = perfect
-    ? "border-racing-yellow/55 bg-racing-yellow/5"
-    : isPartial
-      ? (edgeOnly ? "border-racing-yellow/50 bg-racing-yellow/5" : "border-racing-red/55 bg-racing-red/5")
-      : open
-        ? "border-racing-red/50 bg-card"
-        : "border-border bg-card";
-
-  const facts: React.ReactNode[] = [];
-  if (profile?.location) facts.push(<span key="loc">{profile.location}</span>);
-  if (profile?.day_rate != null) facts.push(<span key="rate">{t("sweep_engage.request_matches.day_rate_per_day", { rate: profile.day_rate })}</span>);
-  facts.push(<span key="days">{t("mcard.days_available", { count: match?.overlap_days ?? 0 })}</span>);
-  if (profile) {
-    facts.push(
-      <span key="travel">
-        {t("mcard.travels")}: <b className="font-semibold">{profile.travels ? t("mcard.yes") : t("mcard.no")}</b>
-      </span>,
-    );
-  }
-  if (match?.rating && match.rating.count > 0) {
-    facts.push(
-      <span key="rating" className="inline-flex items-center gap-1.5">
-        <span className="text-muted-foreground">{t("mcard.rating")}</span>
-        <RatingIcons variant="wrench" value={match.rating.average} count={match.rating.count} size={14} />
-      </span>,
-    );
-  }
-
-  return (
-    <div className="@container">
-      <div className={`rounded-2xl border p-5 @lg:p-6 ${cardBorder}`}>
-        {/* TOP ROW: score block (left) + CTA (right) */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className={`text-[46px] font-black leading-none tracking-tighter @lg:text-[54px] ${scoreColor}`}>{pct}%</div>
-            <div className="mt-1.5">
-              <div className={`font-mono text-[11px] font-bold uppercase tracking-[0.16em] ${labelColor}`}>{stateLabel}</div>
-              <div className="mt-1.5 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                {t("sweep_engage.request_matches.rank_tier_overlap", { rank: match?.rank ?? "—", tier: match?.tier ?? "—", count: match?.overlap_days ?? 0 })}
-              </div>
-              {match?.top_three && <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">{t("sweep_engage.request_matches.top3_free")}</div>}
-              {match?.free_preview && !match?.top_three && match?.unlocked && (
-                <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-racing-yellow">{t("sweep_engage.request_matches.unlocked_tag")}</div>
-              )}
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="flex shrink-0 flex-col items-stretch gap-2.5">
-            {blurred && (
-              <button
-                onClick={onUnlock}
-                disabled={loading}
-                className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-[14px] font-bold text-foreground transition-colors hover:border-racing-red disabled:opacity-60"
-              >
-                <Unlock className="size-3.5" /> {t("sweep_engage.request_matches.unlock_details_button", { cost: perProfileCost })}
-              </button>
-            )}
-            {match?.unlocked && !requestFilled && (
-              match?.confirmation_requested ? (
-                <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-4 py-3 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                  {t("mcard.confirmation_requested")}
-                </span>
-              ) : match?.confirmation_closed ? (
-                <span className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                  {t(match.confirmation_closed === "expired" ? "mcard.confirmation_expired" : "mcard.confirmation_declined")}
-                </span>
-              ) : (
-                <button
-                  onClick={onConfirm}
-                  disabled={loading}
-                  className="rounded-xl bg-racing-red px-4 py-3 text-[14px] font-extrabold text-white hover:brightness-110 disabled:opacity-60"
-                >
-                  {t("sweep_engage.request_matches.request_confirmation_button")}
-                </button>
-              )
-            )}
-            {requestFilled && (
-              <span className="rounded-xl border border-racing-yellow bg-racing-yellow/10 px-3 py-2.5 text-center font-mono text-[11px] uppercase tracking-widest text-racing-yellow">
-                {t("sweep_engage.request_matches.match_already_assigned")}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* MAIN: full width below */}
-        <div className="mt-4 min-w-0">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              {!match?.unlocked && <Lock className="size-4 shrink-0 text-muted-foreground" />}
-              <span className={`text-[19px] font-extrabold ${showIdentity ? "" : "text-muted-foreground"}`}>
-                {showIdentity ? profile.display_name : t("sweep_engage.request_matches.hidden_freelancer")}
-              </span>
-              {profile?.role_group && (
-                <span className="text-[17px] font-bold">
-                  {roleGroupLabel(profile.role_group)}
-                  {subRoles.length > 0 && (
-                    <span className="font-semibold text-muted-foreground">
-                      {" · "}{subRoles.map((sr) => `${subRoleLabel(sr.sub_role)} (${levelLabel(sr.level)})`).join(", ")}
-                    </span>
-                  )}
-                </span>
-              )}
-              {match?.in_pool && <PoolBadge />}
-            </div>
-
-            {facts.length > 0 && (
-              <div className="mt-2 flex flex-wrap items-center gap-y-1 text-[15px]">
-                {facts.map((f, i) => (
-                  <span key={i} className="inline-flex items-center">
-                    {i > 0 && <span className="mx-2.5 text-muted-foreground">·</span>}
-                    {f}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* WHY THIS SCORE */}
-            <div className="mt-2.5 flex flex-col gap-1 text-[14.5px] leading-relaxed">
-              {isPartial && (match?.missing_days ?? 0) > 0 && (
-                <span className={edgeOnly ? "text-racing-yellow" : "text-racing-red"}>
-                  <Clock className="mr-1.5 inline size-3.5" />
-                  {t("mcard.missing_days_line", { count: match?.missing_days ?? 0, dates: missingDates.slice(0, 4).join(", ") || gapLabel })}
-                </span>
-              )}
-              {hardMissing.length > 0 && (
-                <span className="text-racing-red">
-                  ✕ {t("mcard.hard_missing", { list: hardMissing.map((c: any) => formatCriterion(c, t)).join(", ") })}
-                </span>
-              )}
-              {softMissing.length > 0 && (
-                <span className="text-racing-yellow">
-                  ◐ {t("mcard.missing_preferred", { list: softMissing.map((c: any) => formatCriterion(c, t)).join(", ") })}
-                </span>
-              )}
-              {hardMissing.length === 0 && softMissing.length === 0 && (
-                <span className="text-success">✓ {t("mcard.all_hard_met")}</span>
-              )}
-            </div>
-
-            {/* EXPANDED */}
-            {open && (
-              <div className="mt-4 border-t border-border pt-4">
-                <div className="grid gap-5 @xl:grid-cols-2">
-                  {match?.unlocked && profile ? (
-                    <>
-                      {(profile.headline || profile.bio) && (
-                        <DetailBlock title={t("mcard.headline")} wide>
-                          {profile.headline && <p className="text-[14.5px] leading-relaxed">{profile.headline}</p>}
-                          {profile.bio && <p className="mt-1 text-[14.5px] leading-relaxed text-muted-foreground">{profile.bio}</p>}
-                        </DetailBlock>
-                      )}
-                      {disciplines.length > 0 && (
-                        <DetailBlock title={t("mcard.disciplines")}>
-                          <div className="flex flex-wrap gap-1.5">
-                            {disciplines.map((d: string) => <Chip key={d}>{disciplineLabel(d)}</Chip>)}
-                          </div>
-                        </DetailBlock>
-                      )}
-                      {skills.length > 0 && (
-                        <DetailBlock title={t("mcard.skills")}>
-                          <div className="flex flex-wrap gap-1.5">
-                            {skills.map((s: string) => <Chip key={s}>{skillLabel(s)}</Chip>)}
-                          </div>
-                        </DetailBlock>
-                      )}
-                      {languages.length > 0 && (
-                        <DetailBlock title={t("mcard.languages")}>
-                          <div className="flex flex-wrap gap-1.5">
-                            {languages.map((l: any, i: number) => (
-                              <Chip key={i}>{typeof l === "string" ? l : `${l?.custom || l?.code || ""}${l?.level ? ` · ${l.level}` : ""}`}</Chip>
-                            ))}
-                          </div>
-                        </DetailBlock>
-                      )}
-                      {(experiences.length > 0 || profile.education) && (
-                        <DetailBlock title={t("mcard.exp_edu")}>
-                          <div className="text-[14.5px] leading-relaxed text-muted-foreground">
-                            {experiences.map((e: any, i: number) => (
-                              <span key={i}>
-                                {i > 0 && " · "}
-                                {disciplineLabel(e?.discipline)} · {e?.years ?? 0} {t("mcard.years_short")}
-                              </span>
-                            ))}
-                            {profile.education && <span>{experiences.length > 0 ? " · " : ""}{educationLabel(profile.education)}</span>}
-                          </div>
-                        </DetailBlock>
-                      )}
-                      <DetailBlock title={t("mcard.contact")}>
-                        {profile.contact_email || profile.phone_number ? (
-                          <div className="grid gap-1 text-[14.5px]">
-                            {profile.contact_email && <a href={`mailto:${profile.contact_email}`} className="break-all text-racing-red hover:underline">{profile.contact_email}</a>}
-                            {profile.phone_number && <a href={`tel:${telHref}`} className="text-racing-red hover:underline">{phoneLabel || profile.phone_number}</a>}
-                          </div>
-                        ) : (
-                          <div className="text-[14.5px] text-muted-foreground">{t("sweep_engage.matches.name_contacts_hidden")}</div>
-                        )}
-                      </DetailBlock>
-                    </>
-                  ) : (
-                    <DetailBlock title={t("mcard.contact")} wide>
-                      <div className="text-[14.5px] leading-relaxed text-muted-foreground">
-                        {t("sweep_engage.request_matches.tech_details_hidden_note", { cost: perProfileCost })}
-                      </div>
-                    </DetailBlock>
-                  )}
-
-                  <DetailBlock title={t("mcard.criteria")} wide>
-                    <div className="flex flex-col gap-1.5 text-[14.5px]">
-                      {isPartial && (match?.missing_days ?? 0) > 0 && (
-                        <div className={edgeOnly ? "text-racing-yellow" : "text-racing-red"}>
-                          ◐ {t("mcard.missing_days_line", { count: match?.missing_days ?? 0, dates: missingDates.join(", ") || gapLabel })}
-                        </div>
-                      )}
-                      {hardMissing.map((c: any, i: number) => (
-                        <div key={`h${i}`} className="text-racing-red">✕ {formatCriterion(c, t)}</div>
-                      ))}
-                      {softMissing.map((c: any, i: number) => (
-                        <div key={`s${i}`} className="text-racing-yellow">◐ {formatCriterion(c, t)}</div>
-                      ))}
-                      {missingCriteria.length === 0 && (
-                        <div className="text-success">✓ {t("sweep_engage.request_matches.all_criteria_satisfied_100")}</div>
-                      )}
-                    </div>
-                  </DetailBlock>
-                </div>
-              </div>
-            )}
-
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setOpen((v) => !v)}
-                aria-expanded={open}
-                className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-racing-red hover:text-foreground"
-              >
-                {open ? t("mcard.hide_details") : t("mcard.view_details")}
-                <span className="text-racing-red">{open ? "↑" : "↓"}</span>
-              </button>
-            </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 type RefundState = {
