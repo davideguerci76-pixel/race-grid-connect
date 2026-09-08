@@ -161,6 +161,7 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
     } else {
       await supabaseAdmin.auth.admin.updateUserById(data.user_id, { ban_duration: "none" });
     }
+    await logAdminAction(context.userId, data.user_id, data.blocked ? "user_blocked" : "user_unblocked", {});
     return { ok: true };
   });
 
