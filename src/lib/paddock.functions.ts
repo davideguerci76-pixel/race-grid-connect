@@ -155,12 +155,14 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
       return days;
     };
 
-    const engagements = (data ?? []) as Array<{
+    const engagements = ((data ?? []) as Array<{
       request_id?: string | null;
       start_date: string;
       end_date: string;
+      status?: string | null;
+      cancellation_kind?: string | null;
       covered_days?: string[] | null;
-    }>;
+    }>).filter((e) => e.status !== "cancelled" || e.cancellation_kind === "freelancer_late");
     const out = new Set<string>();
     const legacy: typeof engagements = [];
 
