@@ -29,7 +29,7 @@ export function SiteFooter() {
           <img src={logoCompact.url} alt="Pit Call" width={1933} height={274} className="h-10 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
-        <div>
+        <div className="col-start-1 row-start-2 md:col-start-auto md:row-start-auto">
           <div className="label-mono mb-3">{t("footer.network")}</div>
           <ul className="space-y-2 text-sm">
             <li>
@@ -57,7 +57,7 @@ export function SiteFooter() {
             )}
           </ul>
         </div>
-        <div>
+        <div className="col-span-2 row-start-3 md:col-span-1 md:row-start-auto">
           <div className="label-mono mb-3">{t("footer.legal")}</div>
           <ul className="space-y-2 text-sm">
             <li>
