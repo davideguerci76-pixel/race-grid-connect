@@ -19,7 +19,7 @@ type Actions = {
   revealCost: number;
   onWithdraw: () => void;
   withdrawPending: boolean;
-  onComplete: () => void;
+  
   onCancel: (inGrace: boolean) => void;
   onAnswerContact: (contacted: boolean) => void;
   answerContactPending: boolean;
