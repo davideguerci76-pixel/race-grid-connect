@@ -133,7 +133,7 @@ export function SiteFooter() {
               href="https://www.instagram.com/pitcall_net?stkn=emF0aG82djI4M2Rv"
               target="_blank"
               rel="noreferrer noopener nofollow"
-              aria-label={t("footer.socialInstagram")}
+              aria-label="Instagram"
               className="p-2 text-white transition-colors hover:text-racing-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing-red focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <Instagram className="size-5" aria-hidden="true" />
@@ -142,7 +142,7 @@ export function SiteFooter() {
               href="https://www.linkedin.com/company/pitcall/"
               target="_blank"
               rel="noreferrer noopener nofollow"
-              aria-label={t("footer.socialLinkedin")}
+              aria-label="LinkedIn"
               className="p-2 text-white transition-colors hover:text-racing-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing-red focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <Linkedin className="size-5" aria-hidden="true" />
@@ -151,7 +151,7 @@ export function SiteFooter() {
               href={whatsappHref}
               target="_blank"
               rel="noreferrer noopener nofollow"
-              aria-label={t("footer.socialWhatsapp")}
+              aria-label="WhatsApp"
               className="p-2 text-white transition-colors hover:text-racing-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing-red focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <WhatsAppIcon className="size-5" />
