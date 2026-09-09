@@ -764,6 +764,13 @@
       "when": 1788878115935,
       "tag": "0108_freelancer_late_cancel_keeps_days_blocked",
       "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1788963606972,
+      "tag": "0109_remove_human_mark_complete_path",
+      "breakpoints": true
     }
   ]
 }
