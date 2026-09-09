@@ -48,10 +48,6 @@
         "title": "Annuler après la grace window",
         "body": "La grace window est passée : c'est donc une annulation tardive. L'engagement est annulé, le team est prévenu et ces jours restent bloqués dans votre calendrier — vous ne pouvez ni les rendre disponibles ni accepter une autre mission dessus."
       },
-      "mark_complete": {
-        "title": "Marquer comme terminé",
-        "body": "Confirme de votre côté que la mission a été réalisée. Quand les deux parties confirment, l'engagement est marqué terminé."
-      },
       "confirm_calendar": {
         "title": "Confirmer la disponibilité",
         "body": "Indique que vos jours ouverts sont toujours exacts et rafraîchit la fraîcheur de votre calendrier, pour que votre disponibilité continue d'être utilisée dans le matching."

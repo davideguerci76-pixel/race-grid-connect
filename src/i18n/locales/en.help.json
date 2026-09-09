@@ -48,10 +48,6 @@
         "title": "Cancel after the grace window",
         "body": "The grace window has passed, so this counts as a late cancellation: the engagement is cancelled, the team is notified, and those days stay blocked in your calendar — you cannot make them available or take another job on them."
       },
-      "mark_complete": {
-        "title": "Mark as completed",
-        "body": "Confirms on your side that the job was done. When both parties confirm, the engagement is marked completed."
-      },
       "confirm_calendar": {
         "title": "Confirm availability",
         "body": "Tells us your open days are still accurate and refreshes your calendar freshness, so your availability keeps being used for matching."

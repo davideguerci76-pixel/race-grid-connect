@@ -48,10 +48,6 @@
         "title": "Nach der Grace Window absagen",
         "body": "Die Grace Window ist vorbei, es gilt als späte Absage: Das Engagement wird storniert, das Team benachrichtigt, und diese Tage bleiben in Ihrem Kalender gesperrt — Sie können sie weder freigeben noch andere Jobs darauf annehmen."
       },
-      "mark_complete": {
-        "title": "Als abgeschlossen markieren",
-        "body": "Bestätigt von Ihrer Seite, dass die Arbeit erledigt wurde. Wenn beide Seiten bestätigen, gilt das Engagement als abgeschlossen."
-      },
       "confirm_calendar": {
         "title": "Verfügbarkeit bestätigen",
         "body": "Bestätigt, dass Ihre offenen Tage weiterhin stimmen, und frischt die Kalenderaktualität auf, damit Ihre Verfügbarkeit weiter fürs Matching genutzt wird."

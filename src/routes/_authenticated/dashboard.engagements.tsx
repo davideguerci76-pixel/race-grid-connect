@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker } from "@/components/rating-icons";
 import { EngagementCard } from "@/components/cards/engagement-card";
 import { StatusChip, cardBtn } from "@/components/cards/primitives";
-import { getMyEngagements, markEngagementComplete, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
+import { getMyEngagements, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { useRouterState } from "@tanstack/react-router";
@@ -32,7 +32,7 @@ function EngagementsPage() {
   const { ratingBonus } = useActionCosts();
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
-  const completeFn = useServerFn(markEngagementComplete);
+  
   const rateFn = useServerFn(submitRatingV2);
   const ratableFn = useServerFn(getRatableEngagements);
 
@@ -134,7 +134,7 @@ function EngagementsPage() {
   });
 
 
-  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  
   const revealFn = useServerFn(revealMatch);
   const fetchSettings = useServerFn(getPlatformSettings);
   const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
@@ -305,7 +305,7 @@ function EngagementsPage() {
                     if (await confirmDialog(t("engagements.withdraw_confirm", { defaultValue: "Withdraw this request? The freelancer's days will be released." }))) withdrawMut.mutate(e.id);
                   },
                   withdrawPending: withdrawMut.isPending,
-                  onComplete: () => completeMut.mutate(e.id),
+                  
                   onCancel: async (inGrace: boolean) => {
                     const warn = inGrace
                       ? t("sweep_engage.engagements.cancel_grace_confirm")

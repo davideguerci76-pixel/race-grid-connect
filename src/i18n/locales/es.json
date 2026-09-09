@@ -251,10 +251,9 @@
       "expired": "Caducado"
     },
     "confirm": "Confirmar",
-    "mark_complete": "Marcar completado",
     "cancel": "Cancelar",
     "rate": "Valorar",
-    "rating_locked": "Se desbloquea al confirmar ambas partes",
+    "rating_locked": "La valoración se abre tras las fechas del contrato, según el calendario de la plataforma",
     "rate_them": "Valorar {{name}}",
     "ask_more_time": "Pedir más tiempo",
     "decline": "Rechazar",
