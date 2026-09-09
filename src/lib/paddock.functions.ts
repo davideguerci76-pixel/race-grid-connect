@@ -1091,21 +1091,9 @@ export const extendMatchConfirmation = createServerFn({ method: "POST" })
   });
 
 
-export const markEngagementComplete = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: e } = await supabase.from("engagements").select("*").eq("id", data.id).maybeSingle();
-    if (!e) throw new Error("Engagement not found");
-    let patch: { freelancer_marked_complete?: boolean; team_marked_complete?: boolean };
-    if (userId === e.freelancer_id) patch = { freelancer_marked_complete: true };
-    else if (userId === e.team_id) patch = { team_marked_complete: true };
-    else throw new Error("Not a party");
-    const { data: row, error } = await supabase.from("engagements").update(patch).eq("id", data.id).select().single();
-    if (error) throw new Error(error.message);
-    return row;
-  });
+// ENG-COMPLETE-02: the human "mark completed" handshake was removed. Engagements
+// are completed only by the temporal authority (automatic completion cron).
+
 
 export const getMyEngagements = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

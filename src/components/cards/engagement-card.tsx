@@ -53,7 +53,7 @@ export function EngagementCard({
   const { formatDate } = useDateFormat();
   const isFreelancer = userId === e.freelancer_id;
   const other = isFreelancer ? e.team : e.freelancer;
-  const iMarked = isFreelancer ? e.freelancer_marked_complete : e.team_marked_complete;
+  
   const tp = e.team_profile;
   const fp = e.freelancer_profile;
   const req = e.request;
@@ -118,12 +118,6 @@ export function EngagementCard({
           <button type="button" onClick={actions.onWithdraw} disabled={actions.withdrawPending} className={cardBtn.danger}>
             {t("engagements.withdraw")}
           </button>
-        )}
-        {isConfirmed && !iMarked && !isFreelancer && (
-          <span className="inline-flex items-center gap-1">
-            <button type="button" onClick={actions.onComplete} className={cardBtn.dark}>{t("engagements.mark_complete")}</button>
-            <HelpHint titleKey="help.action.mark_complete.title" bodyKey="help.action.mark_complete.body" />
-          </span>
         )}
         {isConfirmed && (
           <span className="inline-flex items-center gap-1">
