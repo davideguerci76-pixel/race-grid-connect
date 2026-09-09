@@ -298,7 +298,10 @@
     "cookie": "Cookies",
     "dataInfo": "Zusätzliche Informationen zur Datenverarbeitung",
     "noticeAtCollection": "Hinweis bei der Erhebung",
-    "privacyChoices": "Ihre Datenschutzoptionen"
+    "privacyChoices": "Ihre Datenschutzoptionen",
+    "socialInstagram": "Instagram",
+    "socialLinkedin": "LinkedIn",
+    "socialWhatsapp": "WhatsApp"
   },
   "requests": {
     "title": "Meine Pit Calls",
