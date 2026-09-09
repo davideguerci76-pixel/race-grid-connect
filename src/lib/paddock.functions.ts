@@ -128,11 +128,14 @@ export const getMyBlockedDates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    // Mirrors the database authority public.day_blocked_by_engagement:
+    // confirmed/completed engagements, plus engagements the freelancer cancelled
+    // late (freelancer_late) — those days stay blocked and are never recovered.
     const { data, error } = await supabase
       .from("engagements")
-      .select("request_id, start_date, end_date, status, covered_days")
+      .select("request_id, start_date, end_date, status, cancellation_kind, covered_days")
       .eq("freelancer_id", userId)
-      .in("status", ["confirmed", "completed"]);
+      .in("status", ["confirmed", "completed", "cancelled"]);
     if (error) throw new Error(error.message);
 
     const toIso = (d: Date) => {
