@@ -313,7 +313,10 @@
     "cookie": "Cookie",
     "dataInfo": "Data processing info",
     "noticeAtCollection": "Notice at collection",
-    "privacyChoices": "Your Privacy Choices"
+    "privacyChoices": "Your Privacy Choices",
+    "socialInstagram": "Instagram",
+    "socialLinkedin": "LinkedIn",
+    "socialWhatsapp": "WhatsApp"
   },
   "requests": {
     "title": "My Pit Calls",
