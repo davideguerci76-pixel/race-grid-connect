@@ -24,8 +24,8 @@ export function SiteFooter() {
   const { noticeUrl, hasUsWidget } = useIubendaFooterLinks();
   return (
     <footer className="mt-24 border-t border-border bg-carbon">
-      <div className="container-page grid gap-10 py-16 md:grid-cols-4">
-        <div className="md:col-span-2">
+      <div className="container-page relative grid grid-cols-[minmax(0,1fr)_auto] gap-x-6 gap-y-10 py-16 md:grid-cols-4 md:gap-10">
+        <div className="col-span-2 md:col-span-2">
           <img src={logoCompact.url} alt="Pit Call" width={1933} height={274} className="h-10 w-auto object-contain mix-blend-screen" />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{t("footer.tagline")}</p>
         </div>
@@ -63,8 +63,9 @@ export function SiteFooter() {
             <li>
               <a
                 href={policyUrl("privacy")}
-                title="Privacy Policy"
-                className="iubenda-black iubenda-noiframe iubenda-embed text-muted-foreground transition-colors hover:text-racing-red"
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+                className="text-muted-foreground transition-colors hover:text-racing-red"
               >
                 {t("footer.privacy")}
               </a>
@@ -77,8 +78,9 @@ export function SiteFooter() {
             <li>
               <a
                 href={policyUrl("cookie")}
-                title="Cookie Policy"
-                className="iubenda-black iubenda-noiframe iubenda-embed text-muted-foreground transition-colors hover:text-racing-red"
+                target="_blank"
+                rel="noreferrer noopener nofollow"
+                className="text-muted-foreground transition-colors hover:text-racing-red"
               >
                 {t("footer.cookie")}
               </a>
@@ -125,7 +127,7 @@ export function SiteFooter() {
             </li>
           </ul>
         </div>
-        <div className="col-span-full flex justify-center">
+        <div className="col-start-2 row-start-2 flex items-center self-center md:absolute md:bottom-12 md:left-1/2 md:row-auto md:-translate-x-1/2">
           <div className="flex items-center gap-2">
             <a
               href="https://www.instagram.com/pitcall_net?stkn=emF0aG82djI4M2Rv"
