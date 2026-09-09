@@ -32,7 +32,9 @@ export const getMyEngagementDays = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const rows = (data ?? []) as any[];
-    const relevant = rows.filter((r) => r.status !== "cancelled" || r.cancellation_kind === "team_late");
+    // Mirrors public.day_blocked_by_engagement: a freelancer late cancellation keeps
+    // its days blocked; a team late cancellation releases them.
+    const relevant = rows.filter((r) => r.status !== "cancelled" || r.cancellation_kind === "freelancer_late");
     const teamIds = Array.from(new Set(relevant.map((r) => r.team_id)));
     const nameMap = new Map<string, string>();
     if (teamIds.length) {
