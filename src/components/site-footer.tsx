@@ -125,9 +125,7 @@ export function SiteFooter() {
             </li>
           </ul>
         </div>
-      </div>
-      <div className="border-t border-border">
-        <div className="container-page flex flex-col items-center gap-4 py-4">
+        <div className="col-span-full flex justify-center">
           <div className="flex items-center gap-2">
             <a
               href="https://www.instagram.com/pitcall_net?stkn=emF0aG82djI4M2Rv"
@@ -157,10 +155,12 @@ export function SiteFooter() {
               <WhatsAppIcon className="size-5" />
             </a>
           </div>
-          <div className="flex w-full items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            <span>© 2026 Pit Call</span>
-            <span>Pit Call Code 44.029 / Z-1</span>
-          </div>
+        </div>
+      </div>
+      <div className="border-t border-border">
+        <div className="container-page flex w-full items-center justify-between py-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span>© 2026 Pit Call</span>
+          <span>Pit Call Code 44.029 / Z-1</span>
         </div>
       </div>
     </footer>
