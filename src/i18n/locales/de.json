@@ -251,10 +251,9 @@
       "expired": "Abgelaufen"
     },
     "confirm": "Bestätigen",
-    "mark_complete": "Als abgeschlossen markieren",
     "cancel": "Stornieren",
     "rate": "Bewerten",
-    "rating_locked": "Bewertung nach beidseitiger Bestätigung",
+    "rating_locked": "Die Bewertung öffnet nach den Einsatztagen, gemäß Plattform-Zeitplan",
     "rate_them": "{{name}} bewerten",
     "ask_more_time": "Mehr Zeit anfragen",
     "decline": "Ablehnen",

@@ -42,7 +42,6 @@
     "rate_bonus_generic": "(Token Bonus)"
   },
   "engagements": {
-    "confirmed_toast": "Engagement bestätigt",
-    "marked_complete_toast": "Engagement als abgeschlossen markiert"
+    "confirmed_toast": "Engagement bestätigt"
   }
 }

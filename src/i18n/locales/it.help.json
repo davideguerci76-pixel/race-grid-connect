@@ -48,10 +48,6 @@
         "title": "Annulla dopo la grace window",
         "body": "La grace window è scaduta, quindi è un annullamento tardivo: l'ingaggio viene annullato, il team viene avvisato e quei giorni restano bloccati nel tuo calendario — non puoi renderli disponibili né accettare altri lavori in quelle date."
       },
-      "mark_complete": {
-        "title": "Segna come completato",
-        "body": "Conferma dalla tua parte che il lavoro è stato svolto. Quando entrambe le parti confermano, l'ingaggio risulta completato."
-      },
       "confirm_calendar": {
         "title": "Conferma disponibilità",
         "body": "Ci dice che i tuoi giorni aperti sono ancora corretti e aggiorna la freschezza del calendario, così la tua disponibilità continua a essere usata per il matching."

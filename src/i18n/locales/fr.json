@@ -251,10 +251,9 @@
       "expired": "Expiré"
     },
     "confirm": "Confirmer",
-    "mark_complete": "Marquer terminé",
     "cancel": "Annuler",
     "rate": "Évaluer",
-    "rating_locked": "Débloqué après confirmation des deux parties",
+    "rating_locked": "L'évaluation s'ouvre après les dates de la mission, selon le calendrier de la plateforme",
     "rate_them": "Évaluer {{name}}",
     "ask_more_time": "Demander plus de temps",
     "decline": "Refuser",

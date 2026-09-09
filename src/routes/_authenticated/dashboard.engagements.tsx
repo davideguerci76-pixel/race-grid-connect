@@ -134,7 +134,7 @@ function EngagementsPage() {
   });
 
 
-  const completeMut = useMutation({ mutationFn: (id: string) => completeFn({ data: { id } }), onSuccess: () => { toast.success(t("engagements.marked_complete_toast")); qc.invalidateQueries(); } });
+  
   const revealFn = useServerFn(revealMatch);
   const fetchSettings = useServerFn(getPlatformSettings);
   const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });

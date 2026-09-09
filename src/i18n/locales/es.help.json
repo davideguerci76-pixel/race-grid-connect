@@ -48,10 +48,6 @@
         "title": "Cancelar tras la grace window",
         "body": "La grace window ha terminado, así que es una cancelación tardía: el engagement se cancela, se avisa al team y esos días siguen bloqueados en tu calendario — no puedes marcarlos disponibles ni aceptar otro trabajo en ellos."
       },
-      "mark_complete": {
-        "title": "Marcar como completado",
-        "body": "Confirma por tu parte que el trabajo se realizó. Cuando ambas partes confirman, el engagement queda como completado."
-      },
       "confirm_calendar": {
         "title": "Confirmar disponibilidad",
         "body": "Indica que tus días abiertos siguen siendo correctos y actualiza la frescura del calendario, para que tu disponibilidad se siga usando en el matching."
