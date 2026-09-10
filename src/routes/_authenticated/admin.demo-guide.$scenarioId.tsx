@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Loader2, Printer } from "lucide-react";
+import { Download, Loader2, Printer } from "lucide-react";
 import { getDemoGuide } from "@/lib/demo.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/demo-guide/$scenarioId")({
@@ -12,6 +12,15 @@ export const Route = createFileRoute("/_authenticated/admin/demo-guide/$scenario
 
 type Lang = "it" | "en";
 const T = (t: { it: string; en: string } | undefined, l: Lang) => (t ? t[l] : "");
+
+function downloadText(filename: string, text: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/calendar;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function DemoGuide() {
   const { scenarioId } = Route.useParams();
@@ -114,7 +123,10 @@ function DemoGuide() {
                 {f.languages.map((l: any) => `${l.code} (${l.level})`).join(", ")}
               </Mono>
               <Mono>
-                {lang === "it" ? "Disponibilità" : "Availability"}: {f.availability.join(", ") || "—"}
+                {lang === "it" ? "Disponibilità" : "Availability"}:{" "}
+                {f.availability.length > 12
+                  ? `${f.availability.length} ${lang === "it" ? "giorni" : "days"} (${f.availability[0]} → ${f.availability[f.availability.length - 1]})`
+                  : f.availability.join(", ") || "—"}
               </Mono>
             </Card>
           ))}
@@ -130,14 +142,63 @@ function DemoGuide() {
             {lang === "it" ? "Team" : "Team"}: {p.team} · {p.input.role_group} / {p.input.sub_role} (min{" "}
             {p.input.sub_role_min_level}) · {p.input.discipline} · {p.input.duration} · {p.input.search_mode}
           </Mono>
-          <Mono>
-            {lang === "it" ? "Date" : "Dates"}: {p.input.dates.join(", ")} · {p.input.location} ·{" "}
-            {p.input.location_relevance} {p.input.location_radius_km}km
-          </Mono>
+          {p.ics ? (
+            <Mono>
+              {lang === "it" ? "Date" : "Dates"}: {p.ics.day_count} {lang === "it" ? "giorni da file ICS" : "days from ICS file"} (
+              {p.input.dates[0]} → {p.input.dates[p.input.dates.length - 1]}) · {p.input.location} · {p.input.location_relevance}{" "}
+              {p.input.location_radius_km}km
+            </Mono>
+          ) : (
+            <Mono>
+              {lang === "it" ? "Date" : "Dates"}: {p.input.dates.join(", ")} · {p.input.location} ·{" "}
+              {p.input.location_relevance} {p.input.location_radius_km}km
+            </Mono>
+          )}
           <Mono>
             {lang === "it" ? "Skill" : "Skills"}: {p.input.skills.join(", ") || "—"} · budget {p.input.budget_min}–
-            {p.input.budget_max}€ · {lang === "it" ? "Trasferte" : "Travel"}: {p.input.travel_required ? "sì/yes" : "no"}
+            {p.input.budget_max}€{p.input.duration === "full_season" ? (lang === "it" ? "/stagione" : "/season") : ""} ·{" "}
+            {lang === "it" ? "Trasferte" : "Travel"}: {p.input.travel_required ? "sì/yes" : "no"}
           </Mono>
+
+          {p.ics && (
+            <>
+              <SubTitle>{lang === "it" ? "File ICS da caricare a mano" : "ICS file to upload by hand"}</SubTitle>
+              <div className="flex flex-wrap items-center gap-3">
+                <Mono>{p.ics.filename}</Mono>
+                {p.ics.text && (
+                  <button
+                    onClick={() => downloadText(p.ics.filename, p.ics.text)}
+                    className="no-print inline-flex items-center gap-2 border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                  >
+                    <Download className="size-3" /> {lang === "it" ? "Scarica .ics" : "Download .ics"}
+                  </button>
+                )}
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {lang === "it"
+                  ? "Il file non viene mai importato dal seed: va caricato dall'operatore nel form Pit Call (“Importa file .ics”)."
+                  : "The file is never imported by the seed: the operator uploads it in the Pit Call form (“Import .ics”)."}
+              </p>
+              <table className="mt-2 w-full border-collapse text-[11px]">
+                <thead>
+                  <tr className="text-left text-muted-foreground">
+                    <th className="border border-border p-1">Round</th>
+                    <th className="border border-border p-1">{lang === "it" ? "Dal" : "From"}</th>
+                    <th className="border border-border p-1">{lang === "it" ? "Al" : "To"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {p.ics.rounds.map((r: any) => (
+                    <tr key={r.label}>
+                      <td className="border border-border p-1">{r.label}</td>
+                      <td className="border border-border p-1 font-mono">{r.start}</td>
+                      <td className="border border-border p-1 font-mono">{r.end}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
 
           <SubTitle>{lang === "it" ? "Passi" : "Steps"}</SubTitle>
           <ol className="ml-4 list-decimal space-y-1 text-sm">

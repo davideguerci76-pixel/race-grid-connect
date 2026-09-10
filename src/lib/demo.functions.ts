@@ -3,7 +3,19 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEMO_SCENARIO_LIST, getScenario } from "@/lib/demo/scenarios";
 import type { DemoCanonicalPitCall, DemoScenario } from "@/lib/demo/scenarios/types";
-import { computeAnchor, resolveDay, resolveDays, todayISO } from "@/lib/demo/anchor";
+import { computeAnchor, expandRanges, resolveDay, resolveDays, todayISO } from "@/lib/demo/anchor";
+import { parseIcs } from "@/lib/ics";
+import SEASON_2027_ICS from "@/lib/demo/assets/PITCALL_DEMO_GT3_EUROPE_2027.ics?raw";
+
+/** ICS files shipped with the demo kit, by filename. Never seeded: the operator uploads them by hand. */
+const DEMO_ICS_FILES: Record<string, string> = {
+  "PITCALL_DEMO_GT3_EUROPE_2027.ics": SEASON_2027_ICS,
+};
+
+/** Days an operator gets when uploading the file in the product (same parser as the Pit Call form). */
+function icsDays(text: string): string[] {
+  return expandRanges(parseIcs(text).map((e) => ({ start: e.start, end: e.end })));
+}
 
 // =====================================================================
 // DEMO scenarios — generic seeder / verifier / guide data.
@@ -378,10 +390,11 @@ async function probePitCall(
       languages: pc.input.languages,
       start_date: days[0],
       end_date: days[days.length - 1],
-      season_dates: null,
+      // Same shape the Pit Call form sends for a season: the full day list + season budget unit.
+      season_dates: pc.input.duration === "full_season" ? days : null,
       budget_min: pc.input.budget_min,
       budget_max: pc.input.budget_max,
-      budget_unit: "day",
+      budget_unit: pc.input.duration === "full_season" ? "season" : "day",
       currency: "EUR",
       travel_required: pc.input.travel_required,
       notes: "DEMO verification probe — deleted immediately after verification.",
@@ -544,6 +557,24 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
   // 5. canonical Pit Calls, verified with the real engine on a transient probe
   const probes: Record<string, ProbeRow[]> = {};
   for (const pc of scenario.canonicalPitCalls) {
+    // Season scenarios: the ICS the operator will upload must yield exactly the
+    // manifest days (same parser as the product) and nothing may be pre-created.
+    if (pc.ics) {
+      const text = DEMO_ICS_FILES[pc.ics.filename];
+      const fromFile = text ? icsDays(text) : [];
+      const fromManifest = resolveDays(anchor, pc.input.days, now);
+      push(`${pc.key}: ICS file shipped`, pc.ics.filename, text ? pc.ics.filename : "missing");
+      push(`${pc.key}: ICS days = manifest days`, `${fromManifest.length} days`, fromFile.join(",") === fromManifest.join(",") ? `${fromFile.length} days` : `mismatch (${fromFile.length} days)`);
+      push(`${pc.key}: ICS rounds`, String(pc.ics.rounds.length), String(parseIcs(text ?? "").length));
+      const { count: preCreated } = await sb
+        .from("requests")
+        .select("*", { count: "exact", head: true })
+        .eq("team_id", personas[pc.team])
+        .eq("duration", "full_season")
+        .eq("is_test", true);
+      push(`${pc.key}: no season Pit Call pre-seeded (manual upload)`, "0", String(preCreated ?? 0));
+    }
+
     const rows = await probePitCall(sb, scenario, pc, personas, anchor, now);
     probes[pc.key] = rows;
     const full = rows.filter((r) => !r.partial).map((r) => r.key);
@@ -799,6 +830,14 @@ export const getDemoGuide = createServerFn({ method: "POST" })
           dates: resolveDays(anchor, p.input.days, now),
           location: `${p.input.location.city}, ${p.input.location.country}`,
         },
+        ics: p.ics
+          ? {
+              filename: p.ics.filename,
+              rounds: p.ics.rounds,
+              text: DEMO_ICS_FILES[p.ics.filename] ?? null,
+              day_count: resolveDays(anchor, p.input.days, now).length,
+            }
+          : null,
         probe: state?.report?.verification?.probes?.[p.key] ?? null,
       })),
       sos: {

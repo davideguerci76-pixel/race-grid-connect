@@ -1,4 +1,5 @@
-import type { DemoCity, DemoScenario } from "./types";
+import type { DemoCity, DemoRound, DemoScenario } from "./types";
+import { expandRanges } from "../anchor";
 
 const MONZA: DemoCity = { city: "Monza", region: "Lombardia", country: "Italy", lat: 45.6156, lng: 9.2811 };
 const IMOLA: DemoCity = { city: "Imola", region: "Emilia-Romagna", country: "Italy", lat: 44.3441, lng: 11.7161 };
@@ -6,9 +7,27 @@ const MODENA: DemoCity = { city: "Modena", region: "Emilia-Romagna", country: "I
 const SILVERSTONE: DemoCity = { city: "Silverstone", region: "England", country: "United Kingdom", lat: 52.0733, lng: -1.0147 };
 const LE_MANS: DemoCity = { city: "Le Mans", region: "Pays de la Loire", country: "France", lat: 47.9558, lng: 0.2075 };
 const SUZUKA: DemoCity = { city: "Suzuka", region: "Mie", country: "Japan", lat: 34.8431, lng: 136.5407 };
+const VALENCIA: DemoCity = { city: "Valencia", region: "Comunidad Valenciana", country: "Spain", lat: 39.4699, lng: -0.3763 };
 
 const ENG_SKILLS = ["telemetry_analysis", "race_engineering", "motec_i2"];
 const MECH_SKILLS = ["pit_stop_crew", "tyre_management", "brake_specialist"];
+
+// Scenario D — the 2027 season exactly as in PITCALL_DEMO_GT3_EUROPE_2027.ics
+// (all-day events, DTEND exclusive → inclusive end shown here). 8 rounds × 4 days = 32 days.
+export const SEASON_2027_FILE = "PITCALL_DEMO_GT3_EUROPE_2027.ics";
+export const SEASON_2027_ROUNDS: DemoRound[] = [
+  { label: "Round 1", start: "2027-03-18", end: "2027-03-21" },
+  { label: "Round 2", start: "2027-04-22", end: "2027-04-25" },
+  { label: "Round 3", start: "2027-05-27", end: "2027-05-30" },
+  { label: "Round 4", start: "2027-07-01", end: "2027-07-04" },
+  { label: "Round 5", start: "2027-08-05", end: "2027-08-08" },
+  { label: "Round 6", start: "2027-09-09", end: "2027-09-12" },
+  { label: "Round 7", start: "2027-10-14", end: "2027-10-17" },
+  { label: "Round 8", start: "2027-11-11", end: "2027-11-14" },
+];
+const SEASON_2027_DAYS = expandRanges(SEASON_2027_ROUNDS); // 32
+const SEASON_2027_MINUS_R8 = expandRanges(SEASON_2027_ROUNDS.slice(0, 7)); // 28 → missing 12.5% ≤ 20% (Partial)
+const SEASON_2027_R1_R5 = expandRanges(SEASON_2027_ROUNDS.slice(0, 5)); // 20 → missing 37.5% > 20% (excluded)
 
 export const DEMO_V1: DemoScenario = {
   id: "v1",
@@ -240,6 +259,69 @@ export const DEMO_V1: DemoScenario = {
       availability: ["today"],
       role_in_demo: { it: "No-show dello scenario SOS", en: "No-show of the SOS scenario" },
     },
+    {
+      key: "elena",
+      first_name: "DEMO Elena",
+      last_name: "Conti",
+      role_group: "engineering",
+      sub_roles: [{ sub_role: "race_engineer", level: "senior" }],
+      disciplines: ["gt3"],
+      skills: [...ENG_SKILLS, "strategy_engineer"],
+      languages: [
+        { code: "it", level: "native" },
+        { code: "en", level: "fluent" },
+      ],
+      experiences: [{ discipline: "gt3", years: 10 }],
+      day_rate: 520,
+      years_experience: 11,
+      travels: true,
+      city: MONZA,
+      headline: { it: "Race Engineer GT3 libera per tutta la stagione 2027", en: "GT3 race engineer free for the whole 2027 season" },
+      availability: SEASON_2027_DAYS,
+      role_in_demo: { it: "Scenario D — Full Match stagione (32/32 giorni)", en: "Scenario D — season Full Match (32/32 days)" },
+    },
+    {
+      key: "tomas",
+      first_name: "DEMO Tomas",
+      last_name: "Weber",
+      role_group: "engineering",
+      sub_roles: [{ sub_role: "race_engineer", level: "senior" }],
+      disciplines: ["gt3"],
+      skills: [...ENG_SKILLS],
+      languages: [
+        { code: "de", level: "native" },
+        { code: "en", level: "fluent" },
+      ],
+      experiences: [{ discipline: "gt3", years: 8 }],
+      day_rate: 500,
+      years_experience: 9,
+      travels: true,
+      city: IMOLA,
+      headline: { it: "Race Engineer GT3, manca all'ultimo round 2027", en: "GT3 race engineer, missing the last 2027 round" },
+      availability: SEASON_2027_MINUS_R8,
+      role_in_demo: { it: "Scenario D — Partial Match stagione (28/32, −12,5%)", en: "Scenario D — season Partial Match (28/32, −12.5%)" },
+    },
+    {
+      key: "hugo",
+      first_name: "DEMO Hugo",
+      last_name: "Navarro",
+      role_group: "engineering",
+      sub_roles: [{ sub_role: "race_engineer", level: "senior" }],
+      disciplines: ["gt3"],
+      skills: [...ENG_SKILLS],
+      languages: [
+        { code: "es", level: "native" },
+        { code: "en", level: "fluent" },
+      ],
+      experiences: [{ discipline: "gt3", years: 7 }],
+      day_rate: 480,
+      years_experience: 8,
+      travels: true,
+      city: VALENCIA,
+      headline: { it: "Race Engineer GT3 libero solo per metà stagione 2027", en: "GT3 race engineer free for half the 2027 season only" },
+      availability: SEASON_2027_R1_R5,
+      role_in_demo: { it: "Scenario D — escluso: copre solo i Round 1–5 (−37,5%)", en: "Scenario D — excluded: covers Rounds 1–5 only (−37.5%)" },
+    },
   ],
 
   canonicalPitCalls: [
@@ -274,7 +356,7 @@ export const DEMO_V1: DemoScenario = {
       expected: {
         full: ["mario", "gianni", "luca"],
         partial: ["anna"],
-        absent: ["pierre", "sofia", "marta", "karl"],
+        absent: ["pierre", "sofia", "marta", "karl", "elena", "tomas", "hugo"],
         ranking: ["mario", "anna", "gianni", "luca"],
         min_score: { mario: 85 },
         max_score: { luca: 49.99 },
@@ -321,7 +403,7 @@ export const DEMO_V1: DemoScenario = {
       expected: {
         full: [],
         partial: [],
-        absent: ["mario", "anna", "gianni", "luca", "pierre", "karl", "sofia", "marta"],
+        absent: ["mario", "anna", "gianni", "luca", "pierre", "karl", "sofia", "marta", "elena", "tomas", "hugo"],
       },
       steps: [
         { it: "Crea la Pit Call dal vivo con gli input qui sotto.", en: "Create the Pit Call live with the inputs below." },
@@ -369,6 +451,49 @@ export const DEMO_V1: DemoScenario = {
         { it: "Come DEMO Apex Racing crea una Pit Call scegliendo “Cerca nel mio Pool”.", en: "As DEMO Apex Racing create a Pit Call choosing “Search my Pool”." },
         { it: "Attivala con il runner “Attiva Pit Call in review”.", en: "Activate it with the “Activate pending reviews” runner." },
         { it: "Nei risultati compare DEMO Sofia (nel pool) e non DEMO Marta (fuori dal pool).", en: "Results show DEMO Sofia (in the pool) and not DEMO Marta (outside the pool)." },
+      ],
+    },
+    {
+      key: "D",
+      team: "apex",
+      title: { it: "Scenario D — Intera stagione 2027 (upload ICS)", en: "Scenario D — Full 2027 season (ICS upload)" },
+      narrative: {
+        it: "Pit Call di intera stagione creata dal vivo caricando il file ICS del campionato: 8 round, 32 giorni. Mostra Full/Partial su una stagione (Partial ammesso fino al 20% di giorni mancanti) e l'esclusione di chi copre troppo poco.",
+        en: "Full-season Pit Call created live by uploading the championship ICS file: 8 rounds, 32 days. Shows Full/Partial over a season (Partial allowed up to 20% missing days) and the exclusion of anyone covering too little.",
+      },
+      ics: { filename: SEASON_2027_FILE, rounds: SEASON_2027_ROUNDS },
+      input: {
+        role_group: "engineering",
+        sub_role: "race_engineer",
+        sub_role_min_level: "intermediate",
+        sub_role_hard: false,
+        role_hard: true,
+        discipline: "gt3",
+        duration: "full_season",
+        search_mode: "standard",
+        days: SEASON_2027_DAYS,
+        skills: ENG_SKILLS,
+        skills_hard: [],
+        languages: [{ code: "en", level: "advanced", hard: false }],
+        budget_min: 30000,
+        budget_max: 45000,
+        travel_required: true,
+        location: MONZA,
+        location_relevance: "relevant",
+        location_radius_km: 500,
+      },
+      expected: {
+        full: ["elena"],
+        partial: ["tomas"],
+        absent: ["hugo", "mario", "anna", "gianni", "luca", "pierre", "karl", "dario", "sofia", "marta"],
+        ranking: ["elena", "tomas"],
+      },
+      steps: [
+        { it: "Accedi come DEMO Apex Racing, apri Nuova Pit Call e scegli durata “Intera stagione”.", en: "Sign in as DEMO Apex Racing, open New Pit Call and choose “Full season”." },
+        { it: "Nei giorni di lavoro della stagione usa “Importa file .ics” e carica PITCALL_DEMO_GT3_EUROPE_2027.ics (scaricabile qui sotto): 32 giorni selezionati.", en: "In the season working days use “Import .ics” and upload PITCALL_DEMO_GT3_EUROPE_2027.ics (downloadable below): 32 days selected." },
+        { it: "Inserisci gli altri input elencati e pubblica; attiva con il runner “Attiva Pit Call in review”.", en: "Enter the other listed inputs and publish; activate with the “Activate pending reviews” runner." },
+        { it: "Match Results: DEMO Elena è Full (32/32), DEMO Tomas è Partial (manca il Round 8, 4 giorni = 12,5%).", en: "Match Results: DEMO Elena is Full (32/32), DEMO Tomas is Partial (Round 8 missing, 4 days = 12.5%)." },
+        { it: "DEMO Hugo copre solo i Round 1–5 (12 giorni mancanti = 37,5% > 20%) e non compare.", en: "DEMO Hugo covers Rounds 1–5 only (12 days missing = 37.5% > 20%) and does not appear." },
       ],
     },
   ],
