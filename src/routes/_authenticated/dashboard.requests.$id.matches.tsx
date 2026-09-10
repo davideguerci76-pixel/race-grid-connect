@@ -93,7 +93,7 @@ function RequestMatchesPage() {
   const sosMut = useMutation({
     mutationFn: () => sosFn({ data: { request_id: id } }),
     onSuccess: (r: any) => {
-      toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 75 }));
+      toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 40 }));
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
     },
     onError: (e) => toastError(e, "sweep_engage.request_matches.sos_failed"),
