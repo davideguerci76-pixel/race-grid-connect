@@ -641,6 +641,7 @@ export const resetAndSeedDemoScenario = createServerFn({ method: "POST" })
         seeded_by: context.userId,
         status: "unverified",
         report: {
+          seed_today: seeded.today,
           personas: seeded.personas,
           sosRequestId: seeded.sosRequestId,
           sosEngagementId: seeded.sosEngagementId,
