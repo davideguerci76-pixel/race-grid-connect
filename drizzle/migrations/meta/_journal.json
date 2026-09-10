@@ -827,6 +827,13 @@
       "when": 1789033293296,
       "tag": "0117_sec_avail_01_owner_only_select",
       "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1789039592481,
+      "tag": "0118_acc_del_01a_account_deletion_authority",
+      "breakpoints": true
     }
   ]
 }
