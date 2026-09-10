@@ -102,6 +102,23 @@ async function validateTaxonomy(sb: any, scenario: DemoScenario) {
 
 // ---------------------------------------------------------------- purge
 
+// token_transactions inherit is_test from the owner profile via tg_inherit_env, but the
+// signup bonus row is inserted by handle_new_user BEFORE the DEMO profile is flagged TEST.
+// A no-op update re-runs the inheritance trigger so those rows are TEST-scoped (purgeable,
+// excluded from LIVE snapshots). Only rows owned by TEST profiles are touched.
+async function normalizeTestTokenFlags(sb: any) {
+  const { data: profiles, error } = await sb.from("profiles").select("id").eq("is_test", true);
+  if (error) throw new Error(error.message);
+  const ids: string[] = (profiles ?? []).map((p: any) => String(p.id));
+  if (!ids.length) return;
+  const { error: updErr } = await sb
+    .from("token_transactions")
+    .update({ is_test: true })
+    .in("user_id", ids)
+    .eq("is_test", false);
+  if (updErr) throw new Error(`token flag normalization failed: ${updErr.message}`);
+}
+
 async function purgeTestScope(sb: any) {
   const { data: profiles, error } = await sb.from("profiles").select("id").eq("is_test", true);
   if (error) throw new Error(error.message);
@@ -119,6 +136,12 @@ async function purgeTestScope(sb: any) {
     /* listing is best-effort */
   }
 
+  // TEST rows first (engagements before availability, so the frozen-day guard never fires
+  // on a confirmed DEMO engagement), then the Auth accounts. A second purge sweeps whatever
+  // the account cascades left behind.
+  const { error: purgeErr } = await sb.rpc("purge_test_environment");
+  if (purgeErr) throw new Error(`purge_test_environment failed: ${purgeErr.message}`);
+
   // Sequential with one retry: parallel cascades race on shared child rows and
   // silently leave accounts behind, which then breaks the next seed on a taken email.
   for (const id of ids) {
@@ -127,9 +150,8 @@ async function purgeTestScope(sb: any) {
     if (delErr) throw new Error(`Cannot delete test account ${id}: ${delErr.message || "unknown error"}`);
   }
 
-
-  const { error: purgeErr } = await sb.rpc("purge_test_environment");
-  if (purgeErr) throw new Error(`purge_test_environment failed: ${purgeErr.message}`);
+  const { error: purgeErr2 } = await sb.rpc("purge_test_environment");
+  if (purgeErr2) throw new Error(`purge_test_environment failed: ${purgeErr2.message}`);
   return ids.length;
 }
 
@@ -338,6 +360,10 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
     .select("id")
     .maybeSingle();
   if (engErr || !engagement) throw new Error(`SOS engagement seed failed: ${engErr?.message ?? "no row"}`);
+
+  // ---- env flag hygiene: the signup bonus is written by handle_new_user before the profile
+  // is flagged TEST, so re-derive the flag now that every DEMO profile is is_test=true.
+  await normalizeTestTokenFlags(sb);
 
   // ---- real matching engine, TEST scope only
   const { error: recErr } = await sb.rpc("recompute_matches_env", { _is_test: true });
@@ -709,6 +735,7 @@ export const resetAndSeedDemoScenario = createServerFn({ method: "POST" })
     const sb = await admin();
 
     await validateTaxonomy(sb, scenario);
+    await normalizeTestTokenFlags(sb);
 
     const { data: liveBefore } = await sb.rpc("live_scope_snapshot");
     const purged = await purgeTestScope(sb);
