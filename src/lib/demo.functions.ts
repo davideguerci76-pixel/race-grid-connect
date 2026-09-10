@@ -830,6 +830,14 @@ export const getDemoGuide = createServerFn({ method: "POST" })
           dates: resolveDays(anchor, p.input.days, now),
           location: `${p.input.location.city}, ${p.input.location.country}`,
         },
+        ics: p.ics
+          ? {
+              filename: p.ics.filename,
+              rounds: p.ics.rounds,
+              text: DEMO_ICS_FILES[p.ics.filename] ?? null,
+              day_count: resolveDays(anchor, p.input.days, now).length,
+            }
+          : null,
         probe: state?.report?.verification?.probes?.[p.key] ?? null,
       })),
       sos: {
