@@ -3,7 +3,19 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEMO_SCENARIO_LIST, getScenario } from "@/lib/demo/scenarios";
 import type { DemoCanonicalPitCall, DemoScenario } from "@/lib/demo/scenarios/types";
-import { computeAnchor, resolveDay, resolveDays, todayISO } from "@/lib/demo/anchor";
+import { computeAnchor, expandRanges, resolveDay, resolveDays, todayISO } from "@/lib/demo/anchor";
+import { parseIcs } from "@/lib/ics";
+import SEASON_2027_ICS from "@/lib/demo/assets/PITCALL_DEMO_GT3_EUROPE_2027.ics?raw";
+
+/** ICS files shipped with the demo kit, by filename. Never seeded: the operator uploads them by hand. */
+const DEMO_ICS_FILES: Record<string, string> = {
+  "PITCALL_DEMO_GT3_EUROPE_2027.ics": SEASON_2027_ICS,
+};
+
+/** Days an operator gets when uploading the file in the product (same parser as the Pit Call form). */
+function icsDays(text: string): string[] {
+  return expandRanges(parseIcs(text).map((e) => ({ start: e.start, end: e.end })));
+}
 
 // =====================================================================
 // DEMO scenarios — generic seeder / verifier / guide data.
@@ -378,10 +390,11 @@ async function probePitCall(
       languages: pc.input.languages,
       start_date: days[0],
       end_date: days[days.length - 1],
-      season_dates: null,
+      // Same shape the Pit Call form sends for a season: the full day list + season budget unit.
+      season_dates: pc.input.duration === "full_season" ? days : null,
       budget_min: pc.input.budget_min,
       budget_max: pc.input.budget_max,
-      budget_unit: "day",
+      budget_unit: pc.input.duration === "full_season" ? "season" : "day",
       currency: "EUR",
       travel_required: pc.input.travel_required,
       notes: "DEMO verification probe — deleted immediately after verification.",
