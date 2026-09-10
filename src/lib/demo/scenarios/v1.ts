@@ -1,4 +1,5 @@
-import type { DemoCity, DemoScenario } from "./types";
+import type { DemoCity, DemoRound, DemoScenario } from "./types";
+import { expandRanges } from "../anchor";
 
 const MONZA: DemoCity = { city: "Monza", region: "Lombardia", country: "Italy", lat: 45.6156, lng: 9.2811 };
 const IMOLA: DemoCity = { city: "Imola", region: "Emilia-Romagna", country: "Italy", lat: 44.3441, lng: 11.7161 };
@@ -6,9 +7,27 @@ const MODENA: DemoCity = { city: "Modena", region: "Emilia-Romagna", country: "I
 const SILVERSTONE: DemoCity = { city: "Silverstone", region: "England", country: "United Kingdom", lat: 52.0733, lng: -1.0147 };
 const LE_MANS: DemoCity = { city: "Le Mans", region: "Pays de la Loire", country: "France", lat: 47.9558, lng: 0.2075 };
 const SUZUKA: DemoCity = { city: "Suzuka", region: "Mie", country: "Japan", lat: 34.8431, lng: 136.5407 };
+const VALENCIA: DemoCity = { city: "Valencia", region: "Comunidad Valenciana", country: "Spain", lat: 39.4699, lng: -0.3763 };
 
 const ENG_SKILLS = ["telemetry_analysis", "race_engineering", "motec_i2"];
 const MECH_SKILLS = ["pit_stop_crew", "tyre_management", "brake_specialist"];
+
+// Scenario D — the 2027 season exactly as in PITCALL_DEMO_GT3_EUROPE_2027.ics
+// (all-day events, DTEND exclusive → inclusive end shown here). 8 rounds × 4 days = 32 days.
+export const SEASON_2027_FILE = "PITCALL_DEMO_GT3_EUROPE_2027.ics";
+export const SEASON_2027_ROUNDS: DemoRound[] = [
+  { label: "Round 1", start: "2027-03-18", end: "2027-03-21" },
+  { label: "Round 2", start: "2027-04-22", end: "2027-04-25" },
+  { label: "Round 3", start: "2027-05-27", end: "2027-05-30" },
+  { label: "Round 4", start: "2027-07-01", end: "2027-07-04" },
+  { label: "Round 5", start: "2027-08-05", end: "2027-08-08" },
+  { label: "Round 6", start: "2027-09-09", end: "2027-09-12" },
+  { label: "Round 7", start: "2027-10-14", end: "2027-10-17" },
+  { label: "Round 8", start: "2027-11-11", end: "2027-11-14" },
+];
+const SEASON_2027_DAYS = expandRanges(SEASON_2027_ROUNDS); // 32
+const SEASON_2027_MINUS_R8 = expandRanges(SEASON_2027_ROUNDS.slice(0, 7)); // 28 → missing 12.5% ≤ 20% (Partial)
+const SEASON_2027_R1_R5 = expandRanges(SEASON_2027_ROUNDS.slice(0, 5)); // 20 → missing 37.5% > 20% (excluded)
 
 export const DEMO_V1: DemoScenario = {
   id: "v1",
