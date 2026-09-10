@@ -557,6 +557,24 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
   // 5. canonical Pit Calls, verified with the real engine on a transient probe
   const probes: Record<string, ProbeRow[]> = {};
   for (const pc of scenario.canonicalPitCalls) {
+    // Season scenarios: the ICS the operator will upload must yield exactly the
+    // manifest days (same parser as the product) and nothing may be pre-created.
+    if (pc.ics) {
+      const text = DEMO_ICS_FILES[pc.ics.filename];
+      const fromFile = text ? icsDays(text) : [];
+      const fromManifest = resolveDays(anchor, pc.input.days, now);
+      push(`${pc.key}: ICS file shipped`, pc.ics.filename, text ? pc.ics.filename : "missing");
+      push(`${pc.key}: ICS days = manifest days`, `${fromManifest.length} days`, fromFile.join(",") === fromManifest.join(",") ? `${fromFile.length} days` : `mismatch (${fromFile.length} days)`);
+      push(`${pc.key}: ICS rounds`, String(pc.ics.rounds.length), String(parseIcs(text ?? "").length));
+      const { count: preCreated } = await sb
+        .from("requests")
+        .select("*", { count: "exact", head: true })
+        .eq("team_id", personas[pc.team])
+        .eq("duration", "full_season")
+        .eq("is_test", true);
+      push(`${pc.key}: no season Pit Call pre-seeded (manual upload)`, "0", String(preCreated ?? 0));
+    }
+
     const rows = await probePitCall(sb, scenario, pc, personas, anchor, now);
     probes[pc.key] = rows;
     const full = rows.filter((r) => !r.partial).map((r) => r.key);
