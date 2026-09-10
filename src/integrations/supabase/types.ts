@@ -2714,7 +2714,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      account_deletion_cleanup: { Args: { _uid: string }; Returns: Json }
       account_deletion_context: { Args: never; Returns: string }
       account_retention_records: { Args: { _user_id: string }; Returns: Json }
       activate_request_if_due: {
