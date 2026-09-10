@@ -3741,7 +3741,7 @@ export type Database = {
       purge_test_environment: {
         Args: never
         Returns: {
-          user_id: string
+          id: string
         }[]
       }
       rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
