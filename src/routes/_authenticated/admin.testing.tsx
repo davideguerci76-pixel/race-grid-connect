@@ -1,9 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, Database, FlaskConical, Loader2, Star, Timer, Trash2, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  Database,
+  FlaskConical,
+  Loader2,
+  RefreshCw,
+  Star,
+  Timer,
+  Trash2,
+  Users,
+  XCircle,
+} from "lucide-react";
 import {
   assignTestPools,
   generatePoolPitCalls,
@@ -16,6 +29,7 @@ import {
   runTestEngagementJobs,
   runTestAntiGhostingJobs,
 } from "@/lib/testlab.functions";
+import { listDemoScenarios, resetAndSeedDemoScenario, runDemoJob, verifyDemoScenario } from "@/lib/demo.functions";
 import { PRESET_SIZES } from "@/lib/testlab-generator";
 import { AdminEnvSwitch, useAdminEnv } from "@/components/admin-env-switch";
 import { toastError } from "@/lib/errors";
@@ -28,6 +42,7 @@ export const Route = createFileRoute("/_authenticated/admin/testing")({
 const PRESETS = ["small", "medium", "large", "stress"] as const;
 const AREAS = ["italy", "europe", "worldwide"] as const;
 const DENSITIES = ["sparse", "normal", "dense"] as const;
+
 
 function TestingLab() {
   const qc = useQueryClient();
@@ -139,6 +154,45 @@ function TestingLab() {
   });
 
 
+  // ---------------- DEMO scenarios ----------------
+  const scenariosFn = useServerFn(listDemoScenarios);
+  const seedFn = useServerFn(resetAndSeedDemoScenario);
+  const verifyFn = useServerFn(verifyDemoScenario);
+  const demoJobFn = useServerFn(runDemoJob);
+  const [demoConfirm, setDemoConfirm] = useState("");
+
+  const { data: scenarios } = useQuery({ queryKey: ["demo-scenarios"], queryFn: () => scenariosFn() });
+
+  const seedMut = useMutation({
+    mutationFn: (id: string) => seedFn({ data: { scenario_id: id, confirm: "RESET TEST DATA" as const } }),
+    onSuccess: (r: any) => {
+      if (r.status === "READY") toast.success(`Demo ${r.scenario_id} ready — anchor ${r.anchor}`);
+      else toast.warning(`Demo ${r.scenario_id} seeded but verification failed (${r.failures} checks)`);
+      setDemoConfirm("");
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
+  const verifyMut = useMutation({
+    mutationFn: (id: string) => verifyFn({ data: { scenario_id: id } }),
+    onSuccess: (r: any) => {
+      if (r.status === "READY") toast.success("Verification passed — demo is READY");
+      else toast.warning(`Verification failed: ${r.failures} checks`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
+  const demoJobMut = useMutation({
+    mutationFn: (job: string) => demoJobFn({ data: { job: job as never } }),
+    onSuccess: (r: any) => {
+      toast.success(`Runner "${r.job}" done (${r.result})`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toastError(e),
+  });
+
   const size = PRESET_SIZES[preset];
 
 
@@ -155,6 +209,98 @@ function TestingLab() {
         </div>
         <AdminEnvSwitch />
       </div>
+
+      <div className="border border-border p-4">
+        <div className="mb-1 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest">
+          <BookOpen className="size-4" /> Demo scenarios
+        </div>
+        <p className="mb-3 text-[11px] text-muted-foreground">
+          Deterministic, resettable commercial demo. “Reset &amp; seed” <span className="text-racing-red">deletes the
+          whole TEST environment</span> (including any randomly generated dataset) and rebuilds the scenario cast,
+          calendars, pool and pre-seeded SOS situation with relative dates. LIVE data is snapshotted before and after and
+          the seed aborts if it changes. Type
+          <span className="mx-1 font-mono text-foreground">RESET TEST DATA</span> to enable the buttons.
+        </p>
+
+        <input
+          value={demoConfirm}
+          onChange={(e) => setDemoConfirm(e.target.value)}
+          placeholder="RESET TEST DATA"
+          className="mb-3 w-56 border border-border bg-background px-2 py-1.5 font-mono text-sm"
+        />
+
+        <div className="space-y-3">
+          {(scenarios ?? []).map((s: any) => (
+            <div key={s.id} className="border border-border p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-widest">
+                    {s.title.en} <span className="text-muted-foreground">v{s.version}</span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{s.description.en}</p>
+                </div>
+                <StatusPill status={s.status} failures={s.failures} />
+              </div>
+
+              <div className="mt-2 font-mono text-[11px] text-muted-foreground">
+                {s.seeded ? `anchor ${s.anchor_date} · seeded ${new Date(s.seeded_at).toLocaleString()}` : "not seeded"}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  onClick={() => seedMut.mutate(s.id)}
+                  disabled={demoConfirm !== "RESET TEST DATA" || seedMut.isPending}
+                  className="inline-flex items-center gap-2 bg-racing-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
+                >
+                  {seedMut.isPending ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
+                  Reset &amp; seed
+                </button>
+                <button
+                  onClick={() => verifyMut.mutate(s.id)}
+                  disabled={!s.seeded || verifyMut.isPending}
+                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-40"
+                >
+                  {verifyMut.isPending ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3" />}
+                  Verify
+                </button>
+                <Link
+                  to="/admin/demo-guide/$scenarioId"
+                  params={{ scenarioId: s.id }}
+                  className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary"
+                >
+                  <BookOpen className="size-3" /> Open demo guide
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            Demo runners (TEST scope only)
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["pending_review", "Activate pending reviews"],
+              ["recompute", "Recompute matches"],
+              ["availability_queue", "Drain availability queue"],
+              ["availability_opportunity", "Availability opportunities"],
+              ["team_match_activity", "Team match notifications"],
+              ["hot_partial", "Hot partial notifications"],
+            ].map(([job, label]) => (
+              <button
+                key={job}
+                onClick={() => demoJobMut.mutate(job)}
+                disabled={demoJobMut.isPending}
+                className="inline-flex items-center gap-2 border border-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:bg-secondary disabled:opacity-40"
+              >
+                <Timer className="size-3" /> {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
 
       <div className="border border-border p-4">
         <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest">
@@ -372,5 +518,20 @@ function SimCard({
         Run
       </button>
     </div>
+  );
+}
+
+function StatusPill({ status, failures }: { status: string | null; failures: number | null }) {
+  if (!status) return <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Not seeded</span>;
+  const ok = status === "READY";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 border px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${
+        ok ? "border-racing-green text-racing-green" : "border-racing-red text-racing-red"
+      }`}
+    >
+      {ok ? <CheckCircle2 className="size-3" /> : <XCircle className="size-3" />}
+      {ok ? "Ready" : `Verification failed${failures ? ` (${failures})` : ""}`}
+    </span>
   );
 }
