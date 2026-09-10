@@ -447,8 +447,14 @@ async function probePitCall(
   }
 }
 
+/** Every relative date of a seeded dataset resolves against the day it was seeded. */
+function seedClock(state: any): { seedToday: string; now: Date } {
+  const seedToday: string = state?.report?.seed_today ?? todayISO(new Date());
+  return { seedToday, now: new Date(`${seedToday}T12:00:00.000Z`) };
+}
+
 async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
-  const now = new Date();
+  const { seedToday, now } = seedClock(state);
   const anchor: string = state.anchor_date;
   const personas: Record<string, string> = state.report?.personas ?? {};
   const assertions: Assertion[] = [];
@@ -491,7 +497,8 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("id", sosRequestId)
     .eq("is_test", true)
     .maybeSingle();
-  const today = todayISO(now);
+  const today = seedToday;
+  push("dataset seeded today (SOS day is the current day)", todayISO(new Date()), seedToday);
   const sosState = sosReq
     ? `${sosReq.status}/${sosReq.is_active ? "active" : "inactive"}/${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
     : "missing";
@@ -634,6 +641,7 @@ export const resetAndSeedDemoScenario = createServerFn({ method: "POST" })
         seeded_by: context.userId,
         status: "unverified",
         report: {
+          seed_today: seeded.today,
           personas: seeded.personas,
           sosRequestId: seeded.sosRequestId,
           sosEngagementId: seeded.sosEngagementId,
@@ -704,9 +712,8 @@ export const getDemoGuide = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const scenario = getScenario(data.scenario_id);
     const sb = await admin();
-    const now = new Date();
-
     const { data: state } = await sb.from("demo_seed_state").select("*").eq("scenario_id", scenario.id).maybeSingle();
+    const { seedToday, now } = seedClock(state);
     const personas: Record<string, string> = state?.report?.personas ?? {};
     const anchor: string = state?.anchor_date ?? computeAnchor(now);
 
@@ -746,7 +753,8 @@ export const getDemoGuide = createServerFn({ method: "POST" })
       },
       status: state?.status ?? "not seeded",
       anchor,
-      today: todayISO(now),
+      today: seedToday,
+      seed_is_today: seedToday === todayISO(new Date()),
       seeded_at: state?.seeded_at ?? null,
       verification: state?.report?.verification ?? null,
       live_unchanged: state?.report?.live_unchanged ?? null,
