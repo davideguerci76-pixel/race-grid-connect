@@ -771,6 +771,13 @@
       "when": 1788963606972,
       "tag": "0109_remove_human_mark_complete_path",
       "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1789024212999,
+      "tag": "0110_demo_v1_hardening",
+      "breakpoints": true
     }
   ]
 }

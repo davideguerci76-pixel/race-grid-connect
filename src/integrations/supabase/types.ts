@@ -360,6 +360,36 @@ export type Database = {
           },
         ]
       }
+      demo_seed_state: {
+        Row: {
+          anchor_date: string
+          report: Json
+          scenario_id: string
+          seeded_at: string
+          seeded_by: string | null
+          status: string
+          version: string
+        }
+        Insert: {
+          anchor_date: string
+          report?: Json
+          scenario_id: string
+          seeded_at?: string
+          seeded_by?: string | null
+          status?: string
+          version: string
+        }
+        Update: {
+          anchor_date?: string
+          report?: Json
+          scenario_id?: string
+          seeded_at?: string
+          seeded_by?: string | null
+          status?: string
+          version?: string
+        }
+        Relationships: []
+      }
       email_hook_config: {
         Row: {
           endpoint: string
@@ -2994,6 +3024,56 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancel_engagement_internal: {
+        Args: { _actor: string; _engagement_id: string; _reason?: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          covered_days: string[] | null
+          created_at: string
+          currency: string
+          declined_at: string | null
+          end_date: string
+          expired_at: string | null
+          expires_at: string | null
+          extension_count: number
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          is_test: boolean
+          match_id: string | null
+          match_snapshot: Json | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          reminder_12_sent_at: string | null
+          reminder_24_sent_at: string | null
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cancel_token_order: { Args: { _order_id: string }; Returns: undefined }
       classify_match_potential: {
         Args: { _match_count: number }
@@ -3240,6 +3320,56 @@ export type Database = {
         }
       }
       delete_my_account: { Args: never; Returns: Json }
+      demo_cancel_engagement_test: {
+        Args: { _actor: string; _engagement_id: string; _reason?: string }
+        Returns: {
+          cancellation_kind: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          confirmed_at: string | null
+          contact_check_sent_at: string | null
+          covered_days: string[] | null
+          created_at: string
+          currency: string
+          declined_at: string | null
+          end_date: string
+          expired_at: string | null
+          expires_at: string | null
+          extension_count: number
+          fee: number | null
+          freelancer_contacted: boolean | null
+          freelancer_contacted_at: string | null
+          freelancer_id: string
+          freelancer_marked_complete: boolean
+          ghosting_released_at: string | null
+          id: string
+          is_test: boolean
+          match_id: string | null
+          match_snapshot: Json | null
+          no_show: boolean
+          notes: string | null
+          proposed_by: string
+          reminder_12_sent_at: string | null
+          reminder_24_sent_at: string | null
+          request_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["engagement_status"]
+          team_confirmed_contact: boolean | null
+          team_confirmed_contact_at: string | null
+          team_id: string
+          team_marked_complete: boolean
+          team_reminder1_sent_at: string | null
+          team_reminder2_sent_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "engagements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
       dispatch_platform_capacity_check: { Args: never; Returns: undefined }
@@ -3461,6 +3591,7 @@ export type Database = {
           updated_at: string
         }[]
       }
+      live_scope_snapshot: { Args: never; Returns: Json }
       mark_account_identity_deleted: {
         Args: { _user_id: string }
         Returns: undefined
