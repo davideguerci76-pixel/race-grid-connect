@@ -95,14 +95,26 @@ async function purgeTestScope(sb: any) {
   if (error) throw new Error(error.message);
   const ids: string[] = (profiles ?? []).map((p: any) => String(p.id));
 
-  let cursor = 0;
-  const runners = Array.from({ length: Math.min(6, ids.length) }, async () => {
-    while (cursor < ids.length) {
-      const id = ids[cursor++]!;
-      await sb.auth.admin.deleteUser(id);
+  // Safety net: any leftover account on the non-routable demo domain is removed too,
+  // even if a previous failed run left it without the TEST flag.
+  try {
+    const { data: list } = await sb.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    for (const u of list?.users ?? []) {
+      const mail = String(u.email ?? "");
+      if (mail.endsWith(`@${TEST_EMAIL_DOMAIN}`) && !ids.includes(String(u.id))) ids.push(String(u.id));
     }
-  });
-  await Promise.all(runners);
+  } catch {
+    /* listing is best-effort */
+  }
+
+  // Sequential with one retry: parallel cascades race on shared child rows and
+  // silently leave accounts behind, which then breaks the next seed on a taken email.
+  for (const id of ids) {
+    let { error: delErr } = await sb.auth.admin.deleteUser(id);
+    if (delErr) ({ error: delErr } = await sb.auth.admin.deleteUser(id));
+    if (delErr) throw new Error(`Cannot delete test account ${id}: ${delErr.message || "unknown error"}`);
+  }
+
 
   const { error: purgeErr } = await sb.rpc("purge_test_environment");
   if (purgeErr) throw new Error(`purge_test_environment failed: ${purgeErr.message}`);
@@ -142,8 +154,7 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
         terms_accepted_at: stamp,
         privacy_accepted_at: stamp,
       })
-      .eq("id", uid)
-      .eq("is_test", true);
+      .eq("id", uid);
 
     await sb
       .from("team_profiles")
@@ -192,8 +203,7 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
         terms_accepted_at: stamp,
         privacy_accepted_at: stamp,
       })
-      .eq("id", uid)
-      .eq("is_test", true);
+      .eq("id", uid);
 
     await sb
       .from("freelancer_profiles")
@@ -408,8 +418,20 @@ async function probePitCall(
     const byId = new Map<string, string>();
     Object.entries(personas).forEach(([k, id]) => byId.set(id, k));
 
+    // Pool-origin Pit Calls: the engine scores everybody, the product surface shows
+    // only pool members. Verify what the team actually sees.
+    let poolFilter: Set<string> | null = null;
+    if (pc.input.search_mode === "pool") {
+      const { data: poolRows } = await sb
+        .from("team_pool")
+        .select("freelancer_id")
+        .eq("team_id", personas[pc.team]);
+      poolFilter = new Set((poolRows ?? []).map((r: any) => String(r.freelancer_id)));
+    }
+
     return (matches ?? [])
       .filter((m: any) => m.stale === false)
+      .filter((m: any) => !poolFilter || poolFilter.has(String(m.freelancer_id)))
       .map((m: any) => ({
         key: byId.get(String(m.freelancer_id)) ?? String(m.freelancer_id),
         partial: Boolean(m.is_partial),

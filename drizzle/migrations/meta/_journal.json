@@ -785,6 +785,41 @@
       "when": 1789024910016,
       "tag": "0111_purge_test_env_token_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1789025323855,
+      "tag": "0112_allow_test_token_order_purge",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1789025402676,
+      "tag": "0113_purge_skip_append_only_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1789025470334,
+      "tag": "0114_purge_test_env_timeout",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1789025616852,
+      "tag": "0115_skip_recompute_enqueue_for_deleted_profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1789026421579,
+      "tag": "0116_allow_test_legal_acceptance_purge",
+      "breakpoints": true
     }
   ]
 }
