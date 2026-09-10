@@ -388,10 +388,15 @@ function RequestMatchesPage() {
               {sosEligible && (
                 <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
                   <div className="min-w-0">
-                    <div className="label-mono text-racing-red">[SOS CALL — FIRST DAY ONLY]</div>
+                    <div className="label-mono text-racing-red">[SOS CALL]</div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t("sweep_engage.request_matches.sos_description")}
                     </p>
+                    {sosDeclaresNoShow && (
+                      <p className="mt-1 text-xs font-semibold text-racing-red">
+                        {t("sweep_engage.request_matches.sos_no_show_notice")}
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={async () => {
