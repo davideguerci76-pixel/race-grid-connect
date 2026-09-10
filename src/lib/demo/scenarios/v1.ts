@@ -468,7 +468,9 @@ export const DEMO_V1: DemoScenario = {
       steps: [
         { it: "Come DEMO Apex Racing crea una Pit Call scegliendo “Cerca nel mio Pool”.", en: "As DEMO Apex Racing create a Pit Call choosing “Search my Pool”." },
         { it: "Attivala con il runner “Attiva Pit Call in review”.", en: "Activate it with the “Activate pending reviews” runner." },
-        { it: "Nei risultati compare DEMO Sofia (nel pool) e non DEMO Marta (fuori dal pool).", en: "Results show DEMO Sofia (in the pool) and not DEMO Marta (outside the pool)." },
+        { it: "Dopo la creazione si apre direttamente la pagina della Pit Call appena creata (review/countdown), non la pagina generale My Pool.", en: "After creation the newly created Pit Call's own page (review/countdown) opens, not the generic My Pool page." },
+        { it: "Nei risultati compare DEMO Sofia (nel pool) e non DEMO Marta (fuori dal pool). Usa esattamente i 3 giorni indicati sopra: Sofia risulta 3 of 3.", en: "Results show DEMO Sofia (in the pool) and not DEMO Marta (outside the pool). Use exactly the 3 days listed above: Sofia shows 3 of 3." },
+        { it: "Esegui “Upgrade a Standard”: la ricerca si estende fuori dal Pool e compare anche DEMO Marta.", en: "Run “Upgrade to Standard”: the search extends outside the Pool and DEMO Marta appears as well." },
       ],
     },
     {
