@@ -712,9 +712,8 @@ export const getDemoGuide = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const scenario = getScenario(data.scenario_id);
     const sb = await admin();
-    const now = new Date();
-
     const { data: state } = await sb.from("demo_seed_state").select("*").eq("scenario_id", scenario.id).maybeSingle();
+    const { seedToday, now } = seedClock(state);
     const personas: Record<string, string> = state?.report?.personas ?? {};
     const anchor: string = state?.anchor_date ?? computeAnchor(now);
 
