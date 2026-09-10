@@ -142,8 +142,15 @@ function RequestMatchesPage() {
     : matchPotential === "targeted"
       ? "border-racing-yellow/70 bg-racing-yellow/10 text-racing-yellow"
       : "border-racing-red/70 bg-racing-red/10 text-racing-red";
-  const isFirstDayToday = data?.request?.start_date ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
-  const sosEligible = Boolean(data?.request && !requestFilled && !inReview && isFirstDayToday && data.request.duration !== "full_season");
+  // SOS authority v2: available from the first required day until the last one, also when the
+  // Pit Call is FILLED (the click is then a Team-declared no-show). Server-side is authoritative.
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const sosWindowOpen = Boolean(
+    data?.request?.start_date && todayIso >= data.request.start_date && todayIso <= (data.request.end_date ?? data.request.start_date),
+  );
+  const sosStatusOk = !["closed", "completed", "paused", "pending_review"].includes(String(data?.request?.status ?? ""));
+  const sosEligible = Boolean(data?.request && sosStatusOk && !inReview && sosWindowOpen && data.request.duration !== "full_season");
+  const sosDeclaresNoShow = sosEligible && data?.request?.status === "filled";
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
