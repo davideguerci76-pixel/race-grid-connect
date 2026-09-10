@@ -255,9 +255,9 @@ export const DEMO_V1: DemoScenario = {
       years_experience: 5,
       travels: true,
       city: MONZA,
-      headline: { it: "Race Engineer che ha rinunciato all'ultimo", en: "Race engineer who pulled out at the last minute" },
+      headline: { it: "Race Engineer confermato che non si presenta", en: "Confirmed race engineer who does not show up" },
       availability: ["today"],
-      role_in_demo: { it: "No-show dello scenario SOS", en: "No-show of the SOS scenario" },
+      role_in_demo: { it: "Scenario SOS — confermato, no-show dichiarato dal Team via SOS", en: "SOS scenario — confirmed, Team-declared no-show via SOS" },
     },
     {
       key: "elena",
