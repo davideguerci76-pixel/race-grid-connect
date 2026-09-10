@@ -72,7 +72,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const { error: dbError } = await (supabase as any).rpc("delete_my_account");
+    const { data: res, error: dbError } = await (supabase as any).rpc("delete_my_account");
     if (dbError) {
       // Nothing was committed: the transaction rolled back as a whole.
       const m = dbError.message as string;
@@ -81,6 +81,12 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       throw new Error(m);
     }
 
+    // ACC-DEL-01.A retention safety gate: when append-only economic/legal
+    // records exist, the data is purged and the profile de-identified, but the
+    // Auth identity is NOT hard-deleted (that retention law is not defined yet).
+    if ((res as any)?.identity_hard_delete_allowed === false) {
+      return { ok: true, state: (res as any)?.state ?? "db_purged_retained", identity_deleted: false };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
@@ -92,8 +98,9 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
 
     await (supabaseAdmin as any).rpc("mark_account_identity_deleted", { _user_id: userId });
 
-    return { ok: true };
+    return { ok: true, state: "complete", identity_deleted: true };
   });
+
 
 /** Current published version of Terms + Privacy Policy. */
 export const LEGAL_VERSION = "2026-08";
