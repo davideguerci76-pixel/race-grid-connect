@@ -21,9 +21,31 @@ export function computeAnchor(now: Date = new Date()): string {
   return isoDay(new Date(base.getTime() + daysToNextMonday * DAY_MS));
 }
 
+const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export function resolveDay(anchor: string, day: DemoDay, now: Date = new Date()): string {
   if (day === "today") return todayISO(now);
+  if (typeof day === "string") {
+    if (!ISO_RE.test(day)) throw new Error(`Invalid demo day "${day}"`);
+    return day;
+  }
   return isoDay(new Date(new Date(`${anchor}T00:00:00.000Z`).getTime() + day * DAY_MS));
+}
+
+/** Expand inclusive ISO ranges (championship rounds) into the list of days. */
+export function expandRanges(ranges: { start: string; end: string }[]): string[] {
+  const out = new Set<string>();
+  for (const r of ranges) {
+    let t = new Date(`${r.start}T00:00:00.000Z`).getTime();
+    const end = new Date(`${r.end}T00:00:00.000Z`).getTime();
+    let guard = 0;
+    while (t <= end && guard < 400) {
+      out.add(isoDay(new Date(t)));
+      t += DAY_MS;
+      guard += 1;
+    }
+  }
+  return Array.from(out).sort();
 }
 
 export function resolveDays(anchor: string, days: DemoDay[], now: Date = new Date()): string[] {

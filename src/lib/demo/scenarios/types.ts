@@ -5,8 +5,14 @@
 export type DemoLangLevel = "basic" | "intermediate" | "advanced" | "fluent" | "native";
 export type DemoLevel = "junior" | "intermediate" | "senior";
 
-/** A day is either an offset (in days) from the scenario anchor, or "today". */
-export type DemoDay = number | "today";
+/**
+ * A day is an offset (in days) from the scenario anchor, "today", or an
+ * absolute ISO date (YYYY-MM-DD) for scenarios tied to a real championship file.
+ */
+export type DemoDay = number | "today" | string;
+
+/** A championship round as it appears in the ICS file (all-day, inclusive end). */
+export type DemoRound = { label: string; start: string; end: string };
 
 export type DemoText = { it: string; en: string };
 
@@ -81,6 +87,12 @@ export type DemoCanonicalPitCall = {
     location_relevance: "not_relevant" | "relevant" | "mandatory";
     location_radius_km: number;
   };
+  /**
+   * Season Pit Calls only: the ICS file the operator uploads manually in the
+   * Pit Call form. The seeder never imports it; the verifier only checks that
+   * the file and the manifest agree on the round days.
+   */
+  ics?: { filename: string; rounds: DemoRound[] };
   /** Structural assertions verified against the real engine (probe run). */
   expected: {
     full?: string[];
