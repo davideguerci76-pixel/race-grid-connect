@@ -374,7 +374,7 @@ export const DEMO_V1: DemoScenario = {
       expected: {
         full: ["mario", "gianni", "luca"],
         partial: ["anna"],
-        absent: ["pierre", "sofia", "marta", "karl", "elena", "tomas", "hugo"],
+        absent: ["pierre", "sofia", "marta", "karl", "elena", "tomas", "hugo", "nadia"],
         ranking: ["mario", "anna", "gianni", "luca"],
         min_score: { mario: 85 },
         max_score: { luca: 49.99 },
@@ -421,7 +421,7 @@ export const DEMO_V1: DemoScenario = {
       expected: {
         full: [],
         partial: [],
-        absent: ["mario", "anna", "gianni", "luca", "pierre", "karl", "sofia", "marta", "elena", "tomas", "hugo"],
+        absent: ["mario", "anna", "gianni", "luca", "pierre", "karl", "sofia", "marta", "elena", "tomas", "hugo", "nadia"],
       },
       steps: [
         { it: "Crea la Pit Call dal vivo con gli input qui sotto.", en: "Create the Pit Call live with the inputs below." },
@@ -501,16 +501,18 @@ export const DEMO_V1: DemoScenario = {
         location_radius_km: 500,
       },
       expected: {
-        full: ["elena"],
+        full: ["elena", "nadia"],
         partial: ["tomas"],
         absent: ["hugo", "mario", "anna", "gianni", "luca", "pierre", "karl", "dario", "sofia", "marta"],
-        ranking: ["elena", "tomas"],
+        ranking: ["elena", "tomas", "nadia"],
+        lower_relevance_full: { weaker: "nadia", stronger: "elena" },
       },
       steps: [
         { it: "Accedi come DEMO Apex Racing, apri Nuova Pit Call e scegli durata “Intera stagione”.", en: "Sign in as DEMO Apex Racing, open New Pit Call and choose “Full season”." },
         { it: "Nei giorni di lavoro della stagione usa “Importa file .ics” e carica PITCALL_DEMO_GT3_EUROPE_2027.ics (scaricabile qui sotto): 32 giorni selezionati.", en: "In the season working days use “Import .ics” and upload PITCALL_DEMO_GT3_EUROPE_2027.ics (downloadable below): 32 days selected." },
         { it: "Inserisci gli altri input elencati e pubblica; attiva con il runner “Attiva Pit Call in review”.", en: "Enter the other listed inputs and publish; activate with the “Activate pending reviews” runner." },
         { it: "Match Results: DEMO Elena è Full (32/32), DEMO Tomas è Partial (manca il Round 8, 4 giorni = 12,5%).", en: "Match Results: DEMO Elena is Full (32/32), DEMO Tomas is Partial (Round 8 missing, 4 days = 12.5%)." },
+        { it: "DEMO Nadia è anch'essa Full (32/32) ma con Professional Relevance nettamente più bassa di Elena: copertura stagione e relevance sono dimensioni indipendenti.", en: "DEMO Nadia is Full too (32/32) but with a clearly lower Professional Relevance than Elena: season coverage and relevance are independent dimensions." },
         { it: "DEMO Hugo copre solo i Round 1–5 (12 giorni mancanti = 37,5% > 20%) e non compare.", en: "DEMO Hugo covers Rounds 1–5 only (12 days missing = 37.5% > 20%) and does not appear." },
       ],
     },
