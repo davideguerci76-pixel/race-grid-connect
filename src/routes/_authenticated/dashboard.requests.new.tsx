@@ -296,10 +296,16 @@ function NewRequestPage() {
       attemptKeyRef.current = null;
       toastError(e);
     },
-    onSuccess: () => {
+    onSuccess: (result: unknown) => {
       toast.success(t(isModify ? "sweep_engage.new_request.modified" : "requests.posted", { cost: displayCost }));
       qc.invalidateQueries();
-      navigate({ to: isModify ? "/dashboard/requests/$id/matches" : searchMode === "pool" ? "/dashboard/pool" : "/dashboard/requests", params: isModify && from ? { id: from } : undefined });
+      // Every freshly created Pit Call (standard AND My Pool) lands on its own
+      // detail page: that is where the review window, countdown, modify/cancel
+      // and (later) SOS actions live. Only a missing id falls back to the list.
+      const createdId = (result as { id?: string } | null | undefined)?.id ?? null;
+      const targetId = isModify && from ? from : createdId;
+      if (targetId) navigate({ to: "/dashboard/requests/$id/matches", params: { id: targetId } });
+      else navigate({ to: "/dashboard/requests" });
     },
   });
 
