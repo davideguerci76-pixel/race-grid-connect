@@ -447,8 +447,14 @@ async function probePitCall(
   }
 }
 
+/** Every relative date of a seeded dataset resolves against the day it was seeded. */
+function seedClock(state: any): { seedToday: string; now: Date } {
+  const seedToday: string = state?.report?.seed_today ?? todayISO(new Date());
+  return { seedToday, now: new Date(`${seedToday}T12:00:00.000Z`) };
+}
+
 async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
-  const now = new Date();
+  const { seedToday, now } = seedClock(state);
   const anchor: string = state.anchor_date;
   const personas: Record<string, string> = state.report?.personas ?? {};
   const assertions: Assertion[] = [];
