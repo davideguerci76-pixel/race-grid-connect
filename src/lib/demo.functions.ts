@@ -497,7 +497,10 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("is_test", true);
   push("pool baseline", `${poolExpected} members`, `${poolCount ?? 0} members`);
 
-  // 4. SOS eligibility, proven against the real product law
+  // 4. SOS situation, proven against the real product law (SOS authority v2):
+  //    PRE-ACTION  — Pit Call FILLED, Dario still confirmed, first requested day = today.
+  //    POST-ACTION — the Team fired SOS: Dario cancelled as team-declared no_show, SOS call
+  //                  open with fixed 150 km / 40% and the standby among the targets.
   const sosRequestId = state.report?.sosRequestId;
   const { data: sosReq } = await sb
     .from("requests")
@@ -507,10 +510,18 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .maybeSingle();
   const today = seedToday;
   push("dataset seeded today (SOS day is the current day)", todayISO(new Date()), seedToday);
+  const { data: sosCalls } = await sb
+    .from("sos_calls")
+    .select("id, min_pct, radius_km, resolved_at, target_count")
+    .eq("request_id", sosRequestId)
+    .eq("is_test", true)
+    .order("triggered_at", { ascending: false });
+  const sosCall = (sosCalls ?? [])[0];
+  const phase = sosCall ? "post-action" : "pre-action";
   const sosState = sosReq
-    ? `${sosReq.status}/${sosReq.is_active ? "active" : "inactive"}/${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
+    ? `${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
     : "missing";
-  push("SOS request state", "active/active/race_weekend/first-day-today", sosState);
+  push("SOS request: race weekend starting today", "race_weekend/first-day-today", sosState);
 
   const { count: confirmed } = await sb
     .from("engagements")
@@ -518,36 +529,53 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("request_id", sosRequestId)
     .eq("status", "confirmed")
     .eq("is_test", true);
-  push("SOS: no confirmed engagement", "0", String(confirmed ?? 0));
-
   const { count: noShow } = await sb
     .from("engagements")
     .select("*", { count: "exact", head: true })
     .eq("request_id", sosRequestId)
     .eq("status", "cancelled")
-    .eq("cancellation_kind", "freelancer_late")
+    .eq("cancellation_kind", "no_show")
+    .eq("freelancer_id", personas[scenario.preSeeded.sos.noShowFreelancer])
     .eq("is_test", true);
-  push("SOS: late freelancer cancellation on record", "1", String(noShow ?? 0));
-
-  const { data: sosTargets } = await sb
-    .from("matches")
-    .select("freelancer_id, skills_score, stale")
-    .eq("request_id", sosRequestId)
-    .eq("is_test", true)
-    .gte("skills_score", 75);
   const standbyIds = scenario.preSeeded.sos.standby.map((k) => personas[k]);
-  const standbyFound = (sosTargets ?? []).filter(
-    (m: any) => !m.stale && standbyIds.includes(String(m.freelancer_id)),
-  ).length;
-  push("SOS standby ≥ 75% relevance", String(standbyIds.length), String(standbyFound));
 
-  const { data: standbyAvail } = await sb
-    .from("availability")
-    .select("freelancer_id")
-    .in("freelancer_id", standbyIds)
-    .eq("day", today)
-    .eq("is_test", true);
-  push("SOS standby available today", String(standbyIds.length), String((standbyAvail ?? []).length));
+  if (phase === "pre-action") {
+    push("SOS [pre-action]: Pit Call FILLED with the no-show professional still confirmed", "filled/1 confirmed/0 no_show", `${sosReq?.status ?? "missing"}/${confirmed ?? 0} confirmed/${noShow ?? 0} no_show`);
+    const { data: standbyAvail } = await sb
+      .from("availability")
+      .select("freelancer_id")
+      .in("freelancer_id", standbyIds)
+      .eq("day", today)
+      .eq("is_test", true);
+    push("SOS [pre-action]: standby available today", String(standbyIds.length), String((standbyAvail ?? []).length));
+    const { count: standbyBusy } = await sb
+      .from("engagements")
+      .select("*", { count: "exact", head: true })
+      .in("freelancer_id", standbyIds)
+      .in("status", ["confirmed", "proposed"])
+      .eq("is_test", true);
+    push("SOS [pre-action]: standby not engaged elsewhere", "0", String(standbyBusy ?? 0));
+  } else {
+    push("SOS [post-action]: team-declared no-show recorded (no_show), no concurrent confirmed", "1 no_show/≤1 confirmed", `${noShow ?? 0} no_show/${(confirmed ?? 0) <= 1 ? "≤1" : String(confirmed)} confirmed`);
+    push("SOS [post-action]: fixed radius 150 km", "150", String(sosCall.radius_km));
+    push("SOS [post-action]: minimum Professional Relevance 40%", "40", String(sosCall.min_pct));
+    const { data: targets } = await sb
+      .from("sos_call_targets")
+      .select("freelancer_id, skills_score, distance_km")
+      .eq("sos_id", sosCall.id);
+    const standbyTargets = (targets ?? []).filter((t: any) => standbyIds.includes(String(t.freelancer_id)));
+    push("SOS [post-action]: standby reached by the SOS broadcast", String(standbyIds.length), String(standbyTargets.length));
+    push("SOS [post-action]: every target ≥ 40% and ≤ 150 km", "true", String((targets ?? []).every((t: any) => Number(t.skills_score) >= 40 && (t.distance_km == null || Number(t.distance_km) <= 150))));
+    push("SOS [post-action]: no-show professional not re-targeted", "0", String((targets ?? []).filter((t: any) => String(t.freelancer_id) === personas[scenario.preSeeded.sos.noShowFreelancer]).length));
+    // Days of the no-show engagement stay blocked: the availability row of today must still exist.
+    const { count: noShowAvail } = await sb
+      .from("availability")
+      .select("*", { count: "exact", head: true })
+      .eq("freelancer_id", personas[scenario.preSeeded.sos.noShowFreelancer])
+      .eq("day", today)
+      .eq("is_test", true);
+    push("SOS [post-action]: no-show professional's day still on record (blocked)", "1", String(noShowAvail ?? 0));
+  }
 
   // 5. canonical Pit Calls, verified with the real engine on a transient probe
   const probes: Record<string, ProbeRow[]> = {};
