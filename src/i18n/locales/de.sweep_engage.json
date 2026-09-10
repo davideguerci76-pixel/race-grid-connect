@@ -265,10 +265,10 @@
       "save_freelancer_contact": "Freelancer-Kontakt speichern",
       "search_stays_active": "Die Suche bleibt aktiv. Sie werden benachrichtigt, sobald ein vollständiger Match erscheint.",
       "skills_affinity": "Fähigkeiten-Affinität",
-      "sos_confirm": "SOS-Anruf für heute auslösen? Alle heute verfügbaren, hoch affinen Freelancer werden benachrichtigt. Wer zuerst annimmt, sichert sich den Match — dies ist unwiderruflich.",
-      "sos_description": "Notfall-Rundruf an alle heute verfügbaren, hoch affinen Freelancer. Wer zuerst annimmt, füllt den Match automatisch.",
+      "sos_confirm": "SOS-Anruf jetzt auslösen? PITCALL kontaktiert automatisch alle Profis im Umkreis von 150 km mit Professional Relevance ≥40 %, die heute verfügbar sind. Wer zuerst bestätigt, erhält den Auftrag; manuelle Request Confirmations sind bis zur Auflösung des SOS deaktiviert. Ist noch ein Profi bestätigt, erklärt dieser Klick dessen No-Show. Dies ist unwiderruflich.",
+      "sos_description": "Notfallmodus: automatischer Rundruf an alle Profis im Umkreis von 150 km, Professional Relevance ≥40 %, heute verfügbar. Wer zuerst bestätigt = Match.",
       "sos_failed": "SOS-Anruf fehlgeschlagen",
-      "sos_sent": "SOS-Anruf an {{count}} Freelancer mit ≥{{pct}}% Affinität gesendet.",
+      "sos_sent": "SOS-Anruf an {{count}} Profi(s) im Umkreis von 150 km mit ≥{{pct}} % Relevance gesendet.",
       "tech_details_hidden_note": "Technische Details sind verborgen, bis Sie freischalten ({{cost}} Token). Echter Name und Kontakte erscheinen erst, nachdem der Freelancer den Match bestätigt hat.",
       "tier_unlock_failed": "Stufenfreischaltung fehlgeschlagen",
       "tier_unlock_success": "Stufe {{tier}} ({{scope}}) freigeschaltet — {{spent}} Token ausgegeben. Guthaben: {{balance}}",
@@ -295,7 +295,8 @@
       "red_cancel_retry": "Erneut versuchen",
       "unlock_details_button_free": "Details freischalten (kostenlos)",
       "econ_continue_active_title": "PITCALL WIRD FÜR SIE AKTIV",
-      "econ_continue_active_body": "Wir versuchen, neue passende Freelancer für Ihre Anfrage zu aktivieren."
+      "econ_continue_active_body": "Wir versuchen, neue passende Freelancer für Ihre Anfrage zu aktivieren.",
+      "sos_no_show_notice": "Auf dieser Pit Call ist noch ein Profi bestätigt: Mit SOS erklärst du dessen No-Show. Seine Termine bleiben blockiert."
     },
     "requests": {
       "confirmed_filled": "Bestätigt · Besetzt",

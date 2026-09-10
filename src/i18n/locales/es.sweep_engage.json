@@ -265,10 +265,10 @@
       "save_freelancer_contact": "Guardar contacto del freelancer",
       "search_stays_active": "La búsqueda sigue activa. Se te notificará en cuanto aparezca un match completo.",
       "skills_affinity": "Afinidad de habilidades",
-      "sos_confirm": "¿Activar la Llamada SOS para hoy? Se notificará a todos los freelancers de alta afinidad disponibles hoy. El primero en aceptar bloquea el match — esto es irreversible.",
-      "sos_description": "Difusión de emergencia a todos los freelancers de alta afinidad disponibles hoy. El primero en aceptar cubre el match automáticamente.",
+      "sos_confirm": "¿Activar la Llamada SOS ahora? PITCALL contactará automáticamente a todos los profesionales en un radio de 150 km con Relevancia Profesional ≥40% disponibles hoy. El primero en confirmar se lleva el trabajo; las Request Confirmation manuales quedan desactivadas hasta resolver el SOS. Si un profesional sigue confirmado, este clic declara su no-show. Esto es irreversible.",
+      "sos_description": "Modo emergencia: difusión automática a todos los profesionales en 150 km, Relevancia Profesional ≥40%, disponibles hoy. El primero en confirmar = match.",
       "sos_failed": "Error en la Llamada SOS",
-      "sos_sent": "Llamada SOS enviada a {{count}} freelancer(s) con afinidad ≥{{pct}}%.",
+      "sos_sent": "Llamada SOS enviada a {{count}} profesional(es) en 150 km con relevancia ≥{{pct}}%.",
       "tech_details_hidden_note": "Los detalles técnicos están ocultos hasta que desbloquees ({{cost}} token(s)). El nombre real y los contactos aparecen solo después de que el freelancer confirme el match.",
       "tier_unlock_failed": "Error al desbloquear el nivel",
       "tier_unlock_success": "Nivel {{tier}} ({{scope}}) desbloqueado — {{spent}} tokens gastados. Saldo: {{balance}}",
@@ -295,7 +295,8 @@
       "red_cancel_retry": "Reintentar",
       "unlock_details_button_free": "Desbloquear detalles (gratis)",
       "econ_continue_active_title": "PITCALL SE ACTIVA POR TI",
-      "econ_continue_active_body": "Intentaremos activar nuevos freelancers compatibles con tu solicitud."
+      "econ_continue_active_body": "Intentaremos activar nuevos freelancers compatibles con tu solicitud.",
+      "sos_no_show_notice": "Un profesional sigue confirmado en esta Pit Call: al pulsar SOS declaras su no-show. Sus fechas permanecen bloqueadas."
     },
     "requests": {
       "confirmed_filled": "Confirmado · Cubierto",
