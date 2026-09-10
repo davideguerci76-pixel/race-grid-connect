@@ -315,7 +315,9 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
     .maybeSingle();
   if (reqErr || !sosRequest) throw new Error(`SOS request seed failed: ${reqErr?.message ?? "no row"}`);
 
-  // The professional had confirmed three days ago (outside the grace window)...
+  // The professional confirmed three days ago and is still formally confirmed: today (first
+  // requested day) he does not show up. No cancellation is seeded — the Team's SOS click IS the
+  // team-declared no-show, executed by the real authority during the demo.
   const { data: engagement, error: engErr } = await sb
     .from("engagements")
     .insert({
@@ -330,21 +332,12 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       currency: "EUR",
       status: "confirmed",
       confirmed_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-      notes: "DEMO scenario — engagement later abandoned by the professional.",
+      notes: "DEMO scenario — confirmed professional who will not show up on the first day.",
       is_test: true,
     })
     .select("id")
     .maybeSingle();
   if (engErr || !engagement) throw new Error(`SOS engagement seed failed: ${engErr?.message ?? "no row"}`);
-
-  // ...and pulls out late today: this runs the REAL cancellation law, which
-  // reopens the Pit Call and makes it legitimately SOS-eligible.
-  const { error: cancelErr } = await sb.rpc("demo_cancel_engagement_test", {
-    _engagement_id: engagement.id,
-    _actor: noShowId,
-    _reason: "DEMO scenario — professional pulled out on the event day.",
-  });
-  if (cancelErr) throw new Error(`demo_cancel_engagement_test failed: ${cancelErr.message}`);
 
   // ---- real matching engine, TEST scope only
   const { error: recErr } = await sb.rpc("recompute_matches_env", { _is_test: true });
