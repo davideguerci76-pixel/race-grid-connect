@@ -3808,6 +3808,7 @@ export type Database = {
         Args: { _request_id: string }
         Returns: boolean
       }
+      request_in_sos_mode: { Args: { _request_id: string }; Returns: boolean }
       request_match_confirmation: {
         Args: { _match_id: string }
         Returns: {
@@ -4006,6 +4007,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sos_min_relevance_pct: { Args: never; Returns: number }
+      sos_radius_km: { Args: never; Returns: number }
       submit_rating_v2: {
         Args: {
           _comment?: string
