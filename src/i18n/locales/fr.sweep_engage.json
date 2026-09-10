@@ -265,10 +265,10 @@
       "save_freelancer_contact": "Enregistrer le contact du freelance",
       "search_stays_active": "La recherche reste active. Vous serez averti dès qu'un match complet apparaîtra.",
       "skills_affinity": "Affinité de compétences",
-      "sos_confirm": "Déclencher l'appel SOS pour aujourd'hui ? Tous les freelances à forte affinité disponibles aujourd'hui seront avertis. Le premier à accepter verrouille le match — ceci est irréversible.",
-      "sos_description": "Diffusion d'urgence à tous les freelances à forte affinité disponibles aujourd'hui. Le premier à accepter pourvoit automatiquement le match.",
+      "sos_confirm": "Déclencher l'appel SOS maintenant ? PITCALL contactera automatiquement tous les professionnels dans un rayon de 150 km avec une Professional Relevance ≥40 % disponibles aujourd'hui. Le premier à confirmer obtient la mission ; les Request Confirmation manuelles sont désactivées jusqu'à la résolution du SOS. Si un professionnel est encore confirmé, ce clic déclare son no-show. Ceci est irréversible.",
+      "sos_description": "Mode urgence : diffusion automatique à tous les professionnels dans un rayon de 150 km, Professional Relevance ≥40 %, disponibles aujourd'hui. Premier à confirmer = match.",
       "sos_failed": "Échec de l'appel SOS",
-      "sos_sent": "Appel SOS envoyé à {{count}} freelance(s) avec une affinité ≥{{pct}}%.",
+      "sos_sent": "Appel SOS envoyé à {{count}} professionnel(s) dans un rayon de 150 km avec une relevance ≥{{pct}} %.",
       "tech_details_hidden_note": "Les détails techniques sont masqués jusqu'à ce que vous débloquiez ({{cost}} token(s)). Le vrai nom et les contacts n'apparaissent qu'après confirmation du match par le freelance.",
       "tier_unlock_failed": "Échec du déblocage du niveau",
       "tier_unlock_success": "Niveau {{tier}} ({{scope}}) débloqué — {{spent}} tokens dépensés. Solde : {{balance}}",
@@ -295,7 +295,8 @@
       "red_cancel_retry": "Réessayer",
       "unlock_details_button_free": "Débloquer les détails (gratuit)",
       "econ_continue_active_title": "PITCALL SE MOBILISE POUR VOUS",
-      "econ_continue_active_body": "Nous essaierons d'activer de nouveaux freelances compatibles avec votre demande."
+      "econ_continue_active_body": "Nous essaierons d'activer de nouveaux freelances compatibles avec votre demande.",
+      "sos_no_show_notice": "Un professionnel est encore confirmé sur cette Pit Call : appuyer sur SOS déclare son no-show. Ses dates restent bloquées."
     },
     "requests": {
       "confirmed_filled": "Confirmé · Pourvu",

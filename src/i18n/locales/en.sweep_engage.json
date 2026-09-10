@@ -265,10 +265,10 @@
       "save_freelancer_contact": "Save freelancer contact",
       "search_stays_active": "Search stays active. You'll be notified as soon as a full match appears.",
       "skills_affinity": "Skills affinity",
-      "sos_confirm": "Trigger SOS Call for today? Every high-affinity freelancer available today will be notified. The first to accept locks the match — this is irreversible.",
-      "sos_description": "Emergency broadcast to all high-affinity freelancers available today. The first to accept fills the match automatically.",
+      "sos_confirm": "Trigger SOS Call now? PITCALL will automatically contact every professional within 150 km with Professional Relevance ≥40% who is available today. The first to confirm takes the job; manual Request Confirmations are disabled until the SOS is resolved. If a professional is still confirmed, this click declares their no-show. This is irreversible.",
+      "sos_description": "Emergency mode: automatic broadcast to all professionals within 150 km, Professional Relevance ≥40%, available today. First to confirm = match.",
       "sos_failed": "SOS Call failed",
-      "sos_sent": "SOS Call sent to {{count}} freelancer(s) at ≥{{pct}}% affinity.",
+      "sos_sent": "SOS Call sent to {{count}} professional(s) within 150 km at ≥{{pct}}% relevance.",
       "tech_details_hidden_note": "Technical details are hidden until you unlock ({{cost}} token(s)). Real name and contacts appear only after the freelancer confirms the match.",
       "tier_unlock_failed": "Tier unlock failed",
       "tier_unlock_success": "Tier {{tier}} ({{scope}}) unlocked — {{spent}} tokens spent. Balance: {{balance}}",
@@ -295,7 +295,8 @@
       "red_cancel_retry": "Retry",
       "unlock_details_button_free": "Unlock details (free)",
       "econ_continue_active_title": "PITCALL GOES ACTIVE FOR YOU",
-      "econ_continue_active_body": "We will try to activate new freelancers who match your request."
+      "econ_continue_active_body": "We will try to activate new freelancers who match your request.",
+      "sos_no_show_notice": "A professional is still confirmed on this Pit Call: pressing SOS declares their no-show. Their dates remain blocked."
     },
     "requests": {
       "confirmed_filled": "Confirmed · Filled",

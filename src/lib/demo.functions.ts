@@ -305,15 +305,19 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       location_anchor: "this",
       location_radius_km: sos.request.location_radius_km,
       search_mode: "standard",
-      status: "active",
-      is_active: true,
+      // FILLED: the professional confirmed days ago. The SOS entry point of the demo is the
+      // team-declared no-show on the first requested day (SOS authority v2, migration 0122).
+      status: "filled",
+      is_active: false,
       activated_at: new Date(Date.now() - 4 * 86400000).toISOString(),
     })
     .select("id")
     .maybeSingle();
   if (reqErr || !sosRequest) throw new Error(`SOS request seed failed: ${reqErr?.message ?? "no row"}`);
 
-  // The professional had confirmed three days ago (outside the grace window)...
+  // The professional confirmed three days ago and is still formally confirmed: today (first
+  // requested day) he does not show up. No cancellation is seeded — the Team's SOS click IS the
+  // team-declared no-show, executed by the real authority during the demo.
   const { data: engagement, error: engErr } = await sb
     .from("engagements")
     .insert({
@@ -328,21 +332,12 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       currency: "EUR",
       status: "confirmed",
       confirmed_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-      notes: "DEMO scenario — engagement later abandoned by the professional.",
+      notes: "DEMO scenario — confirmed professional who will not show up on the first day.",
       is_test: true,
     })
     .select("id")
     .maybeSingle();
   if (engErr || !engagement) throw new Error(`SOS engagement seed failed: ${engErr?.message ?? "no row"}`);
-
-  // ...and pulls out late today: this runs the REAL cancellation law, which
-  // reopens the Pit Call and makes it legitimately SOS-eligible.
-  const { error: cancelErr } = await sb.rpc("demo_cancel_engagement_test", {
-    _engagement_id: engagement.id,
-    _actor: noShowId,
-    _reason: "DEMO scenario — professional pulled out on the event day.",
-  });
-  if (cancelErr) throw new Error(`demo_cancel_engagement_test failed: ${cancelErr.message}`);
 
   // ---- real matching engine, TEST scope only
   const { error: recErr } = await sb.rpc("recompute_matches_env", { _is_test: true });
@@ -502,7 +497,10 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("is_test", true);
   push("pool baseline", `${poolExpected} members`, `${poolCount ?? 0} members`);
 
-  // 4. SOS eligibility, proven against the real product law
+  // 4. SOS situation, proven against the real product law (SOS authority v2):
+  //    PRE-ACTION  — Pit Call FILLED, Dario still confirmed, first requested day = today.
+  //    POST-ACTION — the Team fired SOS: Dario cancelled as team-declared no_show, SOS call
+  //                  open with fixed 150 km / 40% and the standby among the targets.
   const sosRequestId = state.report?.sosRequestId;
   const { data: sosReq } = await sb
     .from("requests")
@@ -512,10 +510,18 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .maybeSingle();
   const today = seedToday;
   push("dataset seeded today (SOS day is the current day)", todayISO(new Date()), seedToday);
+  const { data: sosCalls } = await sb
+    .from("sos_calls")
+    .select("id, min_pct, radius_km, resolved_at, target_count")
+    .eq("request_id", sosRequestId)
+    .eq("is_test", true)
+    .order("triggered_at", { ascending: false });
+  const sosCall = (sosCalls ?? [])[0];
+  const phase = sosCall ? "post-action" : "pre-action";
   const sosState = sosReq
-    ? `${sosReq.status}/${sosReq.is_active ? "active" : "inactive"}/${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
+    ? `${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
     : "missing";
-  push("SOS request state", "active/active/race_weekend/first-day-today", sosState);
+  push("SOS request: race weekend starting today", "race_weekend/first-day-today", sosState);
 
   const { count: confirmed } = await sb
     .from("engagements")
@@ -523,36 +529,53 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("request_id", sosRequestId)
     .eq("status", "confirmed")
     .eq("is_test", true);
-  push("SOS: no confirmed engagement", "0", String(confirmed ?? 0));
-
   const { count: noShow } = await sb
     .from("engagements")
     .select("*", { count: "exact", head: true })
     .eq("request_id", sosRequestId)
     .eq("status", "cancelled")
-    .eq("cancellation_kind", "freelancer_late")
+    .eq("cancellation_kind", "no_show")
+    .eq("freelancer_id", personas[scenario.preSeeded.sos.noShowFreelancer])
     .eq("is_test", true);
-  push("SOS: late freelancer cancellation on record", "1", String(noShow ?? 0));
-
-  const { data: sosTargets } = await sb
-    .from("matches")
-    .select("freelancer_id, skills_score, stale")
-    .eq("request_id", sosRequestId)
-    .eq("is_test", true)
-    .gte("skills_score", 75);
   const standbyIds = scenario.preSeeded.sos.standby.map((k) => personas[k]);
-  const standbyFound = (sosTargets ?? []).filter(
-    (m: any) => !m.stale && standbyIds.includes(String(m.freelancer_id)),
-  ).length;
-  push("SOS standby ≥ 75% relevance", String(standbyIds.length), String(standbyFound));
 
-  const { data: standbyAvail } = await sb
-    .from("availability")
-    .select("freelancer_id")
-    .in("freelancer_id", standbyIds)
-    .eq("day", today)
-    .eq("is_test", true);
-  push("SOS standby available today", String(standbyIds.length), String((standbyAvail ?? []).length));
+  if (phase === "pre-action") {
+    push("SOS [pre-action]: Pit Call FILLED with the no-show professional still confirmed", "filled/1 confirmed/0 no_show", `${sosReq?.status ?? "missing"}/${confirmed ?? 0} confirmed/${noShow ?? 0} no_show`);
+    const { data: standbyAvail } = await sb
+      .from("availability")
+      .select("freelancer_id")
+      .in("freelancer_id", standbyIds)
+      .eq("day", today)
+      .eq("is_test", true);
+    push("SOS [pre-action]: standby available today", String(standbyIds.length), String((standbyAvail ?? []).length));
+    const { count: standbyBusy } = await sb
+      .from("engagements")
+      .select("*", { count: "exact", head: true })
+      .in("freelancer_id", standbyIds)
+      .in("status", ["confirmed", "proposed"])
+      .eq("is_test", true);
+    push("SOS [pre-action]: standby not engaged elsewhere", "0", String(standbyBusy ?? 0));
+  } else {
+    push("SOS [post-action]: team-declared no-show recorded (no_show), no concurrent confirmed", "1 no_show/≤1 confirmed", `${noShow ?? 0} no_show/${(confirmed ?? 0) <= 1 ? "≤1" : String(confirmed)} confirmed`);
+    push("SOS [post-action]: fixed radius 150 km", "150", String(sosCall.radius_km));
+    push("SOS [post-action]: minimum Professional Relevance 40%", "40", String(sosCall.min_pct));
+    const { data: targets } = await sb
+      .from("sos_call_targets")
+      .select("freelancer_id, skills_score, distance_km")
+      .eq("sos_id", sosCall.id);
+    const standbyTargets = (targets ?? []).filter((t: any) => standbyIds.includes(String(t.freelancer_id)));
+    push("SOS [post-action]: standby reached by the SOS broadcast", String(standbyIds.length), String(standbyTargets.length));
+    push("SOS [post-action]: every target ≥ 40% and ≤ 150 km", "true", String((targets ?? []).every((t: any) => Number(t.skills_score) >= 40 && (t.distance_km == null || Number(t.distance_km) <= 150))));
+    push("SOS [post-action]: no-show professional not re-targeted", "0", String((targets ?? []).filter((t: any) => String(t.freelancer_id) === personas[scenario.preSeeded.sos.noShowFreelancer]).length));
+    // Days of the no-show engagement stay blocked: the availability row of today must still exist.
+    const { count: noShowAvail } = await sb
+      .from("availability")
+      .select("*", { count: "exact", head: true })
+      .eq("freelancer_id", personas[scenario.preSeeded.sos.noShowFreelancer])
+      .eq("day", today)
+      .eq("is_test", true);
+    push("SOS [post-action]: no-show professional's day still on record (blocked)", "1", String(noShowAvail ?? 0));
+  }
 
   // 5. canonical Pit Calls, verified with the real engine on a transient probe
   const probes: Record<string, ProbeRow[]> = {};
@@ -566,13 +589,41 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
       push(`${pc.key}: ICS file shipped`, pc.ics.filename, text ? pc.ics.filename : "missing");
       push(`${pc.key}: ICS days = manifest days`, `${fromManifest.length} days`, fromFile.join(",") === fromManifest.join(",") ? `${fromFile.length} days` : `mismatch (${fromFile.length} days)`);
       push(`${pc.key}: ICS rounds`, String(pc.ics.rounds.length), String(parseIcs(text ?? "").length));
-      const { count: preCreated } = await sb
+      // PRE-ACTION (right after reset): no season Pit Call exists — the operator creates it by hand.
+      // POST-HUMAN-ACTION: the manually created Pit Call must carry exactly the ICS days and the
+      // real engine must classify the season personas as the manifest expects.
+      const { data: seasonReqs } = await sb
         .from("requests")
-        .select("*", { count: "exact", head: true })
+        .select("id, season_dates, status, created_at")
         .eq("team_id", personas[pc.team])
         .eq("duration", "full_season")
-        .eq("is_test", true);
-      push(`${pc.key}: no season Pit Call pre-seeded (manual upload)`, "0", String(preCreated ?? 0));
+        .eq("is_test", true)
+        .not("title", "like", "DEMO verification probe%")
+        .order("created_at", { ascending: false });
+      const manual = (seasonReqs ?? [])[0];
+      if (!manual) {
+        push(`${pc.key} [pre-action]: season Pit Call not pre-seeded (manual upload)`, "0", String(seasonReqs?.length ?? 0));
+      } else {
+        const got: string[] = [...(manual.season_dates ?? [])].sort();
+        push(`${pc.key} [post-action]: imported days = ICS days`, `${fromManifest.length} days`, got.join(",") === fromManifest.join(",") ? `${got.length} days` : `mismatch (${got.length} days)`);
+        const { data: live } = await sb
+          .from("matches")
+          .select("freelancer_id, is_partial, skills_score, stale")
+          .eq("request_id", manual.id)
+          .eq("is_test", true)
+          .eq("stale", false);
+        const byId = new Map(Object.entries(personas).map(([k, id]) => [id, k]));
+        const liveFull = (live ?? []).filter((m: any) => !m.is_partial).map((m: any) => byId.get(String(m.freelancer_id)) ?? "?").sort();
+        const livePartial = (live ?? []).filter((m: any) => m.is_partial).map((m: any) => byId.get(String(m.freelancer_id)) ?? "?").sort();
+        push(`${pc.key} [post-action]: Full matches (Season law)`, [...(pc.expected.full ?? [])].sort().join(","), liveFull.join(","));
+        push(`${pc.key} [post-action]: Partial matches (Season law)`, [...(pc.expected.partial ?? [])].sort().join(","), livePartial.join(","));
+        // Relevance is independent from coverage: the lower-relevance Full persona must score below the strong one.
+        const lo = pc.expected.lower_relevance_full;
+        if (lo) {
+          const s = (k: string) => Number((live ?? []).find((m: any) => byId.get(String(m.freelancer_id)) === k)?.skills_score ?? -1);
+          push(`${pc.key} [post-action]: ${lo.weaker} Full but lower relevance than ${lo.stronger}`, "true", String(s(lo.weaker) >= 0 && s(lo.weaker) < s(lo.stronger)));
+        }
+      }
     }
 
     const rows = await probePitCall(sb, scenario, pc, personas, anchor, now);

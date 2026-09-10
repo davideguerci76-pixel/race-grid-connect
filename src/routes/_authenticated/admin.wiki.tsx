@@ -325,34 +325,42 @@ function PlatformWiki() {
       </Section>
 
 
-      <Section icon={Siren} tag="[05 · SOS CALL]" title="Emergency SOS Call — high-affinity broadcast">
+      <Section icon={Siren} tag="[05 · SOS CALL]" title="Emergency SOS Call — automatic emergency broadcast">
         <p>
-          Last-resort emergency broadcast for single-race requests that are unfilled on the first required day.
-          Configurable in <span className="font-mono">Admin → Tokens → matching</span>:{" "}
-          <span className="font-mono">sos_min_match_pct</span> (default 75%).
+          Emergency replacement for single-race Pit Calls from the first required day. SOS is NOT re-matching:
+          PITCALL finds every sufficiently compatible professional nearby, contacts them all automatically and
+          assigns the job to the first who confirms. Fixed authority (no ACP setting):{" "}
+          <span className="font-mono">sos_radius_km() = 150 km</span> and{" "}
+          <span className="font-mono">sos_min_relevance_pct() = 40%</span> (SOS-only; the generic 50% law is untouched).
         </p>
         <p className="font-bold uppercase text-racing-yellow">Activation conditions (ALL must be true)</p>
         <ul className="list-disc pl-5">
           <li>The Pit Call is single-race (<span className="font-mono">duration ≠ full_season</span>).</li>
-          <li>Today (simulated clock) equals the first required day.</li>
-          <li>No confirmed engagement exists on the Pit Call.</li>
-          <li>Team is the Pit Call owner.</li>
+          <li>Today is between the first and the last required day (from the first requested day onward).</li>
+          <li>Team is the Pit Call owner; no SOS already open on the Pit Call.</li>
+          <li>
+            Entry point A — FILLED/CONFIRMED: the professional does not show up. The SOS click is the{" "}
+            <span className="font-mono">Team-declared no-show</span>: the engagement leaves confirmed as{" "}
+            <span className="font-mono">cancelled / no_show</span>, its dates stay blocked for the professional, who is
+            notified. No automatic rating, refund, token or fee consequence.
+          </li>
+          <li>Entry point B — ACTIVE/REOPENED without replacement: nothing to declare, SOS starts directly.</li>
         </ul>
         <p className="font-bold uppercase text-racing-yellow">Behaviour</p>
         <ul className="list-disc pl-5">
           <li>
-            Selects every freelancer whose <span className="font-mono">skills_score ≥ sos_min_match_pct</span> AND who is
-            free on the first required day AND who passes the request's geographic radius (mandatory-style, always
-            applied for SOS regardless of the request's original relevance setting).
-          </li>
-          <li>Inserts SOS notifications with an <span className="font-mono">Accept now</span> CTA in the notification centre and a dashboard banner.</li>
-          <li>
-            The first freelancer to accept skips the propose step and creates a <span className="font-mono">confirmed</span> engagement
-            directly. All other targets receive a <span className="font-mono">sos_taken</span> notification.
+            Targets every freelancer with <span className="font-mono">skills_score ≥ 40%</span>, within 150 km of the Pit
+            Call anchor (the Pit Call's own <span className="font-mono">location_radius_km</span> is ignored), available
+            today and not blocked by another engagement. All of them receive the SOS Request Confirmation at once.
           </li>
           <li>
-            Auto-triggered path: when a freelancer late-cancels on the same day as the first required day, SOS fires
-            automatically for the same request.
+            Exclusive SOS mode while the SOS is open: <span className="font-mono">request_match_confirmation</span> and{" "}
+            <span className="font-mono">accept_match_confirmation</span> are blocked server-side for that Pit Call.
+          </li>
+          <li>
+            First confirms = first match: <span className="font-mono">accept_sos_call</span> creates the{" "}
+            <span className="font-mono">confirmed</span> engagement under a lock and refuses if any confirmed engagement
+            already exists. Other targets receive <span className="font-mono">sos_taken</span>; pending manual proposals lapse.
           </li>
         </ul>
         <p className="text-xs text-muted-foreground">

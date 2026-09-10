@@ -93,7 +93,7 @@ function RequestMatchesPage() {
   const sosMut = useMutation({
     mutationFn: () => sosFn({ data: { request_id: id } }),
     onSuccess: (r: any) => {
-      toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 75 }));
+      toast.success(t("sweep_engage.request_matches.sos_sent", { count: r?.target_count ?? 0, pct: r?.min_pct ?? 40 }));
       qc.invalidateQueries({ queryKey: ["request-matches", id] });
     },
     onError: (e) => toastError(e, "sweep_engage.request_matches.sos_failed"),
@@ -142,8 +142,15 @@ function RequestMatchesPage() {
     : matchPotential === "targeted"
       ? "border-racing-yellow/70 bg-racing-yellow/10 text-racing-yellow"
       : "border-racing-red/70 bg-racing-red/10 text-racing-red";
-  const isFirstDayToday = data?.request?.start_date ? new Date().toISOString().slice(0, 10) === data.request.start_date : false;
-  const sosEligible = Boolean(data?.request && !requestFilled && !inReview && isFirstDayToday && data.request.duration !== "full_season");
+  // SOS authority v2: available from the first required day until the last one, also when the
+  // Pit Call is FILLED (the click is then a Team-declared no-show). Server-side is authoritative.
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const sosWindowOpen = Boolean(
+    data?.request?.start_date && todayIso >= data.request.start_date && todayIso <= (data.request.end_date ?? data.request.start_date),
+  );
+  const sosStatusOk = !["closed", "completed", "paused", "pending_review"].includes(String(data?.request?.status ?? ""));
+  const sosEligible = Boolean(data?.request && sosStatusOk && !inReview && sosWindowOpen && data.request.duration !== "full_season");
+  const sosDeclaresNoShow = sosEligible && data?.request?.status === "filled";
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
@@ -381,10 +388,15 @@ function RequestMatchesPage() {
               {sosEligible && (
                 <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
                   <div className="min-w-0">
-                    <div className="label-mono text-racing-red">[SOS CALL — FIRST DAY ONLY]</div>
+                    <div className="label-mono text-racing-red">[SOS CALL]</div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t("sweep_engage.request_matches.sos_description")}
                     </p>
+                    {sosDeclaresNoShow && (
+                      <p className="mt-1 text-xs font-semibold text-racing-red">
+                        {t("sweep_engage.request_matches.sos_no_show_notice")}
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={async () => {
