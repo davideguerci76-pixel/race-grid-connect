@@ -862,6 +862,13 @@
       "when": 1789056503789,
       "tag": "0122_sos_authority_v2_fixed_radius_relevance_no_show_exclusive_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1789057707110,
+      "tag": "0123_sos_accept_required_days_inline",
+      "breakpoints": true
     }
   ]
 }
