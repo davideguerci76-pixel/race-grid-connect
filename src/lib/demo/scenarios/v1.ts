@@ -385,7 +385,7 @@ export const DEMO_V1: DemoScenario = {
         { it: "Inserisci gli input elencati qui sotto e guarda la Preview.", en: "Enter the inputs listed below and look at the Preview." },
         { it: "Pubblica la Pit Call: entra nella review window reale (5 minuti).", en: "Publish the Pit Call: it enters the real 5-minute review window." },
         { it: "Dall'ACP esegui il runner “Attiva Pit Call in review” per non aspettare.", en: "From the ACP run the “Activate pending reviews” runner instead of waiting." },
-        { it: "Apri i Match Results: verifica Full, Partial, ranking e il match <50% visibile.", en: "Open Match Results: check Full, Partial, ranking and the visible sub-50% match." },
+        { it: "Apri i Match Results: verifica Full, Partial, ranking e il match <50% visibile. Le percentuali riportate qui sotto sono calcolate dal motore reale sugli input esatti elencati: cambiando skill, lingue o livello richiesti (es. 42% invece di 35%) cambiano di conseguenza.", en: "Open Match Results: check Full, Partial, ranking and the visible sub-50% match. The percentages below are computed by the real engine on the exact inputs listed: changing required skills, languages or level (e.g. 42% instead of 35%) changes them accordingly." },
         { it: "Invia la Request Confirmation a DEMO Mario.", en: "Send the Request Confirmation to DEMO Mario." },
         { it: "Nella finestra del freelancer accetta: nasce l'Engagement e i giorni si bloccano a calendario.", en: "In the freelancer window accept it: the Engagement is created and the days get blocked in the calendar." },
       ],
