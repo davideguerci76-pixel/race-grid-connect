@@ -305,8 +305,10 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       location_anchor: "this",
       location_radius_km: sos.request.location_radius_km,
       search_mode: "standard",
-      status: "active",
-      is_active: true,
+      // FILLED: the professional confirmed days ago. The SOS entry point of the demo is the
+      // team-declared no-show on the first requested day (SOS authority v2, migration 0122).
+      status: "filled",
+      is_active: false,
       activated_at: new Date(Date.now() - 4 * 86400000).toISOString(),
     })
     .select("id")
