@@ -538,10 +538,12 @@ export const DEMO_V1: DemoScenario = {
         location_radius_km: 500,
       },
       steps: [
-        { it: "Accedi come DEMO Apex Racing e apri la Pit Call di oggi.", en: "Sign in as DEMO Apex Racing and open today's Pit Call." },
-        { it: "DEMO Dario aveva confermato e ha poi rinunciato: la Pit Call è tornata attiva.", en: "DEMO Dario had confirmed and then pulled out: the Pit Call is active again." },
-        { it: "Oggi è il primo giorno richiesto: compare l'azione SOS Call.", en: "Today is the first required day: the SOS Call action appears." },
-        { it: "Lancia la SOS Call: DEMO Karl riceve la chiamata nel Notification Center.", en: "Fire the SOS Call: DEMO Karl gets it in the Notification Center." },
+        { it: "Accedi come DEMO Apex Racing e apri la Pit Call di oggi: è FILLED, DEMO Dario è formalmente confermato.", en: "Sign in as DEMO Apex Racing and open today's Pit Call: it is FILLED, DEMO Dario is formally confirmed." },
+        { it: "Oggi è il primo giorno richiesto e Dario non si presenta né risponde: compare l'azione SOS Call (disponibile dal primo giorno richiesto, anche con un Engagement confirmed).", en: "Today is the first required day and Dario neither shows up nor answers: the SOS Call action appears (available from the first requested day, even with a confirmed engagement)." },
+        { it: "Premi SOS: il click è la dichiarazione di NO-SHOW del Team. L'Engagement di Dario esce da confirmed come no_show, i suoi giorni restano bloccati, Dario riceve la notifica. Nessuna conseguenza economica/rating automatica.", en: "Press SOS: the click is the Team-declared NO-SHOW. Dario's engagement leaves confirmed as no_show, his days stay blocked, Dario is notified. No automatic economic/rating consequence." },
+        { it: "SOS cerca automaticamente entro 150 km fissi con Professional Relevance ≥40% e disponibilità oggi, e contatta TUTTI gli eleggibili: DEMO Karl riceve la SOS Call nel Notification Center.", en: "SOS automatically searches within a fixed 150 km with Professional Relevance ≥40% and availability today, and contacts ALL eligible professionals: DEMO Karl gets the SOS Call in the Notification Center." },
+        { it: "Modalità SOS esclusiva: il Team non può inviare Request Confirmation manuali (bloccato anche server-side). Accedi come DEMO Karl e accetta: primo che conferma = match. Gli altri target ricevono sos_taken; due Engagement confirmed concorrenti sono impossibili.", en: "Exclusive SOS mode: the Team cannot send manual Request Confirmations (blocked server-side too). Sign in as DEMO Karl and accept: first to confirm = match. Other targets get sos_taken; two concurrent confirmed engagements are impossible." },
+        { it: "Stesso flusso anche dall'altro entry point (Pit Call ACTIVE/riaperta senza replacement dal primo giorno richiesto): in quel caso non c'è alcun no-show da dichiarare.", en: "Same flow from the other entry point (ACTIVE/reopened Pit Call without replacement, from the first requested day): no no-show is declared in that case." },
       ],
     },
     pool: {
