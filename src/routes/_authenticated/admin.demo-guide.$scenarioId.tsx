@@ -76,6 +76,13 @@ function DemoGuide() {
             tone={ok ? "ok" : "bad"}
           />
         </div>
+        {g.seed_is_today === false && (
+          <p className="mt-2 text-[11px] font-bold text-racing-red">
+            {lang === "it"
+              ? `ATTENZIONE: questo dataset è stato generato il ${g.today}. Esegui di nuovo “Reset & seed” oggi prima della demo: lo scenario SOS richiede che il primo giorno sia la data odierna.`
+              : `WARNING: this dataset was generated on ${g.today}. Run “Reset & seed” again today before the demo: the SOS scenario requires its first day to be the current date.`}
+          </p>
+        )}
         {g.live_unchanged === false && (
           <p className="mt-2 text-[11px] font-bold text-racing-red">
             {lang === "it"
