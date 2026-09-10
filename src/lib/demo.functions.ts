@@ -497,7 +497,8 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     .eq("id", sosRequestId)
     .eq("is_test", true)
     .maybeSingle();
-  const today = todayISO(now);
+  const today = seedToday;
+  push("dataset seeded today (SOS day is the current day)", todayISO(new Date()), seedToday);
   const sosState = sosReq
     ? `${sosReq.status}/${sosReq.is_active ? "active" : "inactive"}/${sosReq.duration}/${sosReq.start_date === today ? "first-day-today" : "wrong-day"}`
     : "missing";
