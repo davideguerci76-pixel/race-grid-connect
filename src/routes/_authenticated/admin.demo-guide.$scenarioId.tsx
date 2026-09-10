@@ -123,7 +123,10 @@ function DemoGuide() {
                 {f.languages.map((l: any) => `${l.code} (${l.level})`).join(", ")}
               </Mono>
               <Mono>
-                {lang === "it" ? "Disponibilità" : "Availability"}: {f.availability.join(", ") || "—"}
+                {lang === "it" ? "Disponibilità" : "Availability"}:{" "}
+                {f.availability.length > 12
+                  ? `${f.availability.length} ${lang === "it" ? "giorni" : "days"} (${f.availability[0]} → ${f.availability[f.availability.length - 1]})`
+                  : f.availability.join(", ") || "—"}
               </Mono>
             </Card>
           ))}
