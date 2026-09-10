@@ -566,13 +566,41 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
       push(`${pc.key}: ICS file shipped`, pc.ics.filename, text ? pc.ics.filename : "missing");
       push(`${pc.key}: ICS days = manifest days`, `${fromManifest.length} days`, fromFile.join(",") === fromManifest.join(",") ? `${fromFile.length} days` : `mismatch (${fromFile.length} days)`);
       push(`${pc.key}: ICS rounds`, String(pc.ics.rounds.length), String(parseIcs(text ?? "").length));
-      const { count: preCreated } = await sb
+      // PRE-ACTION (right after reset): no season Pit Call exists — the operator creates it by hand.
+      // POST-HUMAN-ACTION: the manually created Pit Call must carry exactly the ICS days and the
+      // real engine must classify the season personas as the manifest expects.
+      const { data: seasonReqs } = await sb
         .from("requests")
-        .select("*", { count: "exact", head: true })
+        .select("id, season_dates, status, created_at")
         .eq("team_id", personas[pc.team])
         .eq("duration", "full_season")
-        .eq("is_test", true);
-      push(`${pc.key}: no season Pit Call pre-seeded (manual upload)`, "0", String(preCreated ?? 0));
+        .eq("is_test", true)
+        .not("title", "like", "DEMO verification probe%")
+        .order("created_at", { ascending: false });
+      const manual = (seasonReqs ?? [])[0];
+      if (!manual) {
+        push(`${pc.key} [pre-action]: season Pit Call not pre-seeded (manual upload)`, "0", String(seasonReqs?.length ?? 0));
+      } else {
+        const got: string[] = [...(manual.season_dates ?? [])].sort();
+        push(`${pc.key} [post-action]: imported days = ICS days`, `${fromManifest.length} days`, got.join(",") === fromManifest.join(",") ? `${got.length} days` : `mismatch (${got.length} days)`);
+        const { data: live } = await sb
+          .from("matches")
+          .select("freelancer_id, is_partial, skills_score, stale")
+          .eq("request_id", manual.id)
+          .eq("is_test", true)
+          .eq("stale", false);
+        const byId = new Map(Object.entries(personas).map(([k, id]) => [id, k]));
+        const liveFull = (live ?? []).filter((m: any) => !m.is_partial).map((m: any) => byId.get(String(m.freelancer_id)) ?? "?").sort();
+        const livePartial = (live ?? []).filter((m: any) => m.is_partial).map((m: any) => byId.get(String(m.freelancer_id)) ?? "?").sort();
+        push(`${pc.key} [post-action]: Full matches (Season law)`, [...(pc.expected.full ?? [])].sort().join(","), liveFull.join(","));
+        push(`${pc.key} [post-action]: Partial matches (Season law)`, [...(pc.expected.partial ?? [])].sort().join(","), livePartial.join(","));
+        // Relevance is independent from coverage: the lower-relevance Full persona must score below the strong one.
+        const lo = pc.expected.lower_relevance_full;
+        if (lo) {
+          const s = (k: string) => Number((live ?? []).find((m: any) => byId.get(String(m.freelancer_id)) === k)?.skills_score ?? -1);
+          push(`${pc.key} [post-action]: ${lo.weaker} Full but lower relevance than ${lo.stronger}`, "true", String(s(lo.weaker) >= 0 && s(lo.weaker) < s(lo.stronger)));
+        }
+      }
     }
 
     const rows = await probePitCall(sb, scenario, pc, personas, anchor, now);
