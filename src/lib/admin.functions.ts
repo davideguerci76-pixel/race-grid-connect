@@ -171,12 +171,30 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     if (data.user_id === context.userId) throw new Error("You cannot delete your own account here.");
+
+    // ACC-DEL-01.A: administrative deletion goes through the shared, controlled
+    // account-deletion authority (cleanup + de-identification + retention gate)
+    // instead of a blind Auth hard delete that let FK cascades decide.
+    const { data: res, error: rpcError } = await (context.supabase as any).rpc("admin_delete_account", {
+      _user_id: data.user_id,
+    });
+    if (rpcError) throw new Error(rpcError.message);
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
-    if (error) throw new Error(error.message);
-    await logAdminAction(context.userId, data.user_id, "user_deleted", {});
-    return { ok: true };
+    const allowHardDelete = (res as any)?.identity_hard_delete_allowed !== false;
+    if (allowHardDelete) {
+      const { error } = await supabaseAdmin.auth.admin.deleteUser(data.user_id);
+      if (error) throw new Error(error.message);
+      await (supabaseAdmin as any).rpc("mark_account_identity_deleted", { _user_id: data.user_id });
+    }
+    await logAdminAction(context.userId, data.user_id, "user_deleted", {
+      state: (res as any)?.state ?? null,
+      identity_hard_deleted: allowHardDelete,
+      retained: (res as any)?.retained ?? null,
+    });
+    return { ok: true, state: (res as any)?.state ?? null, identity_hard_deleted: allowHardDelete };
   });
+
 
 export const adminSetAdminRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

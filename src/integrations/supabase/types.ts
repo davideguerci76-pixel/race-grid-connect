@@ -2714,6 +2714,9 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      account_deletion_cleanup: { Args: { _uid: string }; Returns: Json }
+      account_deletion_context: { Args: never; Returns: string }
+      account_retention_records: { Args: { _user_id: string }; Returns: Json }
       activate_request_if_due: {
         Args: { _request_id: string }
         Returns: {
@@ -2898,6 +2901,7 @@ export type Database = {
         Args: { _admin_id: string; _calendar_id: string; _name?: string }
         Returns: Json
       }
+      admin_delete_account: { Args: { _user_id: string }; Returns: Json }
       admin_set_env: { Args: { _is_test: boolean }; Returns: boolean }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
