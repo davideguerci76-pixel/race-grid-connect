@@ -103,6 +103,8 @@ export type DemoCanonicalPitCall = {
     max_score?: Record<string, number>;
     /** Personas expected to be visible although below the relevance threshold. */
     visible_below_threshold?: string[];
+    /** Season: both Full, but `weaker` must show a lower Professional Relevance than `stronger`. */
+    lower_relevance_full?: { weaker: string; stronger: string };
   };
   steps: { it: string; en: string }[];
 };
