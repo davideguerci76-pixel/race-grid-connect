@@ -841,6 +841,20 @@
       "when": 1789039736240,
       "tag": "0119_acc_del_01a_retention_gate_env_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1789041871250,
+      "tag": "0120_acc_del_01a_sec_internal_cleanup_authority",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1789042026545,
+      "tag": "0121_acc_del_01a_sec_caller_frame_match",
+      "breakpoints": true
     }
   ]
 }
