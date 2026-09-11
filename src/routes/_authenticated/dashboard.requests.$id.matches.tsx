@@ -151,6 +151,9 @@ function RequestMatchesPage() {
   const sosStatusOk = !["closed", "completed", "paused", "pending_review"].includes(String(data?.request?.status ?? ""));
   const sosEligible = Boolean(data?.request && sosStatusOk && !inReview && sosWindowOpen && data.request.duration !== "full_season");
   const sosDeclaresNoShow = sosEligible && data?.request?.status === "filled";
+  // SOS exclusive mode is server-derived (unresolved sos_calls row). While active, the Team
+  // must not see normal candidate CTAs: the first freelancer to accept wins.
+  const sosActive = ((data as any)?.sos_active ?? null) as { id: string; triggered_at: string; target_count: number; min_pct: number; radius_km: number } | null;
   const isPoolRequest = (data?.request as any)?.search_mode === "pool";
   const fullItems = Array.isArray(data?.items) ? data.items : [];
   const partialItems = Array.isArray(data?.items_partial) ? data.items_partial : [];
@@ -241,6 +244,7 @@ function RequestMatchesPage() {
                       match={m}
                       perProfileCost={data!.per_profile_cost}
                       requestFilled={!!requestFilled}
+                      sosMode={sosActive ? ((m as any).sos_target ? "target" : "excluded") : null}
                       onUnlock={() => unlockMut.mutate(m.match_id)}
                       onConfirm={async () => {
                         if (await confirmDialog(t("sweep_engage.request_matches.confirm_match_prompt"))) {
@@ -385,7 +389,21 @@ function RequestMatchesPage() {
                 </ul>
               </div>
 
-              {sosEligible && (
+              {sosActive && (
+                <div className="mt-4 border-2 border-racing-red bg-racing-red/10 p-4">
+                  <div className="label-mono text-racing-red">
+                    <Flame className="mr-1 inline size-3 animate-pulse" /> {t("sos.team_banner_title")}
+                  </div>
+                  <p className="mt-1 text-sm text-foreground">
+                    {sosActive.target_count > 0
+                      ? t("sos.team_banner_body", { count: sosActive.target_count, radius: sosActive.radius_km, pct: sosActive.min_pct })
+                      : t("sos.team_banner_no_targets", { radius: sosActive.radius_km, pct: sosActive.min_pct })}
+                  </p>
+                  <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{t("sos.team_manual_locked")}</p>
+                </div>
+              )}
+
+              {sosEligible && !sosActive && (
                 <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-2 border-racing-red bg-racing-red/10 p-4">
                   <div className="min-w-0">
                     <div className="label-mono text-racing-red">[SOS CALL]</div>
