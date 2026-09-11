@@ -14,7 +14,7 @@ import { disciplineLabel } from "@/lib/paddock";
 import { PoolBadge } from "@/components/pool-badge";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw, Flame } from "lucide-react";
-import { usePlatformFlags } from "@/hooks/use-platform-flags";
+import { usePitcallCreationDisabled } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
 import { PitCallDates } from "@/components/championship-dates";
 import { toastError } from "@/lib/errors";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/requests/")({
 
 function RequestsPage() {
   const { t } = useTranslation();
-  const flags = usePlatformFlags();
+  const creationDisabled = usePitcallCreationDisabled();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -73,7 +73,7 @@ function RequestsPage() {
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-racing-red">{t("requests.helper")}</p>
             <p className="mt-2 text-sm text-muted-foreground">{t("requests.subtitle")}</p>
           </div>
-          {flags.pitcallCreationDisabled ? (
+          {creationDisabled === null ? null : creationDisabled ? (
             <div className="w-full border border-border bg-secondary px-4 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-foreground sm:w-auto sm:max-w-xs">
               {t("sweep_admin_a.pitcall_creation_disabled")}
             </div>
@@ -94,7 +94,7 @@ function RequestsPage() {
           {!isLoading && requests.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card p-10 text-center">
               <p className="text-sm text-muted-foreground">{t("requests.empty")}</p>
-              {!flags.pitcallCreationDisabled && (
+              {creationDisabled === false && (
               <Link to="/dashboard/requests/new" className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-racing-red px-4 py-2 text-xs font-bold uppercase tracking-widest text-white">
                 {t("requests.new")}
               </Link>
@@ -166,7 +166,7 @@ function RequestsPage() {
                     <XCircle className="size-4" /> {t("requests.close")}
                   </button>
                 )}
-                {!flags.pitcallCreationDisabled && (
+                {creationDisabled === false && (
                   <>
                     <Link
                       to="/dashboard/requests/new"
