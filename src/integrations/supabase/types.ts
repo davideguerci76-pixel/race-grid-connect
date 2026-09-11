@@ -3719,6 +3719,7 @@ export type Database = {
         Args: { _request_id: string }
         Returns: boolean
       }
+      pitcall_creation_allowed: { Args: never; Returns: boolean }
       platform_capacity_counts: {
         Args: never
         Returns: {
