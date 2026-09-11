@@ -258,6 +258,13 @@ export function parseIcs(text: string): CalendarEventItem[] {
 }
 
 
+/** Exact days covered by a list of events (inclusive ranges), deduplicated and sorted. */
+export function eventsToDays(events: CalendarEventItem[]): string[] {
+  const set = new Set<string>();
+  for (const ev of events) expandRange(ev.start, ev.end).forEach((d) => set.add(d));
+  return [...set].sort();
+}
+
 /** Group a flat list of days into contiguous "events" (rounds). */
 export function daysToEvents(days: string[], namePrefix = "Round"): CalendarEventItem[] {
   const sorted = [...new Set(days)].sort();
