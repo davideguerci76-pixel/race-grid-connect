@@ -44,6 +44,9 @@ function RequestMatchesPage() {
     queryKey: ["request-matches", id],
     queryFn: () => fetchMatches({ data: { request_id: id } }),
     retry: false,
+    // While an SOS is open the Team is waiting for the first accept: poll so the page
+    // flips to FILLED / hired without a manual reload.
+    refetchInterval: (q) => ((q.state.data as any)?.sos_active ? 10_000 : false),
   });
 
 
