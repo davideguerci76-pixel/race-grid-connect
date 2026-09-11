@@ -1865,7 +1865,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
 
     // SOS exclusive mode is derived from the existing authority (sos_calls.resolved_at IS NULL),
     // never from a request status. Targets are flagged so the UI shows them as SOS targets.
-    const { data: sosRow } = await supabase
+    const { data: sosRow, error: sosErr } = await supabase
       .from("sos_calls")
       .select("id, triggered_at, target_count, min_pct, radius_km")
       .eq("request_id", data.request_id)
@@ -1874,6 +1874,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .limit(1)
       .maybeSingle();
     let sosTargetIds = new Set<string>();
+    if (sosErr) console.error("[getRequestMatches] sos lookup failed", sosErr.message);
     if (sosRow) {
       const { data: tRows } = await supabase.from("sos_call_targets").select("freelancer_id").eq("sos_id", (sosRow as any).id);
       sosTargetIds = new Set(((tRows ?? []) as any[]).map((r) => String(r.freelancer_id)));

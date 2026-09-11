@@ -4007,8 +4007,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sos_is_target: {
+        Args: { _sos_id: string; _uid: string }
+        Returns: boolean
+      }
       sos_min_relevance_pct: { Args: never; Returns: number }
       sos_radius_km: { Args: never; Returns: number }
+      sos_team_owner: {
+        Args: { _sos_id: string; _uid: string }
+        Returns: boolean
+      }
       submit_rating_v2: {
         Args: {
           _comment?: string

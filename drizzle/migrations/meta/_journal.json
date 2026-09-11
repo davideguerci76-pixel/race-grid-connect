@@ -876,6 +876,20 @@
       "when": 1789115759981,
       "tag": "0124_sos_ui_r_notification_gates_and_sos_row_first",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1789116701643,
+      "tag": "0125_sos_ui_r_fix_rls_recursion_sos_calls_targets",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1789116840659,
+      "tag": "0126_sos_ui_r_read_grants_and_restrictive_write_block",
+      "breakpoints": true
     }
   ]
 }
