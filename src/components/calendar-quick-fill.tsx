@@ -40,6 +40,7 @@ export function CalendarQuickFillDialog({
   onApply,
   showMode = false,
   existingCount = 0,
+  importedDates,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -48,6 +49,12 @@ export function CalendarQuickFillDialog({
   onApply: (dates: string[], mode: ApplyMode) => void;
   showMode?: boolean;
   existingCount?: number;
+  /**
+   * When the events come from an import (ICS / saved calendar), the exact
+   * imported days. Enables the optional "keep imported dates" path that
+   * bypasses the logistics rule entirely.
+   */
+  importedDates?: string[];
 }) {
   const { t } = useTranslation();
   const resolvedTitle = title ?? t("sweep_public.calendar_quick_fill.default_title");
@@ -55,6 +62,7 @@ export function CalendarQuickFillDialog({
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
   const [mode, setMode] = useState<ApplyMode>("merge");
+  const hasImported = !!importedDates && importedDates.length > 0;
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
