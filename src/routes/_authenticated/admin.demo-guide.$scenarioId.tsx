@@ -156,7 +156,7 @@ function DemoGuide() {
           )}
           <Mono>
             {lang === "it" ? "Skill" : "Skills"}: {p.input.skills.join(", ") || "—"} · budget {p.input.budget_min}–
-            {p.input.budget_max}€{p.input.duration === "full_season" ? (lang === "it" ? "/stagione" : "/season") : ""} ·{" "}
+            {p.input.budget_max}€{lang === "it" ? "/giorno" : "/day"} ·{" "}
             {lang === "it" ? "Trasferte" : "Travel"}: {p.input.travel_required ? "sì/yes" : "no"}
           </Mono>
 
