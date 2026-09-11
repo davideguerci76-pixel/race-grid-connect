@@ -42,6 +42,7 @@ function Bar({ value, max, label, sub }: { value: number; max: number; label: st
 
 function MarketPage() {
   const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const flags = usePlatformFlags();
   const { data: rawStats, isLoading } = useMarketStats();
   const data = flags.homeStats ? rawStats : undefined;

@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/sos/$sosId")({
 
 function SosCallPage() {
   const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const { sosId } = Route.useParams();
   const qc = useQueryClient();
   const fetchDetail = useServerFn(getSosCallDetail);
