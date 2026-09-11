@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { CalendarRange, Upload, Save, ListChecks } from "lucide-react";
 import { listMyCalendars, saveCalendar, type UserCalendar } from "@/lib/calendars.functions";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
-import { daysToEvents, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
+import { daysToEvents, eventsToDays, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
 import { toastError } from "@/lib/errors";
 
 const btn =
@@ -36,12 +36,19 @@ export function CalendarSourcePicker({
   const save = useServerFn(saveCalendar);
   const fileRef = useRef<HTMLInputElement>(null);
   const [quickEvents, setQuickEvents] = useState<CalendarEventItem[] | null>(null);
+  // Exact days of an imported source (ICS / saved calendar) — enables "keep imported dates".
+  const [importedDates, setImportedDates] = useState<string[] | null>(null);
   const [saving, setSaving] = useState(false);
 
   const { data } = useQuery({ queryKey: ["my-calendars"], queryFn: () => list() });
   const mine: UserCalendar[] = data?.mine ?? [];
   const shared: UserCalendar[] = data?.shared ?? [];
   const options: UserCalendar[] = [...mine, ...shared];
+
+  const openImported = (events: CalendarEventItem[]) => {
+    setImportedDates(eventsToDays(events));
+    setQuickEvents(events);
+  };
 
   const handleFile = async (file: File) => {
     try {
@@ -51,7 +58,7 @@ export function CalendarSourcePicker({
         toast.error(t("sweep_public.calendar_source_picker.no_events_in_ics"));
         return;
       }
-      setQuickEvents(events);
+      openImported(events);
     } catch {
       toast.error(t("sweep_public.calendar_source_picker.could_not_read_ics"));
     }
@@ -61,7 +68,7 @@ export function CalendarSourcePicker({
     const cal = options.find((c) => c.id === id);
     if (!cal) return;
     const events = cal.events?.length ? cal.events : daysToEvents(cal.dates);
-    if (events.length) setQuickEvents(events);
+    if (events.length) openImported(events);
     else onChange(cal.dates);
   };
 
@@ -142,6 +149,7 @@ export function CalendarSourcePicker({
             });
             return;
           }
+          setImportedDates(null);
           setQuickEvents(events);
         }}
       >
@@ -159,10 +167,16 @@ export function CalendarSourcePicker({
       {quickEvents && (
         <CalendarQuickFillDialog
           open={!!quickEvents}
-          onOpenChange={(v) => !v && setQuickEvents(null)}
+          onOpenChange={(v) => {
+            if (!v) {
+              setQuickEvents(null);
+              setImportedDates(null);
+            }
+          }}
           events={quickEvents}
           showMode
           existingCount={value.length}
+          importedDates={importedDates ?? undefined}
           onApply={(dates, mode) =>
             onChange(mode === "replace" ? [...new Set(dates)].sort() : [...new Set([...value, ...dates])].sort())
           }

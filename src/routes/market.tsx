@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { HotDayRow, useMarketStats } from "@/components/market-highlights";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { ConsentGate } from "@/components/consent-gate";
+import { useDateFormat } from "@/lib/date-locale";
 
 const MarketWorldMap = lazy(() => import("@/components/market-world-map"));
 
@@ -41,6 +42,7 @@ function Bar({ value, max, label, sub }: { value: number; max: number; label: st
 
 function MarketPage() {
   const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const flags = usePlatformFlags();
   const { data: rawStats, isLoading } = useMarketStats();
   const data = flags.homeStats ? rawStats : undefined;
@@ -209,7 +211,7 @@ function MarketPage() {
 
         {data?.generated_at && (
           <div className="mt-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            {t("market.updated")} {new Date(data.generated_at).toLocaleString()}
+            {t("market.updated")} {formatDateTime(data.generated_at)}
           </div>
         )}
       </div>

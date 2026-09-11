@@ -14,7 +14,7 @@ import {
   adminUpsertOfficialCalendar,
   type AdminCalendar,
 } from "@/lib/admin-calendars.functions";
-import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, rangeDayCount, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, eventsToDays, dateOf, isoOf, parseIcs, rangeDayCount, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { useTranslation } from "react-i18next";
 import { toastError } from "@/lib/errors";
@@ -39,6 +39,7 @@ function AdminCalendarsPage() {
 
   const [editing, setEditing] = useState<{ id?: string; name: string; discipline: string; season: string; dates: string[]; source: "manual" | "ics" } | null>(null);
   const [quickEvents, setQuickEvents] = useState<CalendarEventItem[] | null>(null);
+  const [quickImported, setQuickImported] = useState(false);
 
   const { data, isLoading } = useQuery({ queryKey: ["admin-calendars"], queryFn: () => list() });
   const rows: AdminCalendar[] = data ?? [];
@@ -105,6 +106,7 @@ function AdminCalendarsPage() {
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), discipline: "", season: String(new Date(events[0]!.start).getFullYear()), dates: [], source: "ics" });
+      setQuickImported(true);
       setQuickEvents(events);
     } catch {
       toast.error(t("sweep_admin_b.calendars.could_not_read_ics"));
@@ -176,6 +178,7 @@ function AdminCalendarsPage() {
                   toast.error(t("sweep_admin_b.calendars.select_race_days_first"));
                   return;
                 }
+                setQuickImported(false);
                 setQuickEvents(events);
               }}
             >
@@ -314,6 +317,7 @@ function AdminCalendarsPage() {
           open={!!quickEvents}
           onOpenChange={(v) => !v && setQuickEvents(null)}
           events={quickEvents}
+          importedDates={quickImported ? eventsToDays(quickEvents) : undefined}
           onApply={(dates) =>
             setEditing((prev) =>
               prev

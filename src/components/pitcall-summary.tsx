@@ -5,15 +5,9 @@ import { levelLabel, roleGroupLabel, subRoleLabel } from "@/lib/roles";
 import { PoolBadge } from "@/components/pool-badge";
 import { requestStatusLabel } from "@/lib/labels";
 import { PitCallDates } from "@/components/championship-dates";
+import { useDateFormat } from "@/lib/date-locale";
 
 type AnyRequest = Record<string, any>;
-
-function fmtDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const d = new Date(`${iso}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return String(iso);
-  return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
-}
 
 function daysBetween(a?: string | null, b?: string | null): number {
   if (!a || !b) return 0;
@@ -69,7 +63,10 @@ function Block({ icon, title, tone, children }: { icon: React.ReactNode; title: 
  */
 export function PitCallSummary({ request }: { request: AnyRequest }) {
   const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const r = request ?? {};
+  // Date-only ISO strings are rendered at local midnight so the calendar day never shifts.
+  const fmtDate = (iso: string | null | undefined) => (iso ? formatDate(`${iso}T00:00:00`, String(iso)) : "—");
 
   const seasonDates: string[] = Array.isArray(r.season_dates) ? r.season_dates : [];
   const dayCount = seasonDates.length > 0 ? seasonDates.length : daysBetween(r.start_date, r.end_date);

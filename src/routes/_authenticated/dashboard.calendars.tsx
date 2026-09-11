@@ -12,7 +12,7 @@ import { BackButton } from "@/components/back-button";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { deleteCalendar, listMyCalendars, saveCalendar, submitCalendarForReview, type UserCalendar } from "@/lib/calendars.functions";
-import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, eventsToDays, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { toastError } from "@/lib/errors";
 import { confirmDialog } from "@/hooks/use-confirm";
@@ -45,6 +45,7 @@ function ManageCalendarsPage() {
 
   const [editing, setEditing] = useState<{ id?: string; name: string; dates: string[] } | null>(null);
   const [quickEvents, setQuickEvents] = useState<CalendarEventItem[] | null>(null);
+  const [quickImported, setQuickImported] = useState(false);
 
   const { data } = useQuery({ queryKey: ["my-calendars"], queryFn: () => list() });
   const mine: UserCalendar[] = data?.mine ?? [];
@@ -100,6 +101,7 @@ function ManageCalendarsPage() {
         return;
       }
       setEditing({ name: file.name.replace(/\.ics$/i, ""), dates: [] });
+      setQuickImported(true);
       setQuickEvents(events);
     } catch {
       toast.error(t("sweep_public.dashboard_calendars.toast.could_not_read_ics"));
@@ -156,7 +158,8 @@ function ManageCalendarsPage() {
                     toast.error(t("sweep_public.dashboard_calendars.quick_fill_error"));
                     return;
                   }
-                  setQuickEvents(events);
+                  setQuickImported(false);
+                setQuickEvents(events);
                 }}
               >
                 <ListChecks className="size-3.5" /> {t("sweep_public.dashboard_calendars.quick_fill_button")}
@@ -303,6 +306,7 @@ function ManageCalendarsPage() {
           open={!!quickEvents}
           onOpenChange={(v) => !v && setQuickEvents(null)}
           events={quickEvents}
+          importedDates={quickImported ? eventsToDays(quickEvents) : undefined}
           onApply={(dates) => setEditing((prev) => ({ id: prev?.id, name: prev?.name ?? "", dates }))}
         />
       )}

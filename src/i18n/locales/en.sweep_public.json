@@ -144,7 +144,11 @@
       "cancel": "Cancel",
       "confirm_replace": "Confirm — replace with {{count}} days",
       "confirm_merge": "Confirm — merge {{count}} days",
-      "apply_days": "Apply {{count}} days"
+      "apply_days": "Apply {{count}} days",
+      "keep_imported_label": "[KEEP IMPORTED DATES]",
+      "keep_imported_desc": "Your import contains {{days}} day(s) across {{count}} event(s). Keep them exactly as imported — no logistics rule applied, no day removed. Quick fill stays available afterwards from the toolbar.",
+      "keep_imported_button": "Keep {{count}} imported days as-is",
+      "optional_rule_intro": "Optional — apply a logistics rule instead:"
     },
     "calendar_source_picker": {
       "use_calendar_placeholder": "Use one of my calendars…",

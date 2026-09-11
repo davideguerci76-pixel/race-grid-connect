@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { confirmDialog } from "@/hooks/use-confirm";
 import { acceptSosCall, getSosCallDetail } from "@/lib/paddock.functions";
 import { toastError } from "@/lib/errors";
+import { useDateFormat } from "@/lib/date-locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard/sos/$sosId")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/sos/$sosId")({
 
 function SosCallPage() {
   const { t } = useTranslation();
+  const { formatDateTime } = useDateFormat();
   const { sosId } = Route.useParams();
   const qc = useQueryClient();
   const fetchDetail = useServerFn(getSosCallDetail);
@@ -121,7 +123,7 @@ function SosCallPage() {
                   <Fact icon={<MapPin />} label={t("sweep_engage.matches.location_label")} value={req?.circuit || req?.location || "—"} />
                   <Fact icon={<Coins />} label={t("sweep_engage.pitcall_summary.budget")} value={budget} />
                   <Fact icon={<Navigation />} label={t("sos.distance")} value={data.distance_km == null ? "—" : `${Math.round(data.distance_km)} km`} />
-                  <Fact icon={<Flame />} label={t("sos.triggered_at")} value={<span className="font-mono">{new Date(data.triggered_at).toLocaleString()}</span>} />
+                  <Fact icon={<Flame />} label={t("sos.triggered_at")} value={<span className="font-mono">{formatDateTime(data.triggered_at)}</span>} />
                   {data.team && <Fact icon={<Users />} label={t("sos.team_revealed")} value={data.team.team_name ?? t("sweep_profile.dashboard.team_fallback")} />}
                 </FactGrid></div>
 

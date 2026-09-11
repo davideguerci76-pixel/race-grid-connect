@@ -40,6 +40,7 @@ export function CalendarQuickFillDialog({
   onApply,
   showMode = false,
   existingCount = 0,
+  importedDates,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -48,6 +49,12 @@ export function CalendarQuickFillDialog({
   onApply: (dates: string[], mode: ApplyMode) => void;
   showMode?: boolean;
   existingCount?: number;
+  /**
+   * When the events come from an import (ICS / saved calendar), the exact
+   * imported days. Enables the optional "keep imported dates" path that
+   * bypasses the logistics rule entirely.
+   */
+  importedDates?: string[];
 }) {
   const { t } = useTranslation();
   const resolvedTitle = title ?? t("sweep_public.calendar_quick_fill.default_title");
@@ -55,6 +62,7 @@ export function CalendarQuickFillDialog({
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
   const [mode, setMode] = useState<ApplyMode>("merge");
+  const hasImported = !!importedDates && importedDates.length > 0;
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
@@ -72,7 +80,27 @@ export function CalendarQuickFillDialog({
           <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">{resolvedTitle}</DialogTitle>
         </DialogHeader>
 
+        {hasImported && (
+          <div className="border-2 border-[#16a34a]/70 bg-[#16a34a]/10 p-4">
+            <div className="label-mono text-[#16a34a]">{t("sweep_public.calendar_quick_fill.keep_imported_label")}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("sweep_public.calendar_quick_fill.keep_imported_desc", { days: importedDates!.length, count: events.length })}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onApply([...new Set(importedDates!)].sort(), mode);
+                onOpenChange(false);
+              }}
+              className="mt-3 border border-[#16a34a] bg-[#16a34a]/20 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#16a34a] hover:brightness-110"
+            >
+              {t("sweep_public.calendar_quick_fill.keep_imported_button", { count: importedDates!.length })}
+            </button>
+          </div>
+        )}
+
         <p className="text-xs text-muted-foreground">
+          {hasImported ? t("sweep_public.calendar_quick_fill.optional_rule_intro") + " " : ""}
           {t(events.length === 1 ? "sweep_public.calendar_quick_fill.description" : "sweep_public.calendar_quick_fill.description_plural", { count: events.length })}
         </p>
 
