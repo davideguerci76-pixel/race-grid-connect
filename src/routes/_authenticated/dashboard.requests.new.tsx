@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { usePlatformFlags } from "@/hooks/use-platform-flags";
+import { usePitcallCreationDisabled } from "@/hooks/use-platform-flags";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -59,7 +59,7 @@ function fmt(d: Date): string {
 
 function NewRequestPage() {
   const { t } = useTranslation();
-  const flags = usePlatformFlags();
+  const creationDisabled = usePitcallCreationDisabled();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -86,8 +86,8 @@ function NewRequestPage() {
   }, [profile, navigate]);
 
   useEffect(() => {
-    if (flags.pitcallCreationDisabled) navigate({ to: "/dashboard/requests" });
-  }, [flags.pitcallCreationDisabled, navigate]);
+    if (creationDisabled === true) navigate({ to: "/dashboard/requests" });
+  }, [creationDisabled, navigate]);
 
   const list = useServerFn(getMyRequests);
   const create = useServerFn(createRequest);

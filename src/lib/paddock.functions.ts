@@ -587,12 +587,11 @@ export const createRequest = createServerFn({ method: "POST" })
       location_radius_km: data.location_radius_km ?? null,
       search_mode: data.search_mode ?? "standard",
     };
-    const { data: flag } = await context.supabase
-      .from("platform_settings")
-      .select("value_num")
-      .eq("key", "flag_pitcall_creation_disabled")
-      .maybeSingle();
-    if (flag && Number(flag.value_num) > 0) {
+    // Launch gate (UAT-LAUNCH-02): env-aware, server-authoritative. LIVE follows the
+    // ACP toggle; TEST/DEMO sessions (env_is_test()) are always allowed. The same
+    // rule is re-checked inside create_request(), so a direct RPC cannot bypass it.
+    const { data: allowed, error: gateErr } = await context.supabase.rpc("pitcall_creation_allowed");
+    if (gateErr || allowed !== true) {
       throw new Error("Pit Call creation is temporarily disabled by the platform administrator.");
     }
     const { data: row, error } = await context.supabase.rpc("create_request", { _payload: payload as never });
