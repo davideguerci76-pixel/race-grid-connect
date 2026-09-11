@@ -670,9 +670,10 @@ export const getMyRequests = createServerFn({ method: "GET" })
     const ids = (data ?? []).map((r) => r.id);
     let counts: Record<string, number> = {};
     let confirmedMap: Record<string, string> = {};
+    const sosActive = new Set<string>();
     if (ids.length) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const [{ data: matches }, { data: engs }, { data: poolRows }] = await Promise.all([
+      const [{ data: matches }, { data: engs }, { data: poolRows }, { data: sosRows }] = await Promise.all([
         supabaseAdmin.from("matches").select("request_id, freelancer_id").eq("stale", false).in("request_id", ids),
         supabase
           .from("engagements")
@@ -680,7 +681,10 @@ export const getMyRequests = createServerFn({ method: "GET" })
           .in("request_id", ids)
           .eq("status", "confirmed"),
         supabase.from("team_pool").select("freelancer_id").eq("team_id", userId),
+        // Unresolved SOS = exclusive mode (existing authority, no new status).
+        supabase.from("sos_calls").select("request_id").in("request_id", ids).is("resolved_at", null),
       ]);
+      for (const s of ((sosRows ?? []) as any[])) sosActive.add(String(s.request_id));
       const poolSet = new Set(((poolRows ?? []) as any[]).map((p) => p.freelancer_id));
       const modeById = new Map((data ?? []).map((r: any) => [r.id, r.search_mode]));
       for (const m of ((matches ?? []) as any[])) {
@@ -699,6 +703,7 @@ export const getMyRequests = createServerFn({ method: "GET" })
       ...r,
       matches_count: counts[r.id] ?? 0,
       confirmed_engagement_id: confirmedMap[r.id] ?? null,
+      sos_active: sosActive.has(String(r.id)),
     }));
 
 
@@ -1858,14 +1863,40 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       _request_id: data.request_id,
     });
 
+    // SOS exclusive mode is derived from the existing authority (sos_calls.resolved_at IS NULL),
+    // never from a request status. Targets are flagged so the UI shows them as SOS targets.
+    const { data: sosRow } = await supabase
+      .from("sos_calls")
+      .select("id, triggered_at, target_count, min_pct, radius_km")
+      .eq("request_id", data.request_id)
+      .is("resolved_at", null)
+      .order("triggered_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    let sosTargetIds = new Set<string>();
+    if (sosRow) {
+      const { data: tRows } = await supabase.from("sos_call_targets").select("freelancer_id").eq("sos_id", (sosRow as any).id);
+      sosTargetIds = new Set(((tRows ?? []) as any[]).map((r) => String(r.freelancer_id)));
+    }
+    const flagSos = (list: any[]) => list.map((i) => ({ ...i, sos_target: sosTargetIds.has(String(i.freelancer_id)) }));
+
     return {
       request: req,
       in_review: inReview,
       review_deadline_at: (req as any).review_deadline_at ?? null,
       match_potential: ((req as any).initial_match_potential ?? null) as "strong" | "targeted" | "red" | null,
       confirmable_left: Number(confirmableLeft ?? 0),
-      items,
-      items_partial: itemsPartial,
+      sos_active: sosRow
+        ? {
+            id: (sosRow as any).id as string,
+            triggered_at: (sosRow as any).triggered_at as string,
+            target_count: Number((sosRow as any).target_count ?? sosTargetIds.size),
+            min_pct: Number((sosRow as any).min_pct ?? 40),
+            radius_km: Number((sosRow as any).radius_km ?? 150),
+          }
+        : null,
+      items: flagSos(items),
+      items_partial: flagSos(itemsPartial),
       hired,
       tiers: tiersFull,
       tiers_partial: tiersPartial,
@@ -2256,6 +2287,83 @@ export const getMyOpenSosCalls = createServerFn({ method: "GET" })
       distance_km: o.distance_km == null ? null : Number(o.distance_km),
       triggered_at: o.sos.triggered_at,
     }));
+  });
+
+/**
+ * Freelancer SOS review page data. Eligibility = an sos_call_targets row for the caller
+ * (RLS-scoped read). Status is derived from the existing SOS authority only:
+ *   open      → unresolved, caller may accept (accept_sos_call() is the sole accept authority)
+ *   won       → resolved by the caller's own engagement
+ *   taken     → resolved by someone else (sos_taken)
+ *   resolved  → resolved without an engagement (Pit Call closed, etc.)
+ */
+export const getSosCallDetail = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => z.object({ sos_id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: target } = await supabase
+      .from("sos_call_targets")
+      .select("sos_id, skills_score, distance_km, notified_at")
+      .eq("sos_id", data.sos_id)
+      .eq("freelancer_id", userId)
+      .maybeSingle();
+    if (!target) throw new Error("You are not an eligible target for this SOS Call");
+
+    const { data: sos } = await supabase
+      .from("sos_calls")
+      .select("id, request_id, team_id, triggered_at, resolved_at, resolved_engagement_id, min_pct, radius_km, target_count")
+      .eq("id", data.sos_id)
+      .maybeSingle();
+    if (!sos) throw new Error("SOS Call not found");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: req }, { data: myEng }] = await Promise.all([
+      supabaseAdmin
+        .from("requests")
+        .select("id, title, role, sub_role, discipline, start_date, end_date, season_dates, location, circuit, budget_min, budget_max, budget_unit, notes, status")
+        .eq("id", (sos as any).request_id)
+        .maybeSingle(),
+      supabase
+        .from("engagements")
+        .select("id, status")
+        .eq("request_id", (sos as any).request_id)
+        .eq("freelancer_id", userId)
+        .eq("status", "confirmed")
+        .maybeSingle(),
+    ]);
+
+    const resolved = !!(sos as any).resolved_at;
+    const wonByMe = resolved && !!myEng && (sos as any).resolved_engagement_id === (myEng as any).id;
+    const status: "open" | "won" | "taken" | "resolved" = !resolved
+      ? "open"
+      : wonByMe
+        ? "won"
+        : (sos as any).resolved_engagement_id
+          ? "taken"
+          : "resolved";
+
+    // Team identity follows the platform anonymity law: revealed only once the caller is confirmed.
+    let team: { team_name: string | null; location: string | null } | null = null;
+    if (wonByMe) {
+      const { data: tp } = await supabaseAdmin.from("team_profiles").select("team_name, location").eq("user_id", (sos as any).team_id).maybeSingle();
+      team = tp ? { team_name: (tp as any).team_name ?? null, location: (tp as any).location ?? null } : null;
+    }
+
+    return {
+      sos_id: (sos as any).id as string,
+      status,
+      triggered_at: (sos as any).triggered_at as string,
+      resolved_at: ((sos as any).resolved_at ?? null) as string | null,
+      min_pct: Number((sos as any).min_pct ?? 40),
+      radius_km: Number((sos as any).radius_km ?? 150),
+      target_count: Number((sos as any).target_count ?? 0),
+      skills_score: Number((target as any).skills_score ?? 0),
+      distance_km: (target as any).distance_km == null ? null : Number((target as any).distance_km),
+      my_engagement_id: wonByMe ? ((myEng as any).id as string) : null,
+      request: req ?? null,
+      team,
+    };
   });
 
 export const getTeamCancellationStats = createServerFn({ method: "GET" })

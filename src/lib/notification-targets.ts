@@ -25,8 +25,8 @@ const BASE: Record<string, NotificationTarget> = {
   engagement_cancelled: { title: "Engagement cancelled", path: "/dashboard/engagements", label: "View engagement" },
   match_taken: { title: "Match taken", path: "/dashboard/engagements", label: "View engagement" },
   match_reopened: { title: "Match reopened", path: "/dashboard/engagements", label: "View engagement" },
-  sos_call: { title: "SOS call", path: "/dashboard/engagements", label: "View SOS call" },
-  sos_taken: { title: "SOS call taken", path: "/dashboard/engagements", label: "View engagement" },
+  sos_call: { title: "SOS call", path: "/dashboard", label: "View SOS call" },
+  sos_taken: { title: "SOS call taken", path: "/dashboard", label: "View SOS call" },
   contact_check: { title: "Contact check", path: "/dashboard/engagements", label: "View engagement" },
   rating_received: { title: "New rating", path: "/dashboard/engagements", label: "See the rating" },
   rating_available: { title: "Rating available", path: "/dashboard/engagements", label: "Leave your rating" },
@@ -96,6 +96,13 @@ export function resolveNotificationTarget(kind: string, payload?: Payload | null
 
   if (requestId && (kind === "new_matches" || kind === "request_unfilled" || kind === "revealed_by")) {
     return { ...base, path: `/dashboard/requests/${requestId}/matches` };
+  }
+
+  // SOS alerts deep-link to the SOS review page: before acceptance there is no engagement,
+  // so the Engagements list is never the right destination.
+  const sosId = typeof p["sos_id"] === "string" ? (p["sos_id"] as string) : null;
+  if (sosId && (kind === "sos_call" || kind === "sos_taken")) {
+    return { ...base, path: `/dashboard/sos/${sosId}` };
   }
 
   // Engagement-scoped alerts deep-link to the specific card. The id is the
