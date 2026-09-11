@@ -92,7 +92,9 @@
       "home_stats_title": "Show stats on home page",
       "home_stats_body": "Show or hide market highlights and counters on the home page.",
       "pitcall_off_title": "Disable Pit Call creation",
-      "pitcall_off_body": "Freezes new Pit Call creation for teams. Sign-ups and calendars stay active."
+      "pitcall_off_body": "Freezes new Pit Call creation for teams. Sign-ups and calendars stay active.",
+      "token_purchases_title": "Token purchases",
+      "token_purchases_body": "Master switch for the token purchase flow (TEST and LIVE). OFF: teams see packages but cannot buy; the server rejects any checkout attempt."
     },
     "home_coming_soon": {
       "coming_soon_title": "We're coming soon",

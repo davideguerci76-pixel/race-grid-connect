@@ -92,7 +92,9 @@
       "home_stats_title": "Statistiche in home page",
       "home_stats_body": "Mostra o nascondi highlight di mercato e contatori sulla home page.",
       "pitcall_off_title": "Disattiva creazione Pit Call",
-      "pitcall_off_body": "Congela la creazione di nuove Pit Call per i team. Registrazioni e calendari restano attivi."
+      "pitcall_off_body": "Congela la creazione di nuove Pit Call per i team. Registrazioni e calendari restano attivi.",
+      "token_purchases_title": "Acquisti token",
+      "token_purchases_body": "Interruttore principale del flusso di acquisto token (TEST e LIVE). OFF: i team vedono i pacchetti ma non possono acquistare; il server rifiuta qualsiasi tentativo di checkout."
     },
     "home_coming_soon": {
       "coming_soon_title": "Stiamo arrivando presto",

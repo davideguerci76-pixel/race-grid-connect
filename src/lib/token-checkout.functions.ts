@@ -58,6 +58,12 @@ export const startTokenCheckout = createServerFn({ method: "POST" })
       return { ok: false, reason: "provider_unavailable" };
     }
 
+    // 0. Launch gate (ACP → Launch → Token purchases). Server-authoritative:
+    // token_purchase_allowed() is re-checked inside create_token_order() too,
+    // so a direct invocation can never reach Stripe while the gate is OFF.
+    const { data: gateOpen, error: gateErr } = await context.supabase.rpc("my_token_purchase_enabled");
+    if (gateErr || gateOpen !== true) return { ok: false, reason: "purchase_disabled" };
+
     // 1. PITCALL creates the priced order (gate + snapshot live in the DB).
     const { data: orderId, error } = await context.supabase.rpc("create_token_order", {
       _package_code: data.package_code,
