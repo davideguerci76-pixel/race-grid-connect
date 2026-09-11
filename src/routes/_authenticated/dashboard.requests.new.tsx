@@ -59,7 +59,7 @@ function fmt(d: Date): string {
 
 function NewRequestPage() {
   const { t } = useTranslation();
-  const flags = usePlatformFlags();
+  const creationDisabled = usePitcallCreationDisabled();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
