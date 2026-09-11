@@ -59,6 +59,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicWebhooksStripeRouteImport } from './routes/api/public/webhooks/stripe'
+import { Route as AuthenticatedDashboardSosSosIdRouteImport } from './routes/_authenticated/dashboard.sos.$sosId'
 import { Route as AuthenticatedDashboardRequestsNewRouteImport } from './routes/_authenticated/dashboard.requests.new'
 import { Route as AuthenticatedAdminDemoGuideScenarioIdRouteImport } from './routes/_authenticated/admin.demo-guide.$scenarioId'
 import { Route as AuthenticatedDashboardRequestsIdMatchesRouteImport } from './routes/_authenticated/dashboard.requests.$id.matches'
@@ -337,6 +338,12 @@ const ApiPublicWebhooksStripeRoute = ApiPublicWebhooksStripeRouteImport.update({
   path: '/api/public/webhooks/stripe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardSosSosIdRoute =
+  AuthenticatedDashboardSosSosIdRouteImport.update({
+    id: '/sos/$sosId',
+    path: '/sos/$sosId',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardRequestsNewRoute =
   AuthenticatedDashboardRequestsNewRouteImport.update({
     id: '/requests/new',
@@ -403,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/dashboard/sos/$sosId': typeof AuthenticatedDashboardSosSosIdRoute
   '/api/public/webhooks/stripe': typeof ApiPublicWebhooksStripeRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -455,6 +463,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
   '/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/dashboard/sos/$sosId': typeof AuthenticatedDashboardSosSosIdRoute
   '/api/public/webhooks/stripe': typeof ApiPublicWebhooksStripeRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -511,6 +520,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
   '/_authenticated/dashboard/requests/new': typeof AuthenticatedDashboardRequestsNewRoute
+  '/_authenticated/dashboard/sos/$sosId': typeof AuthenticatedDashboardSosSosIdRoute
   '/api/public/webhooks/stripe': typeof ApiPublicWebhooksStripeRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -567,6 +577,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/admin/demo-guide/$scenarioId'
     | '/dashboard/requests/new'
+    | '/dashboard/sos/$sosId'
     | '/api/public/webhooks/stripe'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -619,6 +630,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/admin/demo-guide/$scenarioId'
     | '/dashboard/requests/new'
+    | '/dashboard/sos/$sosId'
     | '/api/public/webhooks/stripe'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -674,6 +686,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/admin/demo-guide/$scenarioId'
     | '/_authenticated/dashboard/requests/new'
+    | '/_authenticated/dashboard/sos/$sosId'
     | '/api/public/webhooks/stripe'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1060,6 +1073,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/sos/$sosId': {
+      id: '/_authenticated/dashboard/sos/$sosId'
+      path: '/sos/$sosId'
+      fullPath: '/dashboard/sos/$sosId'
+      preLoaderRoute: typeof AuthenticatedDashboardSosSosIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/requests/new': {
       id: '/_authenticated/dashboard/requests/new'
       path: '/requests/new'
@@ -1136,6 +1156,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
+  AuthenticatedDashboardSosSosIdRoute: typeof AuthenticatedDashboardSosSosIdRoute
   AuthenticatedDashboardRequestsIndexRoute: typeof AuthenticatedDashboardRequestsIndexRoute
   AuthenticatedDashboardRequestsIdMatchesRoute: typeof AuthenticatedDashboardRequestsIdMatchesRoute
 }
@@ -1157,6 +1178,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardRequestsNewRoute:
       AuthenticatedDashboardRequestsNewRoute,
+    AuthenticatedDashboardSosSosIdRoute: AuthenticatedDashboardSosSosIdRoute,
     AuthenticatedDashboardRequestsIndexRoute:
       AuthenticatedDashboardRequestsIndexRoute,
     AuthenticatedDashboardRequestsIdMatchesRoute:

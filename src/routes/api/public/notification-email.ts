@@ -51,8 +51,12 @@ export const Route = createFileRoute("/api/public/notification-email")({
         let sent = 0;
         for (const n of pending ?? []) {
           const informational = ((n.payload ?? {}) as Record<string, unknown>)["informational"] === true;
+          const sosId = ((n.payload ?? {}) as Record<string, unknown>)["sos_id"];
           const meta = informational
             ? { title: "Pit Call update", path: "/dashboard/notifications", label: "Open Pit Call" }
+            : (n.kind === "sos_call" || n.kind === "sos_taken") && typeof sosId === "string"
+              // SOS deep-links to the SOS review page: no engagement exists before acceptance.
+              ? { title: n.kind === "sos_call" ? "SOS call" : "SOS call taken", path: `/dashboard/sos/${sosId}`, label: "View SOS call" }
             : (KIND_META[n.kind as string] ?? {
                 title: "New activity on Pit Call",
                 path: "/dashboard/notifications",

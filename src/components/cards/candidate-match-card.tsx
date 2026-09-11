@@ -37,6 +37,7 @@ export function CandidateMatchCard({
   loading = false,
   requestFilled = false,
   perProfileCost = 0,
+  sosMode = null,
 }: {
   match: any;
   /** "request": standard Pit Call results with unlock/confirmation flow. "pool": My Pool search (names in clear, no unlock CTA). */
@@ -46,6 +47,8 @@ export function CandidateMatchCard({
   loading?: boolean;
   requestFilled?: boolean;
   perProfileCost?: number;
+  /** Non-null while the Pit Call is in SOS exclusive mode: manual confirmation is hidden (and blocked server-side). */
+  sosMode?: "target" | "excluded" | null;
 }) {
   const { t } = useTranslation();
   const pct = Math.round(Number(match?.skills_score ?? match?.match_score ?? 0));
@@ -105,7 +108,10 @@ export function CandidateMatchCard({
               <HelpHint titleKey="help.action.unlock_details.title" bodyKey="help.action.unlock_details.body" />
             </span>
           )}
-          {match?.unlocked && !requestFilled && (
+          {sosMode && (
+            <StatusChip tone={sosMode === "target" ? "danger" : "muted"}>{t(sosMode === "target" ? "sos.target_chip" : "sos.not_target_chip")}</StatusChip>
+          )}
+          {match?.unlocked && !requestFilled && !sosMode && (
             match?.confirmation_requested ? (
               <StatusChip tone="warn">{t("mcard.confirmation_requested")}</StatusChip>
             ) : match?.confirmation_closed ? (
@@ -119,7 +125,7 @@ export function CandidateMatchCard({
               </span>
             )
           )}
-          {requestFilled && <StatusChip tone="warn">{t("sweep_engage.request_matches.match_already_assigned")}</StatusChip>}
+          {requestFilled && !sosMode && <StatusChip tone="warn">{t("sweep_engage.request_matches.match_already_assigned")}</StatusChip>}
         </ActionRow>
       )}
 

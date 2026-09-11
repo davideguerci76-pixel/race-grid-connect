@@ -122,11 +122,13 @@ function NotificationsPage() {
                 const info = !isTeamMatch && n.payload?.informational === true;
                 // Stable object id persisted server-side. Never inferred from text.
                 const engagementId = typeof n.payload?.engagement_id === "string" ? n.payload.engagement_id : null;
-                const isEngagement = !info && !isTeamMatch && (!!engagementId || [
+                // SOS alerts route to the SOS review page (no engagement exists before acceptance).
+                const sosId = typeof n.payload?.sos_id === "string" ? n.payload.sos_id : null;
+                const isSos = !!sosId && (n.kind === "sos_call" || n.kind === "sos_taken");
+                const isEngagement = !info && !isTeamMatch && !isSos && (!!engagementId || [
                   "engagement_proposed",
                   "match_taken",
                   "match_reopened",
-                  "sos_call",
                   "contact_check",
                   "rating_available",
                   "rating_unlocked",
@@ -196,6 +198,15 @@ function NotificationsPage() {
                         className={cardBtn.warn}
                       >
                         {t("sweep_profile.notifications.update_calendar")}
+                      </Link>
+                    ) : isSos ? (
+                      <Link
+                        onClick={markClicked}
+                        to="/dashboard/sos/$sosId"
+                        params={{ sosId }}
+                        className={n.kind === "sos_call" ? cardBtn.primary : cardBtn.secondary}
+                      >
+                        {t("sweep_profile.notifications.view_sos_call")}
                       </Link>
                     ) : isEngagement ? (
                       <Link

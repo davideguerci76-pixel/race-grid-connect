@@ -198,6 +198,9 @@ function DashboardHome() {
                   >
                     {t("sweep_profile.dashboard.accept_sos")}
                   </button>
+                  <Link to="/dashboard/sos/$sosId" params={{ sosId: s.sos_id }} className={cardBtn.secondary}>
+                    {t("sos.view_sos_call")}
+                  </Link>
                 </ActionRow>
                 <CardBody>
                   <FactGrid cols={3}>

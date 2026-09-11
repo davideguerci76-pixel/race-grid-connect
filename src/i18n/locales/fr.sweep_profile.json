@@ -115,7 +115,8 @@
       "availability_opportunity_title": "Une opportunité compatible est peut-être possible",
       "availability_opportunity_body": "Vérifiez vos disponibilités pour un Pit Call qui pourrait devenir compatible après la mise à jour de votre calendrier.",
       "availability_opportunity_multi_title": "{{count}} opportunités de disponibilité pour vous",
-      "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver."
+      "calendar_stale_unconfirmed_message": "Nous avons temporairement cessé d'utiliser certaines de vos dates pour le matching car nous ne pouvons pas garantir qu'elles sont encore valables. Vérifiez-les à tout moment pour les réactiver.",
+      "view_sos_call": "Voir le SOS Call"
     },
     "push": {
       "title": "Notifications push",

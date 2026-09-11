@@ -869,6 +869,13 @@
       "when": 1789057707110,
       "tag": "0123_sos_accept_required_days_inline",
       "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1789115759981,
+      "tag": "0124_sos_ui_r_notification_gates_and_sos_row_first",
+      "breakpoints": true
     }
   ]
 }
