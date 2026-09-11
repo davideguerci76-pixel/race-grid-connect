@@ -18,6 +18,8 @@ export const FLAG_KEYS = {
   comingSoon: "flag_coming_soon",
   homeStats: "flag_home_stats",
   pitcallCreationDisabled: "flag_pitcall_creation_disabled",
+  /** Launch gate: master authority for token purchases (TEST and LIVE). Admin-only, not exposed publicly. */
+  tokenPurchases: "flag_token_purchase_enabled",
 } as const;
 
 /** Public, unauthenticated read of the three launch-control flags. */

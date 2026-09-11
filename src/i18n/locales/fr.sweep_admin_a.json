@@ -92,7 +92,9 @@
       "home_stats_title": "Afficher les statistiques en accueil",
       "home_stats_body": "Affiche ou masque les données de marché et compteurs sur l'accueil.",
       "pitcall_off_title": "Désactiver la création de Pit Call",
-      "pitcall_off_body": "Gèle la création de nouvelles Pit Call. Inscriptions et calendriers restent actifs."
+      "pitcall_off_body": "Gèle la création de nouvelles Pit Call. Inscriptions et calendriers restent actifs.",
+      "token_purchases_title": "Achats de jetons",
+      "token_purchases_body": "Interrupteur principal du flux d'achat de jetons (TEST et LIVE). OFF : les équipes voient les packs mais ne peuvent pas acheter ; le serveur refuse toute tentative de paiement."
     },
     "home_coming_soon": {
       "coming_soon_title": "Nous arrivons bientôt",

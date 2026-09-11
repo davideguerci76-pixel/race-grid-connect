@@ -92,7 +92,9 @@
       "home_stats_title": "Mostrar estadísticas en la home",
       "home_stats_body": "Muestra u oculta los destacados de mercado y contadores en la home.",
       "pitcall_off_title": "Desactivar creación de Pit Call",
-      "pitcall_off_body": "Congela la creación de nuevas Pit Call. Registros y calendarios siguen activos."
+      "pitcall_off_body": "Congela la creación de nuevas Pit Call. Registros y calendarios siguen activos.",
+      "token_purchases_title": "Compras de tokens",
+      "token_purchases_body": "Interruptor principal del flujo de compra de tokens (TEST y LIVE). OFF: los equipos ven los paquetes pero no pueden comprar; el servidor rechaza cualquier intento de pago."
     },
     "home_coming_soon": {
       "coming_soon_title": "Llegamos muy pronto",

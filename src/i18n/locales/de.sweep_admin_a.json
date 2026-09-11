@@ -92,7 +92,9 @@
       "home_stats_title": "Statistiken auf der Startseite",
       "home_stats_body": "Markt-Highlights und Zähler auf der Startseite ein- oder ausblenden.",
       "pitcall_off_title": "Pit-Call-Erstellung deaktivieren",
-      "pitcall_off_body": "Friert die Erstellung neuer Pit Calls ein. Registrierung und Kalender bleiben aktiv."
+      "pitcall_off_body": "Friert die Erstellung neuer Pit Calls ein. Registrierung und Kalender bleiben aktiv.",
+      "token_purchases_title": "Token-Käufe",
+      "token_purchases_body": "Hauptschalter für den Token-Kaufprozess (TEST und LIVE). OFF: Teams sehen die Pakete, können aber nicht kaufen; der Server lehnt jeden Checkout-Versuch ab."
     },
     "home_coming_soon": {
       "coming_soon_title": "Wir sind bald da",

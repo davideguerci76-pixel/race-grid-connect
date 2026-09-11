@@ -40,6 +40,7 @@ function AdminLaunchPage() {
     { key: FLAG_KEYS.comingSoon, fallback: false, title: t("sweep_admin_a.launch.coming_soon_title"), body: t("sweep_admin_a.launch.coming_soon_body") },
     { key: FLAG_KEYS.homeStats, fallback: true, title: t("sweep_admin_a.launch.home_stats_title"), body: t("sweep_admin_a.launch.home_stats_body") },
     { key: FLAG_KEYS.pitcallCreationDisabled, fallback: false, title: t("sweep_admin_a.launch.pitcall_off_title"), body: t("sweep_admin_a.launch.pitcall_off_body") },
+    { key: FLAG_KEYS.tokenPurchases, fallback: false, title: t("sweep_admin_a.launch.token_purchases_title"), body: t("sweep_admin_a.launch.token_purchases_body") },
   ];
 
   if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_a.loading")}</div>;
