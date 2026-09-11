@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { CalendarRange, Upload, Save, ListChecks } from "lucide-react";
 import { listMyCalendars, saveCalendar, type UserCalendar } from "@/lib/calendars.functions";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
-import { daysToEvents, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
+import { daysToEvents, eventsToDays, isoOf, parseIcs, type CalendarEventItem } from "@/lib/ics";
 import { toastError } from "@/lib/errors";
 
 const btn =
@@ -149,6 +149,7 @@ export function CalendarSourcePicker({
             });
             return;
           }
+          setImportedDates(null);
           setQuickEvents(events);
         }}
       >
@@ -166,10 +167,16 @@ export function CalendarSourcePicker({
       {quickEvents && (
         <CalendarQuickFillDialog
           open={!!quickEvents}
-          onOpenChange={(v) => !v && setQuickEvents(null)}
+          onOpenChange={(v) => {
+            if (!v) {
+              setQuickEvents(null);
+              setImportedDates(null);
+            }
+          }}
           events={quickEvents}
           showMode
           existingCount={value.length}
+          importedDates={importedDates ?? undefined}
           onApply={(dates, mode) =>
             onChange(mode === "replace" ? [...new Set(dates)].sort() : [...new Set([...value, ...dates])].sort())
           }
