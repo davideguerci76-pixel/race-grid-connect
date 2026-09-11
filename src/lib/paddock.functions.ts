@@ -2367,18 +2367,8 @@ export const getSosCallDetail = createServerFn({ method: "GET" })
     };
   });
 
-export const getTeamCancellationStats = createServerFn({ method: "GET" })
-  .validator((data: unknown) => z.object({ team_id: z.string().uuid() }).parse(data))
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
-      .from("engagements")
-      .select("cancelled_at, start_date")
-      .eq("team_id", data.team_id)
-      .eq("cancellation_kind", "team_late");
-    const count = (rows ?? []).length;
-    return { count };
-  });
+
+
 
 // ---- Anti-Ghosting workflow ----
 export const freelancerAnswerContact = createServerFn({ method: "POST" })
