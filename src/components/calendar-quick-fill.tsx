@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { addDaysIso, mondayOf, type CalendarEventItem } from "@/lib/ics";
 
@@ -61,8 +62,9 @@ export function CalendarQuickFillDialog({
   const [rule, setRule] = useState<boolean[]>(DEFAULT_RULE);
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
-  const [mode, setMode] = useState<ApplyMode>("merge");
   const hasImported = !!importedDates && importedDates.length > 0;
+  const [mode, setMode] = useState<ApplyMode>("merge");
+  const [advancedOpen, setAdvancedOpen] = useState(hasImported ? false : true);
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
@@ -100,11 +102,27 @@ export function CalendarQuickFillDialog({
         )}
 
         <p className="text-xs text-muted-foreground">
-          {hasImported ? t("sweep_public.calendar_quick_fill.optional_rule_intro") + " " : ""}
           {t(events.length === 1 ? "sweep_public.calendar_quick_fill.description" : "sweep_public.calendar_quick_fill.description_plural", { count: events.length })}
         </p>
 
-        <div className="border border-border bg-card p-4">
+        {hasImported && (
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen((v) => !v)}
+            className="flex w-full items-center justify-between rounded-lg border border-border bg-card px-4 py-3 text-left transition-colors hover:border-racing-red"
+            aria-expanded={advancedOpen}
+            aria-label={advancedOpen ? t("sweep_public.calendar_quick_fill.advanced_collapse_aria") : t("sweep_public.calendar_quick_fill.advanced_expand_aria")}
+          >
+            <div>
+              <div className="label-mono text-[12px] text-foreground">{t("sweep_public.calendar_quick_fill.advanced_label")}</div>
+              <div className="mt-0.5 text-[11px] text-muted-foreground">{t("sweep_public.calendar_quick_fill.advanced_subtext")}</div>
+            </div>
+            {advancedOpen ? <ChevronUp className="size-4 text-racing-red" /> : <ChevronDown className="size-4 text-racing-red" />}
+          </button>
+        )}
+
+        <div className="space-y-3" hidden={hasImported && !advancedOpen}>
+          <div className="border border-border bg-card p-4">
           <div className="label-mono">{t("sweep_public.calendar_quick_fill.standard_week_label")}</div>
           <div className="mt-2">
             <SlotRow rule={rule} onToggle={(i) => setRule(rule.map((v, j) => (j === i ? !v : v)))} />
@@ -160,6 +178,7 @@ export function CalendarQuickFillDialog({
               ))}
             </div>
           )}
+        </div>
         </div>
 
         {showMode && (

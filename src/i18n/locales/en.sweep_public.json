@@ -148,7 +148,11 @@
       "keep_imported_label": "[KEEP IMPORTED DATES]",
       "keep_imported_desc": "Your import contains {{days}} day(s) across {{count}} event(s). Keep them exactly as imported — no logistics rule applied, no day removed. Quick fill stays available afterwards from the toolbar.",
       "keep_imported_button": "Keep {{count}} imported days as-is",
-      "optional_rule_intro": "Optional — apply a logistics rule instead:"
+      "optional_rule_intro": "Optional — apply a logistics rule instead:",
+      "advanced_label": "Advanced — Customize logistics days",
+      "advanced_subtext": "Change the days around each imported event",
+      "advanced_expand_aria": "Expand advanced options",
+      "advanced_collapse_aria": "Collapse advanced options"
     },
     "calendar_source_picker": {
       "use_calendar_placeholder": "Use one of my calendars…",

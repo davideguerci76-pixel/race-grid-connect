@@ -148,7 +148,11 @@
       "keep_imported_label": "[MANTENER FECHAS IMPORTADAS]",
       "keep_imported_desc": "La importación contiene {{days}} día(s) en {{count}} evento(s). Mantenlos exactamente como se importaron — sin regla logística, sin quitar días. El Quick fill sigue disponible después desde la barra de herramientas.",
       "keep_imported_button": "Mantener {{count}} días importados tal cual",
-      "optional_rule_intro": "Opcional — aplica en su lugar una regla logística:"
+      "optional_rule_intro": "Opcional — aplica en su lugar una regla logística:",
+      "advanced_label": "Avanzado — Personalizar días logísticos",
+      "advanced_subtext": "Cambia los días alrededor de cada evento importado",
+      "advanced_expand_aria": "Expandir opciones avanzadas",
+      "advanced_collapse_aria": "Contraer opciones avanzadas"
     },
     "calendar_source_picker": {
       "use_calendar_placeholder": "Usar uno de mis calendarios…",
