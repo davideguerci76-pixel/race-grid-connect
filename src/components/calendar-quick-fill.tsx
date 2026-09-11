@@ -179,6 +179,7 @@ export function CalendarQuickFillDialog({
             </div>
           )}
         </div>
+        </div>
 
         {showMode && (
           <div className="rounded-2xl border border-border bg-card p-4">
