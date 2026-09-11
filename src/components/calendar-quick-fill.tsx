@@ -62,9 +62,9 @@ export function CalendarQuickFillDialog({
   const [rule, setRule] = useState<boolean[]>(DEFAULT_RULE);
   const [perEvent, setPerEvent] = useState<Record<number, boolean[]>>({});
   const [expanded, setExpanded] = useState(false);
+  const hasImported = !!importedDates && importedDates.length > 0;
   const [mode, setMode] = useState<ApplyMode>("merge");
   const [advancedOpen, setAdvancedOpen] = useState(hasImported ? false : true);
-  const hasImported = !!importedDates && importedDates.length > 0;
 
   const effective = (i: number) => perEvent[i] ?? rule;
 
