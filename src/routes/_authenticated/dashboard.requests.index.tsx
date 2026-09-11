@@ -13,7 +13,7 @@ import { getMyRequests, setRequestStatus } from "@/lib/paddock.functions";
 import { disciplineLabel } from "@/lib/paddock";
 import { PoolBadge } from "@/components/pool-badge";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
-import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw } from "lucide-react";
+import { Plus, Calendar, MapPin, Wrench, Eye, Play, XCircle, Copy, RotateCcw, Flame } from "lucide-react";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
 import { BackButton } from "@/components/back-button";
 import { PitCallDates } from "@/components/championship-dates";
@@ -107,6 +107,11 @@ function RequestsPage() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <StatusBadge status={r.status} />
+                    {(r as any).sos_active && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-racing-red bg-racing-red px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+                        <Flame className="size-3 animate-pulse" /> {t("sos.status_badge")}
+                      </span>
+                    )}
                     {(r as any).search_mode === "pool" && <PoolBadge />}
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       <Wrench className="size-3.5" />
