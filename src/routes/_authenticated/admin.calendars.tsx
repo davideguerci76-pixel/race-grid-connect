@@ -14,7 +14,7 @@ import {
   adminUpsertOfficialCalendar,
   type AdminCalendar,
 } from "@/lib/admin-calendars.functions";
-import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, rangeDayCount, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, eventsToDays, dateOf, isoOf, parseIcs, rangeDayCount, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { useTranslation } from "react-i18next";
 import { toastError } from "@/lib/errors";

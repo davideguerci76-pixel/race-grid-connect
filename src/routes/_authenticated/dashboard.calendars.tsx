@@ -12,7 +12,7 @@ import { BackButton } from "@/components/back-button";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { deleteCalendar, listMyCalendars, saveCalendar, submitCalendarForReview, type UserCalendar } from "@/lib/calendars.functions";
-import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
+import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, eventsToDays, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
 import { toastError } from "@/lib/errors";
 import { confirmDialog } from "@/hooks/use-confirm";

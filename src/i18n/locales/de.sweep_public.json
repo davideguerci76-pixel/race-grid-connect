@@ -144,7 +144,11 @@
       "cancel": "Abbrechen",
       "confirm_replace": "Bestätigen — mit {{count}} Tagen ersetzen",
       "confirm_merge": "Bestätigen — {{count}} Tage zusammenführen",
-      "apply_days": "{{count}} Tage anwenden"
+      "apply_days": "{{count}} Tage anwenden",
+      "keep_imported_label": "[IMPORTIERTE DATEN BEHALTEN]",
+      "keep_imported_desc": "Der Import enthält {{days}} Tag(e) in {{count}} Event(s). Behalte sie genau wie importiert — keine Logistikregel, kein Tag entfernt. Quick fill bleibt danach über die Werkzeugleiste verfügbar.",
+      "keep_imported_button": "{{count}} importierte Tage unverändert behalten",
+      "optional_rule_intro": "Optional — stattdessen eine Logistikregel anwenden:"
     },
     "calendar_source_picker": {
       "use_calendar_placeholder": "Einen meiner Kalender verwenden…",

@@ -144,7 +144,11 @@
       "cancel": "Cancelar",
       "confirm_replace": "Confirmar — reemplazar con {{count}} días",
       "confirm_merge": "Confirmar — fusionar {{count}} días",
-      "apply_days": "Aplicar {{count}} días"
+      "apply_days": "Aplicar {{count}} días",
+      "keep_imported_label": "[MANTENER FECHAS IMPORTADAS]",
+      "keep_imported_desc": "La importación contiene {{days}} día(s) en {{count}} evento(s). Mantenlos exactamente como se importaron — sin regla logística, sin quitar días. El Quick fill sigue disponible después desde la barra de herramientas.",
+      "keep_imported_button": "Mantener {{count}} días importados tal cual",
+      "optional_rule_intro": "Opcional — aplica en su lugar una regla logística:"
     },
     "calendar_source_picker": {
       "use_calendar_placeholder": "Usar uno de mis calendarios…",
