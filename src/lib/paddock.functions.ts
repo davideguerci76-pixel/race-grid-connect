@@ -1874,7 +1874,7 @@ export const getRequestMatches = createServerFn({ method: "GET" })
       .limit(1)
       .maybeSingle();
     let sosTargetIds = new Set<string>();
-    if (sosErr) console.error("[getRequestMatches] sos lookup failed", sosErr.message);
+    if (sosErr) console.error("[getRequestMatches] sos lookup failed", sosErr.message); else console.log("[getRequestMatches] sosRow", JSON.stringify(sosRow));
     if (sosRow) {
       const { data: tRows } = await supabase.from("sos_call_targets").select("freelancer_id").eq("sos_id", (sosRow as any).id);
       sosTargetIds = new Set(((tRows ?? []) as any[]).map((r) => String(r.freelancer_id)));
