@@ -116,14 +116,14 @@ function SosCallPage() {
                 {status === "won" && <p className="text-sm text-success">{t("sos.won_body")}</p>}
                 {status === "resolved" && <p className="text-sm text-muted-foreground">{t("sos.resolved_body")}</p>}
 
-                <FactGrid cols={3} className="mt-4">
+                <div className="mt-4"><FactGrid cols={3}>
                   <Fact icon={<Calendar />} label={t("cards.dates")} value={<span className="font-mono">{dates}</span>} />
                   <Fact icon={<MapPin />} label={t("sweep_engage.matches.location_label")} value={req?.circuit || req?.location || "—"} />
                   <Fact icon={<Coins />} label={t("sweep_engage.pitcall_summary.budget")} value={budget} />
                   <Fact icon={<Navigation />} label={t("sos.distance")} value={data.distance_km == null ? "—" : `${Math.round(data.distance_km)} km`} />
                   <Fact icon={<Flame />} label={t("sos.triggered_at")} value={<span className="font-mono">{new Date(data.triggered_at).toLocaleString()}</span>} />
                   {data.team && <Fact icon={<Users />} label={t("sos.team_revealed")} value={data.team.team_name ?? t("sweep_profile.dashboard.team_fallback")} />}
-                </FactGrid>
+                </FactGrid></div>
 
                 {req?.notes && (
                   <div className="mt-4 border-l-2 border-border pl-3 text-sm text-muted-foreground">
