@@ -17,6 +17,7 @@ import { MarketHighlights } from "@/components/market-highlights";
 import { MiniAvailabilityCard } from "@/components/mini-availability-card";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
+import { ActivationCard } from "@/components/activation-card";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
