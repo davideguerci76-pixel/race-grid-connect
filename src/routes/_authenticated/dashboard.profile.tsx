@@ -394,7 +394,9 @@ function FreelancerSection({ profile }: { profile: any }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
-  const [editing, setEditing] = useState(false);
+  // Deep-link from the Activation Card (?focus=role): open the edit form directly.
+  const { focus } = Route.useSearch();
+  const [editing, setEditing] = useState(focus === "role");
   const [showAllSkills, setShowAllSkills] = useState(false);
   const tax = useTaxonomy();
   const [form, setForm] = useState({
