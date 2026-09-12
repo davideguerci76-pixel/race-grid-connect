@@ -364,6 +364,7 @@
     "fuel_systems": "Fuel Systems",
     "brake_specialist": "Brake Systems Specialist",
     "telemetry_analysis": "Telemetry Analysis",
+    "data_analysis": "Data Analysis",
     "data_acquisition": "Data Acquisition (MoTeC, Cosworth, Bosch)",
     "motec_i2": "MoTeC i2 Pro",
     "matlab_simulink": "MATLAB / Simulink",
