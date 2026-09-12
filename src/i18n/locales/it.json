@@ -1030,7 +1030,8 @@
     "team_contact_reminder_1": "Promemoria contatto",
     "team_contact_reminder_2": "Promemoria contatto",
     "team_ghosted": "Nessuna risposta dal team",
-    "tokens_credited": "Token accreditati"
+    "tokens_credited": "Token accreditati",
+    "readiness_nudge": "Preparati al match"
   },
   "pcal": {
     "today": "Oggi",

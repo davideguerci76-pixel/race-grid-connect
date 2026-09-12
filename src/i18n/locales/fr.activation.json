@@ -22,6 +22,11 @@
     "calendar_empty_title": "Aucune disponibilité",
     "calendar_empty_body": "Sélectionne directement sur le calendrier les jours où tu es disponible, ou utilise Ajouter depuis le calendrier pour les importer.",
     "calendar_empty_cta": "Sélectionner les dates",
-    "calendar_stale_hint": "Vérifiez vos disponibilités pour redevenir prêt pour le match."
+    "calendar_stale_hint": "Vérifiez vos disponibilités pour redevenir prêt pour le match.",
+    "nudge_intro": "Complétez les dernières étapes pour être Ready to Match sur PITCALL :",
+    "nudge_missing_role": "complétez votre rôle professionnel",
+    "nudge_missing_phone": "ajoutez le numéro de téléphone dont un Team a besoin pour vous contacter après l’acceptation d’un Pit Call",
+    "nudge_missing_availability": "ajoutez vos disponibilités pour apparaître dans les matches",
+    "nudge_stale_availability": "vérifiez et confirmez vos disponibilités futures"
   }
 }
