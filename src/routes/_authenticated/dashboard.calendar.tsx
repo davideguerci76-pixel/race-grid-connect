@@ -464,8 +464,7 @@ function CalendarPage() {
   // UAT-ONBOARD-03 — zero-state derived from loaded availability; stale label comes from the DB READY authority.
   const { data: activation } = useActivationStatus();
   const todayIso = isoOf(new Date());
-  const availabilityLoaded = myDays !== undefined;
-  const zeroFutureAvailability = availabilityLoaded && ![...availableSet].some((d) => d >= todayIso);
+  const zeroFutureAvailability = availFetched && ![...availableSet].some((d) => d >= todayIso);
   const staleNotReady = !zeroFutureAvailability && activation?.reasons?.includes("stale_availability") === true;
 
   const selectedCell = selected ? cells.get(selected) : undefined;
