@@ -82,6 +82,14 @@
       "callout3": {
         "title": "James partial 94% vs Marco full 88%",
         "body": "James has a higher professional relevance than Marco, even though he is a Partial match. Full / Partial tells you date availability. Relevance % tells you professional fit. A Partial match can be professionally stronger than a Full match."
+      },
+      "next": {
+        "title": "What happens next in a real Pit Call?",
+        "body": "Choose the Freelancer you want to work with and send them a Request Confirmation. If the Freelancer confirms, the Pit Call is filled and their contact details are revealed so you can get in touch.",
+        "step_choose": "Choose Freelancer",
+        "step_request": "Request Confirmation",
+        "step_confirm": "Freelancer confirms",
+        "step_contact": "Contact details revealed"
       }
     },
     "end": {
@@ -100,7 +108,7 @@
       "guided_label": "Guided Pit Call",
       "step_role": "1/4 — Who are you looking for? Select {{role}}.",
       "step_dates": "2/4 — Select the required travel dates: {{range}}.",
-      "step_requirements": "3/4 — Describe who you need. Select GT3, 3+ years, English and Telemetry Analysis.",
+      "step_requirements": "3/4 — Describe who you need. Select GT3, 3+ years, English and Data Analysis.",
       "step_specific": "4/4 — Make it more specific. Add {{skill}}.",
       "role_section": "Role",
       "dates_section": "Required travel dates",

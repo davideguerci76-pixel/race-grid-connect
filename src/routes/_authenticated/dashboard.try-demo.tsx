@@ -33,7 +33,7 @@ const DEMO_SUB_ROLE = "race_engineer";
 const DEMO_DISCIPLINE = "gt3";
 const DEMO_LANGUAGE = "en";
 const DEMO_MIN_YEARS = 3;
-const DEMO_SKILL_1 = "telemetry_analysis";
+const DEMO_SKILL_1 = "data_analysis";
 const DEMO_SKILL_2 = "corner_weights_setup";
 
 type Step = "intro" | "role" | "dates" | "requirements" | "preview1" | "requirements2" | "preview2" | "results" | "end";
@@ -298,6 +298,19 @@ function TryDemoPitCall() {
                   <CandidateMatchCard match={match} mode="request" hideActions />
                 </div>
               ))}
+            </div>
+            <div className="mt-6 border border-border bg-card p-4">
+              <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-racing-yellow">{t("trial.results.next.title")}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t("trial.results.next.body")}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <span>{t("trial.results.next.step_choose")}</span>
+                <span className="text-racing-yellow">→</span>
+                <span>{t("trial.results.next.step_request")}</span>
+                <span className="text-racing-yellow">→</span>
+                <span>{t("trial.results.next.step_confirm")}</span>
+                <span className="text-racing-yellow">→</span>
+                <span>{t("trial.results.next.step_contact")}</span>
+              </div>
             </div>
           </section>
         )}
