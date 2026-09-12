@@ -461,6 +461,12 @@ function CalendarPage() {
   const daysSince = lastConfirmed ? Math.floor((Date.now() - lastConfirmed.getTime()) / 86400000) : null;
   const state = freshness?.state ?? "fresh";
   const freshTone = state === "fresh" ? "text-[#16a34a]" : "text-racing-yellow";
+  // UAT-ONBOARD-03 — zero-state derived from loaded availability; stale label comes from the DB READY authority.
+  const { data: activation } = useActivationStatus();
+  const todayIso = isoOf(new Date());
+  const availabilityLoaded = myDays !== undefined;
+  const zeroFutureAvailability = availabilityLoaded && ![...availableSet].some((d) => d >= todayIso);
+  const staleNotReady = !zeroFutureAvailability && activation?.reasons?.includes("stale_availability") === true;
 
   const selectedCell = selected ? cells.get(selected) : undefined;
   const selectedEng = selected ? engMap.get(selected) : undefined;
