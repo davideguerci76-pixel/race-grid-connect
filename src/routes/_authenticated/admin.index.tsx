@@ -165,6 +165,49 @@ function AdminFreelancers() {
           </div>
         ))}
       </div>
+
+      {/* UAT-ONBOARD-04 — Pool health (whole environment; not affected by filters). READY = same DB authority as the Activation Card. */}
+      {!isLoading && (
+        <div className="mb-4 border border-border" data-testid="pool-health">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-border bg-secondary/40 px-3 py-2">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-widest">{tr("pool_title")}</div>
+            <div className="text-[10px] text-muted-foreground">{tr("env_note")}</div>
+          </div>
+          <div className="grid grid-cols-3 divide-x divide-border">
+            {[
+              ["registered", pool.registered, "", ""],
+              ["ready", pool.ready, "text-emerald-500", "ready"],
+              ["not_ready", pool.notReady, "text-racing-yellow", "not_ready"],
+            ].map(([k, v, cls, f]) => (
+              <button
+                key={String(k)}
+                type="button"
+                onClick={() => { setReadyFilter(f as any); setReasonFilter(""); }}
+                className={`p-3 text-left hover:bg-secondary/40 ${readyFilter === f && k !== "registered" ? "bg-secondary/60" : ""}`}
+                data-testid={`pool-${k}`}
+              >
+                <div className={`font-mono text-[10px] font-bold uppercase tracking-widest ${cls}`}>{tr(String(k))}</div>
+                <div className="mt-1 font-mono text-2xl font-black tracking-tighter">{String(v)}</div>
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3 py-2 text-xs">
+            <span className="text-muted-foreground">{tr("reasons_title")}:</span>
+            {REASONS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => { setReadyFilter("not_ready"); setReasonFilter(reasonFilter === k ? "" : k); }}
+                className={`font-mono ${reasonFilter === k ? "text-racing-yellow underline" : "hover:underline"}`}
+                data-testid={`pool-reason-${k}`}
+              >
+                <b>{pool.byReason[k]}</b> {reasonLabel(k)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-3 flex flex-wrap gap-2">
         <input
           value={q}
@@ -176,6 +219,27 @@ function AdminFreelancers() {
           <option value="">{t("sweep_admin_a.freelancers.all_roles")}</option>
           {roles.map((r: any) => (
             <option key={r} value={r}>{r}</option>
+          ))}
+        </select>
+        <select
+          value={readyFilter}
+          onChange={(e) => { const v = e.target.value as any; setReadyFilter(v); if (v !== "not_ready") setReasonFilter(""); }}
+          className="border border-border bg-background px-3 py-2 text-sm"
+          data-testid="filter-ready"
+        >
+          <option value="">{tr("status_all")}</option>
+          <option value="ready">{tr("ready")}</option>
+          <option value="not_ready">{tr("not_ready")}</option>
+        </select>
+        <select
+          value={reasonFilter}
+          onChange={(e) => { setReasonFilter(e.target.value); if (e.target.value) setReadyFilter("not_ready"); }}
+          className="border border-border bg-background px-3 py-2 text-sm"
+          data-testid="filter-reason"
+        >
+          <option value="">{tr("reason_all")}</option>
+          {REASONS.map((k) => (
+            <option key={k} value={k}>{reasonLabel(k)}</option>
           ))}
         </select>
         <button
@@ -196,13 +260,19 @@ function AdminFreelancers() {
               Status: r.blocked_at ? "Blocked" : "Active",
               Roles: (r.roles ?? []).join(", "),
               CreatedAt: r.created_at,
+              ReadyToMatch: r.ready ? "READY" : "NOT READY",
+              NotReadyReasons: (r.ready_reasons ?? []).join(", "),
+              ProfileGaps: (r.profile_gaps ?? []).join(", "),
+              Travels: r.travels == null ? "" : r.travels ? "yes" : "no",
             })))
           }
           className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary"
         >
           {t("sweep_admin_a.export_to_excel")}
         </button>
-        <div className="ml-auto text-xs text-muted-foreground self-center">{t("sweep_admin_a.freelancers.count", { count: rows.length })}</div>
+        <div className="ml-auto text-xs text-muted-foreground self-center" data-testid="shown-count">
+          {tr("shown", { shown: rows.length, total: pool.registered })}
+        </div>
       </div>
       {isLoading ? (
         <div className="text-sm text-muted-foreground">{t("sweep_admin_a.loading")}</div>
