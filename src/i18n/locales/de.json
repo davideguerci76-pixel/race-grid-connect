@@ -350,6 +350,7 @@
     "fuel_systems": "Kraftstoffsysteme",
     "brake_specialist": "Bremsanlagen-Spezialist",
     "telemetry_analysis": "Telemetrie-Analyse",
+    "data_analysis": "Datenanalyse",
     "data_acquisition": "Datenerfassung (MoTeC, Cosworth, Bosch)",
     "motec_i2": "MoTeC i2 Pro",
     "matlab_simulink": "MATLAB / Simulink",
