@@ -22,3 +22,8 @@
 - [x] UAT-TEAM-DEMO-01A: rebuild Guided Demo creation surface with real Pit Call presentation and contextual guidance
 - [x] UAT-TEAM-DEMO-01A: persist one-way Team completion state and switch dashboard banner to discreet replay entry
 - [x] UAT-TEAM-DEMO-01A: hide operational match CTA only in Guided Demo and verify A–H regressions
+- [ ] UAT-DOC-01B: remediate ACP Wiki against current implementation and UAT-DOC-01A
+- [ ] UAT-DOC-01B: update HelpHint wording and resolve orphan keys with documented MOUNT/REMOVE decisions
+- [ ] UAT-DOC-01B: update public FAQ in EN/IT/ES/FR/DE with semantic parity
+- [ ] UAT-DOC-01B: run differential retest, global stale-copy search, build/typecheck validation, and visual evidence
+- [ ] UAT-DOC-01B: publish final report and findings tracker without product or database changes
