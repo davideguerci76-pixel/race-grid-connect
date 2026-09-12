@@ -491,6 +491,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), ...(saved ?? {}) } } : old,
       );
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("sweep_profile.freelancer.saved"));
       setEditing(false);
     },
