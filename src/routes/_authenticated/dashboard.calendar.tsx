@@ -212,6 +212,7 @@ function CalendarPage() {
     onSuccess: () => {
       toast.success(t("calendar.confirm_success", { defaultValue: "Availability confirmed." }));
       qc.invalidateQueries({ queryKey: ["my-calendar-freshness"] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
   });
