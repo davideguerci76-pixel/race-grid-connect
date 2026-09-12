@@ -486,7 +486,23 @@ function CalendarPage() {
         <h1 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">{t("calendar.title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
 
-        <div className="mt-6 grid grid-cols-1 gap-3 border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        {zeroFutureAvailability ? (
+          /* UAT-ONBOARD-03 — zero future availability: no misleading Confirm CTA, guide to add dates instead. */
+          <div className="mt-6 grid grid-cols-1 gap-3 border border-racing-yellow bg-racing-yellow/10 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" data-testid="calendar-empty-state">
+            <div className="min-w-0">
+              <div className="label-mono text-racing-yellow">[{t("activation.calendar_empty_title")}]</div>
+              <p className="mt-1 text-sm">{t("activation.calendar_empty_body")}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAddOpen(true)}
+              className="inline-flex w-full items-center justify-center gap-2 bg-racing-red px-4 py-3 text-xs font-black uppercase tracking-widest text-white hover:brightness-110 sm:w-auto"
+            >
+              <CalendarPlus className="size-3.5" /> {t("activation.calendar_empty_cta")}
+            </button>
+          </div>
+        ) : (
+        <div className="mt-6 grid grid-cols-1 gap-3 border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" data-testid="calendar-confirm-block">
           <div className="min-w-0">
             <div className="flex items-center gap-1">
               <span className="label-mono">[{t("calendar.freshness_label")}]</span>
@@ -504,6 +520,9 @@ function CalendarPage() {
                   ? t("calendar.state_needs_review", { defaultValue: "Some of your available dates haven't been reviewed recently." })
                   : t("calendar.freshness_benefit", { defaultValue: "Your availability is up to date." })}
             </p>
+            {staleNotReady && (
+              <p className="mt-1 text-[11px] font-bold text-racing-yellow" data-testid="calendar-stale-hint">{t("activation.calendar_stale_hint")}</p>
+            )}
           </div>
           <button
             onClick={() => confirmMut.mutate()}
@@ -513,6 +532,7 @@ function CalendarPage() {
             {confirmMut.isPending ? t("common.loading") : t("calendar.confirm_button", { defaultValue: "Everything is still correct — Confirm" })}
           </button>
         </div>
+        )}
 
         <div className="mt-6">
           <PitcallCalendar
