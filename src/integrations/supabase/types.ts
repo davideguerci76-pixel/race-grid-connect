@@ -3684,6 +3684,7 @@ export type Database = {
           deleted: boolean
         }[]
       }
+      my_activation_status: { Args: never; Returns: Json }
       my_availability_opportunity_mute: {
         Args: never
         Returns: {
