@@ -105,7 +105,7 @@ export const Route = createFileRoute("/api/public/notification-email")({
             .eq("id", n.id as string);
         }
 
-        return Response.json({ processed: pending?.length ?? 0, sent });
+        return Response.json({ processed: pending?.length ?? 0, sent, suppressed_test: suppressedTest });
       },
     },
   },
