@@ -265,6 +265,14 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       })
       .eq("user_id", uid);
 
+    // Fictitious phone (READY law). Same validation as updateMyPhone; deterministic per persona.
+    if (f.phone) {
+      const { error: phoneErr } = await sb
+        .from("freelancer_contacts")
+        .upsert({ user_id: uid, phone_dial_code: f.phone.dial, phone_number: f.phone.number }, { onConflict: "user_id" });
+      if (phoneErr) throw new Error(`phone seed failed for ${f.key}: ${phoneErr.message}`);
+    }
+
     const days = resolveDays(anchor, f.availability, now);
     if (days.length) {
       const { error: availErr } = await sb
