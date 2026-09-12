@@ -257,9 +257,12 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const { user } = useAuth();
   const savePhone = useServerFn(updateMyPhone);
+  const { focus } = Route.useSearch();
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneDial, setPhoneDial] = useState("+39");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const phoneRef = useRef<HTMLDivElement | null>(null);
+  const focusedRef = useRef(false);
 
   const isFreelancer = profile?.user_type === "freelancer";
   const fp = profile?.freelancerProfile;
@@ -270,6 +273,14 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       setPhoneNumber(fp?.phone_number ?? "");
     }
   }, [fp, editingPhone]);
+
+  // Deep-link from the Activation Card: open the phone editor once and bring it into view.
+  useEffect(() => {
+    if (focus !== "phone" || !isFreelancer || focusedRef.current) return;
+    focusedRef.current = true;
+    setEditingPhone(true);
+    phoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focus, isFreelancer]);
 
 
   const phoneMutation = useMutation({
