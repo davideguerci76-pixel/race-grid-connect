@@ -306,6 +306,23 @@ function AdminFreelancers() {
                     <td className="px-2 py-2">
                       <input className={inputCls} value={draftValue(r, "display_name", r.display_name)} onChange={(e) => setDraft(r.id, "display_name", e.target.value)} />
                     </td>
+                    <td className="px-2 py-2" data-testid="ready-cell" data-ready={r.ready ? "1" : "0"}>
+                      {r.ready ? (
+                        <span className="inline-block border border-emerald-500 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-emerald-500">READY</span>
+                      ) : (
+                        <>
+                          <span className="inline-block border border-racing-yellow px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-racing-yellow">NOT READY</span>
+                          <div className="mt-1 max-w-[180px] text-[10px] leading-tight text-racing-yellow/90">
+                            {(r.ready_reasons ?? []).map(reasonLabel).join(" · ")}
+                          </div>
+                        </>
+                      )}
+                      {(r.profile_gaps?.length > 0 || r.travels === false) && (
+                        <div className="mt-1 max-w-[180px] text-[10px] leading-tight text-muted-foreground" title={tr("gaps_note")}>
+                          {[...(r.profile_gaps ?? []).map(gapLabel), ...(r.travels === false ? [tr("no_travel")] : [])].join(" · ")}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-2 py-2 text-muted-foreground">{r.email}</td>
                     <td className="px-2 py-2">
                       <input className={inputCls} value={draftValue(r, "role_group", r.freelancer?.role_group)} onChange={(e) => setDraft(r.id, "role_group", e.target.value)} />
