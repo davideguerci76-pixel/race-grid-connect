@@ -173,7 +173,7 @@ function AdminFreelancers() {
     const primary = (r.ready_reasons ?? [])[0] ?? null;
     const ok = await confirmDialog(tr("nudge_confirm_body", { name: r.display_name, reasons, cta: ctaLabel(primary) }), {
       title: tr("nudge_confirm_title"),
-      confirmText: tr("nudge_send"),
+      confirmLabel: tr("nudge_send"),
     });
     if (!ok) return;
     setNudging(r.id);
