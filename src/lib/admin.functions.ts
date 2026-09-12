@@ -31,16 +31,25 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     const ids = (profiles ?? []).map((p: any) => p.id);
-    const [{ data: fps }, { data: roles }, { data: contacts }] = await Promise.all([
+    // UAT-ONBOARD-04: READY TO MATCH via the same DB authority as the Freelancer Activation Card
+    // (activation_status_for → my_activation_status), evaluated in ONE bulk RPC (no per-row query).
+    const [{ data: fps }, { data: roles }, { data: contacts }, { data: readiness, error: readinessErr }] = await Promise.all([
       supabaseAdmin.from("freelancer_profiles").select("*").in("user_id", ids),
       supabaseAdmin.from("user_roles").select("user_id, role").in("user_id", ids),
       supabaseAdmin.from("freelancer_contacts").select("user_id, phone_dial_code, phone_number").in("user_id", ids),
+      (supabaseAdmin.rpc as any)("admin_activation_status_bulk", { _user_ids: ids }),
     ]);
+    if (readinessErr) throw new Error(readinessErr.message);
+    // Emails: paginated listUsers (bulk) instead of one getUserById per row (mass-boarding safe).
     const emails: Record<string, string> = {};
-    for (const id of ids) {
-      const { data: u } = await supabaseAdmin.auth.admin.getUserById(id);
-      if (u?.user?.email) emails[id] = u.user.email;
+    const idSet = new Set(ids);
+    for (let page = 1; page <= 50; page++) {
+      const { data: list, error: lerr } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
+      if (lerr) throw new Error(lerr.message);
+      for (const u of list?.users ?? []) if (idSet.has(u.id) && u.email) emails[u.id] = u.email;
+      if ((list?.users?.length ?? 0) < 1000) break;
     }
+    const readinessMap = new Map<string, any>((readiness ?? []).map((r: any) => [r.user_id, r.status]));
     const contactMap = new Map((contacts ?? []).map((c: any) => [c.user_id, c]));
     const fpMap = new Map(
       (fps ?? []).map((r: any) => [r.user_id, { ...r, phone_dial_code: contactMap.get(r.user_id)?.phone_dial_code ?? null, phone_number: contactMap.get(r.user_id)?.phone_number ?? null }]),
@@ -64,14 +73,35 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
       const c = cur.count + 1;
       ratingMap.set(r.to_user_id, { avg: (cur.avg * cur.count + v) / c, count: c });
     }
-    return (profiles ?? []).map((p: any) => ({
-      ...p,
-      email: emails[p.id] ?? null,
-      roles: roleMap.get(p.id) ?? [],
-      freelancer: fpMap.get(p.id) ?? null,
-      rating_avg: ratingMap.get(p.id)?.avg ?? 0,
-      rating_count: ratingMap.get(p.id)?.count ?? 0,
-    }));
+    // Profile quality gaps: informational flags from real data, separate from READY (no score, no %).
+    const gapsFor = (fp: any): string[] => {
+      if (!fp) return [];
+      const g: string[] = [];
+      if (!(fp.skills ?? []).length) g.push("skills");
+      if (!(Array.isArray(fp.sub_roles) ? fp.sub_roles.length : 0)) g.push("sub_role");
+      if (!(Array.isArray(fp.languages) ? fp.languages.length : 0)) g.push("languages");
+      if (!(Array.isArray(fp.experiences) ? fp.experiences.length : 0) && fp.years_experience == null) g.push("experience");
+      if (!(fp.disciplines ?? []).length) g.push("disciplines");
+      if (fp.day_rate == null) g.push("day_rate");
+      if (!fp.location && fp.location_lat == null) g.push("location");
+      return g;
+    };
+    return (profiles ?? []).map((p: any) => {
+      const st = readinessMap.get(p.id) ?? { ready: false, reasons: [] };
+      const fp = fpMap.get(p.id) ?? null;
+      return {
+        ...p,
+        email: emails[p.id] ?? null,
+        roles: roleMap.get(p.id) ?? [],
+        freelancer: fp,
+        rating_avg: ratingMap.get(p.id)?.avg ?? 0,
+        rating_count: ratingMap.get(p.id)?.count ?? 0,
+        ready: !!st.ready,
+        ready_reasons: (st.reasons ?? []) as string[],
+        profile_gaps: gapsFor(fp),
+        travels: fp?.travels ?? null,
+      };
+    });
   });
 
 export const adminListTeams = createServerFn({ method: "GET" })
