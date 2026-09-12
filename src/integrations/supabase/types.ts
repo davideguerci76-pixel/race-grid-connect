@@ -4354,6 +4354,7 @@ export type Database = {
         | "engagement_expired"
         | "engagement_declined"
         | "engagement_more_time"
+        | "readiness_nudge"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -4626,6 +4627,7 @@ export const Constants = {
         "engagement_expired",
         "engagement_declined",
         "engagement_more_time",
+        "readiness_nudge",
       ],
       rating_moderation_status: [
         "active",

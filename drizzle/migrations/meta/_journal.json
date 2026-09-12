@@ -925,6 +925,13 @@
       "when": 1789199173752,
       "tag": "0131_0131_activation_status_core_and_admin_bulk",
       "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1789200908891,
+      "tag": "0132_0132_readiness_nudge_kind",
+      "breakpoints": true
     }
   ]
 }
