@@ -108,7 +108,7 @@ export function ActivationCard() {
         ))}
       </ul>
       <p className="mt-4 text-sm text-muted-foreground">
-        {availReason ? t("activation.invisible_hint") : t("activation.why")}
+        {t("activation.why")}
       </p>
       <Link
         to={target.to}
