@@ -283,6 +283,7 @@ function AdminFreelancers() {
               <tr>
                 <Th onClick={() => toggle("freelancer.pit_code")} label={`Pit Code${indicator("freelancer.pit_code")}`} />
                 <Th onClick={() => toggle("display_name")} label={`${t("sweep_admin_a.columns.name")}${indicator("display_name")}`} />
+                <Th onClick={() => toggle("ready")} label={`${tr("col_ready")} / ${tr("col_gaps")}${indicator("ready")}`} />
                 <Th onClick={() => toggle("email")} label={`${t("sweep_admin_a.columns.email")}${indicator("email")}`} />
                 <Th onClick={() => toggle("freelancer.role_group")} label={`${t("sweep_admin_a.columns.macro_role")}${indicator("freelancer.role_group")}`} />
                 <Th onClick={() => toggle("freelancer.disciplines")} label={`${t("sweep_admin_a.columns.disciplines")}${indicator("freelancer.disciplines")}`} />
