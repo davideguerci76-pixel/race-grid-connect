@@ -527,7 +527,7 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
   //     a persona without phone is intentionally NOT READY (missing_phone).
   for (const f of scenario.freelancers) {
     const { data: st } = await sb.rpc("activation_status_for", { _uid: personas[f.key] });
-    const hasFutureDays = resolveDays(anchor, f.availability, now).some((d) => d >= seedToday);
+    const hasFutureDays = resolveDays(anchor, f.availability, now).some((d) => d >= todayISO(new Date()));
     const expected = f.phone && hasFutureDays ? "ready" : "not ready";
     push(`readiness ${f.key}`, expected, st?.ready ? "ready" : "not ready");
   }
