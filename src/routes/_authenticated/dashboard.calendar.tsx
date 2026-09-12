@@ -29,6 +29,7 @@ import { dateOf, isoOf } from "@/lib/ics";
 import { calendarDayState, chunkDays } from "@/lib/calendar-days";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
+import { useActivationStatus, ACTIVATION_QUERY_KEY } from "@/hooks/use-activation-status";
 import { roleGroupLabel, subRoleLabel } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/dashboard/calendar")({
