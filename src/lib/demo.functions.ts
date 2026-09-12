@@ -522,6 +522,16 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     push(`availability ${f.key}`, expectedDays.join(","), got.join(","));
   }
 
+  // 2b. readiness — the ONE authority (activation_status_for). A persona with a
+  //     phone in the manifest and availability today-or-later must be READY;
+  //     a persona without phone is intentionally NOT READY (missing_phone).
+  for (const f of scenario.freelancers) {
+    const { data: st } = await sb.rpc("activation_status_for", { _uid: personas[f.key] });
+    const hasFutureDays = resolveDays(anchor, f.availability, now).some((d) => d >= seedToday);
+    const expected = f.phone && hasFutureDays ? "ready" : "not ready";
+    push(`readiness ${f.key}`, expected, st?.ready ? "ready" : "not ready");
+  }
+
   // 3. pool baseline
   const poolExpected = scenario.preSeeded.pool.members.length;
   const { count: poolCount } = await sb
