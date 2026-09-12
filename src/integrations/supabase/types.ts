@@ -1158,6 +1158,7 @@ export type Database = {
           deletion_state: string | null
           display_name: string
           first_name: string | null
+          guided_demo_completed_at: string | null
           id: string
           is_test: boolean
           last_name: string | null
@@ -1177,6 +1178,7 @@ export type Database = {
           deletion_state?: string | null
           display_name: string
           first_name?: string | null
+          guided_demo_completed_at?: string | null
           id: string
           is_test?: boolean
           last_name?: string | null
@@ -1196,6 +1198,7 @@ export type Database = {
           deletion_state?: string | null
           display_name?: string
           first_name?: string | null
+          guided_demo_completed_at?: string | null
           id?: string
           is_test?: boolean
           last_name?: string | null
@@ -3625,6 +3628,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      mark_guided_demo_completed: { Args: never; Returns: string }
       market_stats: { Args: never; Returns: Json }
       match_edge_only: {
         Args: { _freelancer: string; _required: string[] }

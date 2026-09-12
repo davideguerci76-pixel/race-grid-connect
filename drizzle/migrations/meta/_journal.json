@@ -946,6 +946,13 @@
       "when": 1789201044445,
       "tag": "0134_0134_admin_readiness_nudge_empty_candidates",
       "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1789211121642,
+      "tag": "0135_guided_demo_completion_state",
+      "breakpoints": true
     }
   ]
 }
