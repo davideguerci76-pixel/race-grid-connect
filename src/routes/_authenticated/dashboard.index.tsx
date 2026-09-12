@@ -17,6 +17,7 @@ import { MarketHighlights } from "@/components/market-highlights";
 import { MiniAvailabilityCard } from "@/components/mini-availability-card";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
+import { ActivationCard } from "@/components/activation-card";
 import { toastError } from "@/lib/errors";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
@@ -167,6 +168,8 @@ function DashboardHome() {
         <h1 className="text-4xl font-black uppercase italic tracking-tighter">{t("dashboard.welcome", { name: (profile?.user_type === "freelancer" ? [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") : profile?.display_name) || "" })}</h1>
 
         <InstallAppCard />
+
+        {isFreelancer && <ActivationCard />}
 
         {(activeMatchesCount ?? 0) > 0 && (
           <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">

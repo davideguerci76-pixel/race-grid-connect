@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { teamTypeLabel } from "@/lib/labels";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ACTIVATION_QUERY_KEY } from "@/hooks/use-activation-status";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -30,6 +31,10 @@ import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
+  // UAT-ONBOARD-03 — Activation Card deep-link: ?focus=role|phone opens the matching edit form.
+  validateSearch: (search: Record<string, unknown>): { focus?: "role" | "phone" } => ({
+    focus: search.focus === "role" || search.focus === "phone" ? search.focus : undefined,
+  }),
 });
 
 function ProfilePage() {
@@ -253,9 +258,12 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const qc = useQueryClient();
   const { user } = useAuth();
   const savePhone = useServerFn(updateMyPhone);
+  const { focus } = Route.useSearch();
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneDial, setPhoneDial] = useState("+39");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const phoneRef = useRef<HTMLDivElement | null>(null);
+  const focusedRef = useRef(false);
 
   const isFreelancer = profile?.user_type === "freelancer";
   const fp = profile?.freelancerProfile;
@@ -266,6 +274,14 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       setPhoneNumber(fp?.phone_number ?? "");
     }
   }, [fp, editingPhone]);
+
+  // Deep-link from the Activation Card: open the phone editor once and bring it into view.
+  useEffect(() => {
+    if (focus !== "phone" || !isFreelancer || focusedRef.current) return;
+    focusedRef.current = true;
+    setEditingPhone(true);
+    phoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focus, isFreelancer]);
 
 
   const phoneMutation = useMutation({
@@ -282,6 +298,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), phone_dial_code: phoneDial.trim(), phone_number: phoneNumber.trim() } } : old,
       );
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("phone.save"));
       setEditingPhone(false);
     },
@@ -321,7 +338,13 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       </div>
 
       {isFreelancer && (
-        <div className="border-t border-border pt-3">
+        <div ref={phoneRef} className={`border-t border-border pt-3 ${focus === "phone" ? "-mx-2 border border-racing-yellow bg-racing-yellow/10 p-2" : ""}`} data-testid="phone-block">
+          {(editingPhone || !fp?.phone_number) && (
+            <div className="mb-2 text-xs text-muted-foreground" data-testid="phone-why">
+              <p>{t("activation.phone_why")}</p>
+              <p className="mt-0.5 text-[11px]">{t("activation.phone_private")}</p>
+            </div>
+          )}
           {editingPhone ? (
             <>
               <label className="text-xs text-muted-foreground">{t("phone.label")}</label>
@@ -357,7 +380,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
                 <span className="ml-2 font-mono">{fp?.phone_number ? `${fp.phone_dial_code ?? ""} ${fp.phone_number}`.trim() : "—"}</span>
               </div>
               <button onClick={() => setEditingPhone(true)} className="mt-1 text-xs text-racing-red hover:underline">
-                {t("phone.edit")}
+                {fp?.phone_number ? t("phone.edit") : t("activation.cta_phone")}
               </button>
             </>
           )}
@@ -372,7 +395,9 @@ function FreelancerSection({ profile }: { profile: any }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const saveFreelancerProfile = useServerFn(updateMyFreelancerProfile);
-  const [editing, setEditing] = useState(false);
+  // Deep-link from the Activation Card (?focus=role): open the edit form directly.
+  const { focus } = Route.useSearch();
+  const [editing, setEditing] = useState(focus === "role");
   const [showAllSkills, setShowAllSkills] = useState(false);
   const tax = useTaxonomy();
   const [form, setForm] = useState({
@@ -469,6 +494,7 @@ function FreelancerSection({ profile }: { profile: any }) {
         old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), ...(saved ?? {}) } } : old,
       );
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("sweep_profile.freelancer.saved"));
       setEditing(false);
     },

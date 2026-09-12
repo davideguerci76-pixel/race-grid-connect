@@ -1,0 +1,27 @@
+{
+  "activation": {
+    "not_ready_label": "Noch nicht bereit fürs Match",
+    "title": "Mach dich bereit fürs Match",
+    "step_role": "Rolle hinzufügen",
+    "step_phone": "Telefonnummer hinzufügen",
+    "step_availability": "Verfügbarkeit hinzufügen",
+    "reason_missing_role": "Teams suchen nach Rolle. Ohne Rolle ist kein Match möglich.",
+    "reason_missing_phone": "Damit ein Team dich kontaktieren kann, nachdem du einen Pit Call angenommen hast.",
+    "reason_missing_availability": "Du erscheinst erst in Team-Matches, wenn du Verfügbarkeit hinzufügst.",
+    "reason_stale_availability": "Deine Termine sind pausiert. Überprüfe deine Verfügbarkeit, um wieder bereit zu sein.",
+    "why": "Teams können dich nur richtig finden und kontaktieren, wenn du bereit bist.",
+    "invisible_hint": "Du erscheinst erst in Team-Matches, wenn deine Verfügbarkeit aktiv ist.",
+    "cta_role": "Rolle hinzufügen",
+    "cta_phone": "Telefon hinzufügen",
+    "cta_availability": "Meinen Kalender öffnen",
+    "ready_title": "Bereit fürs Match ✓",
+    "ready_body": "Du bist für Teams an deinen verfügbaren Tagen sichtbar.",
+    "dismiss": "Schließen",
+    "phone_why": "Füge deine Telefonnummer hinzu, damit ein Team dich kontaktieren kann, nachdem du einen Pit Call angenommen hast.",
+    "phone_private": "Deine Telefonnummer bleibt privat, bis du annimmst.",
+    "calendar_empty_title": "Noch keine Verfügbarkeit",
+    "calendar_empty_body": "Du erscheinst erst in Team-Matches, wenn du Verfügbarkeit hinzufügst. Trage die Tage ein, an denen du arbeiten kannst.",
+    "calendar_empty_cta": "Verfügbarkeit hinzufügen",
+    "calendar_stale_hint": "Überprüfe deine Verfügbarkeit, um wieder bereit fürs Match zu sein."
+  }
+}

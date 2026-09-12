@@ -1,0 +1,27 @@
+{
+  "activation": {
+    "not_ready_label": "Non ancora pronto al match",
+    "title": "Preparati al match",
+    "step_role": "Aggiungi il tuo ruolo",
+    "step_phone": "Aggiungi il tuo numero di telefono",
+    "step_availability": "Aggiungi la tua disponibilità",
+    "reason_missing_role": "I Team cercano per ruolo. Senza ruolo nessun match è possibile.",
+    "reason_missing_phone": "Così un Team può contattarti dopo che accetti un Pit Call.",
+    "reason_missing_availability": "Non comparirai nei match dei Team finché non aggiungi disponibilità.",
+    "reason_stale_availability": "Le tue date sono in pausa. Rivedi la tua disponibilità per tornare pronto al match.",
+    "why": "I Team possono trovarti e contattarti correttamente solo quando sei pronto.",
+    "invisible_hint": "Non comparirai nei match dei Team finché la tua disponibilità non è attiva.",
+    "cta_role": "Aggiungi il ruolo",
+    "cta_phone": "Aggiungi il telefono",
+    "cta_availability": "Apri il mio calendario",
+    "ready_title": "Pronto al match ✓",
+    "ready_body": "Sei visibile ai Team per le tue date disponibili.",
+    "dismiss": "Chiudi",
+    "phone_why": "Aggiungi il tuo numero di telefono così un Team può contattarti dopo che accetti un Pit Call.",
+    "phone_private": "Il tuo numero resta privato finché non accetti.",
+    "calendar_empty_title": "Nessuna disponibilità",
+    "calendar_empty_body": "Non comparirai nei match dei Team finché non aggiungi disponibilità. Aggiungi i giorni in cui sei libero di lavorare.",
+    "calendar_empty_cta": "Aggiungi disponibilità",
+    "calendar_stale_hint": "Rivedi la tua disponibilità per tornare pronto al match."
+  }
+}
