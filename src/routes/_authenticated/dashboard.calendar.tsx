@@ -579,6 +579,10 @@ function CalendarPage() {
                 <CalendarLegendDot className="bg-[#16a34a]" label={t("pcal.legend_available", { defaultValue: "Available" })} />
                 <CalendarLegendDot className="bg-[#20242b] border border-border" label={t("pcal.legend_busy", { defaultValue: "Busy / private" })} />
                 <CalendarLegendDot className="bg-racing-red" label={t("pcal.legend_pitcall", { defaultValue: "PITCALL · non-editable" })} />
+                <CalendarLegendDot
+                  className="bg-[#16a34a] border border-dashed border-foreground/70"
+                  label={t("pcal.legend_requested", { defaultValue: "REQUESTED · protected" })}
+                />
               </>
             }
             stats={
@@ -635,7 +639,18 @@ function CalendarPage() {
                         {selectedCell?.state === "available"
                           ? t("pcal.legend_available", { defaultValue: "Available" })
                           : t("pcal.legend_busy", { defaultValue: "Busy / private" })}
+                        {frozenSet.has(selected) && (
+                          <span className="text-racing-yellow"> · {t("pcal.frozen", { defaultValue: "REQUESTED" })}</span>
+                        )}
                       </div>
+                      {frozenSet.has(selected) && (
+                        <p className="border border-border bg-secondary/40 p-2 text-[11px] leading-relaxed text-muted-foreground">
+                          {t("pcal.requested_explain", {
+                            defaultValue:
+                              "A team has asked you to confirm this day. It stays available for matching but protected: you cannot change it until you confirm, decline, or the request expires.",
+                          })}
+                        </p>
+                      )}
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"

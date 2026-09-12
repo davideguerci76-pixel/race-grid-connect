@@ -47,6 +47,14 @@
       "confirm_calendar": {
         "title": "Conferma disponibilità",
         "body": "Ci dice che i tuoi giorni aperti sono ancora corretti e aggiorna la freschezza del calendario, così la tua disponibilità continua a essere usata per il matching."
+      },
+      "cancel_late_team": {
+        "title": "Annullare dopo la grace window",
+        "body": "La grace window è terminata, quindi è una cancellazione tardiva: l’engagement viene annullato, il freelancer viene avvisato, la cancellazione viene registrata sul profilo pubblico del team e la Pit Call viene archiviata come completata — non viene riaperta."
+      },
+      "submit_calendar_review": {
+        "title": "Invia per revisione",
+        "body": "Invia questo calendario a PITCALL per la revisione. Se viene approvato, il calendario viene pubblicato per la community PITCALL e ricevi il reward in token previsto dalla configurazione corrente."
       }
     }
   }

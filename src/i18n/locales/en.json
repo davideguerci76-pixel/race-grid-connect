@@ -1053,6 +1053,8 @@
     "legend_available": "Available",
     "legend_busy": "Busy / private",
     "legend_pitcall": "PITCALL · non-editable",
+    "legend_requested": "REQUESTED · protected",
+    "requested_explain": "A team has asked you to confirm this day. It stays available for matching but protected: you cannot change it until you confirm, decline, or the request expires.",
     "legend_engagement": "PITCALL engagement",
     "stat_available": "Available days",
     "stat_busy": "Busy days",

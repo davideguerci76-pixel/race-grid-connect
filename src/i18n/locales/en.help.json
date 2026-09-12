@@ -47,6 +47,14 @@
       "confirm_calendar": {
         "title": "Confirm availability",
         "body": "Tells us your open days are still accurate and refreshes your calendar freshness, so your availability keeps being used for matching."
+      },
+      "cancel_late_team": {
+        "title": "Cancel after the grace window",
+        "body": "The grace window has passed, so this counts as a late cancellation: the engagement is cancelled, the freelancer is notified, the cancellation is recorded on your public team profile and the Pit Call is archived as completed — it is not reopened."
+      },
+      "submit_calendar_review": {
+        "title": "Submit for review",
+        "body": "Sends this calendar to PITCALL for review. If it is approved, the calendar is published for the PITCALL community and you receive the configured token reward."
       }
     }
   }
