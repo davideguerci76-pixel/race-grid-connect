@@ -522,13 +522,23 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
     push(`availability ${f.key}`, expectedDays.join(","), got.join(","));
   }
 
-  // 2b. readiness — the ONE authority (activation_status_for). A persona with a
-  //     phone in the manifest and availability today-or-later must be READY;
-  //     a persona without phone is intentionally NOT READY (missing_phone).
+  // 2b. readiness — the ONE authority (activation_status_for), never re-implemented here.
+  //     Expected READY = phone in the manifest AND at least one future day not locked by a
+  //     proposed/confirmed engagement (e.g. the SOS no-show persona is fully booked → NOT READY
+  //     by law, which is the correct product state, not a seed defect). A persona without
+  //     phone is intentionally NOT READY (missing_phone).
   for (const f of scenario.freelancers) {
     const { data: st } = await sb.rpc("activation_status_for", { _uid: personas[f.key] });
-    const hasFutureDays = resolveDays(anchor, f.availability, now).some((d) => d >= todayISO(new Date()));
-    const expected = f.phone && hasFutureDays ? "ready" : "not ready";
+    const realToday = todayISO(new Date());
+    const { data: busy } = await sb
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", personas[f.key])
+      .in("status", ["proposed", "confirmed"])
+      .eq("is_test", true);
+    const locked = new Set<string>((busy ?? []).flatMap((e: any) => (e.covered_days ?? []).map(String)));
+    const freeFuture = resolveDays(anchor, f.availability, now).some((d) => d >= realToday && !locked.has(d));
+    const expected = f.phone && freeFuture ? "ready" : "not ready";
     push(`readiness ${f.key}`, expected, st?.ready ? "ready" : "not ready");
   }
 
