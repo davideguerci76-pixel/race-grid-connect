@@ -530,13 +530,16 @@ function CalendarPage() {
               <p className="mt-1 text-[11px] font-bold text-racing-yellow" data-testid="calendar-stale-hint">{t("activation.calendar_stale_hint")}</p>
             )}
           </div>
-          <button
-            onClick={() => confirmMut.mutate()}
-            disabled={confirmMut.isPending}
-            className="w-full bg-racing-yellow px-4 py-3 text-xs font-black uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-40 sm:w-auto"
-          >
-            {confirmMut.isPending ? t("common.loading") : t("calendar.confirm_button", { defaultValue: "Everything is still correct — Confirm" })}
-          </button>
+          <span className="inline-flex w-full items-center justify-end gap-1 sm:w-auto">
+            <button
+              onClick={() => confirmMut.mutate()}
+              disabled={confirmMut.isPending}
+              className="w-full bg-racing-yellow px-4 py-3 text-xs font-black uppercase tracking-widest text-carbon hover:brightness-110 disabled:opacity-40 sm:w-auto"
+            >
+              {confirmMut.isPending ? t("common.loading") : t("calendar.confirm_button", { defaultValue: "Everything is still correct — Confirm" })}
+            </button>
+            <HelpHint titleKey="help.action.confirm_calendar.title" bodyKey="help.action.confirm_calendar.body" />
+          </span>
         </div>
         )}
 

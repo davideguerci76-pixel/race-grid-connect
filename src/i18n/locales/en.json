@@ -928,78 +928,91 @@
       {
         "q": "How does PITCALL matching work?",
         "a": [
-          "PITCALL matches a Team's requirements with real Freelancer profiles and availability.",
-          "The matching engine considers role, skills, experience, languages, location, availability and the specific requirements of each Pit Call.",
-          "Compatible Freelancers are then ranked by match quality, so Teams can focus on the strongest matches instead of searching through profiles manually."
+          "PITCALL compares a Team’s role, requirements and dates with real Freelancer profiles and current availability. Results are ranked deterministically by professional relevance; date coverage is shown separately."
         ]
       },
       {
         "q": "What is the difference between a Full Match and a Partial Match?",
         "a": [
-          "A Full Match covers every working day requested in the Pit Call and meets the mandatory requirements.",
-          "A Partial Match covers only part of the requested dates. Partial Matches are shown separately and ranked lower, so Teams always know exactly what they are looking at."
+          "A Full Match covers every requested day. A Partial Match misses some days but still meets the date rule: at least half of a single block, no more than 20% missing for a full season, or the My Pool coverage rule.",
+          "Professional relevance is a separate percentage. A candidate below 50% can still be visible as Full or Partial and counts toward the Pit Call’s coverage."
         ]
       },
       {
-        "q": "How does Freelancer availability work?",
+        "q": "How do availability and READY to Match work?",
         "a": [
-          "Freelancers mark their available days directly in their PITCALL calendar.",
-          "Only days marked as available are used by the matching engine. Keeping the calendar updated is what makes a profile reliably matchable."
+          "Freelancers mark available days in their calendar and periodically confirm they are still accurate. Dates that become stale stop being used for matching until confirmed again.",
+          "READY to Match means the profile has a macro-role, a valid phone number and at least one active availability day. It shows operational readiness; it is not a professional-quality score."
         ]
       },
       {
         "q": "Does PITCALL guarantee that a Freelancer is available?",
         "a": [
-          "No. PITCALL shows availability as declared by the Freelancer at that moment.",
-          "Availability becomes binding only when a match is confirmed by both sides."
+          "No. PITCALL uses the Freelancer’s current declared availability. Dates become committed only after a Request Confirmation is accepted."
         ]
       },
       {
-        "q": "When are Team and Freelancer identities revealed?",
+        "q": "When are identities and contacts revealed?",
         "a": [
-          "Identities stay protected during the early stages of a match.",
-          "Teams can reveal a Freelancer's identity, and Freelancers can unlock the details of a Pit Call, but names, logos and direct contacts are only shared once the match is confirmed by both parties."
+          "Identities and direct contacts are protected during the early lifecycle. A Team may already see the name of a member of its own My Pool; direct contacts are still shared only after confirmation."
         ]
       },
       {
-        "q": "What happens after a Freelancer confirms a match?",
+        "q": "What is a Request Confirmation?",
         "a": [
-          "Once a match is confirmed, both sides gain full visibility: identities and contact details are unlocked so Team and Freelancer can organise the work directly.",
-          "The confirmed match then closes the competing proposals for the same Pit Call."
+          "A Team can send a proposal showing the role, dates, budget and notes. The Freelancer can Confirm, Ask More Time when eligible, or Decline.",
+          "The first successful confirmation wins, closes competing proposals and reveals contacts to both sides."
         ]
       },
       {
-        "q": "Does PITCALL handle contracts or payments between Teams and Freelancers?",
+        "q": "What happens if a confirmed Engagement is cancelled?",
         "a": [
-          "No. PITCALL is a matching platform.",
-          "Agreements, contracts, rates and payments are handled directly between the Team and the Freelancer."
+          "Within 24 hours of confirmation and before the first day, either side can cancel without penalty: the Pit Call goes back to Active and matching is run again.",
+          "After that window, a Freelancer cancellation keeps those days blocked and may return the Pit Call to Active only before the first day. A late Team cancellation archives the Pit Call, releases the Freelancer’s days and is recorded in the Team’s public statistics."
         ]
       },
       {
-        "q": "How do ratings work?",
+        "q": "What is an SOS Call?",
         "a": [
-          "After a completed match, Team and Freelancer can rate each other.",
-          "Ratings are double-blind: they are published only once both sides have voted, or after a fixed waiting period. This keeps feedback honest and free from retaliation."
+          "SOS is a Team-only recovery flow for an eligible single-event Pit Call from its first day. If the Team declares a confirmed Freelancer a no-show, those dates stay blocked and PITCALL broadcasts the SOS to eligible nearby Freelancers; the first valid acceptance wins."
         ]
       },
       {
-        "q": "What happens to my tokens if a Pit Call doesn't find a match?",
+        "q": "What happens to tokens when a Pit Call has weak results?",
         "a": [
-          "If a Pit Call produces no match at all, you can wait for new profiles, unlock partial results or request a refund of the tokens used to publish it."
+          "A Team can keep searching or, when the request is eligible, close it with the refund quoted by PITCALL. Refund outcomes include no matches, no match ever reaching the professional-relevance threshold, and a partial-only result.",
+          "Refunds never unlock candidates or change Full, Partial or coverage. An identical repost is not refundable."
         ]
       },
       {
         "q": "How do PITCALL tokens work?",
         "a": [
-          "Tokens are the platform credits Teams use to publish Pit Calls and unlock matches.",
-          "Every action has a clear and fixed cost, shown before you confirm it. No subscriptions, no hidden fees."
+          "Tokens are platform credits used by Teams to publish Pit Calls and unlock details. The exact server-authorised cost is shown before each action; purchases are available only when the platform purchase gate is open."
+        ]
+      },
+      {
+        "q": "What is My Pool?",
+        "a": [
+          "My Pool is a Team’s private circle of Freelancers added after completed work or with a Pit Code. Pool searches use their own price and coverage rule, and member names are visible to the Pool owner.",
+          "When eligible, a Pool-only Pit Call can be expanded to the wider marketplace by paying the displayed difference. This is separate from viewing Partial Matches."
+        ]
+      },
+      {
+        "q": "How do ratings work?",
+        "a": [
+          "After completed work, Team and Freelancer can rate each other. Ratings are double-blind and appear after both sides submit or after the platform waiting period."
+        ]
+      },
+      {
+        "q": "Does PITCALL handle contracts or payments between users?",
+        "a": [
+          "No. PITCALL provides matching and introductions. Contracts, rates and work payments are agreed directly between Team and Freelancer."
         ]
       },
       {
         "q": "Does PITCALL charge Freelancers?",
         "a": [
-          "Creating a profile, setting availability and receiving matches is free for Freelancers.",
-          "Only some optional actions require tokens."
+          "Creating a profile, managing availability and receiving matches is free. Any optional action with a token cost shows that cost before confirmation."
         ]
       }
     ]

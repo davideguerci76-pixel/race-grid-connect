@@ -914,78 +914,91 @@
       {
         "q": "Comment fonctionne le matching PITCALL ?",
         "a": [
-          "PITCALL met en relation les besoins d'une Team avec des profils et des disponibilités réelles de Freelancers.",
-          "Le moteur de matching prend en compte le rôle, les compétences, l'expérience, les langues, la localisation, la disponibilité et les exigences propres à chaque Pit Call.",
-          "Les Freelancers compatibles sont ensuite classés par qualité de match, afin que les Teams se concentrent sur les meilleurs résultats plutôt que de parcourir les profils manuellement."
+          "PITCALL compare le rôle, les exigences et les dates du Team avec les profils réels et les disponibilités actuelles des Freelances. Les résultats sont classés de façon déterministe par pertinence professionnelle ; la couverture des dates est affichée séparément."
         ]
       },
       {
-        "q": "Quelle est la différence entre Full Match et Partial Match ?",
+        "q": "Quelle différence entre Full Match et Partial Match ?",
         "a": [
-          "Un Full Match couvre toutes les journées demandées dans la Pit Call et remplit les exigences obligatoires.",
-          "Un Partial Match ne couvre qu'une partie des dates demandées. Ils sont affichés séparément et classés plus bas, pour que la Team sache toujours exactement ce qu'elle regarde."
+          "Un Full Match couvre tous les jours demandés. Un Partial Match laisse certains jours non couverts tout en respectant la règle temporelle : au moins la moitié d’un bloc unique, au maximum 20 % manquants pour une saison complète, ou la règle My Pool.",
+          "La pertinence professionnelle est un pourcentage indépendant. Un candidat sous 50 % peut rester visible en Full ou Partial et compte dans la couverture de la Pit Call."
         ]
       },
       {
-        "q": "Comment fonctionne la disponibilité des Freelancers ?",
+        "q": "Comment fonctionnent la disponibilité et READY to Match ?",
         "a": [
-          "Les Freelancers indiquent leurs journées disponibles directement dans leur calendrier PITCALL.",
-          "Seuls les jours marqués comme disponibles sont utilisés par le moteur de matching. Garder le calendrier à jour rend le profil réellement identifiable."
+          "Les Freelances indiquent leurs jours disponibles et confirment régulièrement qu’ils sont toujours exacts. Les dates devenues obsolètes cessent d’être utilisées pour le matching jusqu’à leur confirmation.",
+          "READY to Match signifie que le profil a un macro-rôle, un téléphone valide et au moins un jour de disponibilité actif. Il indique la préparation opérationnelle, pas la qualité professionnelle."
         ]
       },
       {
-        "q": "PITCALL garantit-il qu'un Freelancer est disponible ?",
+        "q": "PITCALL garantit-il la disponibilité d’un Freelance ?",
         "a": [
-          "Non. PITCALL affiche la disponibilité déclarée par le Freelancer à cet instant.",
-          "La disponibilité ne devient engageante qu'une fois le match confirmé par les deux parties."
+          "Non. PITCALL utilise la disponibilité actuelle déclarée par le Freelance. Les dates ne sont engagées qu’après acceptation d’une Request Confirmation."
         ]
       },
       {
-        "q": "Quand les identités des Teams et des Freelancers sont-elles révélées ?",
+        "q": "Quand les identités et contacts sont-ils révélés ?",
         "a": [
-          "Les identités restent protégées durant les premières étapes du match.",
-          "Les Teams peuvent révéler l'identité d'un Freelancer et les Freelancers peuvent débloquer les détails d'une Pit Call, mais noms, logos et contacts directs ne sont partagés qu'une fois le match confirmé par les deux parties."
+          "Les identités et contacts directs sont protégés au début. Un Team peut déjà voir le nom d’un membre de son propre My Pool ; les contacts directs ne sont partagés qu’après confirmation."
         ]
       },
       {
-        "q": "Que se passe-t-il après qu'un Freelancer a confirmé un match ?",
+        "q": "Qu’est-ce qu’une Request Confirmation ?",
         "a": [
-          "Une fois le match confirmé, les deux parties obtiennent une visibilité complète : identités et coordonnées sont débloquées pour organiser le travail directement.",
-          "Le match confirmé clôt ensuite les propositions concurrentes pour la même Pit Call."
+          "Le Team peut envoyer une proposition avec rôle, dates, budget et notes. Le Freelance peut Confirmer, Demander plus de temps lorsqu’il y a droit, ou Refuser.",
+          "La première confirmation valide gagne, clôt les propositions concurrentes et révèle les contacts aux deux parties."
         ]
       },
       {
-        "q": "PITCALL gère-t-il les contrats ou les paiements entre Teams et Freelancers ?",
+        "q": "Que se passe-t-il si un Engagement confirmé est annulé ?",
         "a": [
-          "Non. PITCALL est une plateforme de matching.",
-          "Accords, contrats, tarifs et paiements sont gérés directement entre la Team et le Freelancer."
+          "Dans les 24 heures suivant la confirmation et avant le premier jour, chaque partie peut annuler sans pénalité : la Pit Call repasse Active et le matching est relancé.",
+          "Ensuite, une annulation du Freelance maintient ces jours bloqués et ne peut remettre la Pit Call Active qu’avant le premier jour. Une annulation tardive du Team archive la Pit Call, libère les jours et apparaît dans ses statistiques publiques."
         ]
       },
       {
-        "q": "Comment fonctionnent les évaluations ?",
+        "q": "Qu’est-ce qu’une SOS Call ?",
         "a": [
-          "Après un match terminé, la Team et le Freelancer peuvent s'évaluer mutuellement.",
-          "Les évaluations sont en double aveugle : elles sont publiées uniquement lorsque les deux parties ont voté, ou après un délai fixe. Les retours restent ainsi honnêtes et sans représailles."
+          "SOS est un processus de remplacement réservé au Team pour une Pit Call à événement unique dès son premier jour. Si le Team déclare le Freelance confirmé no-show, ses jours restent bloqués et PITCALL alerte les Freelances proches éligibles ; la première acceptation valide gagne."
         ]
       },
       {
-        "q": "Qu'advient-il de mes tokens si une Pit Call ne trouve aucun match ?",
+        "q": "Que deviennent les tokens si une Pit Call donne peu de résultats ?",
         "a": [
-          "Si une Pit Call ne produit aucun match, vous pouvez attendre de nouveaux profils, débloquer des résultats partiels ou demander le remboursement des tokens utilisés pour la publier."
+          "Le Team peut continuer à chercher ou, si la demande est éligible, la clôturer avec le remboursement indiqué par PITCALL. Les cas comprennent zéro match, aucun match n’ayant atteint le seuil professionnel, et uniquement des Partial.",
+          "Le remboursement ne débloque aucun candidat et ne modifie ni Full, ni Partial, ni la couverture. Une republication identique n’est pas remboursable."
         ]
       },
       {
         "q": "Comment fonctionnent les tokens PITCALL ?",
         "a": [
-          "Les tokens sont les crédits de la plateforme utilisés par les Teams pour publier des Pit Calls et débloquer des matchs.",
-          "Chaque action a un coût clair et fixe, affiché avant confirmation. Aucun abonnement, aucun frais caché."
+          "Les tokens sont des crédits utilisés par les Teams pour publier des Pit Calls et débloquer des détails. Le coût exact autorisé est affiché avant chaque action ; l’achat n’est disponible que lorsque son contrôle de lancement est ouvert."
         ]
       },
       {
-        "q": "PITCALL facture-t-il les Freelancers ?",
+        "q": "Qu’est-ce que My Pool ?",
         "a": [
-          "Créer un profil, définir ses disponibilités et recevoir des matchs est gratuit pour les Freelancers.",
-          "Seules certaines actions facultatives nécessitent des tokens."
+          "My Pool est le cercle privé du Team, composé de Freelances ajoutés après une mission terminée ou via un Pit Code. Les recherches Pool ont leur propre prix et règle de couverture, et le propriétaire voit les noms des membres.",
+          "Lorsqu’elle est éligible, une Pit Call limitée au Pool peut être étendue au marketplace en payant la différence affichée. Cela ne concerne pas l’affichage des Partial Matches."
+        ]
+      },
+      {
+        "q": "Comment fonctionnent les évaluations ?",
+        "a": [
+          "Après une mission terminée, Team et Freelance peuvent s’évaluer. Les évaluations sont en double aveugle et apparaissent après les deux réponses ou après le délai prévu."
+        ]
+      },
+      {
+        "q": "PITCALL gère-t-il les contrats ou paiements entre utilisateurs ?",
+        "a": [
+          "Non. PITCALL fournit le matching et la mise en relation. Contrats, tarifs et paiements sont convenus directement entre Team et Freelance."
+        ]
+      },
+      {
+        "q": "PITCALL facture-t-il les Freelances ?",
+        "a": [
+          "Créer son profil, gérer ses disponibilités et recevoir des matches est gratuit. Toute action facultative payante affiche son coût avant confirmation."
         ]
       }
     ]

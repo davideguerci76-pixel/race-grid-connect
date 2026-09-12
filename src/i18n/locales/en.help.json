@@ -8,15 +8,11 @@
       },
       "partial_coverage": {
         "title": "Partial coverage",
-        "body": "Coverage is about dates only, never about professional fit. A full match covers every requested day. A partial match covers at least half of the requested days but not all of them; the days listed here are the ones not covered."
+        "body": "Full and Partial describe date coverage only. For a single block, a Partial covers at least half of the requested days; for a full season, no more than 20% may be missing. My Pool members follow the Pool coverage rule. Professional relevance is separate."
       },
       "stale_calendar": {
         "title": "Calendar freshness",
         "body": "Availability that has not been confirmed for a while stops being used for matching, so teams only see dates you have recently stood behind. Confirming refreshes every open day at once."
-      },
-      "locked_days": {
-        "title": "Locked days",
-        "body": "Days tied to a confirmed engagement, or to an engagement you cancelled late, stay blocked in your calendar. You cannot make them available again or take another job on them."
       },
       "expand_outside_pool": {
         "title": "Search outside My Pool",
@@ -26,7 +22,7 @@
     "action": {
       "unlock_details": {
         "title": "Unlock details",
-        "body": "Opens the full professional profile of this candidate: skills, seniority, languages, experience, day rate and travel. Real name and contacts appear only after the freelancer confirms the match. The cost shown on the button is the exact amount charged — when it says free, nothing is charged."
+        "body": "Opens the candidate’s full professional profile: skills, seniority, languages, experience, day rate and travel. For candidates outside My Pool, identity and contacts stay protected until the confirmation lifecycle allows them. A My Pool member’s name may already be visible; contacts are still shared only after confirmation. The button shows the exact cost, including when it is free."
       },
       "request_confirmation": {
         "title": "Request confirmation",

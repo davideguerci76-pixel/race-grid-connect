@@ -8,15 +8,11 @@
       },
       "partial_coverage": {
         "title": "Cobertura parcial",
-        "body": "La cobertura se refiere solo a fechas, nunca a la calidad profesional. Un match completo cubre todos los días solicitados. Un match parcial cubre al menos la mitad pero no todos; los días listados aquí son los no cubiertos."
+        "body": "Full y Partial describen solo la cobertura de fechas. En un bloque único, un Partial cubre al menos la mitad de los días solicitados; en una temporada completa puede faltar como máximo el 20%. Los miembros de My Pool siguen la regla de cobertura del Pool. La pertinencia profesional es independiente."
       },
       "stale_calendar": {
         "title": "Actualización del calendario",
         "body": "Una disponibilidad que lleva tiempo sin confirmarse deja de usarse para el matching, así los teams solo ven fechas que has respaldado recientemente. Confirmar actualiza todos los días abiertos a la vez."
-      },
-      "locked_days": {
-        "title": "Días bloqueados",
-        "body": "Los días ligados a un engagement confirmado, o a uno que cancelaste tarde, siguen bloqueados en tu calendario. No puedes volver a marcarlos disponibles ni aceptar otro trabajo en esas fechas."
       },
       "expand_outside_pool": {
         "title": "Buscar fuera de My Pool",
@@ -26,7 +22,7 @@
     "action": {
       "unlock_details": {
         "title": "Desbloquear detalles",
-        "body": "Abre el perfil profesional completo del candidato: competencias, seniority, idiomas, experiencia, tarifa diaria y disponibilidad para viajar. El nombre real y los contactos aparecen solo tras la confirmación del freelancer. El coste mostrado en el botón es el importe exacto: si indica gratis, no se cobra nada."
+        "body": "Abre el perfil profesional completo del candidato: competencias, seniority, idiomas, experiencia, tarifa diaria y disponibilidad para viajar. Para candidatos fuera de My Pool, la identidad y los contactos permanecen protegidos hasta que lo permita el flujo de confirmación. El nombre de un miembro de My Pool puede estar ya visible; los contactos solo se comparten tras la confirmación. El botón muestra el coste exacto, también cuando es gratis."
       },
       "request_confirmation": {
         "title": "Solicitar confirmación",
