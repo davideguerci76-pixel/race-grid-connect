@@ -38,6 +38,7 @@ export function CandidateMatchCard({
   requestFilled = false,
   perProfileCost = 0,
   sosMode = null,
+  hideActions = false,
 }: {
   match: any;
   /** "request": standard Pit Call results with unlock/confirmation flow. "pool": My Pool search (names in clear, no unlock CTA). */
@@ -49,6 +50,8 @@ export function CandidateMatchCard({
   perProfileCost?: number;
   /** Non-null while the Pit Call is in SOS exclusive mode: manual confirmation is hidden (and blocked server-side). */
   sosMode?: "target" | "excluded" | null;
+  /** Presentation-only contexts may hide the complete operational action row. Defaults to the live behavior. */
+  hideActions?: boolean;
 }) {
   const { t } = useTranslation();
   const pct = Math.round(Number(match?.skills_score ?? match?.match_score ?? 0));
@@ -95,7 +98,7 @@ export function CandidateMatchCard({
       </CardHeader>
 
       {/* 2 · ACTION (request mode only; pool-search has no per-card CTA by product design) */}
-      {mode === "request" && (
+      {mode === "request" && !hideActions && (
         <ActionRow>
           {blurred && (
             <span className="inline-flex items-center gap-1">

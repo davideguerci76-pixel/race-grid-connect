@@ -34,7 +34,7 @@ function DashboardHome() {
     enabled: !!user,
     queryFn: async () => {
       const [{ data: p }, { data: balance }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, first_name, last_name, avatar_url, user_type, preferred_language, created_at").eq("id", user!.id).maybeSingle(),
+        supabase.from("profiles").select("id, display_name, first_name, last_name, avatar_url, user_type, preferred_language, created_at, guided_demo_completed_at").eq("id", user!.id).maybeSingle(),
         supabase.rpc("my_token_balance"),
       ]);
       return p ? { ...p, token_balance: (balance as number | null) ?? 0 } : null;
@@ -173,7 +173,7 @@ function DashboardHome() {
 
         {isFreelancer && <ActivationCard />}
 
-        {isTeam && (
+        {isTeam && !profile?.guided_demo_completed_at && (
           <Link
             to="/dashboard/try-demo"
             className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-racing-yellow bg-racing-yellow/10 p-5 transition-colors hover:bg-racing-yellow/20"
@@ -276,6 +276,7 @@ function DashboardHome() {
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={profile ? String(profile.token_balance) : "—"} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={num(matchesCount)} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}
+          {isTeam && profile?.guided_demo_completed_at && <DashCard to="/dashboard/try-demo" icon={Sparkles} label={t("trial.entry.replay_label")} value={t("trial.entry.replay_cta")} />}
         </div>
 
         <MarketHighlights compact />
