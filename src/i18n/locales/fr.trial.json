@@ -1,0 +1,95 @@
+{
+  "trial": {
+    "badge": "Démo — ce n'est pas un vrai Pit Call",
+    "restart": "Recommencer",
+    "exit": "Quitter",
+    "next": "Suivant",
+    "entry": {
+      "label": "Les Pit Calls ouvrent bientôt",
+      "title": "PITCALL est en phase d'onboarding",
+      "body": "Les vrais Pit Calls ouvriront quand le vivier de professionnels sera prêt. Envie de voir comment ça marche ?",
+      "cta": "Essayer un Pit Call démo"
+    },
+    "intro": {
+      "title": "Créez votre premier Pit Call démo",
+      "body": "Suivez les étapes. Nous vous guidons à chaque choix.",
+      "point_time": "Environ 2 minutes.",
+      "point_tokens": "Aucun token utilisé.",
+      "point_nobody": "Aucun professionnel réel ne sera contacté.",
+      "cta": "Démarrer la démo"
+    },
+    "role": {
+      "title": "Qui cherchez-vous ?",
+      "hint": "Cherchons un {{role}}. Sélectionnez : {{role}}.",
+      "done": "{{role}} sélectionné"
+    },
+    "dates": {
+      "title": "Vos vraies dates de déplacement",
+      "hint": "Votre ingénieur doit voyager avec l'équipe. Sélectionnez ces dates requises : {{range}}.",
+      "legend": "Jours de déplacement requis",
+      "done": "4 jours requis",
+      "note": "PITCALL distingue les professionnels disponibles sur toutes ces dates de ceux disponibles seulement sur certaines."
+    },
+    "req": {
+      "title": "Décrivez maintenant qui vous cherchez",
+      "hint": "Sélectionnez les exigences mises en avant.",
+      "field_discipline": "Discipline",
+      "field_experience": "Expérience",
+      "field_language": "Langue",
+      "field_skills": "Compétences",
+      "years_min": "{{count}}+ ans",
+      "done": "Exigences ajoutées",
+      "cta": "Aperçu du potentiel"
+    },
+    "req2": {
+      "hint": "Affinons la recherche. Ajoutez une compétence : {{skill}}.",
+      "done": "{{skill}} ajoutée",
+      "cta": "Nouvel aperçu"
+    },
+    "preview": {
+      "title": "Aperçu du marché",
+      "label": "Vivier potentiel",
+      "matchable": "professionnels compatibles",
+      "coverage_high": "Couverture élevée",
+      "coverage_targeted": "Couverture ciblée"
+    },
+    "preview1": {
+      "hint": "Bon point de départ. Affinons en ajoutant {{skill}}.",
+      "cta": "Modifier les exigences"
+    },
+    "preview2": {
+      "title": "Vous voyez ce qui s'est passé ?",
+      "body": "Ajouter une exigence a réduit le vivier potentiel. C'est pourquoi PITCALL vous laisse voir le marché avant de publier."
+    },
+    "post": {
+      "lead": "Parfait. Publions votre Pit Call démo.",
+      "cta": "Publier le Pit Call démo"
+    },
+    "results": {
+      "title": "Résultats démo",
+      "callout_step": "Étape {{current}} sur {{total}}",
+      "cta_end": "Terminer",
+      "callout1": {
+        "title": "Full match — 100%",
+        "body": "Alex est disponible tous les jours demandés et remplit toutes les exigences professionnelles."
+      },
+      "callout2": {
+        "title": "Partial match — 94%",
+        "body": "James correspond très bien sur le plan professionnel. Il est Partial uniquement car il n'est pas disponible un des jours requis : {{day}}."
+      },
+      "callout3": {
+        "title": "James partial 94% vs Marco full 88%",
+        "body": "James a une pertinence professionnelle supérieure à Marco, bien qu'il soit Partial. Full / Partial indique la couverture des dates. La pertinence % indique l'adéquation professionnelle. Un Partial match peut donc être professionnellement meilleur qu'un Full match."
+      }
+    },
+    "end": {
+      "title": "Voilà PITCALL",
+      "point_dates": "Vous avez défini les vraies dates de déplacement.",
+      "point_preview": "Vous avez vu le marché avant de publier.",
+      "point_requirements": "Vous avez vu comment les exigences modifient le vivier.",
+      "point_matches": "PITCALL a trouvé des Full et Partial matches et classé leur pertinence professionnelle.",
+      "preopen": "À l'ouverture de PITCALL vous ferez exactement cela avec de vrais professionnels. Votre équipe est déjà inscrite : nous vous préviendrons.",
+      "cta": "Retour au tableau de bord"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "trial": {
+    "badge": "Demo — no es una Pit Call real",
+    "restart": "Reiniciar",
+    "exit": "Salir",
+    "next": "Siguiente",
+    "entry": {
+      "label": "Las Pit Calls abren pronto",
+      "title": "PITCALL está en fase de incorporación",
+      "body": "Las Pit Calls reales se abrirán cuando el pool de profesionales esté listo. ¿Quieres ver cómo funciona?",
+      "cta": "Prueba una Pit Call demo"
+    },
+    "intro": {
+      "title": "Crea tu primera Pit Call demo",
+      "body": "Sigue los pasos. Te guiamos en cada elección.",
+      "point_time": "Dura unos 2 minutos.",
+      "point_tokens": "No se usan tokens.",
+      "point_nobody": "Ningún profesional real será contactado.",
+      "cta": "Empezar demo"
+    },
+    "role": {
+      "title": "¿A quién buscas?",
+      "hint": "Busquemos un {{role}}. Selecciona: {{role}}.",
+      "done": "{{role}} seleccionado"
+    },
+    "dates": {
+      "title": "Tus fechas reales de viaje",
+      "hint": "Tu ingeniero debe viajar con el equipo. Selecciona estas fechas requeridas: {{range}}.",
+      "legend": "Días de viaje requeridos",
+      "done": "4 días requeridos",
+      "note": "PITCALL distingue a los profesionales disponibles todos esos días de los disponibles solo algunos."
+    },
+    "req": {
+      "title": "Ahora describe a quién necesitas",
+      "hint": "Selecciona los requisitos destacados.",
+      "field_discipline": "Disciplina",
+      "field_experience": "Experiencia",
+      "field_language": "Idioma",
+      "field_skills": "Competencias",
+      "years_min": "{{count}}+ años",
+      "done": "Requisitos añadidos",
+      "cta": "Vista previa del potencial"
+    },
+    "req2": {
+      "hint": "Hagamos la búsqueda más específica. Añade otra competencia: {{skill}}.",
+      "done": "{{skill}} añadida",
+      "cta": "Ver de nuevo"
+    },
+    "preview": {
+      "title": "Vista previa del mercado",
+      "label": "Pool potencial",
+      "matchable": "profesionales compatibles",
+      "coverage_high": "Cobertura alta",
+      "coverage_targeted": "Cobertura dirigida"
+    },
+    "preview1": {
+      "hint": "Buen punto de partida. Ahora acótalo añadiendo {{skill}}.",
+      "cta": "Editar requisitos"
+    },
+    "preview2": {
+      "title": "¿Ves lo que ha pasado?",
+      "body": "Añadir otro requisito redujo el pool potencial. Por eso PITCALL te deja ver el mercado antes de publicar."
+    },
+    "post": {
+      "lead": "Muy bien. Publiquemos tu Pit Call demo.",
+      "cta": "Publicar Pit Call demo"
+    },
+    "results": {
+      "title": "Resultados demo",
+      "callout_step": "Paso {{current}} de {{total}}",
+      "cta_end": "Finalizar",
+      "callout1": {
+        "title": "Full match — 100%",
+        "body": "Alex está disponible todos los días solicitados y cumple todos los requisitos profesionales."
+      },
+      "callout2": {
+        "title": "Partial match — 94%",
+        "body": "James encaja muy bien a nivel profesional. Es Partial solo porque no está disponible uno de los días requeridos: {{day}}."
+      },
+      "callout3": {
+        "title": "James partial 94% vs Marco full 88%",
+        "body": "James tiene mayor relevancia profesional que Marco aunque sea un Partial match. Full / Partial indica la cobertura de fechas. La relevancia % indica el encaje profesional. Un Partial match puede ser profesionalmente mejor que un Full match."
+      }
+    },
+    "end": {
+      "title": "Esto es PITCALL",
+      "point_dates": "Definiste las fechas reales de viaje.",
+      "point_preview": "Viste el mercado antes de publicar.",
+      "point_requirements": "Viste cómo los requisitos cambian el pool potencial.",
+      "point_matches": "PITCALL encontró Full y Partial matches y ordenó su relevancia profesional.",
+      "preopen": "Cuando PITCALL abra harás exactamente esto con profesionales reales. Tu equipo ya está dentro: te avisaremos en la apertura.",
+      "cta": "Volver al panel"
+    }
+  }
+}

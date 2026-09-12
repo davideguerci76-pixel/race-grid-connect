@@ -1,0 +1,95 @@
+{
+  "trial": {
+    "badge": "Demo — non è una vera Pit Call",
+    "restart": "Ricomincia",
+    "exit": "Esci",
+    "next": "Avanti",
+    "entry": {
+      "label": "Le Pit Call aprono presto",
+      "title": "PITCALL è in fase di onboarding",
+      "body": "Le Pit Call reali apriranno quando il pool di professionisti sarà pronto. Vuoi vedere come funziona?",
+      "cta": "Prova una Pit Call demo"
+    },
+    "intro": {
+      "title": "Crea la tua prima Pit Call demo",
+      "body": "Segui i passaggi. Ti guidiamo in ogni scelta.",
+      "point_time": "Bastano circa 2 minuti.",
+      "point_tokens": "Nessun token utilizzato.",
+      "point_nobody": "Nessun professionista reale verrà contattato.",
+      "cta": "Inizia la demo"
+    },
+    "role": {
+      "title": "Chi stai cercando?",
+      "hint": "Cerchiamo un {{role}}. Seleziona: {{role}}.",
+      "done": "{{role}} selezionato"
+    },
+    "dates": {
+      "title": "Le tue date di trasferta reali",
+      "hint": "Il tuo ingegnere deve viaggiare con il team. Seleziona queste date richieste: {{range}}.",
+      "legend": "Giorni di trasferta richiesti",
+      "done": "4 giorni richiesti",
+      "note": "PITCALL distingue i professionisti disponibili per tutte queste date da quelli disponibili solo per alcune."
+    },
+    "req": {
+      "title": "Ora descrivi chi ti serve",
+      "hint": "Seleziona i requisiti evidenziati.",
+      "field_discipline": "Disciplina",
+      "field_experience": "Esperienza",
+      "field_language": "Lingua",
+      "field_skills": "Competenze",
+      "years_min": "{{count}}+ anni",
+      "done": "Requisiti aggiunti",
+      "cta": "Anteprima potenziale match"
+    },
+    "req2": {
+      "hint": "Rendiamo la ricerca più specifica. Aggiungi un'altra competenza: {{skill}}.",
+      "done": "{{skill}} aggiunta",
+      "cta": "Nuova anteprima"
+    },
+    "preview": {
+      "title": "Anteprima di mercato",
+      "label": "Pool potenziale",
+      "matchable": "professionisti compatibili",
+      "coverage_high": "Copertura alta",
+      "coverage_targeted": "Copertura mirata"
+    },
+    "preview1": {
+      "hint": "Un buon pool di partenza. Ora restringiamolo aggiungendo {{skill}}.",
+      "cta": "Modifica requisiti"
+    },
+    "preview2": {
+      "title": "Hai visto cosa è successo?",
+      "body": "Aggiungere un requisito ha ridotto il pool potenziale. Per questo PITCALL ti permette di vedere il mercato prima di pubblicare."
+    },
+    "post": {
+      "lead": "Perfetto. Pubblichiamo la tua Pit Call demo.",
+      "cta": "Pubblica Pit Call demo"
+    },
+    "results": {
+      "title": "Risultati match demo",
+      "callout_step": "Passo {{current}} di {{total}}",
+      "cta_end": "Concludi",
+      "callout1": {
+        "title": "Full match — 100%",
+        "body": "Alex è disponibile per tutti i giorni richiesti e soddisfa ogni requisito professionale."
+      },
+      "callout2": {
+        "title": "Partial match — 94%",
+        "body": "James è professionalmente molto forte. È Partial solo perché non è disponibile in uno dei giorni richiesti: {{day}}."
+      },
+      "callout3": {
+        "title": "James partial 94% vs Marco full 88%",
+        "body": "James ha una rilevanza professionale più alta di Marco, pur essendo un Partial match. Full / Partial indica la copertura delle date. La rilevanza % indica l'aderenza professionale. Un Partial match può quindi essere professionalmente migliore di un Full match."
+      }
+    },
+    "end": {
+      "title": "Questo è PITCALL",
+      "point_dates": "Hai definito le date di trasferta reali.",
+      "point_preview": "Hai visto il mercato prima di pubblicare.",
+      "point_requirements": "Hai visto come i requisiti cambiano il pool potenziale.",
+      "point_matches": "PITCALL ha trovato Full e Partial match e ne ha ordinato la rilevanza professionale.",
+      "preopen": "Quando PITCALL aprirà farai esattamente questo con professionisti reali. Il tuo team è già a bordo: ti avviseremo all'apertura.",
+      "cta": "Torna alla dashboard"
+    }
+  }
+}

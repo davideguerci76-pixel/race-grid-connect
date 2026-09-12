@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicNotificationPushRouteImport } from './routes/api/public/notification-push'
 import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as ApiPublicCapacityAlertRouteImport } from './routes/api/public/capacity-alert'
+import { Route as AuthenticatedDashboardTryDemoRouteImport } from './routes/_authenticated/dashboard.try-demo'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
 import { Route as AuthenticatedDashboardTeamCalendarRouteImport } from './routes/_authenticated/dashboard.team-calendar'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated/dashboard.profile'
@@ -181,6 +182,12 @@ const ApiPublicCapacityAlertRoute = ApiPublicCapacityAlertRouteImport.update({
   path: '/api/public/capacity-alert',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardTryDemoRoute =
+  AuthenticatedDashboardTryDemoRouteImport.update({
+    id: '/try-demo',
+    path: '/try-demo',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardTokensRoute =
   AuthenticatedDashboardTokensRouteImport.update({
     id: '/tokens',
@@ -403,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -456,6 +464,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -513,6 +522,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/team-calendar': typeof AuthenticatedDashboardTeamCalendarRoute
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
+  '/_authenticated/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/team-calendar'
     | '/dashboard/tokens'
+    | '/dashboard/try-demo'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/team-calendar'
     | '/dashboard/tokens'
+    | '/dashboard/try-demo'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -679,6 +691,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/team-calendar'
     | '/_authenticated/dashboard/tokens'
+    | '/_authenticated/dashboard/try-demo'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -883,6 +896,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/capacity-alert'
       preLoaderRoute: typeof ApiPublicCapacityAlertRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/try-demo': {
+      id: '/_authenticated/dashboard/try-demo'
+      path: '/try-demo'
+      fullPath: '/dashboard/try-demo'
+      preLoaderRoute: typeof AuthenticatedDashboardTryDemoRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
     }
     '/_authenticated/dashboard/tokens': {
       id: '/_authenticated/dashboard/tokens'
@@ -1154,6 +1174,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardTeamCalendarRoute: typeof AuthenticatedDashboardTeamCalendarRoute
   AuthenticatedDashboardTokensRoute: typeof AuthenticatedDashboardTokensRoute
+  AuthenticatedDashboardTryDemoRoute: typeof AuthenticatedDashboardTryDemoRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardRequestsNewRoute: typeof AuthenticatedDashboardRequestsNewRoute
   AuthenticatedDashboardSosSosIdRoute: typeof AuthenticatedDashboardSosSosIdRoute
@@ -1175,6 +1196,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardTeamCalendarRoute:
       AuthenticatedDashboardTeamCalendarRoute,
     AuthenticatedDashboardTokensRoute: AuthenticatedDashboardTokensRoute,
+    AuthenticatedDashboardTryDemoRoute: AuthenticatedDashboardTryDemoRoute,
     AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
     AuthenticatedDashboardRequestsNewRoute:
       AuthenticatedDashboardRequestsNewRoute,

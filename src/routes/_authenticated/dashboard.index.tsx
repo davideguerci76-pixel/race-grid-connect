@@ -5,7 +5,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Calendar, CalendarRange, Coins, Star, Users, User, Briefcase, Flame, MapPin } from "lucide-react";
+import { Calendar, CalendarRange, Coins, Star, Users, User, Briefcase, Flame, MapPin, Sparkles } from "lucide-react";
 import { ActionRow, CardBody, CardHeader, CardShell, Fact, FactGrid, cardBtn } from "@/components/cards/primitives";
 import { RelevanceScore } from "@/components/cards/match-signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { InstallAppCard } from "@/components/install-app-card";
 import { ActivationCard } from "@/components/activation-card";
 import { toastError } from "@/lib/errors";
+import { usePitcallCreationDisabled } from "@/hooks/use-platform-flags";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -153,6 +154,7 @@ function DashboardHome() {
   });
 
   const isTeam = profile?.user_type === "team";
+  const pitcallDisabled = usePitcallCreationDisabled() === true;
   // Role resolution is never assumed: until the profile lands, role-specific
   // cards render as a neutral placeholder instead of defaulting to Team UI.
   const roleReady = !!profile;
@@ -170,6 +172,22 @@ function DashboardHome() {
         <InstallAppCard />
 
         {isFreelancer && <ActivationCard />}
+
+        {isTeam && (
+          <Link
+            to="/dashboard/try-demo"
+            className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-racing-yellow bg-racing-yellow/10 p-5 transition-colors hover:bg-racing-yellow/20"
+          >
+            <div>
+              <div className="font-mono text-xs uppercase tracking-widest text-racing-yellow">{t("trial.entry.label")}</div>
+              <div className="mt-1 text-xl font-bold">{pitcallDisabled ? t("trial.entry.title") : t("trial.intro.title")}</div>
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t("trial.entry.body")}</p>
+            </div>
+            <span className="inline-flex items-center gap-2 border border-racing-yellow px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-racing-yellow">
+              <Sparkles className="size-4" /> {t("trial.entry.cta")} →
+            </span>
+          </Link>
+        )}
 
         {(activeMatchesCount ?? 0) > 0 && (
           <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
