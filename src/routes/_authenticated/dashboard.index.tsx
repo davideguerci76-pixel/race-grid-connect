@@ -169,6 +169,8 @@ function DashboardHome() {
 
         <InstallAppCard />
 
+        {isFreelancer && <ActivationCard />}
+
         {(activeMatchesCount ?? 0) > 0 && (
           <Link to={isFreelancer ? "/dashboard/engagements" : "/dashboard/matches"} className="mt-6 flex items-center justify-between border border-racing-red bg-racing-red/10 p-4 transition-colors hover:bg-racing-red/20">
             <div>
