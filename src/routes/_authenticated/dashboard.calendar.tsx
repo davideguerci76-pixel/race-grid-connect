@@ -386,6 +386,7 @@ function CalendarPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("pcal.note_saved", { defaultValue: "Private note saved" }));
     },
     onError: (e) => toastError(e, "sweep_public.dashboard_calendar.save_failed"),
