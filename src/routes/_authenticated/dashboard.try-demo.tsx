@@ -263,7 +263,7 @@ function TryDemoPitCall() {
                       : "opacity-90",
                   )}
                 >
-                  <CandidateMatchCard match={m} mode="request" requestFilled />
+                  <CandidateMatchCard match={m} mode="request" loading />
                 </div>
               ))}
             </div>
