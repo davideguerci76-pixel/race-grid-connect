@@ -19,3 +19,6 @@
 - [x] MT-06.R: Post Identical mai rimborsabile (colonna server-authoritative repost_identical)
 - [x] MT-06.R: idempotenza server-authoritative del POST (idempotency_key per tentativo)
 - [x] MT-06.R: evidenza reale refund low-relevance (70% del refund zero-match)
+- [ ] UAT-TEAM-DEMO-01A: rebuild Guided Demo creation surface with real Pit Call presentation and contextual guidance
+- [ ] UAT-TEAM-DEMO-01A: persist one-way Team completion state and switch dashboard banner to discreet replay entry
+- [ ] UAT-TEAM-DEMO-01A: hide operational match CTA only in Guided Demo and verify A–H regressions
