@@ -1,0 +1,95 @@
+{
+  "trial": {
+    "badge": "Demo — kein echter Pit Call",
+    "restart": "Neu starten",
+    "exit": "Beenden",
+    "next": "Weiter",
+    "entry": {
+      "label": "Pit Calls starten bald",
+      "title": "PITCALL befindet sich im Onboarding",
+      "body": "Echte Pit Calls öffnen, sobald der Pool an Fachkräften bereit ist. Möchten Sie sehen, wie es funktioniert?",
+      "cta": "Demo-Pit-Call ausprobieren"
+    },
+    "intro": {
+      "title": "Erstellen Sie Ihren ersten Demo-Pit-Call",
+      "body": "Folgen Sie den Schritten. Wir führen Sie durch jede Auswahl.",
+      "point_time": "Dauert etwa 2 Minuten.",
+      "point_tokens": "Keine Token nötig.",
+      "point_nobody": "Es wird keine echte Fachkraft kontaktiert.",
+      "cta": "Demo starten"
+    },
+    "role": {
+      "title": "Wen suchen Sie?",
+      "hint": "Suchen wir einen {{role}}. Wählen Sie: {{role}}.",
+      "done": "{{role}} ausgewählt"
+    },
+    "dates": {
+      "title": "Ihre echten Reisetage",
+      "hint": "Ihr Ingenieur reist mit dem Team. Wählen Sie diese Reisetage: {{range}}.",
+      "legend": "Benötigte Reisetage",
+      "done": "4 benötigte Tage",
+      "note": "PITCALL unterscheidet Fachkräfte, die an allen Tagen verfügbar sind, von solchen, die nur an einigen verfügbar sind."
+    },
+    "req": {
+      "title": "Beschreiben Sie jetzt, wen Sie brauchen",
+      "hint": "Wählen Sie die hervorgehobenen Anforderungen.",
+      "field_discipline": "Disziplin",
+      "field_experience": "Erfahrung",
+      "field_language": "Sprache",
+      "field_skills": "Fähigkeiten",
+      "years_min": "{{count}}+ Jahre",
+      "done": "Anforderungen hinzugefügt",
+      "cta": "Match-Potenzial ansehen"
+    },
+    "req2": {
+      "hint": "Machen wir die Suche spezifischer. Fügen Sie hinzu: {{skill}}.",
+      "done": "{{skill}} hinzugefügt",
+      "cta": "Erneut ansehen"
+    },
+    "preview": {
+      "title": "Marktvorschau",
+      "label": "Möglicher Pool",
+      "matchable": "passende Fachkräfte",
+      "coverage_high": "Hohe Abdeckung",
+      "coverage_targeted": "Gezielte Abdeckung"
+    },
+    "preview1": {
+      "hint": "Ein guter Ausgangspool. Grenzen wir ihn mit {{skill}} ein.",
+      "cta": "Anforderungen bearbeiten"
+    },
+    "preview2": {
+      "title": "Sehen Sie, was passiert ist?",
+      "body": "Eine weitere Anforderung hat den möglichen Pool verkleinert. Deshalb können Sie den Markt vor der Veröffentlichung ansehen."
+    },
+    "post": {
+      "lead": "Sieht gut aus. Veröffentlichen wir Ihren Demo-Pit-Call.",
+      "cta": "Demo-Pit-Call veröffentlichen"
+    },
+    "results": {
+      "title": "Demo-Ergebnisse",
+      "callout_step": "Schritt {{current}} von {{total}}",
+      "cta_end": "Abschließen",
+      "callout1": {
+        "title": "Full Match — 100%",
+        "body": "Alex ist an allen angefragten Tagen verfügbar und erfüllt alle fachlichen Anforderungen."
+      },
+      "callout2": {
+        "title": "Partial Match — 94%",
+        "body": "James passt fachlich sehr gut. Er ist nur Partial, weil er an einem benötigten Tag nicht verfügbar ist: {{day}}."
+      },
+      "callout3": {
+        "title": "James Partial 94% vs Marco Full 88%",
+        "body": "James hat eine höhere fachliche Relevanz als Marco, obwohl er ein Partial Match ist. Full / Partial zeigt die Verfügbarkeit an den Tagen. Relevanz % zeigt die fachliche Passung. Ein Partial Match kann fachlich stärker sein als ein Full Match."
+      }
+    },
+    "end": {
+      "title": "Das ist PITCALL",
+      "point_dates": "Sie haben die echten Reisetage definiert.",
+      "point_preview": "Sie haben den Markt vor der Veröffentlichung gesehen.",
+      "point_requirements": "Sie haben gesehen, wie Anforderungen den Pool verändern.",
+      "point_matches": "PITCALL fand Full- und Partial-Matches und ordnete sie nach fachlicher Relevanz.",
+      "preopen": "Wenn PITCALL öffnet, machen Sie genau das mit echten Fachkräften. Ihr Team ist bereits dabei — wir melden uns zum Start.",
+      "cta": "Zurück zum Dashboard"
+    }
+  }
+}

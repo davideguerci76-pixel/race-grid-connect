@@ -1,0 +1,95 @@
+{
+  "trial": {
+    "badge": "Demo — not a real Pit Call",
+    "restart": "Restart",
+    "exit": "Exit",
+    "next": "Next",
+    "entry": {
+      "label": "Pit Calls open soon",
+      "title": "PITCALL is currently onboarding",
+      "body": "Real Pit Calls will open when the professional pool is ready. Want to see how it works?",
+      "cta": "Try a demo Pit Call"
+    },
+    "intro": {
+      "title": "Build your first demo Pit Call",
+      "body": "Follow the steps. We guide every choice.",
+      "point_time": "It takes about 2 minutes.",
+      "point_tokens": "No tokens are used.",
+      "point_nobody": "No real professional will be contacted.",
+      "cta": "Start demo"
+    },
+    "role": {
+      "title": "Who are you looking for?",
+      "hint": "Let's find a {{role}}. Select: {{role}}.",
+      "done": "{{role}} selected"
+    },
+    "dates": {
+      "title": "Your real travel dates",
+      "hint": "Your engineer needs to travel with the team. Select these required travel dates: {{range}}.",
+      "legend": "Required travel days",
+      "done": "4 required days",
+      "note": "PITCALL can tell apart professionals available for all of these dates and those available for only some of them."
+    },
+    "req": {
+      "title": "Now describe who you need",
+      "hint": "Select the highlighted requirements.",
+      "field_discipline": "Discipline",
+      "field_experience": "Experience",
+      "field_language": "Language",
+      "field_skills": "Skills",
+      "years_min": "{{count}}+ years",
+      "done": "Requirements added",
+      "cta": "Preview match potential"
+    },
+    "req2": {
+      "hint": "Let's make your search more specific. Add one more skill: {{skill}}.",
+      "done": "{{skill}} added",
+      "cta": "Preview again"
+    },
+    "preview": {
+      "title": "Market preview",
+      "label": "Potential pool",
+      "matchable": "matchable professionals",
+      "coverage_high": "High coverage",
+      "coverage_targeted": "Targeted coverage"
+    },
+    "preview1": {
+      "hint": "A good starting pool. Now let's narrow it down by adding {{skill}}.",
+      "cta": "Edit requirements"
+    },
+    "preview2": {
+      "title": "See what happened?",
+      "body": "Adding another requirement narrowed the potential pool. This is why PITCALL lets you preview the market before posting."
+    },
+    "post": {
+      "lead": "Looks good. Let's post your demo Pit Call.",
+      "cta": "Post demo Pit Call"
+    },
+    "results": {
+      "title": "Demo match results",
+      "callout_step": "Step {{current}} of {{total}}",
+      "cta_end": "Finish",
+      "callout1": {
+        "title": "Full match — 100%",
+        "body": "Alex is available for every day you requested, and meets every professional requirement."
+      },
+      "callout2": {
+        "title": "Partial match — 94%",
+        "body": "James is a very strong professional match. He is Partial only because he is unavailable on one of your required days: {{day}}."
+      },
+      "callout3": {
+        "title": "James partial 94% vs Marco full 88%",
+        "body": "James has a higher professional relevance than Marco, even though he is a Partial match. Full / Partial tells you date availability. Relevance % tells you professional fit. A Partial match can be professionally stronger than a Full match."
+      }
+    },
+    "end": {
+      "title": "That's PITCALL",
+      "point_dates": "You defined the real travel dates.",
+      "point_preview": "You previewed the market before posting.",
+      "point_requirements": "You saw how requirements change the potential pool.",
+      "point_matches": "PITCALL found Full and Partial matches and ranked their professional relevance.",
+      "preopen": "When PITCALL opens you'll do exactly this with real professionals. Your team is already onboard — we'll let you know when real Pit Calls open.",
+      "cta": "Back to dashboard"
+    }
+  }
+}
