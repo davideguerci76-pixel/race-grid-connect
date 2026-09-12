@@ -40,7 +40,18 @@ const BASE: Record<string, NotificationTarget> = {
   tokens_credited: { title: "Tokens credited", path: "/dashboard/tokens", label: "View balance" },
   request_unfilled: { title: "Pit Call unfilled", path: "/dashboard/requests", label: "Open Pit Call" },
   admin_alert: { title: "Pit Call notice", path: "/dashboard/notifications", label: "Open Pit Call" },
+  readiness_nudge: { title: "Get ready to match", path: "/dashboard/calendar", label: "Complete the last steps" },
 };
+
+/**
+ * UAT-ONBOARD-05 — readiness nudge deep-link, same priority as the Activation Card:
+ * missing_role → Profile (role) · missing_phone → Profile (phone) · availability → Calendar.
+ */
+export function readinessNudgeTarget(primaryReason: string | null | undefined): NotificationTarget {
+  if (primaryReason === "missing_role") return { title: "Get ready to match", path: "/dashboard/profile?focus=role", label: "Add your role" };
+  if (primaryReason === "missing_phone") return { title: "Get ready to match", path: "/dashboard/profile?focus=phone", label: "Add your phone number" };
+  return { title: "Get ready to match", path: "/dashboard/calendar", label: "Open my calendar" };
+}
 
 const FALLBACK: NotificationTarget = {
   title: "New activity on Pit Call",
@@ -58,6 +69,9 @@ export function isInformationalNotification(payload?: Payload | null): boolean {
 export function resolveNotificationTarget(kind: string, payload?: Payload | null): NotificationTarget {
   const base = BASE[kind] ?? FALLBACK;
   const p = (payload ?? {}) as Payload;
+  if (kind === "readiness_nudge") {
+    return readinessNudgeTarget(typeof p["primary_reason"] === "string" ? (p["primary_reason"] as string) : null);
+  }
   const requestId = typeof p["request_id"] === "string" ? (p["request_id"] as string) : null;
   const audience = p["audience"] === "team" ? "team" : "freelancer";
 
