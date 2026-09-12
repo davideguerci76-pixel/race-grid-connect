@@ -91,7 +91,7 @@ function TryDemoPitCall() {
   };
 
   const fmtDay = (d: Date) => new Intl.DateTimeFormat(i18n.language, { day: "numeric", month: "long" }).format(d);
-  const rangeLabel = `${new Intl.DateTimeFormat(i18n.language, { day: "numeric" }).format(required[0])}–${fmtDay(required[3])}`;
+  const rangeLabel = `${fmtDay(required[0])} – ${new Intl.DateTimeFormat(i18n.language, { day: "numeric" }).format(required[3])}`;
 
   const selectedKeys = dates.map(ymd);
   const datesOk = requiredKeys.every((k) => selectedKeys.includes(k)) && selectedKeys.length === 4;
