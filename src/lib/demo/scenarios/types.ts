@@ -59,6 +59,12 @@ export type DemoFreelancer = {
   role_in_demo: DemoText;
   /** Pool membership: team keys this freelancer belongs to. */
   pool_of?: string[];
+  /**
+   * Fictitious phone (READY law requires one). Must satisfy the existing
+   * updateMyPhone validation; never a real person's number. Omit only for a
+   * persona intentionally NOT READY (Activation UX fixtures).
+   */
+  phone?: { dial: string; number: string };
 };
 
 /** A Pit Call the operator creates LIVE in front of the client. */

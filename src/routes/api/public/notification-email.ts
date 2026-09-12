@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/notification-email")({
         const since = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
         const { data: pending, error } = await supabaseAdmin
           .from("notifications")
-          .select("id, user_id, kind, payload, created_at")
+          .select("id, user_id, kind, payload, created_at, is_test")
           .is("emailed_at", null)
           .gte("created_at", since)
           .order("created_at", { ascending: true })
@@ -50,7 +50,21 @@ export const Route = createFileRoute("/api/public/notification-email")({
         if (error) return new Response(error.message, { status: 500 });
 
         let sent = 0;
+        let suppressedTest = 0;
         for (const n of pending ?? []) {
+          // TEST/LIVE email law (F-NUDGE-02): a TEST notification must never produce a real
+          // email, whatever its kind and whatever the recipient address. Fail-closed: only a
+          // strict `is_test === false` row may reach sendTemplateEmail. The row is stamped
+          // emailed_at so it is consumed exactly once (no infinite reprocessing); the
+          // Notification Center and push delivery are untouched (they read pushed_at/read_at).
+          if (n.is_test !== false) {
+            suppressedTest++;
+            await supabaseAdmin
+              .from("notifications")
+              .update({ emailed_at: new Date().toISOString() } as never)
+              .eq("id", n.id as string);
+            continue;
+          }
           const informational = ((n.payload ?? {}) as Record<string, unknown>)["informational"] === true;
           const sosId = ((n.payload ?? {}) as Record<string, unknown>)["sos_id"];
           const meta = informational
@@ -91,7 +105,7 @@ export const Route = createFileRoute("/api/public/notification-email")({
             .eq("id", n.id as string);
         }
 
-        return Response.json({ processed: pending?.length ?? 0, sent });
+        return Response.json({ processed: pending?.length ?? 0, sent, suppressed_test: suppressedTest });
       },
     },
   },

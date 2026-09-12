@@ -265,6 +265,14 @@ async function seedScenario(sb: any, scenario: DemoScenario, adminId: string) {
       })
       .eq("user_id", uid);
 
+    // Fictitious phone (READY law). Same validation as updateMyPhone; deterministic per persona.
+    if (f.phone) {
+      const { error: phoneErr } = await sb
+        .from("freelancer_contacts")
+        .upsert({ user_id: uid, phone_dial_code: f.phone.dial, phone_number: f.phone.number }, { onConflict: "user_id" });
+      if (phoneErr) throw new Error(`phone seed failed for ${f.key}: ${phoneErr.message}`);
+    }
+
     const days = resolveDays(anchor, f.availability, now);
     if (days.length) {
       const { error: availErr } = await sb
@@ -512,6 +520,26 @@ async function verifyScenario(sb: any, scenario: DemoScenario, state: any) {
       .eq("is_test", true);
     const got = (rows ?? []).map((r: any) => String(r.day)).sort();
     push(`availability ${f.key}`, expectedDays.join(","), got.join(","));
+  }
+
+  // 2b. readiness — the ONE authority (activation_status_for), never re-implemented here.
+  //     Expected READY = phone in the manifest AND at least one future day not locked by a
+  //     proposed/confirmed engagement (e.g. the SOS no-show persona is fully booked → NOT READY
+  //     by law, which is the correct product state, not a seed defect). A persona without
+  //     phone is intentionally NOT READY (missing_phone).
+  for (const f of scenario.freelancers) {
+    const { data: st } = await sb.rpc("activation_status_for", { _uid: personas[f.key] });
+    const realToday = todayISO(new Date());
+    const { data: busy } = await sb
+      .from("engagements")
+      .select("covered_days")
+      .eq("freelancer_id", personas[f.key])
+      .in("status", ["proposed", "confirmed"])
+      .eq("is_test", true);
+    const locked = new Set<string>((busy ?? []).flatMap((e: any) => (e.covered_days ?? []).map(String)));
+    const freeFuture = resolveDays(anchor, f.availability, now).some((d) => d >= realToday && !locked.has(d));
+    const expected = f.phone && freeFuture ? "ready" : "not ready";
+    push(`readiness ${f.key}`, expected, st?.ready ? "ready" : "not ready");
   }
 
   // 3. pool baseline
