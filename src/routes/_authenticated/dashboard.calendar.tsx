@@ -21,7 +21,7 @@ import {
 } from "@/lib/calendar-notes.functions";
 
 import { BackButton } from "@/components/back-button";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, CalendarDays } from "lucide-react";
 import { HelpHint } from "@/components/help-hint";
 import { CalendarAddDialog } from "@/components/calendar-add-dialog";
 import { CalendarTools } from "@/components/calendar-tools";
@@ -129,6 +129,7 @@ function CalendarPage() {
     conflicts: Array<{ day: string; note: string }>;
   } | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
   /**
    * Single-level undo. `availability` is the whole pre-change availability set;
    * `notes` (when present) is the exact pre-change note state of the days that a
@@ -492,7 +493,7 @@ function CalendarPage() {
         <p className="mt-2 text-sm text-muted-foreground">{t("calendar.instructions_freelancer")}</p>
 
         {zeroFutureAvailability ? (
-          /* UAT-ONBOARD-03 — zero future availability: no misleading Confirm CTA, guide to add dates instead. */
+          /* UAT-ONBOARD-03B — zero future availability: point to the calendar first, keep Add from calendar as secondary. */
           <div className="mt-6 grid grid-cols-1 gap-3 border border-racing-yellow bg-racing-yellow/10 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center" data-testid="calendar-empty-state">
             <div className="min-w-0">
               <div className="label-mono text-racing-yellow">[{t("activation.calendar_empty_title")}]</div>
@@ -500,10 +501,10 @@ function CalendarPage() {
             </div>
             <button
               type="button"
-              onClick={() => setAddOpen(true)}
+              onClick={() => calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
               className="inline-flex w-full items-center justify-center gap-2 bg-racing-red px-4 py-3 text-xs font-black uppercase tracking-widest text-white hover:brightness-110 sm:w-auto"
             >
-              <CalendarPlus className="size-3.5" /> {t("activation.calendar_empty_cta")}
+              <CalendarDays className="size-3.5" /> {t("activation.calendar_empty_cta")}
             </button>
           </div>
         ) : (
@@ -539,7 +540,7 @@ function CalendarPage() {
         </div>
         )}
 
-        <div className="mt-6">
+        <div ref={calendarRef} className="mt-6">
           <PitcallCalendar
             month={month}
             onMonthChange={setMonth}

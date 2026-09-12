@@ -20,8 +20,8 @@
     "phone_why": "Aggiungi il tuo numero di telefono così un Team può contattarti dopo che accetti un Pit Call.",
     "phone_private": "Il tuo numero resta privato finché non accetti.",
     "calendar_empty_title": "Nessuna disponibilità",
-    "calendar_empty_body": "Non comparirai nei match dei Team finché non aggiungi disponibilità. Aggiungi i giorni in cui sei libero di lavorare.",
-    "calendar_empty_cta": "Aggiungi disponibilità",
+    "calendar_empty_body": "Seleziona direttamente sul calendario i giorni in cui sei disponibile, oppure usa Aggiungi da calendario per importarli.",
+    "calendar_empty_cta": "Seleziona le date",
     "calendar_stale_hint": "Rivedi la tua disponibilità per tornare pronto al match."
   }
 }
