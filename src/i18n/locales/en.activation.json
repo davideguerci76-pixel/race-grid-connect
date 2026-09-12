@@ -20,8 +20,8 @@
     "phone_why": "Add your phone number so a Team can contact you after you accept a Pit Call.",
     "phone_private": "Your phone number stays private until you accept.",
     "calendar_empty_title": "No availability yet",
-    "calendar_empty_body": "You won't appear in Team matches until you add availability. Add the days you're free to work.",
-    "calendar_empty_cta": "Add availability",
+    "calendar_empty_body": "Select the days you're free directly on the calendar below, or use Add from calendar to import them.",
+    "calendar_empty_cta": "Select dates",
     "calendar_stale_hint": "Review your availability to become ready to match again."
   }
 }
