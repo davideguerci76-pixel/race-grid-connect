@@ -8,7 +8,9 @@
       "label": "Pit Calls starten bald",
       "title": "PITCALL befindet sich im Onboarding",
       "body": "Echte Pit Calls öffnen, sobald der Pool an Fachkräften bereit ist. Möchten Sie sehen, wie es funktioniert?",
-      "cta": "Demo-Pit-Call ausprobieren"
+      "cta": "Demo-Pit-Call ausprobieren",
+      "replay_label": "Demo-Pit-Call",
+      "replay_cta": "Erneut testen →"
     },
     "intro": {
       "title": "Erstellen Sie Ihren ersten Demo-Pit-Call",
@@ -89,7 +91,20 @@
       "point_requirements": "Sie haben gesehen, wie Anforderungen den Pool verändern.",
       "point_matches": "PITCALL fand Full- und Partial-Matches und ordnete sie nach fachlicher Relevanz.",
       "preopen": "Wenn PITCALL öffnet, machen Sie genau das mit echten Fachkräften. Ihr Team ist bereits dabei — wir melden uns zum Start.",
-      "cta": "Zurück zum Dashboard"
+      "cta": "Zurück zum Dashboard",
+      "completion_error": "Die Demo ist beendet, aber der Abschluss konnte nicht gespeichert werden. Kehren Sie zum Dashboard zurück und versuchen Sie es erneut."
+    },
+    "create": {
+      "pitcall_title": "Demo GT3 Race Engineer",
+      "helper": "Geführte Demo · keine Token · keine echten Fachkräfte kontaktiert",
+      "guided_label": "Geführter Pit Call",
+      "step_role": "1/4 — Wen suchen Sie? Wählen Sie {{role}}.",
+      "step_dates": "2/4 — Wählen Sie die benötigten Reisetage: {{range}}.",
+      "step_requirements": "3/4 — Beschreiben Sie den Bedarf. Wählen Sie GT3, 3+ Jahre, Englisch und Telemetrieanalyse.",
+      "step_specific": "4/4 — Machen Sie die Suche spezifischer. Fügen Sie {{skill}} hinzu.",
+      "role_section": "Rolle",
+      "dates_section": "Benötigte Reisetage",
+      "requirements_section": "Fachliche Anforderungen"
     }
   }
 }

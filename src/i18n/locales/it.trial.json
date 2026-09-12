@@ -8,7 +8,9 @@
       "label": "Le Pit Call aprono presto",
       "title": "PITCALL è in fase di onboarding",
       "body": "Le Pit Call reali apriranno quando il pool di professionisti sarà pronto. Vuoi vedere come funziona?",
-      "cta": "Prova una Pit Call demo"
+      "cta": "Prova una Pit Call demo",
+      "replay_label": "Pit Call demo",
+      "replay_cta": "Prova di nuovo →"
     },
     "intro": {
       "title": "Crea la tua prima Pit Call demo",
@@ -89,7 +91,20 @@
       "point_requirements": "Hai visto come i requisiti cambiano il pool potenziale.",
       "point_matches": "PITCALL ha trovato Full e Partial match e ne ha ordinato la rilevanza professionale.",
       "preopen": "Quando PITCALL aprirà farai esattamente questo con professionisti reali. Il tuo team è già a bordo: ti avviseremo all'apertura.",
-      "cta": "Torna alla dashboard"
+      "cta": "Torna alla dashboard",
+      "completion_error": "La Demo è terminata, ma non è stato possibile salvare il completamento. Torna alla dashboard e riprova."
+    },
+    "create": {
+      "pitcall_title": "Race Engineer GT3 demo",
+      "helper": "Demo guidata · nessun token · nessun professionista reale contattato",
+      "guided_label": "Pit Call guidata",
+      "step_role": "1/4 — Chi stai cercando? Seleziona {{role}}.",
+      "step_dates": "2/4 — Seleziona le date di trasferta richieste: {{range}}.",
+      "step_requirements": "3/4 — Descrivi chi ti serve. Seleziona GT3, 3+ anni, Inglese e Analisi telemetria.",
+      "step_specific": "4/4 — Rendila più specifica. Aggiungi {{skill}}.",
+      "role_section": "Ruolo",
+      "dates_section": "Date di trasferta richieste",
+      "requirements_section": "Requisiti professionali"
     }
   }
 }
