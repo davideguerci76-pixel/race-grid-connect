@@ -47,6 +47,14 @@
       "confirm_calendar": {
         "title": "Verfügbarkeit bestätigen",
         "body": "Bestätigt, dass Ihre offenen Tage weiterhin stimmen, und frischt die Kalenderaktualität auf, damit Ihre Verfügbarkeit weiter fürs Matching genutzt wird."
+      },
+      "cancel_late_team": {
+        "title": "Nach der Grace Window stornieren",
+        "body": "Die Grace Window ist vorbei, daher gilt dies als späte Stornierung: Das Engagement wird storniert, der Freelancer wird benachrichtigt, die Stornierung wird im öffentlichen Team-Profil vermerkt und der Pit Call wird als abgeschlossen archiviert — er wird nicht wieder geöffnet."
+      },
+      "submit_calendar_review": {
+        "title": "Zur Prüfung einreichen",
+        "body": "Sendet diesen Kalender zur Prüfung an PITCALL. Nach Freigabe wird der Kalender für die PITCALL-Community veröffentlicht und du erhältst die konfigurierte Token-Belohnung."
       }
     }
   }
