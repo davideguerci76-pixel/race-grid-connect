@@ -1,0 +1,27 @@
+{
+  "activation": {
+    "not_ready_label": "Not ready to match",
+    "title": "Get ready to match",
+    "step_role": "Add your role",
+    "step_phone": "Add your phone number",
+    "step_availability": "Add your availability",
+    "reason_missing_role": "Teams search by role. Without one, nothing can match you.",
+    "reason_missing_phone": "So a Team can contact you after you accept a Pit Call.",
+    "reason_missing_availability": "You won't appear in Team matches until you add availability.",
+    "reason_stale_availability": "Your dates are paused. Review your availability to become ready to match again.",
+    "why": "Teams can only find and contact you properly when you're ready.",
+    "invisible_hint": "You won't appear in Team matches until your availability is active.",
+    "cta_role": "Add your role",
+    "cta_phone": "Add your phone number",
+    "cta_availability": "Open my calendar",
+    "ready_title": "Ready to match ✓",
+    "ready_body": "You're visible to Teams for your available dates.",
+    "dismiss": "Dismiss",
+    "phone_why": "Add your phone number so a Team can contact you after you accept a Pit Call.",
+    "phone_private": "Your phone number stays private until you accept.",
+    "calendar_empty_title": "No availability yet",
+    "calendar_empty_body": "You won't appear in Team matches until you add availability. Add the days you're free to work.",
+    "calendar_empty_cta": "Add availability",
+    "calendar_stale_hint": "Review your availability to become ready to match again."
+  }
+}
