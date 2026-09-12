@@ -413,6 +413,7 @@ function CalendarPage() {
       setBusyDialog(null);
       qc.invalidateQueries({ queryKey: ["my-day-notes"] });
       qc.invalidateQueries({ queryKey: ["my-availability"] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("pcal.busy_applied", { defaultValue: "{{count}} day(s) marked as busy", count: res.applied }));
       if (res.skipped > 0) {
         toast.info(t("pcal.protected_skipped", { count: res.skipped, defaultValue: "{{count}} day(s) were not changed: confirmed PITCALL or locked days." }));
