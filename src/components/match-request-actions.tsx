@@ -120,13 +120,16 @@ export function MatchRequestActions({
         </button>
         <HelpHint titleKey="help.action.ask_more_time.title" bodyKey="help.action.ask_more_time.body" />
       </span>
-      <button
-        onClick={async () => { if (await confirmDialog(t("engagements.decline_confirm"))) declineMut.mutate(); }}
-        disabled={busy}
-        className="border border-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60"
-      >
-        {t("engagements.decline")}
-      </button>
+      <span className="inline-flex items-center gap-1">
+        <button
+          onClick={async () => { if (await confirmDialog(t("engagements.decline_confirm"))) declineMut.mutate(); }}
+          disabled={busy}
+          className="border border-racing-red px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-racing-red hover:bg-racing-red/10 disabled:opacity-60"
+        >
+          {t("engagements.decline")}
+        </button>
+        <HelpHint titleKey="help.action.decline_match.title" bodyKey="help.action.decline_match.body" />
+      </span>
     </>
   );
 }

@@ -8,15 +8,11 @@
       },
       "partial_coverage": {
         "title": "Teilweise Abdeckung",
-        "body": "Abdeckung betrifft nur Termine, nie die fachliche Qualität. Ein vollständiger Match deckt alle angefragten Tage ab. Ein Teil-Match deckt mindestens die Hälfte, aber nicht alle ab; die hier gelisteten Tage sind die nicht abgedeckten."
+        "body": "Full und Partial beschreiben ausschließlich die Terminabdeckung. Bei einem einzelnen Block deckt ein Partial mindestens die Hälfte der angefragten Tage ab; bei einer ganzen Saison dürfen höchstens 20 % fehlen. Mitglieder von My Pool folgen der Pool-Abdeckungsregel. Die fachliche Passung ist davon getrennt."
       },
       "stale_calendar": {
         "title": "Kalenderaktualität",
         "body": "Verfügbarkeit, die länger nicht bestätigt wurde, wird nicht mehr fürs Matching genutzt — Teams sehen nur Termine, zu denen Sie kürzlich standen. Eine Bestätigung frischt alle offenen Tage auf einmal auf."
-      },
-      "locked_days": {
-        "title": "Gesperrte Tage",
-        "body": "Tage aus einem bestätigten Engagement oder aus einem von Ihnen zu spät abgesagten Engagement bleiben in Ihrem Kalender gesperrt. Sie können sie weder wieder freigeben noch andere Jobs darauf annehmen."
       },
       "expand_outside_pool": {
         "title": "Außerhalb von My Pool suchen",
@@ -26,7 +22,7 @@
     "action": {
       "unlock_details": {
         "title": "Details freischalten",
-        "body": "Öffnet das vollständige Berufsprofil: Skills, Seniorität, Sprachen, Erfahrung, Tagessatz und Reisebereitschaft. Echter Name und Kontakte erscheinen erst nach der Bestätigung durch den Freelancer. Der auf der Schaltfläche angezeigte Preis ist der exakte Betrag — steht dort kostenlos, wird nichts abgebucht."
+        "body": "Öffnet das vollständige Berufsprofil: Skills, Seniorität, Sprachen, Erfahrung, Tagessatz und Reisebereitschaft. Bei Personen außerhalb von My Pool bleiben Identität und Kontakte bis zum vorgesehenen Bestätigungsschritt geschützt. Der Name eines My-Pool-Mitglieds kann bereits sichtbar sein; Kontakte werden trotzdem erst nach der Bestätigung geteilt. Die Schaltfläche zeigt den exakten Preis, auch wenn er kostenlos ist."
       },
       "request_confirmation": {
         "title": "Bestätigung anfragen",
