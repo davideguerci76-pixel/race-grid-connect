@@ -911,6 +911,13 @@
       "when": 1789196855096,
       "tag": "0129_0129_freelancer_activation_status_ready_to_match",
       "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1789197313459,
+      "tag": "0130_0130_activation_status_array_append_fix",
+      "breakpoints": true
     }
   ]
 }
