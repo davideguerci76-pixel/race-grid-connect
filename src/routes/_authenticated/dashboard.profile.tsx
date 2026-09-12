@@ -30,6 +30,10 @@ import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
+  // UAT-ONBOARD-03 — Activation Card deep-link: ?focus=role|phone opens the matching edit form.
+  validateSearch: (search: Record<string, unknown>): { focus?: "role" | "phone" } => ({
+    focus: search.focus === "role" || search.focus === "phone" ? search.focus : undefined,
+  }),
 });
 
 function ProfilePage() {
