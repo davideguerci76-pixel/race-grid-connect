@@ -325,7 +325,13 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       </div>
 
       {isFreelancer && (
-        <div className="border-t border-border pt-3">
+        <div ref={phoneRef} className={`border-t border-border pt-3 ${focus === "phone" ? "-mx-2 border border-racing-yellow bg-racing-yellow/10 p-2" : ""}`} data-testid="phone-block">
+          {(editingPhone || !fp?.phone_number) && (
+            <div className="mb-2 text-xs text-muted-foreground" data-testid="phone-why">
+              <p>{t("activation.phone_why")}</p>
+              <p className="mt-0.5 text-[11px]">{t("activation.phone_private")}</p>
+            </div>
+          )}
           {editingPhone ? (
             <>
               <label className="text-xs text-muted-foreground">{t("phone.label")}</label>
@@ -361,7 +367,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
                 <span className="ml-2 font-mono">{fp?.phone_number ? `${fp.phone_dial_code ?? ""} ${fp.phone_number}`.trim() : "—"}</span>
               </div>
               <button onClick={() => setEditingPhone(true)} className="mt-1 text-xs text-racing-red hover:underline">
-                {t("phone.edit")}
+                {fp?.phone_number ? t("phone.edit") : t("activation.cta_phone")}
               </button>
             </>
           )}
