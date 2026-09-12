@@ -125,6 +125,9 @@ export function EngagementCard({
             {!inGrace && isFreelancer && (
               <HelpHint titleKey="help.action.cancel_late.title" bodyKey="help.action.cancel_late.body" />
             )}
+            {!inGrace && !isFreelancer && (
+              <HelpHint titleKey="help.action.cancel_late_team.title" bodyKey="help.action.cancel_late_team.body" />
+            )}
           </span>
         )}
         {!isFreelancer && isCompleted && (

@@ -240,9 +240,12 @@ function ManageCalendarsPage() {
                   <Download className="size-3.5" /> {t("sweep_public.dashboard_calendars.export_ics")}
                 </button>
                 {(c.review_status === "private" || c.review_status === "rejected") && (
-                  <button type="button" className={btn} onClick={() => submitMut.mutate(c.id)}>
-                    <Send className="size-3.5" /> {t("sweep_public.dashboard_calendars.submit_review")}
-                  </button>
+                  <span className="inline-flex items-center gap-1">
+                    <button type="button" className={btn} onClick={() => submitMut.mutate(c.id)}>
+                      <Send className="size-3.5" /> {t("sweep_public.dashboard_calendars.submit_review")}
+                    </button>
+                    <HelpHint titleKey="help.action.submit_calendar_review.title" bodyKey="help.action.submit_calendar_review.body" />
+                  </span>
                 )}
                 {c.review_status !== "approved" && (
                   <button type="button" className={btn} onClick={async () => {
