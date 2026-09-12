@@ -286,6 +286,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         old ? { ...old, freelancerProfile: { ...(old.freelancerProfile ?? {}), phone_dial_code: phoneDial.trim(), phone_number: phoneNumber.trim() } } : old,
       );
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("phone.save"));
       setEditingPhone(false);
     },
