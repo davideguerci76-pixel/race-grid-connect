@@ -283,6 +283,7 @@ function CalendarPage() {
     onSettled: () => {
       inFlightRef.current = Math.max(0, inFlightRef.current - 1);
       qc.invalidateQueries({ queryKey: ["my-availability"] });
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
     },
   });
 
