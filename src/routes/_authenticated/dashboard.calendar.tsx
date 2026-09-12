@@ -88,7 +88,7 @@ function CalendarPage() {
   const restoreNotes = useServerFn(restoreMyDayNotes);
 
 
-  const { data: myDays = [] } = useQuery({
+  const { data: myDays = [], isFetched: availFetched } = useQuery({
     queryKey: ["my-availability", user?.id],
     enabled: !!user && isFreelancer,
     queryFn: () => getAvail(),
