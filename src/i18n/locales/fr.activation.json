@@ -1,0 +1,27 @@
+{
+  "activation": {
+    "not_ready_label": "Pas encore prêt pour le match",
+    "title": "Préparez-vous au match",
+    "step_role": "Ajoutez votre rôle",
+    "step_phone": "Ajoutez votre numéro de téléphone",
+    "step_availability": "Ajoutez vos disponibilités",
+    "reason_missing_role": "Les Teams recherchent par rôle. Sans rôle, aucun match n'est possible.",
+    "reason_missing_phone": "Pour qu'un Team puisse vous contacter après l'acceptation d'un Pit Call.",
+    "reason_missing_availability": "Vous n'apparaîtrez pas dans les matchs des Teams tant que vous n'ajoutez pas de disponibilités.",
+    "reason_stale_availability": "Vos dates sont en pause. Vérifiez vos disponibilités pour redevenir prêt.",
+    "why": "Les Teams ne peuvent vous trouver et vous contacter correctement que lorsque vous êtes prêt.",
+    "invisible_hint": "Vous n'apparaîtrez pas dans les matchs des Teams tant que vos disponibilités ne sont pas actives.",
+    "cta_role": "Ajouter le rôle",
+    "cta_phone": "Ajouter le téléphone",
+    "cta_availability": "Ouvrir mon calendrier",
+    "ready_title": "Prêt pour le match ✓",
+    "ready_body": "Vous êtes visible par les Teams pour vos dates disponibles.",
+    "dismiss": "Fermer",
+    "phone_why": "Ajoutez votre numéro de téléphone pour qu'un Team puisse vous contacter après l'acceptation d'un Pit Call.",
+    "phone_private": "Votre numéro reste privé jusqu'à votre acceptation.",
+    "calendar_empty_title": "Aucune disponibilité",
+    "calendar_empty_body": "Vous n'apparaîtrez pas dans les matchs des Teams tant que vous n'ajoutez pas de disponibilités. Ajoutez les jours où vous êtes libre de travailler.",
+    "calendar_empty_cta": "Ajouter des disponibilités",
+    "calendar_stale_hint": "Vérifiez vos disponibilités pour redevenir prêt pour le match."
+  }
+}
