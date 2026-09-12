@@ -918,6 +918,13 @@
       "when": 1789197313459,
       "tag": "0130_0130_activation_status_array_append_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1789199173752,
+      "tag": "0131_0131_activation_status_core_and_admin_bulk",
+      "breakpoints": true
     }
   ]
 }

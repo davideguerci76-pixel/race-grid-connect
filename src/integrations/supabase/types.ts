@@ -2860,6 +2860,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      activation_status_for: { Args: { _uid: string }; Returns: Json }
       add_pool_member_by_code: {
         Args: { _code: string }
         Returns: {
@@ -2895,6 +2896,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_activation_status_bulk: {
+        Args: { _user_ids: string[] }
+        Returns: {
+          status: Json
+          user_id: string
+        }[]
       }
       admin_approve_calendar: {
         Args: { _admin_id: string; _calendar_id: string; _name?: string }
