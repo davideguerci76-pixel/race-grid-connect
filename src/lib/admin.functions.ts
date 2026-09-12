@@ -104,6 +104,62 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
     });
   });
 
+// UAT-ONBOARD-05 — Admin readiness nudge. Single and bulk share ONE server path:
+// admin_readiness_nudge() (service-role RPC) re-evaluates env / account / READY / reason / cooldown
+// per candidate IMMEDIATELY before inserting the notification. The browser list is only a candidate
+// set; environment comes from admin_env_state, never from the payload. Cooldown = 14 days per
+// freelancer per environment (DB constant), no Admin bypass.
+const nudgeInput = z.object({
+  user_ids: z.array(z.string().uuid()).min(1).max(1000),
+  reason: z.enum(["missing_role", "missing_phone", "missing_availability", "stale_availability"]).nullable().optional(),
+  role: z.string().trim().max(80).nullable().optional(),
+  mode: z.enum(["single", "bulk"]),
+  batch_id: z.string().uuid().nullable().optional(),
+});
+
+export type NudgeOutcome = "eligible" | "sent" | "skipped_ready" | "skipped_cooldown" | "skipped_ineligible" | "skipped_filter" | "failed";
+export type NudgeRow = { user_id: string; outcome: NudgeOutcome; reasons: string[]; primary_reason: string | null };
+
+async function runReadinessNudge(context: any, raw: unknown, dryRun: boolean): Promise<{ env_is_test: boolean; rows: NudgeRow[] }> {
+  const data = nudgeInput.parse(raw);
+  await assertAdmin(context.supabase, context.userId);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { currentAdminEnv } = await import("@/lib/admin-env.server");
+  const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
+  const { data: rows, error } = await (supabaseAdmin.rpc as any)("admin_readiness_nudge", {
+    _admin_id: context.userId,
+    _is_test: envIsTest,
+    _candidate_ids: data.user_ids,
+    _filter_reason: data.reason ?? null,
+    _filter_role: data.role || null,
+    _mode: data.mode,
+    _dry_run: dryRun,
+    _batch_id: data.batch_id ?? null,
+  });
+  if (error) throw new Error(error.message);
+  return {
+    env_is_test: envIsTest,
+    rows: ((rows ?? []) as any[]).map((r) => ({
+      user_id: r.user_id,
+      outcome: r.outcome,
+      reasons: Array.isArray(r.reasons) ? r.reasons : [],
+      primary_reason: r.primary_reason ?? null,
+    })),
+  };
+}
+
+/** Dry run: eligibility / cooldown preview. Never writes. */
+export const adminReadinessNudgePreview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => input)
+  .handler(({ data, context }) => runReadinessNudge(context, data, true));
+
+/** Real send: same authority, same candidate set; returns per-recipient outcome. */
+export const adminReadinessNudgeSend = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => input)
+  .handler(({ data, context }) => runReadinessNudge(context, data, false));
+
 export const adminListTeams = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

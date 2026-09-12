@@ -2909,6 +2909,24 @@ export type Database = {
         Returns: Json
       }
       admin_delete_account: { Args: { _user_id: string }; Returns: Json }
+      admin_readiness_nudge: {
+        Args: {
+          _admin_id: string
+          _batch_id?: string
+          _candidate_ids: string[]
+          _dry_run?: boolean
+          _filter_reason?: string
+          _filter_role?: string
+          _is_test: boolean
+          _mode?: string
+        }
+        Returns: {
+          outcome: string
+          primary_reason: string
+          reasons: Json
+          user_id: string
+        }[]
+      }
       admin_set_env: { Args: { _is_test: boolean }; Returns: boolean }
       admin_set_rating_moderation: {
         Args: { _action: string; _rating_id: string }
@@ -3758,6 +3776,7 @@ export type Database = {
         }[]
       }
       rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
+      readiness_nudge_cooldown_days: { Args: never; Returns: number }
       recompute_matches: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
@@ -4354,6 +4373,7 @@ export type Database = {
         | "engagement_expired"
         | "engagement_declined"
         | "engagement_more_time"
+        | "readiness_nudge"
       rating_moderation_status:
         | "active"
         | "flagged"
@@ -4626,6 +4646,7 @@ export const Constants = {
         "engagement_expired",
         "engagement_declined",
         "engagement_more_time",
+        "readiness_nudge",
       ],
       rating_moderation_status: [
         "active",

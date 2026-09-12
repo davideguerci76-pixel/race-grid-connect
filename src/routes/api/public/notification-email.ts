@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
+import { readinessNudgeTarget } from "@/lib/notification-targets";
 
 const SITE_URL = "https://pitcall.net";
 
@@ -54,6 +55,9 @@ export const Route = createFileRoute("/api/public/notification-email")({
           const sosId = ((n.payload ?? {}) as Record<string, unknown>)["sos_id"];
           const meta = informational
             ? { title: "Pit Call update", path: "/dashboard/notifications", label: "Open Pit Call" }
+            : n.kind === "readiness_nudge"
+              // UAT-ONBOARD-05: CTA follows the first missing READY cause (role → phone → availability).
+              ? readinessNudgeTarget(((n.payload ?? {}) as Record<string, unknown>)["primary_reason"] as string | null)
             : (n.kind === "sos_call" || n.kind === "sos_taken") && typeof sosId === "string"
               // SOS deep-links to the SOS review page: no engagement exists before acceptance.
               ? { title: n.kind === "sos_call" ? "SOS call" : "SOS call taken", path: `/dashboard/sos/${sosId}`, label: "View SOS call" }

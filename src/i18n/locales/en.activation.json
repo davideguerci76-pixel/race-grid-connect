@@ -22,6 +22,11 @@
     "calendar_empty_title": "No availability yet",
     "calendar_empty_body": "Select the days you're free directly on the calendar below, or use Add from calendar to import them.",
     "calendar_empty_cta": "Select dates",
-    "calendar_stale_hint": "Review your availability to become ready to match again."
+    "calendar_stale_hint": "Review your availability to become ready to match again.",
+    "nudge_intro": "Complete the last steps to be Ready to Match on PITCALL:",
+    "nudge_missing_role": "add your professional role",
+    "nudge_missing_phone": "add the phone number a Team needs to contact you after you accept a Pit Call",
+    "nudge_missing_availability": "add your availability so you can appear in matches",
+    "nudge_stale_availability": "review and confirm your future availability"
   }
 }

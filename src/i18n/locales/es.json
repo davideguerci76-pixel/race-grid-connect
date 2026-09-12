@@ -1016,7 +1016,8 @@
     "team_contact_reminder_1": "Recordatorio de contacto",
     "team_contact_reminder_2": "Recordatorio de contacto",
     "team_ghosted": "Sin respuesta del equipo",
-    "tokens_credited": "Tokens acreditados"
+    "tokens_credited": "Tokens acreditados",
+    "readiness_nudge": "Prepárate para el match"
   },
   "pcal": {
     "today": "Hoy",

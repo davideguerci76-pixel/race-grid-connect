@@ -22,6 +22,11 @@
     "calendar_empty_title": "Nessuna disponibilità",
     "calendar_empty_body": "Seleziona direttamente sul calendario i giorni in cui sei disponibile, oppure usa Aggiungi da calendario per importarli.",
     "calendar_empty_cta": "Seleziona le date",
-    "calendar_stale_hint": "Rivedi la tua disponibilità per tornare pronto al match."
+    "calendar_stale_hint": "Rivedi la tua disponibilità per tornare pronto al match.",
+    "nudge_intro": "Completa gli ultimi passaggi per essere Ready to Match su PITCALL:",
+    "nudge_missing_role": "completa il tuo ruolo professionale",
+    "nudge_missing_phone": "aggiungi il numero di telefono necessario a un Team per contattarti dopo l’accettazione di una Pit Call",
+    "nudge_missing_availability": "aggiungi le tue disponibilità per comparire nei match",
+    "nudge_stale_availability": "aggiorna e conferma le tue disponibilità future"
   }
 }

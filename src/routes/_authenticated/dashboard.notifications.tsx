@@ -117,6 +117,10 @@ function NotificationsPage() {
               {(notifications as any[]).map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
+                // UAT-ONBOARD-05 — Admin readiness nudge: localized causes + CTA on the first missing cause.
+                const isNudge = n.kind === "readiness_nudge";
+                const nudgeReasons: string[] = isNudge && Array.isArray(n.payload?.reasons) ? n.payload.reasons : [];
+                const nudgePrimary: string = isNudge ? (n.payload?.primary_reason ?? nudgeReasons[0] ?? "missing_availability") : "";
                 const isAvailabilityOpportunity = n.kind === "new_matches" && n.payload?.event === "availability_opportunity";
                 const isTeamMatch = n.kind === "new_matches" && n.payload?.audience === "team";
                 const info = !isTeamMatch && n.payload?.informational === true;
@@ -159,6 +163,11 @@ function NotificationsPage() {
                       <div className="mt-1 text-sm">
                         {isTeamMatch ? (
                           <TeamMatchMessage event={teamEvent} t={t} />
+                        ) : isNudge ? (
+                          <span data-testid="nudge-message">
+                            {t("activation.nudge_intro")}{" "}
+                            {nudgeReasons.map((r) => t(`activation.nudge_${r}`)).join(" · ")}
+                          </span>
                         ) : isStale ? (
                           n.payload?.state === "unconfirmed"
                             ? t("sweep_profile.notifications.calendar_stale_unconfirmed_message")
@@ -170,7 +179,17 @@ function NotificationsPage() {
                         )}
                       </div>
                     </div>
-                    {isStale ? (
+                    {isNudge ? (
+                      nudgePrimary === "missing_role" || nudgePrimary === "missing_phone" ? (
+                        <Link onClick={markClicked} to="/dashboard/profile" search={{ focus: nudgePrimary === "missing_role" ? "role" : "phone" }} className={cardBtn.warn} data-testid="nudge-cta">
+                          {t(`activation.cta_${nudgePrimary === "missing_role" ? "role" : "phone"}`)}
+                        </Link>
+                      ) : (
+                        <Link onClick={markClicked} to="/dashboard/calendar" className={cardBtn.warn} data-testid="nudge-cta">
+                          {t("activation.cta_availability")}
+                        </Link>
+                      )
+                    ) : isStale ? (
                       <Link onClick={markClicked} to="/dashboard/calendar" className={cardBtn.warn}>
                         {t("sweep_profile.notifications.update_calendar")}
                       </Link>

@@ -12,6 +12,10 @@ import {
   adminDeleteUser,
   adminUpdateFreelancer,
   adminMarketPrivateStats,
+  adminReadinessNudgePreview,
+  adminReadinessNudgeSend,
+  type NudgeOutcome,
+  type NudgeRow,
 } from "@/lib/admin.functions";
 import { exportToExcel } from "@/lib/export-xlsx";
 import { useSort, Th } from "@/lib/use-sort";
@@ -40,6 +44,15 @@ function AdminFreelancers() {
   const [reasonFilter, setReasonFilter] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const nudgePreview = useServerFn(adminReadinessNudgePreview);
+  const nudgeSend = useServerFn(adminReadinessNudgeSend);
+  const [nudging, setNudging] = useState<string | null>(null);
+  const [bulk, setBulk] = useState<null | {
+    phase: "preview" | "result";
+    candidates: string[];
+    batchId: string;
+    counts: Record<NudgeOutcome, number>;
+  }>(null);
   const tr = (k: string, o?: any): string => String(t(`sweep_admin_a.freelancers.readiness.${k}`, o));
 
   const rows = useMemo(() => {
@@ -141,6 +154,73 @@ function AdminFreelancers() {
       qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
     } catch (e: any) {
       toastError(e);
+    }
+  }
+
+  // ---- UAT-ONBOARD-05: readiness nudge (single + bulk). The server re-validates everything. ----
+  const emptyCounts = () => ({ eligible: 0, sent: 0, skipped_ready: 0, skipped_cooldown: 0, skipped_ineligible: 0, skipped_filter: 0, failed: 0 });
+  function countOutcomes(res: NudgeRow[]) {
+    const c = emptyCounts();
+    for (const r of res) c[r.outcome] = (c[r.outcome] ?? 0) + 1;
+    return c;
+  }
+  const ctaLabel = (primary: string | null) =>
+    primary === "missing_role" ? t("activation.cta_role") : primary === "missing_phone" ? t("activation.cta_phone") : t("activation.cta_availability");
+
+  async function onNudgeOne(r: any) {
+    if (nudging) return;
+    const reasons = (r.ready_reasons ?? []).map(reasonLabel).join(", ");
+    const primary = (r.ready_reasons ?? [])[0] ?? null;
+    const ok = await confirmDialog(tr("nudge_confirm_body", { name: r.display_name, reasons, cta: ctaLabel(primary) }), {
+      title: tr("nudge_confirm_title"),
+      confirmLabel: tr("nudge_send"),
+    });
+    if (!ok) return;
+    setNudging(r.id);
+    try {
+      const res = await nudgeSend({ data: { user_ids: [r.id], mode: "single" } });
+      const row = res.rows[0];
+      const name = r.display_name;
+      if (!row) toast.info(tr("nudge_not_eligible"));
+      else if (row.outcome === "sent") toast.success(tr("nudge_sent", { name }));
+      else if (row.outcome === "failed") toast.error(tr("nudge_failed", { name }));
+      else toast.info(tr(`nudge_${row.outcome}`, { name }));
+      if (row?.outcome === "skipped_ready" || row?.outcome === "skipped_ineligible") qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
+    } catch (e: any) {
+      toastError(e);
+    } finally {
+      setNudging(null);
+    }
+  }
+
+  async function onNudgeAllPreview() {
+    if (nudging) return;
+    // Candidate set = the rows currently shown (NOT READY + filters). Only a narrowing hint: the server
+    // re-checks environment, READY, reason and cooldown per user.
+    const candidates = rows.filter((r: any) => !r.ready).map((r: any) => r.id);
+    if (!candidates.length) return;
+    setNudging("__bulk__");
+    try {
+      const res = await nudgePreview({ data: { user_ids: candidates, reason: reasonFilter || null, role: role || null, mode: "bulk" } });
+      setBulk({ phase: "preview", candidates, batchId: crypto.randomUUID(), counts: countOutcomes(res.rows) });
+    } catch (e: any) {
+      toastError(e);
+    } finally {
+      setNudging(null);
+    }
+  }
+
+  async function onNudgeAllConfirm() {
+    if (!bulk || bulk.phase !== "preview" || nudging) return;
+    setNudging("__bulk__");
+    try {
+      const res = await nudgeSend({ data: { user_ids: bulk.candidates, reason: reasonFilter || null, role: role || null, mode: "bulk", batch_id: bulk.batchId } });
+      setBulk({ ...bulk, phase: "result", counts: countOutcomes(res.rows) });
+      qc.invalidateQueries({ queryKey: ["admin-freelancers"] });
+    } catch (e: any) {
+      toastError(e);
+    } finally {
+      setNudging(null);
     }
   }
 
@@ -270,10 +350,64 @@ function AdminFreelancers() {
         >
           {t("sweep_admin_a.export_to_excel")}
         </button>
+        {readyFilter === "not_ready" && (
+          <button
+            onClick={onNudgeAllPreview}
+            disabled={nudging === "__bulk__" || rows.length === 0}
+            className="border border-racing-yellow px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-racing-yellow hover:bg-racing-yellow/10 disabled:opacity-40"
+            data-testid="nudge-all"
+          >
+            {nudging === "__bulk__" ? "…" : tr("nudge_all")}
+          </button>
+        )}
         <div className="ml-auto text-xs text-muted-foreground self-center" data-testid="shown-count">
           {tr("shown", { shown: rows.length, total: pool.registered })}
         </div>
       </div>
+
+      {bulk && (
+        <div className="mb-4 border border-racing-yellow bg-racing-yellow/10 p-4 text-sm" data-testid="nudge-bulk-panel">
+          <div className="font-mono text-xs uppercase tracking-widest text-racing-yellow">{tr("bulk_title")}</div>
+          {bulk.phase === "result" ? (
+            <>
+              <p className="mt-2 font-bold" data-testid="nudge-bulk-result">
+                {tr("bulk_result", { sent: bulk.counts.sent, skipped: bulk.counts.skipped_ready + bulk.counts.skipped_cooldown + bulk.counts.skipped_ineligible + bulk.counts.skipped_filter, failed: bulk.counts.failed })}
+              </p>
+              <ul className="mt-1 grid gap-x-6 text-xs text-muted-foreground sm:grid-cols-2">
+                <li>{tr("bulk_skipped_ready")}: {bulk.counts.skipped_ready}</li>
+                <li>{tr("bulk_skipped_cooldown")}: {bulk.counts.skipped_cooldown}</li>
+                <li>{tr("bulk_skipped_ineligible")}: {bulk.counts.skipped_ineligible}</li>
+                <li>{tr("bulk_skipped_filter")}: {bulk.counts.skipped_filter}</li>
+              </ul>
+              <p className="mt-2 text-xs text-muted-foreground">{tr("bulk_delivery_note")}</p>
+              <button onClick={() => setBulk(null)} className="mt-3 border border-border px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary">{tr("bulk_close")}</button>
+            </>
+          ) : (
+            <>
+              <ul className="mt-2 grid gap-x-6 text-xs sm:grid-cols-2" data-testid="nudge-bulk-preview">
+                <li>{tr("bulk_target")}: <b>{bulk.candidates.length}</b>{reasonFilter ? ` · ${reasonLabel(reasonFilter)}` : ""}{role ? ` · ${role}` : ""}</li>
+                <li>{tr("bulk_eligible")}: <b>{bulk.counts.eligible}</b></li>
+                <li>{tr("bulk_skipped_ready")}: {bulk.counts.skipped_ready}</li>
+                <li>{tr("bulk_skipped_cooldown")}: {bulk.counts.skipped_cooldown}</li>
+                <li>{tr("bulk_skipped_ineligible")}: {bulk.counts.skipped_ineligible}</li>
+                <li>{tr("bulk_skipped_filter")}: {bulk.counts.skipped_filter}</li>
+              </ul>
+              <p className="mt-2 text-xs text-muted-foreground">{tr("bulk_note")}</p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={onNudgeAllConfirm}
+                  disabled={bulk.counts.eligible === 0 || nudging === "__bulk__"}
+                  className="bg-racing-red px-4 py-2 font-mono text-[11px] font-black uppercase tracking-widest text-white hover:brightness-110 disabled:opacity-40"
+                  data-testid="nudge-bulk-confirm"
+                >
+                  {nudging === "__bulk__" ? "…" : tr("bulk_confirm", { count: bulk.counts.eligible })}
+                </button>
+                <button onClick={() => setBulk(null)} className="border border-border px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-secondary">{tr("bulk_cancel")}</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {isLoading ? (
         <div className="text-sm text-muted-foreground">{t("sweep_admin_a.loading")}</div>
       ) : (
@@ -398,6 +532,17 @@ function AdminFreelancers() {
                           protectedAccount={(r.email ?? "").toLowerCase() === "davideguerci76@gmail.com"}
                           invalidateKey="admin-freelancers"
                         />
+                        {!r.ready && !r.blocked_at && (r.ready_reasons ?? []).length > 0 && (
+                          <button
+                            onClick={() => onNudgeOne(r)}
+                            disabled={nudging === r.id}
+                            className="border border-racing-yellow px-2 py-1 text-[10px] font-bold uppercase text-racing-yellow hover:bg-racing-yellow/10 disabled:opacity-40"
+                            data-testid={`nudge-${r.id}`}
+                          >
+                            {nudging === r.id ? "…" : tr("nudge")}
+                          </button>
+                        )}
+
 
                       </div>
                     </td>

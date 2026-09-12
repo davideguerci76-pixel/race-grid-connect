@@ -1030,7 +1030,8 @@
     "team_contact_reminder_1": "Contact reminder",
     "team_contact_reminder_2": "Contact reminder",
     "team_ghosted": "No answer from the team",
-    "tokens_credited": "Tokens credited"
+    "tokens_credited": "Tokens credited",
+    "readiness_nudge": "Get ready to match"
   },
   "pcal": {
     "today": "Today",
