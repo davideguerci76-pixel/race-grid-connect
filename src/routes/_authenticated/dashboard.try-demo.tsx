@@ -299,19 +299,6 @@ function TryDemoPitCall() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 border border-border bg-card p-4">
-              <h3 className="font-mono text-[11px] font-bold uppercase tracking-widest text-racing-yellow">{t("trial.results.next.title")}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{t("trial.results.next.body")}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                <span>{t("trial.results.next.step_choose")}</span>
-                <span className="text-racing-yellow">→</span>
-                <span>{t("trial.results.next.step_request")}</span>
-                <span className="text-racing-yellow">→</span>
-                <span>{t("trial.results.next.step_confirm")}</span>
-                <span className="text-racing-yellow">→</span>
-                <span>{t("trial.results.next.step_contact")}</span>
-              </div>
-            </div>
           </section>
         )}
 
@@ -323,6 +310,16 @@ function TryDemoPitCall() {
               <li>• {t("trial.end.point_requirements")}</li>
               <li>• {t("trial.end.point_matches")}</li>
             </ul>
+            <div className="mt-5 border border-racing-yellow/50 bg-racing-yellow/5 p-4">
+              <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-racing-yellow">{t("trial.results.next.title")}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{t("trial.results.next.body")}</p>
+              <ol className="mt-3 grid gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground sm:grid-cols-4">
+                <li className="flex items-center gap-2"><span className="text-racing-yellow">1.</span>{t("trial.results.next.step_choose")}</li>
+                <li className="flex items-center gap-2"><span className="text-racing-yellow">2.</span>{t("trial.results.next.step_request")}</li>
+                <li className="flex items-center gap-2"><span className="text-racing-yellow">3.</span>{t("trial.results.next.step_confirm")}</li>
+                <li className="flex items-center gap-2"><span className="text-racing-yellow">4.</span>{t("trial.results.next.step_contact")}</li>
+              </ol>
+            </div>
             <p className="mt-4 font-bold">{t("trial.end.preopen")}</p>
             {completeDemo.isError && <p className="mt-3 text-sm text-racing-red">{t("trial.end.completion_error")}</p>}
             <div className="mt-6 flex flex-wrap gap-2">
