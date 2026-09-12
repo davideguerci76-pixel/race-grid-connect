@@ -36,24 +36,43 @@ function AdminFreelancers() {
   const { data: rateStats } = useQuery({ queryKey: ["admin-private-stats"], queryFn: () => privateStatsFn() });
   const [q, setQ] = useState("");
   const [role, setRole] = useState("");
+  const [readyFilter, setReadyFilter] = useState<"" | "ready" | "not_ready">("");
+  const [reasonFilter, setReasonFilter] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const tr = (k: string, o?: any) => t(`sweep_admin_a.freelancers.readiness.${k}`, o);
 
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
     return (data ?? []).filter((r: any) => {
       if (role && r.freelancer?.role_group !== role) return false;
+      if (readyFilter === "ready" && !r.ready) return false;
+      if (readyFilter === "not_ready" && r.ready) return false;
+      if (reasonFilter && !(r.ready_reasons ?? []).includes(reasonFilter)) return false;
       if (!s) return true;
       return [r.display_name, r.email, r.freelancer?.pit_code, r.freelancer?.role_group, r.freelancer?.location, ...(r.freelancer?.skills ?? [])]
         .filter(Boolean)
         .some((v: string) => String(v).toLowerCase().includes(s));
     });
-  }, [data, q, role]);
+  }, [data, q, role, readyFilter, reasonFilter]);
 
   const roles = useMemo(
     () => Array.from(new Set((data ?? []).map((r: any) => r.freelancer?.role_group).filter(Boolean))).sort(),
     [data],
   );
+
+  // Pool health = whole current ACP environment (LIVE or TEST), independent of the filters below.
+  const REASONS = ["missing_role", "missing_phone", "missing_availability", "stale_availability"] as const;
+  const pool = useMemo(() => {
+    const all = data ?? [];
+    const ready = all.filter((r: any) => r.ready).length;
+    const byReason: Record<string, number> = {};
+    for (const k of REASONS) byReason[k] = all.filter((r: any) => (r.ready_reasons ?? []).includes(k)).length;
+    return { registered: all.length, ready, notReady: all.length - ready, byReason };
+  }, [data]);
+
+  const reasonLabel = (k: string) => tr(`r_${k}`);
+  const gapLabel = (k: string) => tr(`g_${k}`);
 
   const { sorted, toggle, indicator } = useSort<any>(rows);
 
