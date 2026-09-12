@@ -40,7 +40,7 @@ function AdminFreelancers() {
   const [reasonFilter, setReasonFilter] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [saving, setSaving] = useState<string | null>(null);
-  const tr = (k: string, o?: any) => t(`sweep_admin_a.freelancers.readiness.${k}`, o);
+  const tr = (k: string, o?: any): string => String(t(`sweep_admin_a.freelancers.readiness.${k}`, o));
 
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
