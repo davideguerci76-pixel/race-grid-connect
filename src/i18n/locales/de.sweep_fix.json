@@ -39,7 +39,9 @@
     "visible_now": "Bewertung sichtbar",
     "submitted_bonus_generic": "Bewertung gesendet — Token geschenkt!",
     "rate_bonus": "(+{{bonus}} Token Bonus)",
-    "rate_bonus_generic": "(Token Bonus)"
+    "rate_bonus_generic": "(Token Bonus)",
+    "rate_no_show": "No-Show bewerten",
+    "no_show_unilateral_hint": "Einseitige Bewertung für ein vom Team gemeldetes No-Show: Sie bewerten {{name}}, der nicht erschienen ist — nicht den SOS-Ersatz. Sofort veröffentlicht, keine Antwort nötig, kein Token-Bonus."
   },
   "engagements": {
     "confirmed_toast": "Engagement bestätigt"

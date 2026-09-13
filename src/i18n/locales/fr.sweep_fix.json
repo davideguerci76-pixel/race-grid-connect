@@ -39,7 +39,9 @@
     "visible_now": "Avis visible",
     "submitted_bonus_generic": "Évaluation envoyée — token offert !",
     "rate_bonus": "(+{{bonus}} token bonus)",
-    "rate_bonus_generic": "(token bonus)"
+    "rate_bonus_generic": "(token bonus)",
+    "rate_no_show": "Évaluer l'absence",
+    "no_show_unilateral_hint": "Avis unilatéral pour une absence déclarée par le Team : vous évaluez {{name}}, qui ne s'est pas présenté — pas le remplaçant SOS. Publié immédiatement, sans réponse requise, sans bonus de jetons."
   },
   "engagements": {
     "confirmed_toast": "Engagement confirmé"
