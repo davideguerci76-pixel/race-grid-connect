@@ -212,7 +212,8 @@
 
   // ---------- envelope parsing ----------
   function parseEnvelope(bytes) {
-    if (bytes.length < 12 || dec.decode(bytes.subarray(0, 8)) !== MAGIC) throw new UserError(E.FORMAT, "magic");
+    if (bytes.length < 12) throw new UserError(E.FORMAT, "too short");
+    for (let i = 0; i < 8; i++) if (bytes[i] !== MAGIC.charCodeAt(i)) throw new UserError(E.FORMAT, "magic");
     const len = new DataView(bytes.buffer, bytes.byteOffset + 8, 4).getUint32(0, false);
     if (len <= 0 || len > 65536 || 12 + len + 16 > bytes.length) throw new UserError(E.FORMAT, "header length");
     let h;
