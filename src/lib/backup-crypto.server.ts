@@ -121,7 +121,12 @@ export function parseEnvelope(bytes: Uint8Array): { header: EnvelopeHeader; pref
   if (bytes.length < 12 || dec.decode(bytes.subarray(0, 8)) !== ENVELOPE_MAGIC) throw new Error("NOT_A_PITCALL_BACKUP");
   const len = new DataView(bytes.buffer, bytes.byteOffset + 8, 4).getUint32(0, false);
   if (12 + len > bytes.length) throw new Error("ENVELOPE_TRUNCATED");
-  const header = JSON.parse(dec.decode(bytes.subarray(12, 12 + len))) as EnvelopeHeader;
+  let header: EnvelopeHeader;
+  try {
+    header = JSON.parse(dec.decode(bytes.subarray(12, 12 + len))) as EnvelopeHeader;
+  } catch {
+    throw new Error("ENVELOPE_HEADER_INVALID");
+  }
   if (header.format !== ENVELOPE_FORMAT || header.version !== ENVELOPE_VERSION) throw new Error("ENVELOPE_VERSION_UNSUPPORTED");
   if (header.kdf !== "scrypt" || header.cipher !== "AES-256-GCM") throw new Error("ENVELOPE_ALGORITHM_UNSUPPORTED");
   return { header, prefix: toAB(bytes.subarray(0, 12 + len)), ciphertext: toAB(bytes.subarray(12 + len)) };
