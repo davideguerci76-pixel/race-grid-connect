@@ -54,6 +54,7 @@ function AdminLayout() {
     { to: "/admin/wiki", label: t("sweep_admin_a.tabs.wiki") },
     { to: "/admin/launch", label: t("sweep_admin_a.tabs.launch") },
     { to: "/admin/testing", label: t("sweep_admin_a.tabs.testing") },
+    { to: "/admin/backup", label: "Backup" },
 
   ];
 
