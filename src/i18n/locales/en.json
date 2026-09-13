@@ -289,7 +289,8 @@
     "rate_bonus": "(+{{bonus}} token bonus)",
     "rate_bonus_generic": "(token bonus)",
     "rate_no_show": "Rate no-show",
-    "no_show_unilateral_hint": "Unilateral review for a Team-declared no-show: you are rating {{name}}, who did not show up — not the SOS replacement. Published immediately, no reply required, no token bonus."
+    "no_show_unilateral_hint": "Unilateral review for a Team-declared no-show: you are rating {{name}}, who did not show up — not the SOS replacement. Published immediately, no reply required. You receive the rating bonus.",
+    "rating_target": "You are rating {{name}}"
   },
   "common": {
     "loading": "Loading...",

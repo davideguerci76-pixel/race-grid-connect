@@ -289,7 +289,8 @@
     "rate_bonus": "(+{{bonus}} token bonus)",
     "rate_bonus_generic": "(token bonus)",
     "rate_no_show": "Valuta il no-show",
-    "no_show_unilateral_hint": "Recensione unilaterale per no-show dichiarato dal Team: stai valutando {{name}}, che non si è presentato — non il sostituto SOS. Pubblicata subito, senza risposta richiesta, nessun bonus token."
+    "no_show_unilateral_hint": "Recensione unilaterale per no-show dichiarato dal Team: stai valutando {{name}}, che non si è presentato — non il sostituto SOS. Pubblicata subito, senza risposta richiesta. Ricevi il bonus recensione.",
+    "rating_target": "Stai valutando {{name}}"
   },
   "common": {
     "loading": "Caricamento...",
