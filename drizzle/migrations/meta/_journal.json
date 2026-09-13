@@ -960,6 +960,13 @@
       "when": 1789291880457,
       "tag": "0136_scale_r3_indexes_o1_o2_o3",
       "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1789291905944,
+      "tag": "0137_scale_r3_worker_w2",
+      "breakpoints": true
     }
   ]
 }
