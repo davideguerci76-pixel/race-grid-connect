@@ -1002,6 +1002,13 @@
       "when": 1789317922462,
       "tag": "0142_sos_rating_02_team_no_show_unilateral_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 143,
+      "version": "7",
+      "when": 1789320153204,
+      "tag": "0143_rating_ux_02_universal_rating_bonus_idempotent_ledger",
+      "breakpoints": true
     }
   ]
 }
