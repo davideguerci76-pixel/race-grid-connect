@@ -981,6 +981,13 @@
       "when": 1789299613319,
       "tag": "0139_f17_welcome_bonus_env_stamping",
       "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1789306603082,
+      "tag": "0140_f19_accept_request_row_lock_first",
+      "breakpoints": true
     }
   ]
 }
