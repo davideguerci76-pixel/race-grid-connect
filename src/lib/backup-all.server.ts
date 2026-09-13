@@ -138,7 +138,7 @@ export async function buildLiveBackup(adminId: string, backupPassword: string): 
   // Cross-check row counts against a second read (detects writes during the export window).
   const recount: Record<string, { exported: number; recount: number }> = {};
   for (const tbl of ["profiles", "requests", "engagements", "token_transactions", "ratings", "availability"]) {
-    const { count } = await (supabaseAdmin.from(tbl) as any).select("*", { count: "exact", head: true }).eq("is_test", false);
+    const { count } = await (supabaseAdmin as any).from(tbl).select("*", { count: "exact", head: true }).eq("is_test", false);
     recount[tbl] = { exported: business[tbl].length, recount: count ?? -1 };
   }
   const recountDrift = Object.entries(recount).filter(([, v]) => v.exported !== v.recount).map(([k]) => k);

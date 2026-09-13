@@ -76,9 +76,9 @@ function concat(...parts: Uint8Array[]): Uint8Array<ArrayBuffer> {
   return out;
 }
 
-function buildPrefix(header: EnvelopeHeader): Uint8Array {
+function buildPrefix(header: EnvelopeHeader): Uint8Array<ArrayBuffer> {
   const headerBytes = enc.encode(JSON.stringify(header));
-  const len = new Uint8Array(4);
+  const len = new Uint8Array(new ArrayBuffer(4));
   new DataView(len.buffer).setUint32(0, headerBytes.length, false);
   return concat(enc.encode(ENVELOPE_MAGIC), len, headerBytes);
 }
