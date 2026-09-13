@@ -62,7 +62,9 @@ function AdminBackup() {
   const [result, setResult] = useState<{ filename: string; sha256: string; bytes: number; datasets: string } | null>(null);
   const [reauthAge, setReauthAge] = useState<number | null>(null);
 
-  const provider = (user?.app_metadata?.provider as string | undefined) ?? "email";
+  const providers: string[] = (user?.app_metadata?.providers as string[] | undefined) ?? (user?.app_metadata?.provider ? [user.app_metadata.provider as string] : []);
+  const hasGoogle = providers.includes("google") || providers.length === 0;
+  const hasEmail = providers.includes("email") || providers.length === 0;
   const s = useMemo(() => strength(pw), [pw]);
   const pwOk = pw.length >= MIN_LEN && pw === pw2;
 
@@ -215,12 +217,13 @@ function AdminBackup() {
                 <DialogTitle className="uppercase tracking-tight">Re-authentication required</DialogTitle>
                 <DialogDescription>Confirm your identity again. The server accepts a backup request only within 5 minutes of a fresh sign-in.</DialogDescription>
               </DialogHeader>
-              {provider === "google" ? (
+              {hasGoogle && (
                 <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Your Admin account signs in with Google. If a full page sign-in opens, come back to Admin → Backup within 5 minutes.</p>
+                  <p className="text-sm text-muted-foreground">If a full page sign-in opens, come back to Admin → Backup within 5 minutes.</p>
                   <Button onClick={reauthGoogle} disabled={busy} className="w-full">Re-authenticate with Google</Button>
                 </div>
-              ) : (
+              )}
+              {hasEmail && (
                 <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); void reauthPassword(); }}>
                   <Label htmlFor="reauth-pw">Account password for {user?.email}</Label>
                   <Input id="reauth-pw" type="password" autoComplete="current-password" value={loginPw} onChange={(e) => setLoginPw(e.target.value)} />
