@@ -953,6 +953,13 @@
       "when": 1789211121642,
       "tag": "0135_guided_demo_completion_state",
       "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1789291880457,
+      "tag": "0136_scale_r3_indexes_o1_o2_o3",
+      "breakpoints": true
     }
   ]
 }
