@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<!--
+  PITCALL BACKUP OPENER — single-file, offline decryptor for PITCALL ".pitbackup" files.
+
+  PURPOSE
+    Open (decrypt + verify) an encrypted PITCALL backup produced by the Admin "BACKUP ALL (LIVE)"
+    function and download the original plaintext ZIP. Works without PITCALL, Lovable or any server.
+
+  SUPPORTED FORMAT
+    Envelope : magic "PITBKP01", header format "PITCALL_BACKUP_ENVELOPE" version 1
+    Payload  : manifest.json backup_format "PITCALL_BACKUP", format_version 1
+
+  CRYPTOGRAPHY (must match the generator exactly — never change these)
+    KDF    : scrypt (RFC 7914)  N=32768, r=8, p=1, dkLen=32, password NFKC-normalised, 16-byte random salt
+             - PBKDF2-HMAC-SHA256 steps  : browser WebCrypto (crypto.subtle.deriveBits)
+             - Salsa20/8, BlockMix, ROMix: plain JavaScript below, self-tested against the RFC 7914 test vector
+    Cipher : AES-256-GCM, 12-byte nonce, 128-bit authentication tag — browser WebCrypto (crypto.subtle.decrypt)
+    AAD    : the envelope prefix (magic + 4-byte header length + header JSON) — header tampering fails authentication
+    Layout : [0..8) magic | [8..12) header length uint32 BE | header JSON | ciphertext || 16-byte tag
+    ZIP    : parsed by a minimal reader below; DEFLATE handled by the browser's native DecompressionStream
+
+  NETWORK
+    None. No CDN, no imports, no fetch, no upload, no analytics. Safe to run from file:// with the network off.
+
+  PRIVACY
+    The backup file and the password never leave this browser tab. The password is kept in memory only for the
+    duration of the key derivation and is discarded afterwards. Nothing is written to localStorage, sessionStorage
+    or cookies. No PII from the backup is rendered on the page (only manifest counters).
+
+  LICENSE / ORIGIN
+    Written for PITCALL (OPS-BR-01C). No third-party code embedded.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none';">
+<meta name="referrer" content="no-referrer">
+<title>PITCALL BACKUP OPENER</title>
+<style>
+  :root { --bg:#0b0d10; --panel:#14181d; --line:#262d35; --text:#e8ecf1; --muted:#8b96a3; --accent:#e10600; --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:640px; margin:40px auto; padding:0 20px; }
+  h1 { font-size:22px; letter-spacing:.14em; margin:0 0 4px; }
+  h1 span { color:var(--accent); }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px; margin-bottom:16px; }
+  label { display:block; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
+  input[type=file], input[type=password] { width:100%; padding:10px 12px; background:#0b0d10; border:1px solid var(--line); border-radius:6px; color:var(--text); font-size:15px; }
+  button { margin-top:18px; width:100%; padding:12px; border:0; border-radius:6px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; background:var(--accent); color:#fff; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  button.secondary { background:#1f2730; color:var(--text); }
+  .note { font-size:13px; color:var(--muted); border-left:3px solid var(--line); padding-left:10px; margin:0; }
+  .status { margin-top:14px; font-size:14px; min-height:20px; }
+  .ok { color:var(--ok); font-weight:700; letter-spacing:.08em; }
+  .bad { color:var(--bad); font-weight:700; letter-spacing:.08em; }
+  .warn { color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:10px; }
+  td { padding:6px 0; border-bottom:1px solid var(--line); }
+  td:first-child { color:var(--muted); width:52%; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:13px; }
+  #result { display:none; }
+  footer { color:var(--muted); font-size:12px; margin-top:24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>PIT<span>CALL</span> BACKUP OPENER</h1>
+  <div class="sub">Offline decryptor for <code>.pitbackup</code> files — format PITBKP01 / PITCALL_BACKUP v1</div>
+
+  <section class="panel">
+    <p class="note">Everything happens locally in your browser.<br>No backup data or password is sent anywhere.</p>
+
+    <label for="file">Select .pitbackup</label>
+    <input id="file" type="file" accept=".pitbackup,application/octet-stream" autocomplete="off">
+
+    <label for="pwd">Backup password</label>
+    <input id="pwd" type="password" autocomplete="off" spellcheck="false">
+
+    <button id="open" type="button">Open backup</button>
+    <div id="status" class="status" aria-live="polite"></div>
+  </section>
+
+  <section class="panel" id="result">
+    <div class="ok">BACKUP VALID</div>
+    <table>
+      <tr><td>generated_at</td><td id="r_generated"></td></tr>
+      <tr><td>environment</td><td id="r_env"></td></tr>
+      <tr><td>format_version</td><td id="r_ver"></td></tr>
+      <tr><td>dataset count</td><td id="r_datasets"></td></tr>
+      <tr><td>file count (in ZIP)</td><td id="r_files"></td></tr>
+      <tr><td>architecture snapshot present</td><td id="r_arch"></td></tr>
+      <tr><td>checksums verified</td><td id="r_sums"></td></tr>
+    </table>
+    <button id="download" type="button">Download decrypted ZIP</button>
+    <p class="note warn" style="margin-top:14px">The decrypted ZIP contains sensitive PITCALL business and user data.<br>Store it securely or delete it after use.</p>
+  </section>
+
+  <footer>Self-test: <span id="selftest">running…</span> · Works offline · PITCALL cannot recover a lost backup password.</footer>
+</main>
+
+<script>
+"use strict";
+(() => {
+  // ---------- constants (mirror of the PITCALL generator; do not change) ----------
+  const MAGIC = "PITBKP01";
+  const ENVELOPE_FORMAT = "PITCALL_BACKUP_ENVELOPE";
+  const ENVELOPE_VERSION = 1;
+  const BACKUP_FORMAT = "PITCALL_BACKUP";
+  const BACKUP_FORMAT_VERSION = 1;
+  const KDF = { N: 32768, r: 8, p: 1, dkLen: 32 };
+  const SALT_BYTES = 16, NONCE_BYTES = 12, TAG_BITS = 128;
+  const ESSENTIAL_DATASETS = [
+    "profiles","freelancer_profiles","team_profiles","freelancer_contacts","user_roles","billing_details","legal_acceptances",
+    "availability","user_calendars","calendar_day_notes","requests","engagements","ratings","rating_bonus_grants",
+    "token_transactions","token_orders","token_order_events","platform_settings","matching_weights","token_packages",
+    "taxonomy_disciplines","taxonomy_languages","taxonomy_role_groups","taxonomy_sub_roles","taxonomy_skills","taxonomy_skill_role_groups",
+    "admin_emails",
+  ];
+
+  // ---------- user-facing error codes ----------
+  const E = {
+    WRONG: "WRONG PASSWORD OR CORRUPTED BACKUP",
+    FORMAT: "UNSUPPORTED PITCALL BACKUP FORMAT",
+    INTEGRITY: "BACKUP INTEGRITY CHECK FAILED",
+    MANIFEST: "MANIFEST INVALID",
+    BROWSER: "BROWSER NOT SUPPORTED",
+  };
+  class UserError extends Error { constructor(code, detail) { super(code); this.code = code; this.detail = detail || ""; } }
+
+  const $ = (id) => document.getElementById(id);
+  const enc = new TextEncoder(), dec = new TextDecoder("utf-8", { fatal: true });
+  const setStatus = (html, cls) => { const s = $("status"); s.className = "status " + (cls || ""); s.textContent = html; };
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+
+  // ---------- browser capability check ----------
+  function assertBrowser() {
+    const le = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1; // scrypt uses little-endian words
+    if (!le || !window.crypto || !crypto.subtle || typeof DecompressionStream === "undefined" || typeof Blob === "undefined")
+      throw new UserError(E.BROWSER);
+  }
+
+  // ---------- scrypt (RFC 7914) ----------
+  function pbkdf2(passwordBytes, salt, bits) {
+    return crypto.subtle.importKey("raw", passwordBytes, "PBKDF2", false, ["deriveBits"])
+      .then((k) => crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: 1 }, k, bits))
+      .then((b) => new Uint8Array(b));
+  }
+  const R = (a, b) => (a << b) | (a >>> (32 - b));
+  // Salsa20/8 core on 16 little-endian words, in place.
+  function salsa208(B, x) {
+    x.set(B);
+    for (let i = 0; i < 8; i += 2) {
+      x[ 4] ^= R(x[ 0]+x[12], 7); x[ 8] ^= R(x[ 4]+x[ 0], 9); x[12] ^= R(x[ 8]+x[ 4],13); x[ 0] ^= R(x[12]+x[ 8],18);
+      x[ 9] ^= R(x[ 5]+x[ 1], 7); x[13] ^= R(x[ 9]+x[ 5], 9); x[ 1] ^= R(x[13]+x[ 9],13); x[ 5] ^= R(x[ 1]+x[13],18);
+      x[14] ^= R(x[10]+x[ 6], 7); x[ 2] ^= R(x[14]+x[10], 9); x[ 6] ^= R(x[ 2]+x[14],13); x[10] ^= R(x[ 6]+x[ 2],18);
+      x[ 3] ^= R(x[15]+x[11], 7); x[ 7] ^= R(x[ 3]+x[15], 9); x[11] ^= R(x[ 7]+x[ 3],13); x[15] ^= R(x[11]+x[ 7],18);
+      x[ 1] ^= R(x[ 0]+x[ 3], 7); x[ 2] ^= R(x[ 1]+x[ 0], 9); x[ 3] ^= R(x[ 2]+x[ 1],13); x[ 0] ^= R(x[ 3]+x[ 2],18);
+      x[ 6] ^= R(x[ 5]+x[ 4], 7); x[ 7] ^= R(x[ 6]+x[ 5], 9); x[ 4] ^= R(x[ 7]+x[ 6],13); x[ 5] ^= R(x[ 4]+x[ 7],18);
+      x[11] ^= R(x[10]+x[ 9], 7); x[ 8] ^= R(x[11]+x[10], 9); x[ 9] ^= R(x[ 8]+x[11],13); x[10] ^= R(x[ 9]+x[ 8],18);
+      x[12] ^= R(x[15]+x[14], 7); x[13] ^= R(x[12]+x[15], 9); x[14] ^= R(x[13]+x[12],13); x[15] ^= R(x[14]+x[13],18);
+    }
+    for (let i = 0; i < 16; i++) B[i] = (B[i] + x[i]) | 0;
+  }
+  // BlockMix: B has 2r blocks of 16 words; result written to Y (same length).
+  function blockMix(B, Y, r, X, tmp) {
+    const n = 2 * r;
+    X.set(B.subarray((n - 1) * 16, n * 16));
+    for (let i = 0; i < n; i++) {
+      for (let k = 0; k < 16; k++) X[k] ^= B[i * 16 + k];
+      salsa208(X, tmp);
+      const dst = (i & 1) ? (r + (i >> 1)) * 16 : (i >> 1) * 16;
+      Y.set(X, dst);
+    }
+  }
+  async function scrypt(passwordBytes, salt, { N, r, p, dkLen }, onProgress) {
+    const blen = 128 * r;                       // bytes per block-set
+    const B = await pbkdf2(passwordBytes, salt, p * blen * 8);
+    const words = blen / 4;
+    const V = new Uint32Array(N * words);       // N * 128r bytes (32 MiB for N=32768, r=8)
+    const X = new Uint32Array(16), tmp = new Uint32Array(16);
+    let Xw = new Uint32Array(words), Yw = new Uint32Array(words);
+    const bytesView = new Uint8Array(B.buffer);
+    for (let pi = 0; pi < p; pi++) {
+      Xw.set(new Uint32Array(B.buffer, pi * blen, words));
+      for (let i = 0; i < N; i++) {             // ROMix step 1
+        V.set(Xw, i * words);
+        blockMix(Xw, Yw, r, X, tmp); [Xw, Yw] = [Yw, Xw];
+        if ((i & 4095) === 4095) { onProgress && onProgress(i / (2 * N)); await tick(); }
+      }
+      for (let i = 0; i < N; i++) {             // ROMix step 2
+        const j = Xw[(2 * r - 1) * 16] & (N - 1);  // Integerify (N is a power of two)
+        for (let k = 0; k < words; k++) Xw[k] ^= V[j * words + k];
+        blockMix(Xw, Yw, r, X, tmp); [Xw, Yw] = [Yw, Xw];
+        if ((i & 4095) === 4095) { onProgress && onProgress(0.5 + i / (2 * N)); await tick(); }
+      }
+      bytesView.set(new Uint8Array(Xw.buffer), pi * blen);
+    }
+    const out = await pbkdf2(passwordBytes, B, dkLen * 8);
+    B.fill(0); V.fill(0); Xw.fill(0); Yw.fill(0);
+    return out;
+  }
+  const hex = (u8) => Array.from(u8, (b) => b.toString(16).padStart(2, "0")).join("");
+
+  // RFC 7914 §12 test vector #2: scrypt("password","NaCl",N=1024,r=8,p=16,dkLen=64)
+  async function selfTest() {
+    const expect = "fdbabe1c9d3472007856e7190d01e9fe7c6ad7cbc8237830e77376634b3731622eaf30d92e22a3886ff109279d9830dac727afb94a83ee6d8360cbdfa2cc0640";
+    const out = await scrypt(enc.encode("password"), enc.encode("NaCl"), { N: 1024, r: 8, p: 16, dkLen: 64 });
+    if (hex(out) !== expect) throw new Error("scrypt self-test mismatch");
+  }
+
+  // ---------- envelope parsing ----------
+  function parseEnvelope(bytes) {
+    if (bytes.length < 12) throw new UserError(E.FORMAT, "too short");
+    for (let i = 0; i < 8; i++) if (bytes[i] !== MAGIC.charCodeAt(i)) throw new UserError(E.FORMAT, "magic");
+    const len = new DataView(bytes.buffer, bytes.byteOffset + 8, 4).getUint32(0, false);
+    if (len <= 0 || len > 65536 || 12 + len + 16 > bytes.length) throw new UserError(E.FORMAT, "header length");
+    let h;
+    try { h = JSON.parse(dec.decode(bytes.subarray(12, 12 + len))); } catch { throw new UserError(E.FORMAT, "header json"); }
+    if (h.format !== ENVELOPE_FORMAT || h.version !== ENVELOPE_VERSION) throw new UserError(E.FORMAT, "format/version");
+    if (h.kdf !== "scrypt" || h.cipher !== "AES-256-GCM" || h.plaintext_content !== "zip") throw new UserError(E.FORMAT, "algorithms");
+    const kp = h.kdf_params || {};
+    if (kp.N !== KDF.N || kp.r !== KDF.r || kp.p !== KDF.p || kp.dkLen !== KDF.dkLen) throw new UserError(E.FORMAT, "kdf params");
+    if (h.tag_bits !== TAG_BITS) throw new UserError(E.FORMAT, "tag bits");
+    let salt, nonce;
+    try { salt = unb64(h.salt); nonce = unb64(h.nonce); } catch { throw new UserError(E.FORMAT, "salt/nonce encoding"); }
+    if (salt.length !== SALT_BYTES || nonce.length !== NONCE_BYTES) throw new UserError(E.FORMAT, "salt/nonce length");
+    return { header: h, salt, nonce, prefix: bytes.slice(0, 12 + len), ciphertext: bytes.slice(12 + len) };
+  }
+  function unb64(s) { const bin = atob(s); const u = new Uint8Array(bin.length); for (let i = 0; i < u.length; i++) u[i] = bin.charCodeAt(i); return u; }
+
+  // ---------- minimal ZIP reader (central directory; STORE + DEFLATE) ----------
+  async function readZip(buf) {
+    const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+    let eocd = -1;
+    for (let i = buf.length - 22; i >= Math.max(0, buf.length - 22 - 65535); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new UserError(E.INTEGRITY, "zip eocd");
+    const count = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true);
+    const files = new Map();
+    let p = cdOff;
+    for (let n = 0; n < count; n++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) throw new UserError(E.INTEGRITY, "zip cd");
+      const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
+      const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lo = dv.getUint32(p + 42, true);
+      const name = dec.decode(buf.subarray(p + 46, p + 46 + nl));
+      if (dv.getUint32(lo, true) !== 0x04034b50) throw new UserError(E.INTEGRITY, "zip local header");
+      const dataStart = lo + 30 + dv.getUint16(lo + 26, true) + dv.getUint16(lo + 28, true);
+      const raw = buf.subarray(dataStart, dataStart + csize);
+      let data;
+      if (method === 0) data = raw;
+      else if (method === 8) data = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
+      else throw new UserError(E.INTEGRITY, "zip method " + method);
+      if (data.length !== usize) throw new UserError(E.INTEGRITY, "zip size");
+      files.set(name, data);
+      p += 46 + nl + el + cl;
+    }
+    return files;
+  }
+
+  // ---------- manifest + checksum validation ----------
+  async function sha256Hex(u8) { return hex(new Uint8Array(await crypto.subtle.digest("SHA-256", u8))); }
+  async function validatePackage(files) {
+    const m = files.get("manifest.json");
+    if (!m) throw new UserError(E.MANIFEST, "manifest missing");
+    let manifest;
+    try { manifest = JSON.parse(dec.decode(m)); } catch { throw new UserError(E.MANIFEST, "manifest json"); }
+    if (manifest.backup_format !== BACKUP_FORMAT) throw new UserError(E.MANIFEST, "backup_format");
+    if (manifest.format_version !== BACKUP_FORMAT_VERSION) throw new UserError(E.MANIFEST, "format_version");
+    if (typeof manifest.environment !== "string" || !manifest.environment) throw new UserError(E.MANIFEST, "environment");
+    if (!Array.isArray(manifest.datasets) || manifest.datasets.length === 0) throw new UserError(E.MANIFEST, "datasets");
+    let verified = 0;
+    for (const d of manifest.datasets) {
+      const f = files.get(String(d.file));
+      if (!f) throw new UserError(E.INTEGRITY, "dataset file missing: " + d.file);
+      if (typeof d.bytes === "number" && d.bytes !== f.length) throw new UserError(E.INTEGRITY, "size " + d.file);
+      if ((await sha256Hex(f)) !== String(d.sha256).toLowerCase()) throw new UserError(E.INTEGRITY, "sha256 " + d.file);
+      verified++;
+    }
+    for (const name of ESSENTIAL_DATASETS) if (!files.has("business/" + name + ".json")) throw new UserError(E.INTEGRITY, "essential dataset missing: " + name);
+    const archDeclared = !!(manifest.schema_state && manifest.schema_state.architecture_snapshot_sha256);
+    const archPresent = files.has("architecture/snapshot.json");
+    if (archDeclared && !archPresent) throw new UserError(E.INTEGRITY, "architecture snapshot missing");
+    if (archPresent && archDeclared && (await sha256Hex(files.get("architecture/snapshot.json"))) !== manifest.schema_state.architecture_snapshot_sha256)
+      throw new UserError(E.INTEGRITY, "architecture snapshot sha256");
+    if (typeof manifest.files_total === "number" && manifest.files_total !== files.size) throw new UserError(E.INTEGRITY, "files_total");
+    return { manifest, verified, archPresent };
+  }
+
+  // ---------- main flow ----------
+  let pendingZip = null, pendingName = "pitcall-backup.zip";
+  function outName(manifest) {
+    const d = new Date(manifest.generated_at);
+    const env = String(manifest.environment || "backup").replace(/[^a-z0-9]/gi, "").toLowerCase();
+    if (isNaN(d.getTime())) return "pitcall-backup-" + env + ".zip";
+    const p = (n) => String(n).padStart(2, "0");
+    return "pitcall-backup-" + env + "-" + d.getUTCFullYear() + "-" + p(d.getUTCMonth() + 1) + "-" + p(d.getUTCDate()) + "_" + p(d.getUTCHours()) + "-" + p(d.getUTCMinutes()) + ".zip";
+  }
+
+  async function openBackup() {
+    const fileEl = $("file"), pwdEl = $("pwd"), btn = $("open");
+    $("result").style.display = "none"; pendingZip = null;
+    if (!fileEl.files || !fileEl.files[0]) { setStatus("Select a .pitbackup file first.", "bad"); return; }
+    if (!pwdEl.value) { setStatus("Enter the backup password.", "bad"); return; }
+    btn.disabled = true;
+    let pwdBytes = null;
+    try {
+      assertBrowser();
+      // Password: NFKC-normalised bytes only; the input is cleared immediately.
+      pwdBytes = enc.encode(pwdEl.value.normalize("NFKC"));
+      pwdEl.value = "";
+
+      setStatus("Reading file…");
+      const bytes = new Uint8Array(await fileEl.files[0].arrayBuffer());
+      const env = parseEnvelope(bytes);
+
+      setStatus("Deriving key (scrypt N=32768)… 0%");
+      const key = await scrypt(pwdBytes, env.salt, KDF, (f) => setStatus("Deriving key (scrypt N=32768)… " + Math.round(f * 100) + "%"));
+      pwdBytes.fill(0); pwdBytes = null;
+
+      setStatus("Decrypting (AES-256-GCM)…");
+      const ck = await crypto.subtle.importKey("raw", key, { name: "AES-GCM" }, false, ["decrypt"]);
+      key.fill(0);
+      let plain;
+      try {
+        plain = new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: env.nonce, additionalData: env.prefix, tagLength: TAG_BITS }, ck, env.ciphertext));
+      } catch { throw new UserError(E.WRONG); }
+
+      setStatus("Verifying package…");
+      const files = await readZip(plain);
+      const { manifest, verified, archPresent } = await validatePackage(files);
+
+      pendingZip = plain; pendingName = outName(manifest);
+      $("r_generated").textContent = String(manifest.generated_at);
+      $("r_env").textContent = String(manifest.environment);
+      $("r_ver").textContent = String(manifest.format_version);
+      $("r_datasets").textContent = String(manifest.datasets.length);
+      $("r_files").textContent = String(files.size);
+      $("r_arch").textContent = archPresent ? "yes" : "no";
+      $("r_sums").textContent = verified + " / " + manifest.datasets.length + " OK";
+      $("result").style.display = "block";
+      setStatus("Decrypted and verified. Password discarded from memory.", "ok");
+    } catch (err) {
+      const code = err instanceof UserError ? err.code : E.INTEGRITY;
+      setStatus(code, "bad");
+      $("result").style.display = "none"; pendingZip = null;
+    } finally {
+      if (pwdBytes) pwdBytes.fill(0);
+      pwdEl.value = "";
+      btn.disabled = false;
+    }
+  }
+
+  function downloadZip() {
+    if (!pendingZip) return;
+    const url = URL.createObjectURL(new Blob([pendingZip], { type: "application/zip" }));
+    const a = document.createElement("a"); a.href = url; a.download = pendingName; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  $("open").addEventListener("click", openBackup);
+  $("download").addEventListener("click", downloadZip);
+  $("pwd").addEventListener("keydown", (e) => { if (e.key === "Enter") openBackup(); });
+
+  try { assertBrowser(); } catch { setStatus(E.BROWSER, "bad"); $("open").disabled = true; $("selftest").textContent = "skipped"; }
+  if (!$("open").disabled) selfTest().then(() => { $("selftest").textContent = "scrypt RFC 7914 vector OK"; })
+    .catch(() => { $("selftest").textContent = "scrypt self-test FAILED"; $("open").disabled = true; setStatus(E.BROWSER, "bad"); });
+})();
+</script>
+</body>
+</html>
