@@ -249,7 +249,7 @@ function EngagementsPage() {
                   <div className="w-full rounded-lg border border-border bg-background p-4">
                     <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
                     {noShowUnilateral ? (
-                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.no_show_unilateral_hint", { name: other?.display_name })}</div>
+                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.no_show_unilateral_hint", { name: other?.display_name || t("contact.user_type_freelancer") })}</div>
                     ) : (
                       <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
                     )}
