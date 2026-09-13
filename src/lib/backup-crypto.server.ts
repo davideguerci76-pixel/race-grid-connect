@@ -58,9 +58,16 @@ function scrypt(password: string, salt: Uint8Array): Promise<Uint8Array> {
   });
 }
 
-function concat(...parts: Uint8Array[]): Uint8Array {
+/** Copies into a fresh ArrayBuffer-backed view (WebCrypto BufferSource typing). */
+export function toAB(u8: Uint8Array): Uint8Array<ArrayBuffer> {
+  const out = new Uint8Array(new ArrayBuffer(u8.byteLength));
+  out.set(u8);
+  return out;
+}
+
+function concat(...parts: Uint8Array[]): Uint8Array<ArrayBuffer> {
   const total = parts.reduce((n, p) => n + p.length, 0);
-  const out = new Uint8Array(total);
+  const out = new Uint8Array(new ArrayBuffer(total));
   let o = 0;
   for (const p of parts) {
     out.set(p, o);
@@ -83,10 +90,10 @@ export function assertBackupPasswordPolicy(password: string) {
 }
 
 /** Encrypts a plaintext archive. The password is used once and never stored. */
-export async function encryptBackup(plaintext: Uint8Array, password: string): Promise<{ bytes: Uint8Array; header: EnvelopeHeader }> {
+export async function encryptBackup(plaintext: Uint8Array, password: string): Promise<{ bytes: Uint8Array<ArrayBuffer>; header: EnvelopeHeader }> {
   assertBackupPasswordPolicy(password);
-  const salt = new Uint8Array(randomBytes(SALT_BYTES));
-  const nonce = new Uint8Array(randomBytes(NONCE_BYTES));
+  const salt = toAB(randomBytes(SALT_BYTES));
+  const nonce = toAB(randomBytes(NONCE_BYTES));
   const header: EnvelopeHeader = {
     format: ENVELOPE_FORMAT,
     version: ENVELOPE_VERSION,
@@ -101,23 +108,23 @@ export async function encryptBackup(plaintext: Uint8Array, password: string): Pr
   };
   const prefix = buildPrefix(header);
   const keyBytes = await scrypt(password, salt);
-  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["encrypt"]);
+  const key = await crypto.subtle.importKey("raw", toAB(keyBytes), { name: "AES-GCM" }, false, ["encrypt"]);
   keyBytes.fill(0);
   const ct = new Uint8Array(
-    await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce, additionalData: prefix, tagLength: TAG_BITS }, key, plaintext),
+    await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce, additionalData: prefix, tagLength: TAG_BITS }, key, toAB(plaintext)),
   );
   return { bytes: concat(prefix, ct), header };
 }
 
 /** Parses the public envelope header without decrypting. */
-export function parseEnvelope(bytes: Uint8Array): { header: EnvelopeHeader; prefix: Uint8Array; ciphertext: Uint8Array } {
+export function parseEnvelope(bytes: Uint8Array): { header: EnvelopeHeader; prefix: Uint8Array<ArrayBuffer>; ciphertext: Uint8Array<ArrayBuffer> } {
   if (bytes.length < 12 || dec.decode(bytes.subarray(0, 8)) !== ENVELOPE_MAGIC) throw new Error("NOT_A_PITCALL_BACKUP");
   const len = new DataView(bytes.buffer, bytes.byteOffset + 8, 4).getUint32(0, false);
   if (12 + len > bytes.length) throw new Error("ENVELOPE_TRUNCATED");
   const header = JSON.parse(dec.decode(bytes.subarray(12, 12 + len))) as EnvelopeHeader;
   if (header.format !== ENVELOPE_FORMAT || header.version !== ENVELOPE_VERSION) throw new Error("ENVELOPE_VERSION_UNSUPPORTED");
   if (header.kdf !== "scrypt" || header.cipher !== "AES-256-GCM") throw new Error("ENVELOPE_ALGORITHM_UNSUPPORTED");
-  return { header, prefix: bytes.subarray(0, 12 + len), ciphertext: bytes.subarray(12 + len) };
+  return { header, prefix: toAB(bytes.subarray(0, 12 + len)), ciphertext: toAB(bytes.subarray(12 + len)) };
 }
 
 /**
@@ -126,15 +133,15 @@ export function parseEnvelope(bytes: Uint8Array): { header: EnvelopeHeader; pref
  */
 export async function decryptBackup(bytes: Uint8Array, password: string): Promise<Uint8Array> {
   const { header, prefix, ciphertext } = parseEnvelope(bytes);
-  const salt = unb64(header.salt);
-  const nonce = unb64(header.nonce);
+  const salt = toAB(unb64(header.salt));
+  const nonce = toAB(unb64(header.nonce));
   const p = header.kdf_params;
   const keyBytes = await new Promise<Uint8Array>((resolve, reject) =>
     scryptCb(password.normalize("NFKC"), salt, p.dkLen, { N: p.N, r: p.r, p: p.p, maxmem: 64 * 1024 * 1024 }, (err, key) =>
       err ? reject(err) : resolve(new Uint8Array(key)),
     ),
   );
-  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, ["decrypt"]);
+  const key = await crypto.subtle.importKey("raw", toAB(keyBytes), { name: "AES-GCM" }, false, ["decrypt"]);
   keyBytes.fill(0);
   try {
     return new Uint8Array(
@@ -146,6 +153,6 @@ export async function decryptBackup(bytes: Uint8Array, password: string): Promis
 }
 
 export async function sha256Hex(bytes: Uint8Array): Promise<string> {
-  const d = await crypto.subtle.digest("SHA-256", bytes);
+  const d = await crypto.subtle.digest("SHA-256", toAB(bytes));
   return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join("");
 }
