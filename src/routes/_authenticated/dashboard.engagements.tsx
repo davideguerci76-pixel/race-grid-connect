@@ -228,14 +228,16 @@ function EngagementsPage() {
             const isFreelancer = user?.id === e.freelancer_id;
             const other = isFreelancer ? e.team : e.freelancer;
             const req = e.request;
-            const ratingSlot = (e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
+            // SOS-RATING-02: Team may rate a Freelancer it declared no-show (SOS Call) — unilateral, immediate.
+            const noShowUnilateral = !isFreelancer && e.status === "cancelled" && e.cancellation_kind === "no_show" && e.no_show === true;
+            const ratingSlot = (e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting") || noShowUnilateral) && (() => {
               const info = ratableMap.get(e.id);
               const mineRated = ratedMap.get(e.id);
               const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
               const now = Date.now();
               const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
               const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
-              const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;
+              const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral || noShowUnilateral;
               if (alreadyRated) {
                 return <StatusChip tone="muted">{t("rating.submitted")}</StatusChip>;
               }
@@ -246,7 +248,11 @@ function EngagementsPage() {
                 return (
                   <div className="w-full rounded-lg border border-border bg-background p-4">
                     <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
-                    <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                    {noShowUnilateral ? (
+                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.no_show_unilateral_hint", { name: other?.display_name })}</div>
+                    ) : (
+                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                    )}
                     {isFreelancer ? (
                       <div>
                         <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.team_overall")}</div>
