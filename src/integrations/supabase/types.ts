@@ -3025,6 +3025,7 @@ export type Database = {
         Args: { _day: string; _freelancer: string }
         Returns: boolean
       }
+      backup_all_live_export: { Args: never; Returns: Json }
       build_match_snapshot: { Args: { _match_id: string }; Returns: Json }
       can_view_team_identity: { Args: { _team: string }; Returns: boolean }
       cancel_engagement: {
