@@ -41,7 +41,7 @@ export const SNAPSHOT_LIMITATIONS = [
 
 type Json = Record<string, unknown>;
 
-const SECRET_MARKERS = ["sb_secret_", "sk_live_", "sk_test_", "rk_live_", "whsec_", "-----BEGIN", "service_role"];
+const SECRET_MARKERS = ["sb_secret_", "sk_live_", "sk_test_", "rk_live_", "whsec_", "-----BEGIN PRIVATE", "-----BEGIN RSA", "eyJhbGciOi"];
 
 function envSecretValues(): string[] {
   const out: string[] = [];
