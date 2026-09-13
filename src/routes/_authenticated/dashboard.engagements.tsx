@@ -180,7 +180,7 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const rateMut = useMutation({
-    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
+    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean; unilateral?: boolean }) => {
       if (v.isFreelancerReviewer) {
         return rateFn({ data: { engagement_id: v.engagement_id, overall, sub_scores: {}, comment: comment || null } });
       }
@@ -193,7 +193,7 @@ function EngagementsPage() {
         next.add(variables.engagement_id);
         return next;
       });
-      if (res && res.ok === false && res.already_rated) {
+      if ((res && res.ok === false && res.already_rated) || variables.unilateral) {
         toast.info(t("rating.submitted"));
       } else {
         toast.success(
@@ -228,14 +228,16 @@ function EngagementsPage() {
             const isFreelancer = user?.id === e.freelancer_id;
             const other = isFreelancer ? e.team : e.freelancer;
             const req = e.request;
-            const ratingSlot = (e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting")) && (() => {
+            // SOS-RATING-02: Team may rate a Freelancer it declared no-show (SOS Call) — unilateral, immediate.
+            const noShowUnilateral = !isFreelancer && e.status === "cancelled" && e.cancellation_kind === "no_show" && e.no_show === true;
+            const ratingSlot = (e.status === "confirmed" || e.status === "completed" || (isFreelancer && e.cancellation_kind === "team_ghosting") || noShowUnilateral) && (() => {
               const info = ratableMap.get(e.id);
               const mineRated = ratedMap.get(e.id);
               const alreadyRated = !!info?.already_rated || !!mineRated || locallySubmittedRatings.has(e.id);
               const now = Date.now();
               const opensAt = info?.opens_at ? new Date(info.opens_at).getTime() : null;
               const ghostingUnilateral = isFreelancer && e.cancellation_kind === "team_ghosting";
-              const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral;
+              const canRate = (opensAt !== null && now >= opensAt) || ghostingUnilateral || noShowUnilateral;
               if (alreadyRated) {
                 return <StatusChip tone="muted">{t("rating.submitted")}</StatusChip>;
               }
@@ -246,7 +248,11 @@ function EngagementsPage() {
                 return (
                   <div className="w-full rounded-lg border border-border bg-background p-4">
                     <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
-                    <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                    {noShowUnilateral ? (
+                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.no_show_unilateral_hint", { name: other?.display_name })}</div>
+                    ) : (
+                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
+                    )}
                     {isFreelancer ? (
                       <div>
                         <div className="mb-1 text-[11px] uppercase tracking-widest">{t("rating.team_overall")}</div>
@@ -273,10 +279,17 @@ function EngagementsPage() {
                     )}
                     <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
                     <div className="mt-3 flex gap-2">
-                      <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer })} className={cardBtn.primary}>{t("rating.submit")}</button>
+                      <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer, unilateral: noShowUnilateral })} className={cardBtn.primary}>{t("rating.submit")}</button>
                       <button onClick={() => setRatingFor(null)} className={cardBtn.ghost}>{t("common.cancel")}</button>
                     </div>
                   </div>
+                );
+              }
+              if (noShowUnilateral) {
+                return (
+                  <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
+                    {t("rating.rate_no_show")}
+                  </button>
                 );
               }
               return (

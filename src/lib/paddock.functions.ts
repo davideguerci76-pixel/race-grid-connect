@@ -2211,15 +2211,30 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: engs, error } = await supabase
       .from("engagements")
-      .select("id, freelancer_id, team_id, start_date, end_date, status, request_id, request:requests(title, season_dates)")
+      .select("id, freelancer_id, team_id, start_date, end_date, status, request_id, cancellation_kind, no_show, request:requests(title, season_dates)")
       .in("status", ["confirmed", "completed"])
       .or(`freelancer_id.eq.${userId},team_id.eq.${userId}`);
     if (error) throw new Error(error.message);
+    // SOS-RATING-02: Team-declared no-show → the Team may rate the no-show Freelancer immediately (unilateral).
+    // Restricted to cancelled + no_show + team owner; no other cancelled engagement becomes ratable here.
+    const { data: noShowEngs, error: nsErr } = await supabase
+      .from("engagements")
+      .select("id, freelancer_id, team_id, start_date, end_date, status, request_id, cancellation_kind, no_show, request:requests(title, season_dates)")
+      .eq("status", "cancelled")
+      .eq("cancellation_kind", "no_show")
+      .eq("no_show", true)
+      .eq("team_id", userId);
+    if (nsErr) throw new Error(nsErr.message);
     const items = [] as any[];
     for (const e of (engs ?? []) as any[]) {
       const { data: opens } = await supabase.rpc("rating_opens_at", { _engagement_id: e.id });
       const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
       items.push({ ...e, opens_at: opens, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
+    }
+    for (const e of (noShowEngs ?? []) as any[]) {
+      const { data: mine } = await supabase.from("ratings").select("id, unlocked_at").eq("engagement_id", e.id).eq("from_user_id", userId).maybeSingle();
+      // Opens immediately: the reputational event (the no-show) has already happened.
+      items.push({ ...e, opens_at: new Date(0).toISOString(), no_show_unilateral: true, already_rated: !!mine, unlocked: !!(mine as any)?.unlocked_at });
     }
     return items;
   });
