@@ -285,6 +285,13 @@ function EngagementsPage() {
                   </div>
                 );
               }
+              if (noShowUnilateral) {
+                return (
+                  <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
+                    {t("rating.rate_no_show")}
+                  </button>
+                );
+              }
               return (
                 <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
                   {t("engagements.rate")}{" "}
