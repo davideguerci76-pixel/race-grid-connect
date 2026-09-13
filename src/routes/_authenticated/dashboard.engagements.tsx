@@ -180,7 +180,7 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const rateMut = useMutation({
-    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean }) => {
+    mutationFn: (v: { engagement_id: string; isFreelancerReviewer: boolean; unilateral?: boolean }) => {
       if (v.isFreelancerReviewer) {
         return rateFn({ data: { engagement_id: v.engagement_id, overall, sub_scores: {}, comment: comment || null } });
       }
@@ -193,7 +193,7 @@ function EngagementsPage() {
         next.add(variables.engagement_id);
         return next;
       });
-      if (res && res.ok === false && res.already_rated) {
+      if ((res && res.ok === false && res.already_rated) || variables.unilateral) {
         toast.info(t("rating.submitted"));
       } else {
         toast.success(
@@ -279,7 +279,7 @@ function EngagementsPage() {
                     )}
                     <textarea rows={2} value={comment} onChange={(v) => setComment(v.target.value)} placeholder={t("rating.comment_placeholder")} className="mt-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" maxLength={500} />
                     <div className="mt-3 flex gap-2">
-                      <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer })} className={cardBtn.primary}>{t("rating.submit")}</button>
+                      <button onClick={() => rateMut.mutate({ engagement_id: e.id, isFreelancerReviewer: isFreelancer, unilateral: noShowUnilateral })} className={cardBtn.primary}>{t("rating.submit")}</button>
                       <button onClick={() => setRatingFor(null)} className={cardBtn.ghost}>{t("common.cancel")}</button>
                     </div>
                   </div>
