@@ -1313,6 +1313,27 @@ export type Database = {
           },
         ]
       }
+      rating_bonus_grants: {
+        Row: {
+          engagement_id: string
+          granted_at: string
+          is_test: boolean
+          user_id: string
+        }
+        Insert: {
+          engagement_id: string
+          granted_at?: string
+          is_test?: boolean
+          user_id: string
+        }
+        Update: {
+          engagement_id?: string
+          granted_at?: string
+          is_test?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       rating_flags: {
         Row: {
           created_at: string

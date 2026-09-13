@@ -1178,7 +1178,11 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       const contact = contactsMap.get(r.freelancer_id) ?? null;
       // The freelancer's legal name is only disclosed to the team once the match is confirmed.
       const engagementSealed = r.status === "confirmed" || r.status === "completed";
-      const disclosed = engagementSealed || r.freelancer_id === userId;
+      // RATING-UX-02: a Team-declared no-show (SOS) always originates from a CONFIRMED
+      // engagement, so the identity was already legitimately revealed to this Team —
+      // keep it visible on the cancelled/no_show row (needed for the unilateral rating form).
+      const noShowDeclaredByMe = r.team_id === userId && r.status === "cancelled" && r.cancellation_kind === "no_show" && r.no_show === true;
+      const disclosed = engagementSealed || noShowDeclaredByMe || r.freelancer_id === userId;
       // Team identity stays anonymous for the freelancer until the engagement is
       // confirmed: a "Request confirmation" (status = proposed) must never leak it.
       const teamDisclosed = engagementSealed || r.team_id === userId;

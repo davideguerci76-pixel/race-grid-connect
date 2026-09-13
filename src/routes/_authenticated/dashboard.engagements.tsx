@@ -193,7 +193,9 @@ function EngagementsPage() {
         next.add(variables.engagement_id);
         return next;
       });
-      if ((res && res.ok === false && res.already_rated) || variables.unilateral) {
+      // RATING-UX-02: the toast reflects the REAL accrual reported by the server
+      // (token_bonus_awarded), so it stays coherent with the idempotency ledger.
+      if ((res && res.ok === false && res.already_rated) || res?.token_bonus_awarded === false) {
         toast.info(t("rating.submitted"));
       } else {
         toast.success(
@@ -247,9 +249,15 @@ function EngagementsPage() {
               if (ratingFor === e.id) {
                 return (
                   <div className="w-full rounded-lg border border-border bg-background p-4">
-                    <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name })}</div>
+                    <div className="label-mono mb-2">{t("engagements.rate_them", { name: other?.display_name || t("contact.user_type_freelancer") })}</div>
                     {noShowUnilateral ? (
-                      <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.no_show_unilateral_hint", { name: other?.display_name || t("contact.user_type_freelancer") })}</div>
+                      <>
+                        <div className="mb-1 text-sm font-bold">{t("rating.rating_target", { name: other?.display_name || t("contact.user_type_freelancer") })}</div>
+                        <div className="mb-2 text-[11px] text-muted-foreground">
+                          {t("rating.no_show_unilateral_hint", { name: other?.display_name || t("contact.user_type_freelancer") })}{" "}
+                          {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                        </div>
+                      </>
                     ) : (
                       <div className="mb-2 text-[11px] text-muted-foreground">{t("rating.double_blind_hint")}</div>
                     )}
@@ -288,7 +296,10 @@ function EngagementsPage() {
               if (noShowUnilateral) {
                 return (
                   <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
-                    {t("rating.rate_no_show")}
+                    {t("rating.rate_no_show")}{" "}
+                    <span className="ml-1 text-[9px]">
+                      {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                    </span>
                   </button>
                 );
               }

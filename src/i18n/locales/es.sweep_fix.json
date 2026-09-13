@@ -41,7 +41,8 @@
     "rate_bonus": "(+{{bonus}} token de bonus)",
     "rate_bonus_generic": "(token de bonus)",
     "rate_no_show": "Valorar la ausencia",
-    "no_show_unilateral_hint": "Reseña unilateral por ausencia declarada por el Team: estás valorando a {{name}}, que no se presentó — no al sustituto SOS. Se publica de inmediato, sin respuesta requerida, sin bono de tokens."
+    "no_show_unilateral_hint": "Reseña unilateral por ausencia declarada por el Team: estás valorando a {{name}}, que no se presentó — no al sustituto SOS. Se publica de inmediato, sin respuesta requerida. Recibes el bono por reseña.",
+    "rating_target": "Estás valorando a {{name}}"
   },
   "engagements": {
     "confirmed_toast": "Engagement confirmado"

@@ -41,7 +41,8 @@
     "rate_bonus": "(+{{bonus}} Token Bonus)",
     "rate_bonus_generic": "(Token Bonus)",
     "rate_no_show": "No-Show bewerten",
-    "no_show_unilateral_hint": "Einseitige Bewertung für ein vom Team gemeldetes No-Show: Sie bewerten {{name}}, der nicht erschienen ist — nicht den SOS-Ersatz. Sofort veröffentlicht, keine Antwort nötig, kein Token-Bonus."
+    "no_show_unilateral_hint": "Einseitige Bewertung für ein vom Team gemeldetes No-Show: Sie bewerten {{name}}, der nicht erschienen ist — nicht den SOS-Ersatz. Sofort veröffentlicht, keine Antwort nötig. Sie erhalten den Bewertungsbonus.",
+    "rating_target": "Sie bewerten {{name}}"
   },
   "engagements": {
     "confirmed_toast": "Engagement bestätigt"
