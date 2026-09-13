@@ -160,9 +160,11 @@ export async function buildLiveBackup(adminId: string, backupPassword: string): 
     auth_users_without_live_profile_excluded: auth.excluded,
     live_profiles_without_auth_user: [...profileIds].filter((id) => !auth.rows.some((u) => u.id === id)).length,
   };
-  for (const rows of Object.values(business)) {
-    for (const r of rows) {
-      if ("id" in r && typeof r.id !== "string") throw new BackupValidationError("UUID_NOT_PRESERVED");
+  // Relational UUID keys must survive serialization verbatim (taxonomy/config tables may use integer ids).
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  for (const name of ["profiles", "requests", "engagements", "ratings", "token_transactions", "token_orders", "matches", "sos_calls"]) {
+    for (const r of business[name] ?? []) {
+      if (typeof r.id !== "string" || !UUID_RE.test(r.id)) throw new BackupValidationError("UUID_NOT_PRESERVED", name);
     }
   }
 
