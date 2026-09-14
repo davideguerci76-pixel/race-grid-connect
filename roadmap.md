@@ -30,3 +30,6 @@
 - [x] HOME-PREOPEN-01: add the independent ACP pre-opening claim toggle using existing Launch authority
 - [x] HOME-PREOPEN-01: localize the existing hero and new pre-opening section in EN/IT/ES/FR/DE
 - [x] HOME-PREOPEN-01: preserve the approved Home and verify toggle, responsive, regression, and LIVE Pit Call safety
+- [ ] HOME-PREOPEN-01A/B: apply the four approved non-English hero claims only
+- [ ] HOME-PREOPEN-01A/B: control both pre-opening headline wraps across five languages and responsive widths
+- [ ] HOME-PREOPEN-01A/B: verify language switching, refresh persistence, visual regressions, and zero LIVE changes

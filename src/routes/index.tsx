@@ -63,12 +63,40 @@ function ComingSoon() {
   );
 }
 
+type PreopeningHeadlineLayout = {
+  lead: number[];
+  join: number[];
+};
+
+const PREOPENING_HEADLINE_LAYOUTS: Record<string, PreopeningHeadlineLayout> = {
+  en: { lead: [2, 2], join: [4, 3] },
+  it: { lead: [1, 1, 2], join: [3, 2, 2] },
+  es: { lead: [1, 1, 2], join: [3, 2, 3] },
+  fr: { lead: [0, 1, 2], join: [3, 2, 2, 1] },
+  de: { lead: [2, 2], join: [3, 2, 2, 2] },
+};
+
+function splitPhrase(phrase: string, groupSizes: number[]) {
+  const words = phrase.trim().split(/\s+/);
+  let offset = 0;
+
+  return groupSizes.map((size, index) => {
+    const group = words.slice(offset, offset + size).join(" ");
+    offset += size;
+    return { group, isLast: index === groupSizes.length - 1 };
+  });
+}
+
 function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const flags = Route.useLoaderData();
   const { data: stats } = useMarketStats();
+  const language = i18n.resolvedLanguage?.split("-")[0] ?? "en";
+  const headlineLayout = PREOPENING_HEADLINE_LAYOUTS[language] ?? PREOPENING_HEADLINE_LAYOUTS.en;
+  const leadGroups = splitPhrase(t("home.preopening.headline_rest"), headlineLayout.lead);
+  const joinGroups = splitPhrase(t("home.preopening.join_headline"), headlineLayout.join);
 
   useEffect(() => {
     if (!loading && user) {
@@ -102,7 +130,7 @@ function Home() {
             width={1089} height={424}
             className="mb-8 w-full max-w-[40rem] object-contain mix-blend-screen"
           />
-          <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter md:max-w-full md:text-8xl">
+          <h1 className="mt-8 max-w-3xl pr-2 text-4xl font-black uppercase italic leading-[0.9] tracking-tighter max-[380px]:text-[2.125rem] sm:text-6xl md:max-w-full md:text-7xl xl:text-8xl">
             {t("home.hero_1")}<br />
             <span className="text-racing-red">{t("home.hero_2")}</span>{" "}{t("home.hero_3")}
           </h1>
@@ -150,20 +178,35 @@ function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/25 sm:via-background/80 lg:via-background/60" />
           <div className="container-page relative flex min-h-[31rem] items-center py-16 sm:min-h-[34rem] sm:py-20 lg:min-h-[36rem] lg:py-24">
-            <div className="max-w-2xl lg:max-w-[55%]">
+            <div className="min-w-0 w-full max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
-              <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
-                {t("home.preopening.headline_rest")}
+              <h2
+                aria-label={`${t("home.preopening.headline_brand")} ${t("home.preopening.headline_rest")}`}
+                className="flex flex-col items-start text-3xl font-black uppercase italic leading-tight tracking-tighter sm:flex-row sm:flex-wrap sm:gap-x-[0.22em] sm:text-4xl xl:text-5xl"
+              >
+                <span className="whitespace-nowrap">
+                  <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
+                  {leadGroups[0]?.group}
+                </span>
+                {leadGroups.slice(1).map(({ group }) => (
+                  <span key={group} className="whitespace-nowrap">{group}</span>
+                ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {t("home.preopening.intro")}
               </p>
 
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
-              <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                {t("home.preopening.join_headline")}{" "}
-                <span className="text-racing-red">{t("home.preopening.join_now")}</span>
+              <h3
+                aria-label={`${t("home.preopening.join_headline")} ${t("home.preopening.join_now")}`}
+                className="mt-1 flex flex-col items-start text-3xl font-black uppercase italic leading-tight tracking-tighter sm:flex-row sm:flex-wrap sm:gap-x-[0.22em] sm:text-4xl xl:text-5xl"
+              >
+                {joinGroups.map(({ group, isLast }) => (
+                  <span key={group} className="whitespace-nowrap">
+                    {group}{" "}
+                    {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
+                  </span>
+                ))}
               </h3>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {t("home.preopening.join_body")}

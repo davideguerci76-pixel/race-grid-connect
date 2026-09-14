@@ -19,8 +19,8 @@
   },
   "home": {
     "badge": "Live · {{count}} offene Stellen",
-    "hero_1": "HÖR AUF ZU SUCHEN.",
-    "hero_2": "MATCH.",
+    "hero_1": "NICHT MEHR SUCHEN.",
+    "hero_2": "FINDEN.",
     "hero_3": "SOFORT.",
     "sub": "Die Motorsport-Matching-Plattform, die Teams und Freelancer nach Rolle, Skills, Standort und tatsächlicher Verfügbarkeit verbindet.",
     "preopening": {
