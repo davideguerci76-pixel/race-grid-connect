@@ -20,6 +20,7 @@ export const ESSENTIAL_DATASETS = [
 export const USEFUL_DATASETS = [
   "matches", "match_history", "team_pool", "match_unlocks", "request_tier_unlocks", "pool_search_unlocks", "review_unlocks",
   "team_reveals", "request_team_reveals", "sos_calls", "sos_call_targets", "rating_flags", "admin_audit_log", "notifications",
+  "operational_event_log",
 ] as const;
 
 export const EXCLUDED_DATASETS = [
