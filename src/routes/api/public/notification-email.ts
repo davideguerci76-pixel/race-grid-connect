@@ -1,19 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
-import { readinessNudgeTarget } from "@/lib/notification-targets";
-
-const SITE_URL = "https://pitcall.net";
-
-const KIND_META: Record<string, { title: string; path: string; label: string }> = {
-  engagement_proposed: { title: "New match proposed", path: "/dashboard/engagements", label: "View engagement" },
-  match_taken: { title: "Match taken", path: "/dashboard/engagements", label: "View engagement" },
-  match_reopened: { title: "Match reopened", path: "/dashboard/engagements", label: "View engagement" },
-  sos_call: { title: "SOS call", path: "/dashboard/engagements", label: "View SOS call" },
-  contact_check: { title: "Contact check", path: "/dashboard/engagements", label: "View engagement" },
-  rating_available: { title: "Rating available", path: "/dashboard/engagements", label: "Leave your rating" },
-  rating_unlocked: { title: "Rating unlocked", path: "/dashboard/engagements", label: "See the rating" },
-  calendar_stale: { title: "Quick availability check", path: "/dashboard/calendar", label: "Review availability" },
-};
+import { EMAIL_LOOKBACK_MS, EMAIL_MAX_ATTEMPTS, processNotificationEmail, type PendingNotification } from "@/lib/notification-email.server";
 
 function timingSafeEqual(a: string, b: string) {
   if (a.length !== b.length) return false;
@@ -22,6 +9,8 @@ function timingSafeEqual(a: string, b: string) {
   return diff === 0;
 }
 
+// OPS-MON-02 / MON-02: `emailed_at` = provider accepted the send. Failures are persisted
+// (email_status / email_attempts / email_next_attempt_at) and retried with bounded backoff.
 export const Route = createFileRoute("/api/public/notification-email")({
   server: {
     handlers: {
@@ -38,74 +27,63 @@ export const Route = createFileRoute("/api/public/notification-email")({
           return new Response("Unauthorized", { status: 401 });
         }
 
-        const since = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+        const nowIso = new Date().toISOString();
+        const since = new Date(Date.now() - EMAIL_LOOKBACK_MS).toISOString();
         const { data: pending, error } = await supabaseAdmin
           .from("notifications")
-          .select("id, user_id, kind, payload, created_at, is_test")
+          .select("id, user_id, kind, payload, created_at, is_test, email_attempts")
           .is("emailed_at", null)
           .gte("created_at", since)
+          .lt("email_attempts", EMAIL_MAX_ATTEMPTS)
+          .or("email_status.is.null,email_status.eq.failed_transient")
+          .or(`email_next_attempt_at.is.null,email_next_attempt_at.lte.${nowIso}`)
           .order("created_at", { ascending: true })
           .limit(50);
 
         if (error) return new Response(error.message, { status: 500 });
 
-        let sent = 0;
-        let suppressedTest = 0;
-        for (const n of pending ?? []) {
-          // TEST/LIVE email law (F-NUDGE-02): a TEST notification must never produce a real
-          // email, whatever its kind and whatever the recipient address. Fail-closed: only a
-          // strict `is_test === false` row may reach sendTemplateEmail. The row is stamped
-          // emailed_at so it is consumed exactly once (no infinite reprocessing); the
-          // Notification Center and push delivery are untouched (they read pushed_at/read_at).
-          if (n.is_test !== false) {
-            suppressedTest++;
-            await supabaseAdmin
-              .from("notifications")
-              .update({ emailed_at: new Date().toISOString() } as never)
-              .eq("id", n.id as string);
-            continue;
-          }
-          const informational = ((n.payload ?? {}) as Record<string, unknown>)["informational"] === true;
-          const sosId = ((n.payload ?? {}) as Record<string, unknown>)["sos_id"];
-          const meta = informational
-            ? { title: "Pit Call update", path: "/dashboard/notifications", label: "Open Pit Call" }
-            : n.kind === "readiness_nudge"
-              // UAT-ONBOARD-05: CTA follows the first missing READY cause (role → phone → availability).
-              ? readinessNudgeTarget(((n.payload ?? {}) as Record<string, unknown>)["primary_reason"] as string | null)
-            : (n.kind === "sos_call" || n.kind === "sos_taken") && typeof sosId === "string"
-              // SOS deep-links to the SOS review page: no engagement exists before acceptance.
-              ? { title: n.kind === "sos_call" ? "SOS call" : "SOS call taken", path: `/dashboard/sos/${sosId}`, label: "View SOS call" }
-            : (KIND_META[n.kind as string] ?? {
-                title: "New activity on Pit Call",
-                path: "/dashboard/notifications",
-                label: "Open Pit Call",
+        const counts: Record<string, number> = {};
+        for (const row of pending ?? []) {
+          const n: PendingNotification = {
+            id: row.id as string,
+            user_id: row.user_id as string,
+            kind: row.kind as string,
+            payload: (row.payload ?? {}) as Record<string, unknown>,
+            is_test: row.is_test as boolean,
+            email_attempts: (row.email_attempts as number) ?? 0,
+          };
+          const outcome = await processNotificationEmail(n, {
+            now: () => new Date(),
+            recipientFor: async (userId) => {
+              const { data: userRes, error: uErr } = await supabaseAdmin.auth.admin.getUserById(userId);
+              if (uErr) throw uErr;
+              const u = userRes?.user;
+              return u?.email && u.email_confirmed_at ? u.email : null;
+            },
+            send: async (to, templateData, idempotencyKey) => {
+              const r = await sendTemplateEmail("notification", to, { templateData, idempotencyKey });
+              return { sent: r.sent };
+            },
+            update: async (id, patch) => {
+              const { error: upErr } = await supabaseAdmin.from("notifications").update(patch as never).eq("id", id);
+              if (upErr) console.error("[notification-email] state update failed", id, upErr.message);
+            },
+            logEvent: async (e) => {
+              await (supabaseAdmin.rpc as any)("ops_log_event", {
+                p_environment: e.environment,
+                p_event_type: e.event_type,
+                p_result: e.result,
+                p_entity_type: "notification",
+                p_entity_id: e.entity_id,
+                p_error_code: e.error_code ?? null,
+                p_metadata: e.metadata,
               });
-          try {
-            const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(n.user_id as string);
-            const email = userRes?.user?.email;
-            if (email && userRes?.user?.email_confirmed_at) {
-              const payload = (n.payload ?? {}) as Record<string, unknown>;
-              await sendTemplateEmail("notification", email, {
-                templateData: {
-                  title: meta.title,
-                  message: (payload["message"] as string) ?? meta.title,
-                  actionUrl: `${SITE_URL}${meta.path}`,
-                  actionLabel: meta.label,
-                },
-                idempotencyKey: `notification-${n.id}`,
-              });
-              sent++;
-            }
-          } catch (e) {
-            console.error("[notification-email] send failed", n.id, e);
-          }
-          await supabaseAdmin
-            .from("notifications")
-            .update({ emailed_at: new Date().toISOString() } as never)
-            .eq("id", n.id as string);
+            },
+          });
+          counts[outcome] = (counts[outcome] ?? 0) + 1;
         }
 
-        return Response.json({ processed: pending?.length ?? 0, sent, suppressed_test: suppressedTest });
+        return Response.json({ processed: pending?.length ?? 0, ...counts });
       },
     },
   },
