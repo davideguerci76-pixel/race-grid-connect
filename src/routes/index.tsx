@@ -70,8 +70,8 @@ type PreopeningHeadlineLayout = {
 
 const PREOPENING_HEADLINE_LAYOUTS: Record<string, PreopeningHeadlineLayout> = {
   en: { lead: [2, 2], join: [4, 3] },
-  it: { lead: [2, 2], join: [4, 3] },
-  es: { lead: [2, 2], join: [4, 4] },
+  it: { lead: [1, 3], join: [4, 3] },
+  es: { lead: [1, 1, 2], join: [4, 4] },
   fr: { lead: [1, 2], join: [4, 4] },
   de: { lead: [2, 3], join: [3, 3, 3] },
 };
@@ -186,7 +186,7 @@ function Home() {
                   {leadGroups[0]?.group}
                 </span>
                 {leadGroups.slice(1).map(({ group }) => (
-                  <span key={group} className="block whitespace-nowrap sm:ml-[0.22em] sm:inline-block">{group}</span>
+                  <span key={group} className="block whitespace-nowrap sm:ml-[0.22em] sm:inline-block">{" "}{group}</span>
                 ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
@@ -195,9 +195,9 @@ function Home() {
 
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
               <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                {joinGroups.map(({ group, isLast }) => (
+                {joinGroups.map(({ group, isLast }, index) => (
                   <span key={group} className="block whitespace-nowrap sm:mr-[0.22em] sm:inline-block">
-                    {group}{" "}
+                    {index > 0 && " "}{group}{" "}
                     {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
                   </span>
                 ))}
