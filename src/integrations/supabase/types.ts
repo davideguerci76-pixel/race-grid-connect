@@ -1006,6 +1006,11 @@ export type Database = {
       notifications: {
         Row: {
           created_at: string
+          email_attempts: number
+          email_last_attempt_at: string | null
+          email_last_error: string | null
+          email_next_attempt_at: string | null
+          email_status: string | null
           emailed_at: string | null
           id: string
           is_test: boolean
@@ -1017,6 +1022,11 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_attempts?: number
+          email_last_attempt_at?: string | null
+          email_last_error?: string | null
+          email_next_attempt_at?: string | null
+          email_status?: string | null
           emailed_at?: string | null
           id?: string
           is_test?: boolean
@@ -1028,6 +1038,11 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_attempts?: number
+          email_last_attempt_at?: string | null
+          email_last_error?: string | null
+          email_next_attempt_at?: string | null
+          email_status?: string | null
           emailed_at?: string | null
           id?: string
           is_test?: boolean
@@ -1046,6 +1061,138 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      operational_event_log: {
+        Row: {
+          actor_type: string
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          environment: string
+          error_code: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          occurred_at: string
+          reference_id: string | null
+          result: string
+          secondary_entity_id: string | null
+          secondary_entity_type: string | null
+          severity: string
+        }
+        Insert: {
+          actor_type?: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          environment: string
+          error_code?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          reference_id?: string | null
+          result: string
+          secondary_entity_id?: string | null
+          secondary_entity_type?: string | null
+          severity: string
+        }
+        Update: {
+          actor_type?: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          environment?: string
+          error_code?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          reference_id?: string | null
+          result?: string
+          secondary_entity_id?: string | null
+          secondary_entity_type?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      ops_alert_state: {
+        Row: {
+          alert_key: string
+          check_kind: string
+          environment: string
+          last_notified_at: string | null
+          last_seen_at: string
+          notify_attempts: number
+          notify_kind: string | null
+          notify_pending: boolean
+          opened_at: string
+          payload: Json
+          recovered_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          alert_key: string
+          check_kind: string
+          environment?: string
+          last_notified_at?: string | null
+          last_seen_at: string
+          notify_attempts?: number
+          notify_kind?: string | null
+          notify_pending?: boolean
+          opened_at: string
+          payload?: Json
+          recovered_at?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          alert_key?: string
+          check_kind?: string
+          environment?: string
+          last_notified_at?: string | null
+          last_seen_at?: string
+          notify_attempts?: number
+          notify_kind?: string | null
+          notify_pending?: boolean
+          opened_at?: string
+          payload?: Json
+          recovered_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ops_ledger_baseline: {
+        Row: {
+          difference: number
+          ledger_sum: number
+          recorded_at: string
+          source: string
+          token_balance: number
+          user_id: string
+        }
+        Insert: {
+          difference: number
+          ledger_sum: number
+          recorded_at?: string
+          source?: string
+          token_balance: number
+          user_id: string
+        }
+        Update: {
+          difference?: number
+          ledger_sum?: number
+          recorded_at?: string
+          source?: string
+          token_balance?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       platform_capacity_state: {
         Row: {
@@ -3026,6 +3173,10 @@ export type Database = {
         Returns: boolean
       }
       backup_all_live_export: { Args: never; Returns: Json }
+      backup_operational_event_log_live_export: {
+        Args: { p_until?: string }
+        Returns: Json
+      }
       build_match_snapshot: { Args: { _match_id: string }; Returns: Json }
       can_view_team_identity: { Args: { _team: string }; Returns: boolean }
       cancel_engagement: {
@@ -3426,6 +3577,7 @@ export type Database = {
       }
       dispatch_notification_emails: { Args: never; Returns: undefined }
       dispatch_notification_push: { Args: never; Returns: undefined }
+      dispatch_ops_alerts: { Args: never; Returns: undefined }
       dispatch_platform_capacity_check: { Args: never; Returns: undefined }
       emit_availability_opportunity_notifications: {
         Args: { _is_test: boolean }
@@ -3772,6 +3924,74 @@ export type Database = {
         Args: { _request_id: string }
         Returns: boolean
       }
+      ops_alert_mark_notified: {
+        Args: { p_error?: string; p_key: string; p_sent: boolean }
+        Returns: undefined
+      }
+      ops_alert_observe: {
+        Args: {
+          p_active: boolean
+          p_dry_run?: boolean
+          p_env?: string
+          p_key: string
+          p_kind: string
+          p_now?: string
+          p_payload: Json
+        }
+        Returns: string
+      }
+      ops_alerts_take_pending: {
+        Args: never
+        Returns: {
+          alert_key: string
+          check_kind: string
+          environment: string
+          last_notified_at: string | null
+          last_seen_at: string
+          notify_attempts: number
+          notify_kind: string | null
+          notify_pending: boolean
+          opened_at: string
+          payload: Json
+          recovered_at: string | null
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "ops_alert_state"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      ops_cron_interval_minutes: {
+        Args: { p_schedule: string }
+        Returns: number
+      }
+      ops_env: { Args: { _is_test: boolean }; Returns: string }
+      ops_health_check: {
+        Args: { p_dry_run?: boolean; p_now?: string }
+        Returns: Json
+      }
+      ops_log_event: {
+        Args: {
+          p_actor_type?: string
+          p_actor_user_id?: string
+          p_entity_id?: string
+          p_entity_type?: string
+          p_environment: string
+          p_error_code?: string
+          p_event_type: string
+          p_metadata?: Json
+          p_occurred_at?: string
+          p_reference_id?: string
+          p_result?: string
+          p_secondary_entity_id?: string
+          p_secondary_entity_type?: string
+          p_severity?: string
+        }
+        Returns: string
+      }
       pitcall_creation_allowed: { Args: never; Returns: boolean }
       platform_capacity_counts: {
         Args: never
@@ -3804,6 +4024,10 @@ export type Database = {
       rating_opens_at: { Args: { _engagement_id: string }; Returns: string }
       readiness_nudge_cooldown_days: { Args: never; Returns: number }
       recompute_matches: {
+        Args: { _freelancer_id: string; _request_id: string }
+        Returns: number
+      }
+      recompute_matches_core: {
         Args: { _freelancer_id?: string; _request_id?: string }
         Returns: number
       }
