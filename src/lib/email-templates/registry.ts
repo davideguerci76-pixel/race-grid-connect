@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { template as notificationTemplate } from './notification'
 import { template as contactFormTemplate } from './contact-form'
 import { template as capacityAlertTemplate } from './capacity-alert'
+import { template as opsAlertTemplate } from './ops-alert'
 
 
 export interface TemplateEntry {
