@@ -70,10 +70,10 @@ type PreopeningHeadlineLayout = {
 
 const PREOPENING_HEADLINE_LAYOUTS: Record<string, PreopeningHeadlineLayout> = {
   en: { lead: [2, 2], join: [4, 3] },
-  it: { lead: [1, 3], join: [4, 3] },
-  es: { lead: [1, 1, 2], join: [4, 4] },
-  fr: { lead: [1, 2], join: [4, 4] },
-  de: { lead: [2, 3], join: [3, 3, 3] },
+  it: { lead: [1, 1, 2], join: [3, 2, 2] },
+  es: { lead: [1, 1, 2], join: [3, 2, 3] },
+  fr: { lead: [1, 2], join: [3, 2, 3] },
+  de: { lead: [2, 2], join: [3, 2, 2, 2] },
 };
 
 function splitPhrase(phrase: string, groupSizes: number[]) {
