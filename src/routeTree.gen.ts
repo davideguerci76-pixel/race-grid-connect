@@ -33,6 +33,7 @@ import { Route as ApiPublicOpsAlertRouteImport } from './routes/api/public/ops-a
 import { Route as ApiPublicNotificationPushRouteImport } from './routes/api/public/notification-push'
 import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as ApiPublicCapacityAlertRouteImport } from './routes/api/public/capacity-alert'
+import { Route as ApiAdminOpsLogRouteImport } from './routes/api/admin/ops-log'
 import { Route as ApiAdminBackupAllRouteImport } from './routes/api/admin/backup-all'
 import { Route as AuthenticatedDashboardTryDemoRouteImport } from './routes/_authenticated/dashboard.try-demo'
 import { Route as AuthenticatedDashboardTokensRouteImport } from './routes/_authenticated/dashboard.tokens'
@@ -188,6 +189,11 @@ const ApiPublicNotificationEmailRoute =
 const ApiPublicCapacityAlertRoute = ApiPublicCapacityAlertRouteImport.update({
   id: '/api/public/capacity-alert',
   path: '/api/public/capacity-alert',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminOpsLogRoute = ApiAdminOpsLogRouteImport.update({
+  id: '/api/admin/ops-log',
+  path: '/api/admin/ops-log',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminBackupAllRoute = ApiAdminBackupAllRouteImport.update({
@@ -432,6 +438,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/admin/backup-all': typeof ApiAdminBackupAllRoute
+  '/api/admin/ops-log': typeof ApiAdminOpsLogRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -489,6 +496,7 @@ export interface FileRoutesByTo {
   '/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/admin/backup-all': typeof ApiAdminBackupAllRoute
+  '/api/admin/ops-log': typeof ApiAdminOpsLogRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -550,6 +558,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tokens': typeof AuthenticatedDashboardTokensRoute
   '/_authenticated/dashboard/try-demo': typeof AuthenticatedDashboardTryDemoRoute
   '/api/admin/backup-all': typeof ApiAdminBackupAllRoute
+  '/api/admin/ops-log': typeof ApiAdminOpsLogRoute
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
@@ -611,6 +620,7 @@ export interface FileRouteTypes {
     | '/dashboard/tokens'
     | '/dashboard/try-demo'
     | '/api/admin/backup-all'
+    | '/api/admin/ops-log'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -668,6 +678,7 @@ export interface FileRouteTypes {
     | '/dashboard/tokens'
     | '/dashboard/try-demo'
     | '/api/admin/backup-all'
+    | '/api/admin/ops-log'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -728,6 +739,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tokens'
     | '/_authenticated/dashboard/try-demo'
     | '/api/admin/backup-all'
+    | '/api/admin/ops-log'
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
@@ -763,6 +775,7 @@ export interface RootRouteChildren {
   LegalInfoRoute: typeof LegalInfoRoute
   TeamsIdRoute: typeof TeamsIdRoute
   ApiAdminBackupAllRoute: typeof ApiAdminBackupAllRoute
+  ApiAdminOpsLogRoute: typeof ApiAdminOpsLogRoute
   ApiPublicCapacityAlertRoute: typeof ApiPublicCapacityAlertRoute
   ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
   ApiPublicNotificationPushRoute: typeof ApiPublicNotificationPushRoute
@@ -941,6 +954,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/capacity-alert'
       fullPath: '/api/public/capacity-alert'
       preLoaderRoute: typeof ApiPublicCapacityAlertRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/ops-log': {
+      id: '/api/admin/ops-log'
+      path: '/api/admin/ops-log'
+      fullPath: '/api/admin/ops-log'
+      preLoaderRoute: typeof ApiAdminOpsLogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/backup-all': {
@@ -1305,6 +1325,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalInfoRoute: LegalInfoRoute,
   TeamsIdRoute: TeamsIdRoute,
   ApiAdminBackupAllRoute: ApiAdminBackupAllRoute,
+  ApiAdminOpsLogRoute: ApiAdminOpsLogRoute,
   ApiPublicCapacityAlertRoute: ApiPublicCapacityAlertRoute,
   ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
   ApiPublicNotificationPushRoute: ApiPublicNotificationPushRoute,
