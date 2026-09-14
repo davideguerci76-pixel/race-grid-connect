@@ -27,6 +27,6 @@
 - [x] UAT-DOC-01B: update public FAQ in EN/IT/ES/FR/DE with semantic parity
 - [x] UAT-DOC-01B: run differential retest, global stale-copy search, build/typecheck validation, and visual evidence
 - [x] UAT-DOC-01B: publish final report and findings tracker without product or database changes
-- [ ] HOME-PREOPEN-01: add the independent ACP pre-opening claim toggle using existing Launch authority
-- [ ] HOME-PREOPEN-01: localize the existing hero and new pre-opening section in EN/IT/ES/FR/DE
-- [ ] HOME-PREOPEN-01: preserve the approved Home and verify toggle, responsive, regression, and LIVE Pit Call safety
+- [x] HOME-PREOPEN-01: add the independent ACP pre-opening claim toggle using existing Launch authority
+- [x] HOME-PREOPEN-01: localize the existing hero and new pre-opening section in EN/IT/ES/FR/DE
+- [x] HOME-PREOPEN-01: preserve the approved Home and verify toggle, responsive, regression, and LIVE Pit Call safety
