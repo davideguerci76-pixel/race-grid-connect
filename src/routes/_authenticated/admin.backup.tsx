@@ -191,6 +191,8 @@ function AdminBackup() {
         </div>
       )}
 
+      <OpsLogExportCard />
+
       <Dialog open={open} onOpenChange={(o) => { if (!o && step !== "running") reset(); }}>
         <DialogContent className="sm:max-w-lg">
           {step === "warning" && (
@@ -303,6 +305,78 @@ function AdminBackup() {
           )}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// OPS-MON-02 — Operational event log ("black box") export as readable TXT. Read-only, Admin-only (server-side).
+function OpsLogExportCard() {
+  const today = new Date().toISOString().slice(0, 10);
+  const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+  const [env, setEnv] = useState<"live" | "test">("live");
+  const [from, setFrom] = useState(weekAgo);
+  const [to, setTo] = useState(today);
+  const [busy, setBusy] = useState(false);
+
+  const download = async () => {
+    setBusy(true);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("UNAUTHENTICATED");
+      const qs = new URLSearchParams({ env, from: `${from}T00:00:00.000Z`, to: `${to}T23:59:59.999Z` });
+      const res = await fetch(`/api/admin/ops-log?${qs}`, { headers: { authorization: `Bearer ${token}` } });
+      if (!res.ok) {
+        let code = "EXPORT_FAILED";
+        try { code = ((await res.json()) as { error?: string }).error ?? code; } catch { /* no body */ }
+        throw new Error(code);
+      }
+      const blob = await res.blob();
+      const filename = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? `pitcall-ops-log-${env}.txt`;
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = href; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(href), 10_000);
+      toast.success(`Operational log exported (${(blob.size / 1024).toFixed(1)} KB)`);
+    } catch (e) {
+      const code = e instanceof Error ? e.message : "EXPORT_FAILED";
+      toast.error(ERROR_COPY[code] ?? `Export failed (${code})`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="border border-border p-5">
+      <div className="text-[11px] font-bold uppercase tracking-widest text-racing-red">Operational black box</div>
+      <h2 className="text-xl font-black italic tracking-tighter">Operational event log export</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Append-only chronological record of what happened on the platform (registrations, Pit Calls, engagements, tokens, ratings,
+        notifications, cron health, alerts). Exported as a readable TXT file for review or post-backup reconstruction. The LIVE log is also
+        included in every Backup All package up to its snapshot time.
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        <div>
+          <Label className="text-xs">Environment</Label>
+          <select value={env} onChange={(e) => setEnv(e.target.value as "live" | "test")} className="mt-1 h-9 w-full border border-border bg-background px-2 text-sm">
+            <option value="live">LIVE</option>
+            <option value="test">TEST</option>
+          </select>
+        </div>
+        <div>
+          <Label className="text-xs">From (UTC)</Label>
+          <Input type="date" value={from} max={to} onChange={(e) => setFrom(e.target.value)} className="mt-1" />
+        </div>
+        <div>
+          <Label className="text-xs">To (UTC)</Label>
+          <Input type="date" value={to} min={from} max={today} onChange={(e) => setTo(e.target.value)} className="mt-1" />
+        </div>
+        <div className="flex items-end">
+          <Button onClick={download} disabled={busy || !from || !to} variant="outline" className="w-full">
+            {busy ? "Exporting…" : "EXPORT TXT"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

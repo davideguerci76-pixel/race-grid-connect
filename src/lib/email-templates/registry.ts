@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { template as notificationTemplate } from './notification'
 import { template as contactFormTemplate } from './contact-form'
 import { template as capacityAlertTemplate } from './capacity-alert'
+import { template as opsAlertTemplate } from './ops-alert'
 
 
 export interface TemplateEntry {
@@ -25,5 +26,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   notification: notificationTemplate,
   contactForm: contactFormTemplate,
   capacityAlert: capacityAlertTemplate,
+  opsAlert: opsAlertTemplate,
 }
 

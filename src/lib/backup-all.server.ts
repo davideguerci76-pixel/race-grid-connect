@@ -20,12 +20,13 @@ export const ESSENTIAL_DATASETS = [
 export const USEFUL_DATASETS = [
   "matches", "match_history", "team_pool", "match_unlocks", "request_tier_unlocks", "pool_search_unlocks", "review_unlocks",
   "team_reveals", "request_team_reveals", "sos_calls", "sos_call_targets", "rating_flags", "admin_audit_log", "notifications",
+  "operational_event_log",
 ] as const;
 
 export const EXCLUDED_DATASETS = [
   "availability_recompute_queue", "availability_opportunity_state", "hot_partial_state", "team_match_notification_state",
   "platform_capacity_state", "push_deliveries", "push_subscriptions", "client_error_log", "demo_seed_state", "admin_env_state",
-  "admin_time_settings", "request_recheck_ledger", "email_hook_config",
+  "admin_time_settings", "request_recheck_ledger", "email_hook_config", "ops_alert_state", "ops_ledger_baseline",
 ];
 
 export const SNAPSHOT_LIMITATIONS = [
@@ -108,10 +109,14 @@ export async function buildLiveBackup(adminId: string, backupPassword: string): 
   // One SQL statement → business data and architecture come from one statement-level snapshot.
   const { data, error } = await (supabaseAdmin.rpc as any)("backup_all_live_export");
   if (error) throw new Error(`EXPORT_FAILED: ${error.message}`);
-  const exportMs = Date.now() - t0;
   const business = (data?.business ?? {}) as Record<string, Json[]>;
   const architecture = (data?.architecture ?? {}) as Json;
   if (!data?.snapshot_time || !business || !architecture) throw new BackupValidationError("EXPORT_SHAPE_INVALID");
+  // OPS-MON-02: operational black box (LIVE) cut at the same snapshot_time → "which events happened AFTER this backup?"
+  // is answerable by comparing occurred_at against manifest.consistency.snapshot_time. USEFUL tier: absence never blocks a backup.
+  const { data: opsLog, error: opsErr } = await (supabaseAdmin.rpc as any)("backup_operational_event_log_live_export", { p_until: data.snapshot_time });
+  if (!opsErr && Array.isArray(opsLog)) business.operational_event_log = opsLog as Json[];
+  const exportMs = Date.now() - t0;
 
   const t1 = Date.now();
   const liveIds = new Set<string>((business.profiles ?? []).map((p) => String(p.id)));
