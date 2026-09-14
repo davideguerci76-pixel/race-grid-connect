@@ -72,7 +72,7 @@ const PREOPENING_HEADLINE_LAYOUTS: Record<string, PreopeningHeadlineLayout> = {
   en: { lead: [2, 2], join: [4, 3] },
   it: { lead: [1, 1, 2], join: [3, 2, 2] },
   es: { lead: [1, 1, 2], join: [3, 2, 3] },
-  fr: { lead: [1, 2], join: [3, 2, 3] },
+  fr: { lead: [0, 1, 2], join: [3, 2, 2, 1] },
   de: { lead: [2, 2], join: [3, 2, 2, 2] },
 };
 
@@ -178,7 +178,7 @@ function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/25 sm:via-background/80 lg:via-background/60" />
           <div className="container-page relative flex min-h-[31rem] items-center py-16 sm:min-h-[34rem] sm:py-20 lg:min-h-[36rem] lg:py-24">
-            <div className="max-w-2xl lg:max-w-[55%]">
+            <div className="min-w-0 w-full max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
               <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
                 <span className="block whitespace-nowrap sm:inline-block">
