@@ -191,6 +191,8 @@ function AdminBackup() {
         </div>
       )}
 
+      <OpsLogExportCard />
+
       <Dialog open={open} onOpenChange={(o) => { if (!o && step !== "running") reset(); }}>
         <DialogContent className="sm:max-w-lg">
           {step === "warning" && (
