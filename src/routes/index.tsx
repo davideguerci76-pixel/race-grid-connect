@@ -180,13 +180,16 @@ function Home() {
           <div className="container-page relative flex min-h-[31rem] items-center py-16 sm:min-h-[34rem] sm:py-20 lg:min-h-[36rem] lg:py-24">
             <div className="min-w-0 w-full max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
-              <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
-                <span className="block whitespace-nowrap sm:inline-block">
+              <h2
+                aria-label={`${t("home.preopening.headline_brand")} ${t("home.preopening.headline_rest")}`}
+                className="flex flex-col items-start text-3xl font-black uppercase italic leading-tight tracking-tighter sm:flex-row sm:flex-wrap sm:gap-x-[0.22em] sm:text-4xl xl:text-5xl"
+              >
+                <span className="whitespace-nowrap">
                   <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
                   {leadGroups[0]?.group}
-                </span>{" "}
+                </span>
                 {leadGroups.slice(1).map(({ group }) => (
-                  <span key={group} className="block whitespace-nowrap sm:inline-block">{group}{" "}</span>
+                  <span key={group} className="whitespace-nowrap">{group}</span>
                 ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
@@ -194,10 +197,13 @@ function Home() {
               </p>
 
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
-              <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
-                {joinGroups.map(({ group, isLast }, index) => (
-                  <span key={group} className="block whitespace-nowrap sm:inline-block">
-                    {index > 0 && " "}{group}{" "}
+              <h3
+                aria-label={`${t("home.preopening.join_headline")} ${t("home.preopening.join_now")}`}
+                className="mt-1 flex flex-col items-start text-3xl font-black uppercase italic leading-tight tracking-tighter sm:flex-row sm:flex-wrap sm:gap-x-[0.22em] sm:text-4xl xl:text-5xl"
+              >
+                {joinGroups.map(({ group, isLast }) => (
+                  <span key={group} className="whitespace-nowrap">
+                    {group}{" "}
                     {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
                   </span>
                 ))}
