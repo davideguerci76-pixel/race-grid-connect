@@ -180,7 +180,7 @@ function Home() {
           <div className="container-page relative flex min-h-[31rem] items-center py-16 sm:min-h-[34rem] sm:py-20 lg:min-h-[36rem] lg:py-24">
             <div className="max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
-              <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
+              <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
                 <span className="block whitespace-nowrap sm:inline-block">
                   <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
                   {leadGroups[0]?.group}
@@ -194,7 +194,7 @@ function Home() {
               </p>
 
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
-              <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
+              <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
                 {joinGroups.map(({ group, isLast }, index) => (
                   <span key={group} className="block whitespace-nowrap sm:mr-[0.22em] sm:inline-block">
                     {index > 0 && " "}{group}{" "}
