@@ -63,12 +63,40 @@ function ComingSoon() {
   );
 }
 
+type PreopeningHeadlineLayout = {
+  lead: number[];
+  join: number[];
+};
+
+const PREOPENING_HEADLINE_LAYOUTS: Record<string, PreopeningHeadlineLayout> = {
+  en: { lead: [2, 2], join: [4, 3] },
+  it: { lead: [2, 2], join: [4, 3] },
+  es: { lead: [2, 2], join: [4, 4] },
+  fr: { lead: [1, 2], join: [4, 4] },
+  de: { lead: [2, 3], join: [3, 3, 3] },
+};
+
+function splitPhrase(phrase: string, groupSizes: number[]) {
+  const words = phrase.trim().split(/\s+/);
+  let offset = 0;
+
+  return groupSizes.map((size, index) => {
+    const group = words.slice(offset, offset + size).join(" ");
+    offset += size;
+    return { group, isLast: index === groupSizes.length - 1 };
+  });
+}
+
 function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const flags = Route.useLoaderData();
   const { data: stats } = useMarketStats();
+  const language = i18n.resolvedLanguage?.split("-")[0] ?? "en";
+  const headlineLayout = PREOPENING_HEADLINE_LAYOUTS[language] ?? PREOPENING_HEADLINE_LAYOUTS.en;
+  const leadGroups = splitPhrase(t("home.preopening.headline_rest"), headlineLayout.lead);
+  const joinGroups = splitPhrase(t("home.preopening.join_headline"), headlineLayout.join);
 
   useEffect(() => {
     if (!loading && user) {
@@ -153,8 +181,13 @@ function Home() {
             <div className="max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
               <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
-                {t("home.preopening.headline_rest")}
+                <span className="block whitespace-nowrap sm:inline">
+                  <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
+                  {leadGroups[0]?.group}
+                </span>{" "}
+                {leadGroups.slice(1).map(({ group }) => (
+                  <span key={group} className="block whitespace-nowrap sm:inline">{group}{" "}</span>
+                ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {t("home.preopening.intro")}
@@ -162,8 +195,12 @@ function Home() {
 
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
               <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                {t("home.preopening.join_headline")}{" "}
-                <span className="text-racing-red">{t("home.preopening.join_now")}</span>
+                {joinGroups.map(({ group, isLast }) => (
+                  <span key={group} className="block whitespace-nowrap sm:inline">
+                    {group}{isLast ? " " : " "}
+                    {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
+                  </span>
+                ))}
               </h3>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
                 {t("home.preopening.join_body")}
