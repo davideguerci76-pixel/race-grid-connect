@@ -141,6 +141,8 @@
       "coming_soon_body": "Ersetzt die öffentliche Startseite durch eine Warteseite (nur Logos und Claim, keine Daten).",
       "home_stats_title": "Statistiken auf der Startseite",
       "home_stats_body": "Markt-Highlights und Zähler auf der Startseite ein- oder ausblenden.",
+      "preopening_claim_title": "CLAIM PRE-OPENING",
+      "preopening_claim_body": "Blendet den Pre-Opening-Informationsbereich unter der Hero der öffentlichen Startseite ein oder aus.",
       "pitcall_off_title": "Pit-Call-Erstellung deaktivieren",
       "pitcall_off_body": "Friert die Erstellung neuer Pit Calls ein. Registrierung und Kalender bleiben aktiv.",
       "token_purchases_title": "Token-Käufe",

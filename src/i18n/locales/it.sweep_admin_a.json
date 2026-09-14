@@ -141,6 +141,8 @@
       "coming_soon_body": "Sostituisce la home page pubblica con una landing di attesa (solo loghi e claim, nessun dato pubblico).",
       "home_stats_title": "Statistiche in home page",
       "home_stats_body": "Mostra o nascondi highlight di mercato e contatori sulla home page.",
+      "preopening_claim_title": "CLAIM PRE-OPENING",
+      "preopening_claim_body": "Mostra o nasconde la sezione informativa pre-opening sotto la hero della Home pubblica.",
       "pitcall_off_title": "Disattiva creazione Pit Call",
       "pitcall_off_body": "Congela la creazione di nuove Pit Call per i team. Registrazioni e calendari restano attivi.",
       "token_purchases_title": "Acquisti token",

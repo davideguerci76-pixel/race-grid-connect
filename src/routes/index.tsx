@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-pit.jpg";
 import logoFull from "@/assets/pitcall-logo-full.png.asset.json";
+import preopeningImg from "@/assets/preopening-pitlane.webp.asset.json";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { UserRoundCheck, Headset, Cog, ListChecks, Handshake } from "lucide-react";
@@ -11,6 +12,16 @@ import { MarketHighlights, useMarketStats } from "@/components/market-highlights
 import { getPublicFlags } from "@/lib/flags.functions";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "PITCALL — Motorsport Jobs & Freelancers" },
+      { name: "description", content: "Connect motorsport teams and freelancers by role, skills, location and real availability." },
+      { property: "og:title", content: "PITCALL — Motorsport Jobs & Freelancers" },
+      { property: "og:description", content: "Connect motorsport teams and freelancers by role, skills, location and real availability." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   loader: () => getPublicFlags(),
   component: Home,
 });
@@ -125,6 +136,47 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* PRE-OPENING CLAIM */}
+      {flags?.homePreopeningClaim && (
+        <section data-testid="preopening-claim" className="relative isolate overflow-hidden border-b border-border bg-pit">
+          <img
+            src={preopeningImg.url}
+            alt="PITCALL pit lane at sunset"
+            width={1920}
+            height={896}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-[58%_center] lg:object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/25 sm:via-background/80 lg:via-background/60" />
+          <div className="container-page relative flex min-h-[31rem] items-center py-16 sm:min-h-[34rem] sm:py-20 lg:min-h-[36rem] lg:py-24">
+            <div className="max-w-2xl lg:max-w-[55%]">
+              <div className="mb-5 h-0.5 w-12 bg-racing-red" />
+              <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
+                <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
+                {t("home.preopening.headline_rest")}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
+                {t("home.preopening.intro")}
+              </p>
+
+              <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
+              <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
+                {t("home.preopening.join_headline")}{" "}
+                <span className="text-racing-red">{t("home.preopening.join_now")}</span>
+              </h3>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
+                {t("home.preopening.join_body")}
+              </p>
+
+              <div className="mt-7 border-l-2 border-racing-red pl-4 text-sm font-bold leading-relaxed text-foreground sm:text-base">
+                <div>{t("home.preopening.stay_connected")}</div>
+                <div className="text-racing-red">{t("home.preopening.notification")}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* HOW */}
       <section className="border-b border-border">

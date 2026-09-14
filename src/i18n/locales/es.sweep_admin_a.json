@@ -141,6 +141,8 @@
       "coming_soon_body": "Sustituye la home pública por una landing de espera (solo logos y claim, sin datos públicos).",
       "home_stats_title": "Mostrar estadísticas en la home",
       "home_stats_body": "Muestra u oculta los destacados de mercado y contadores en la home.",
+      "preopening_claim_title": "CLAIM PRE-OPENING",
+      "preopening_claim_body": "Muestra u oculta la sección informativa de prelanzamiento bajo la hero de la Home pública.",
       "pitcall_off_title": "Desactivar creación de Pit Call",
       "pitcall_off_body": "Congela la creación de nuevas Pit Call. Registros y calendarios siguen activos.",
       "token_purchases_title": "Compras de tokens",
