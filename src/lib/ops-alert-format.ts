@@ -8,7 +8,8 @@ export interface OpsAlertRow {
   payload: Record<string, unknown> | null;
 }
 
-const fmt = (v: unknown) => (typeof v === "string" ? v.replace("T", " ").replace(/\.\d+.*$/, "") : String(v ?? "—"));
+const fmt = (v: unknown) =>
+  typeof v === "string" ? v.replace("T", " ").replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/, "") : String(v ?? "—");
 
 export function describeOpsAlert(a: OpsAlertRow) {
   const p = a.payload ?? {};
