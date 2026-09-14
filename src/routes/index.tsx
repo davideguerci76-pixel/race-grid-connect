@@ -130,7 +130,7 @@ function Home() {
             width={1089} height={424}
             className="mb-8 w-full max-w-[40rem] object-contain mix-blend-screen"
           />
-          <h1 className="mt-8 max-w-3xl text-6xl font-black uppercase italic leading-[0.9] tracking-tighter max-[380px]:text-5xl md:max-w-full md:text-7xl xl:text-8xl">
+          <h1 className="mt-8 max-w-3xl text-5xl font-black uppercase italic leading-[0.9] tracking-tighter md:max-w-full md:text-7xl xl:text-8xl">
             {t("home.hero_1")}<br />
             <span className="text-racing-red">{t("home.hero_2")}</span>{" "}{t("home.hero_3")}
           </h1>
