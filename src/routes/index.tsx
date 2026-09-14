@@ -184,9 +184,9 @@ function Home() {
                 <span className="block whitespace-nowrap sm:inline-block">
                   <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
                   {leadGroups[0]?.group}
-                </span>
+                </span>{" "}
                 {leadGroups.slice(1).map(({ group }) => (
-                  <span key={group} className="block whitespace-nowrap sm:ml-[0.22em] sm:inline-block">{" "}{group}</span>
+                  <span key={group} className="block whitespace-nowrap sm:inline-block">{group}{" "}</span>
                 ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
@@ -196,7 +196,7 @@ function Home() {
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
               <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl xl:text-5xl">
                 {joinGroups.map(({ group, isLast }, index) => (
-                  <span key={group} className="block whitespace-nowrap sm:mr-[0.22em] sm:inline-block">
+                  <span key={group} className="block whitespace-nowrap sm:inline-block">
                     {index > 0 && " "}{group}{" "}
                     {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
                   </span>
