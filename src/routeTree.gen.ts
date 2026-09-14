@@ -29,6 +29,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicOpsAlertRouteImport } from './routes/api/public/ops-alert'
 import { Route as ApiPublicNotificationPushRouteImport } from './routes/api/public/notification-push'
 import { Route as ApiPublicNotificationEmailRouteImport } from './routes/api/public/notification-email'
 import { Route as ApiPublicCapacityAlertRouteImport } from './routes/api/public/capacity-alert'
@@ -166,6 +167,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const ApiPublicOpsAlertRoute = ApiPublicOpsAlertRouteImport.update({
+  id: '/api/public/ops-alert',
+  path: '/api/public/ops-alert',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicNotificationPushRoute =
   ApiPublicNotificationPushRouteImport.update({
@@ -429,6 +435,7 @@ export interface FileRoutesByFullPath {
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
+  '/api/public/ops-alert': typeof ApiPublicOpsAlertRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
@@ -485,6 +492,7 @@ export interface FileRoutesByTo {
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
+  '/api/public/ops-alert': typeof ApiPublicOpsAlertRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
@@ -545,6 +553,7 @@ export interface FileRoutesById {
   '/api/public/capacity-alert': typeof ApiPublicCapacityAlertRoute
   '/api/public/notification-email': typeof ApiPublicNotificationEmailRoute
   '/api/public/notification-push': typeof ApiPublicNotificationPushRoute
+  '/api/public/ops-alert': typeof ApiPublicOpsAlertRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/admin/demo-guide/$scenarioId': typeof AuthenticatedAdminDemoGuideScenarioIdRoute
@@ -605,6 +614,7 @@ export interface FileRouteTypes {
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
+    | '/api/public/ops-alert'
     | '/admin/'
     | '/dashboard/'
     | '/admin/demo-guide/$scenarioId'
@@ -661,6 +671,7 @@ export interface FileRouteTypes {
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
+    | '/api/public/ops-alert'
     | '/admin'
     | '/dashboard'
     | '/admin/demo-guide/$scenarioId'
@@ -720,6 +731,7 @@ export interface FileRouteTypes {
     | '/api/public/capacity-alert'
     | '/api/public/notification-email'
     | '/api/public/notification-push'
+    | '/api/public/ops-alert'
     | '/_authenticated/admin/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/admin/demo-guide/$scenarioId'
@@ -754,6 +766,7 @@ export interface RootRouteChildren {
   ApiPublicCapacityAlertRoute: typeof ApiPublicCapacityAlertRoute
   ApiPublicNotificationEmailRoute: typeof ApiPublicNotificationEmailRoute
   ApiPublicNotificationPushRoute: typeof ApiPublicNotificationPushRoute
+  ApiPublicOpsAlertRoute: typeof ApiPublicOpsAlertRoute
   ApiPublicWebhooksStripeRoute: typeof ApiPublicWebhooksStripeRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -901,6 +914,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/ops-alert': {
+      id: '/api/public/ops-alert'
+      path: '/api/public/ops-alert'
+      fullPath: '/api/public/ops-alert'
+      preLoaderRoute: typeof ApiPublicOpsAlertRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/notification-push': {
       id: '/api/public/notification-push'
@@ -1288,6 +1308,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCapacityAlertRoute: ApiPublicCapacityAlertRoute,
   ApiPublicNotificationEmailRoute: ApiPublicNotificationEmailRoute,
   ApiPublicNotificationPushRoute: ApiPublicNotificationPushRoute,
+  ApiPublicOpsAlertRoute: ApiPublicOpsAlertRoute,
   ApiPublicWebhooksStripeRoute: ApiPublicWebhooksStripeRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
