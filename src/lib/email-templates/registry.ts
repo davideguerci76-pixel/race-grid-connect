@@ -26,5 +26,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   notification: notificationTemplate,
   contactForm: contactFormTemplate,
   capacityAlert: capacityAlertTemplate,
+  opsAlert: opsAlertTemplate,
 }
 
