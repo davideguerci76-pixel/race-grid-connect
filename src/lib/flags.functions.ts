@@ -5,24 +5,27 @@ import type { Database } from "@/integrations/supabase/types";
 export type PlatformFlags = {
   comingSoon: boolean;
   homeStats: boolean;
+  homePreopeningClaim: boolean;
   pitcallCreationDisabled: boolean;
 };
 
 export const DEFAULT_FLAGS: PlatformFlags = {
   comingSoon: false,
   homeStats: true,
+  homePreopeningClaim: true,
   pitcallCreationDisabled: false,
 };
 
 export const FLAG_KEYS = {
   comingSoon: "flag_coming_soon",
   homeStats: "flag_home_stats",
+  homePreopeningClaim: "flag_home_preopening_claim",
   pitcallCreationDisabled: "flag_pitcall_creation_disabled",
   /** Launch gate: master authority for token purchases (TEST and LIVE). Admin-only, not exposed publicly. */
   tokenPurchases: "flag_token_purchase_enabled",
 } as const;
 
-/** Public, unauthenticated read of the three launch-control flags. */
+/** Public, unauthenticated read of the launch-control flags used by public pages. */
 export const getPublicFlags = createServerFn({ method: "GET" }).handler(async (): Promise<PlatformFlags> => {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   const url = process.env["SUPABASE_URL"]!;
@@ -50,6 +53,10 @@ export const getPublicFlags = createServerFn({ method: "GET" }).handler(async ()
   return {
     comingSoon: read(FLAG_KEYS.comingSoon, DEFAULT_FLAGS.comingSoon),
     homeStats: read(FLAG_KEYS.homeStats, DEFAULT_FLAGS.homeStats),
+    homePreopeningClaim: read(
+      FLAG_KEYS.homePreopeningClaim,
+      DEFAULT_FLAGS.homePreopeningClaim,
+    ),
     pitcallCreationDisabled: read(
       FLAG_KEYS.pitcallCreationDisabled,
       DEFAULT_FLAGS.pitcallCreationDisabled,

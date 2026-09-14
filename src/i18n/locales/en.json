@@ -23,6 +23,17 @@
     "hero_2": "MATCH.",
     "hero_3": "INSTANTLY.",
     "sub": "The motorsport matching platform connecting teams and freelancers by role, skills, location and real availability.",
+    "preopening": {
+      "headline_brand": "PITCALL",
+      "headline_rest": "IS BUILDING THE GRID.",
+      "intro": "Before Pit Calls go live, we’re bringing together motorsport professionals and teams from across the paddock.",
+      "bridge": "That’s why",
+      "join_headline": "THE TIME TO JOIN THE GRID IS",
+      "join_now": "NOW!",
+      "join_body": "Join now and complete your profile. Be part of the network from the beginning and be ready when PITCALL goes live.",
+      "stay_connected": "Stay connected. The grid is growing.",
+      "notification": "You’ll be notified when PITCALL goes live."
+    },
     "cta_freelancer_title": "I'M A FREELANCER",
     "cta_freelancer_body": "Publish your availability. Get matched!",
     "cta_team_title": "WE'RE A TEAM",

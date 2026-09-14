@@ -141,6 +141,8 @@
       "coming_soon_body": "Remplace la page d'accueil publique par une landing d'attente (logos et slogan uniquement).",
       "home_stats_title": "Afficher les statistiques en accueil",
       "home_stats_body": "Affiche ou masque les données de marché et compteurs sur l'accueil.",
+      "preopening_claim_title": "CLAIM PRE-OPENING",
+      "preopening_claim_body": "Affiche ou masque la section d’information de pré-lancement sous la hero de l’accueil public.",
       "pitcall_off_title": "Désactiver la création de Pit Call",
       "pitcall_off_body": "Gèle la création de nouvelles Pit Call. Inscriptions et calendriers restent actifs.",
       "token_purchases_title": "Achats de jetons",

@@ -141,6 +141,8 @@
       "coming_soon_body": "Replaces the public home page with a waiting landing page (logos + claim only, no public data).",
       "home_stats_title": "Show stats on home page",
       "home_stats_body": "Show or hide market highlights and counters on the home page.",
+      "preopening_claim_title": "CLAIM PRE-OPENING",
+      "preopening_claim_body": "Show or hide the pre-opening information section below the public home hero.",
       "pitcall_off_title": "Disable Pit Call creation",
       "pitcall_off_body": "Freezes new Pit Call creation for teams. Sign-ups and calendars stay active.",
       "token_purchases_title": "Token purchases",
