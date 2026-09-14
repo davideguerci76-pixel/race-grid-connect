@@ -181,12 +181,12 @@ function Home() {
             <div className="max-w-2xl lg:max-w-[55%]">
               <div className="mb-5 h-0.5 w-12 bg-racing-red" />
               <h2 className="text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
-                <span className="block whitespace-nowrap sm:inline">
+                <span className="block whitespace-nowrap sm:inline-block">
                   <span className="text-racing-red">{t("home.preopening.headline_brand")}</span>{" "}
                   {leadGroups[0]?.group}
-                </span>{" "}
+                </span>
                 {leadGroups.slice(1).map(({ group }) => (
-                  <span key={group} className="block whitespace-nowrap sm:inline">{group}{" "}</span>
+                  <span key={group} className="block whitespace-nowrap sm:ml-[0.22em] sm:inline-block">{group}</span>
                 ))}
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-foreground/85 sm:text-base">
@@ -196,8 +196,8 @@ function Home() {
               <p className="mt-7 text-sm text-muted-foreground sm:text-base">{t("home.preopening.bridge")}</p>
               <h3 className="mt-1 text-3xl font-black uppercase italic leading-tight tracking-tighter sm:text-4xl lg:text-5xl">
                 {joinGroups.map(({ group, isLast }) => (
-                  <span key={group} className="block whitespace-nowrap sm:inline">
-                    {group}{isLast ? " " : " "}
+                  <span key={group} className="block whitespace-nowrap sm:mr-[0.22em] sm:inline-block">
+                    {group}{" "}
                     {isLast && <span className="text-racing-red">{t("home.preopening.join_now")}</span>}
                   </span>
                 ))}
