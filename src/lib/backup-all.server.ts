@@ -26,7 +26,7 @@ export const USEFUL_DATASETS = [
 export const EXCLUDED_DATASETS = [
   "availability_recompute_queue", "availability_opportunity_state", "hot_partial_state", "team_match_notification_state",
   "platform_capacity_state", "push_deliveries", "push_subscriptions", "client_error_log", "demo_seed_state", "admin_env_state",
-  "admin_time_settings", "request_recheck_ledger", "email_hook_config",
+  "admin_time_settings", "request_recheck_ledger", "email_hook_config", "ops_alert_state", "ops_ledger_baseline",
 ];
 
 export const SNAPSHOT_LIMITATIONS = [
