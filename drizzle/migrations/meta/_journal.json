@@ -1030,6 +1030,13 @@
       "when": 1789386219669,
       "tag": "0146_ops_mon_02_operational_black_box",
       "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1789386742066,
+      "tag": "0147_ops_mon_02_log_event_fail_open",
+      "breakpoints": true
     }
   ]
 }
