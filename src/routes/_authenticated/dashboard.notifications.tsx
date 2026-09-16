@@ -180,7 +180,11 @@ function NotificationsPage() {
                       </div>
                     </div>
                     {isNudge ? (
-                      nudgePrimary === "missing_role" || nudgePrimary === "missing_phone" ? (
+                      nudgePrimary === "missing_first_name" || nudgePrimary === "missing_last_name" ? (
+                        <Link onClick={markClicked} to="/dashboard/profile" search={{ focus: "name" }} className={cardBtn.warn} data-testid="nudge-cta">
+                          {t("activation.cta_name")}
+                        </Link>
+                      ) : nudgePrimary === "missing_role" || nudgePrimary === "missing_phone" ? (
                         <Link onClick={markClicked} to="/dashboard/profile" search={{ focus: nudgePrimary === "missing_role" ? "role" : "phone" }} className={cardBtn.warn} data-testid="nudge-cta">
                           {t(`activation.cta_${nudgePrimary === "missing_role" ? "role" : "phone"}`)}
                         </Link>
