@@ -28,6 +28,8 @@ function AuthPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"freelancer" | "team">(type);
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,10 @@ function AuthPage() {
     setLoading(true);
     try {
       if (isSignup) {
+        if (password !== confirmPassword) {
+          setPasswordMismatch(true);
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
