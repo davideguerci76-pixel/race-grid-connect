@@ -11,6 +11,7 @@ import { RatingPicker } from "@/components/rating-icons";
 import { EngagementCard } from "@/components/cards/engagement-card";
 import { StatusChip, cardBtn } from "@/components/cards/primitives";
 import { getMyEngagements, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
+import { createBlockedPair } from "@/lib/blacklist.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { useRouterState } from "@tanstack/react-router";
@@ -162,6 +163,20 @@ function EngagementsPage() {
       qc.invalidateQueries();
     },
     onError: (e) => toastError(e, "sweep_engage.engagements.cancel_failed"),
+  });
+
+  // BLACKLIST-02: the only two creation authorities are a grace cancellation made
+  // by this user and a no-show engagement (Team side). The server re-verifies both.
+  const blockFn = useServerFn(createBlockedPair);
+  const [locallyBlocked, setLocallyBlocked] = useState<Set<string>>(() => new Set());
+  const blockMut = useMutation({
+    mutationFn: (engagement_id: string) => blockFn({ data: { engagement_id } }),
+    onSuccess: (_r, engagement_id) => {
+      setLocallyBlocked((prev) => new Set(prev).add(engagement_id));
+      toast.success(t("blacklist.added"));
+      qc.invalidateQueries({ queryKey: ["my-blacklist"] });
+    },
+    onError: (e) => toastError(e, "blacklist.add_failed"),
   });
 
   const answerContactFn = useServerFn(freelancerAnswerContact);
