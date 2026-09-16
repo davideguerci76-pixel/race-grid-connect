@@ -76,6 +76,8 @@ export function ActivationCard() {
       ? "missing_availability"
       : undefined;
   const steps: Step[] = [
+    { key: "first_name", done: !reasons.has("missing_first_name"), reason: "missing_first_name" },
+    { key: "last_name", done: !reasons.has("missing_last_name"), reason: "missing_last_name" },
     { key: "role", done: !reasons.has("missing_role"), reason: "missing_role" },
     { key: "phone", done: !reasons.has("missing_phone"), reason: "missing_phone" },
     { key: "availability", done: !availReason, reason: availReason },
