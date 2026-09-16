@@ -31,6 +31,9 @@ function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  // READY-NAME-01 — Freelancers register with first + last name (both required).
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [userType, setUserType] = useState<"freelancer" | "team">(type);
   const [loading, setLoading] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
@@ -75,12 +78,18 @@ function AuthPage() {
           setPasswordMismatch(true);
           return;
         }
+        const first = firstName.trim().replace(/\s+/g, " ");
+        const last = lastName.trim().replace(/\s+/g, " ");
+        const isFreelancer = userType === "freelancer";
+        const meta: Record<string, string> = isFreelancer
+          ? { user_type: userType, first_name: first, last_name: last, display_name: `${first} ${last}`.trim() }
+          : { user_type: userType, display_name: displayName || email.split("@")[0] };
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { user_type: userType, display_name: displayName || email.split("@")[0] },
+            data: meta,
           },
         });
         if (error) throw error;
@@ -150,9 +159,9 @@ function AuthPage() {
           )}
 
           <form onSubmit={handleEmail} className="space-y-4">
-            {isSignup && (
+            {isSignup && userType === "team" && (
               <div>
-                <label className="label-mono">{userType === "team" ? t("auth.team_name") : t("auth.display_name")}</label>
+                <label className="label-mono">{t("auth.team_name")}</label>
                 <input
                   type="text"
                   value={displayName}
@@ -162,6 +171,36 @@ function AuthPage() {
                   maxLength={80}
                   className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
                 />
+              </div>
+            )}
+            {isSignup && userType === "freelancer" && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="label-mono">{t("auth.first_name")}</label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={60}
+                    data-testid="signup-first-name"
+                    className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="label-mono">{t("auth.last_name")}</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={60}
+                    data-testid="signup-last-name"
+                    className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                  />
+                </div>
               </div>
             )}
             <div>

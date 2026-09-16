@@ -31,9 +31,9 @@ import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   component: ProfilePage,
-  // UAT-ONBOARD-03 — Activation Card deep-link: ?focus=role|phone opens the matching edit form.
-  validateSearch: (search: Record<string, unknown>): { focus?: "role" | "phone" } => ({
-    focus: search.focus === "role" || search.focus === "phone" ? search.focus : undefined,
+  // UAT-ONBOARD-03 / READY-NAME-01 — Activation Card deep-link: ?focus=role|phone|name.
+  validateSearch: (search: Record<string, unknown>): { focus?: "role" | "phone" | "name" } => ({
+    focus: search.focus === "role" || search.focus === "phone" || search.focus === "name" ? search.focus : undefined,
   }),
 });
 
@@ -315,7 +315,11 @@ function PersonalInfoSection({ profile }: { profile: any }) {
         <span className="text-muted-foreground">{t("sweep_profile.profile.email")}:</span>
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
       </div>
-      {isFreelancer && <LegalNameBlock profile={profile} />}
+      {isFreelancer && (
+        <div className={focus === "name" ? "-mx-2 border border-racing-yellow bg-racing-yellow/10 p-2" : ""} data-testid="legal-name-block">
+          <LegalNameBlock profile={profile} />
+        </div>
+      )}
       {isFreelancer && <PitCodeBlock />}
       <div className="text-sm">
         <span className="text-muted-foreground">{t("profile.account_type")}:</span>
@@ -827,6 +831,8 @@ function LegalNameBlock({ profile }: { profile: any }) {
     mutationFn: async () => saveName({ data: { first_name: first, last_name: last } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile-detail", user?.id] });
+      // READY-NAME-01: first/last name is a READY requirement — refresh the activation status.
+      qc.invalidateQueries({ queryKey: [ACTIVATION_QUERY_KEY] });
       toast.success(t("profile.legal_name_saved"));
     },
     onError: (e) => {

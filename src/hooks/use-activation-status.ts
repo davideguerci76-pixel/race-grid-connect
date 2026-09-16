@@ -2,12 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
-export type ActivationReason = "missing_role" | "missing_phone" | "missing_availability" | "stale_availability";
+export type ActivationReason =
+  | "missing_first_name"
+  | "missing_last_name"
+  | "missing_role"
+  | "missing_phone"
+  | "missing_availability"
+  | "stale_availability";
 
 export type ActivationStatus = {
   is_freelancer: boolean;
   ready: boolean;
   reasons: ActivationReason[];
+  has_first_name?: boolean;
+  has_last_name?: boolean;
   has_role?: boolean;
   has_phone?: boolean;
   active_days?: number;

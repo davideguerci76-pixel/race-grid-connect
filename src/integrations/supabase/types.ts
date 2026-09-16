@@ -3739,6 +3739,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      freelancer_identity_complete: { Args: { _uid: string }; Returns: boolean }
       freelancer_match_actionable: {
         Args: { _freelancer: string; _request: string }
         Returns: boolean

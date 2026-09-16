@@ -136,7 +136,9 @@
     "type_team_desc": "Racing team, manufacturer, constructor, or other motorsport organization.",
     "which_are_you": "What best describes you?",
     "signed_in_as": "Signed in as {{email}}",
-    "forgot_password": "Forgot password?"
+    "forgot_password": "Forgot password?",
+    "first_name": "First name",
+    "last_name": "Last name"
   },
   "dashboard": {
     "title": "Dashboard",

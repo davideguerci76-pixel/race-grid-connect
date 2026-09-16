@@ -5,12 +5,14 @@ import { CheckCircle2, Circle, Flag, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useActivationStatus, type ActivationReason } from "@/hooks/use-activation-status";
 
-type Step = { key: "role" | "phone" | "availability"; done: boolean; reason?: ActivationReason };
+type StepKey = "first_name" | "last_name" | "role" | "phone" | "availability";
+type Step = { key: StepKey; done: boolean; reason?: ActivationReason };
 
 const dismissKey = (uid: string) => `pitcall.ready_dismissed.${uid}`;
 
-/** Deep-link target for the first missing requirement (role → phone → availability). */
+/** Deep-link target for the first missing requirement (name → role → phone → availability). */
 function targetFor(step: Step): { to: string; search?: Record<string, string> } {
+  if (step.key === "first_name" || step.key === "last_name") return { to: "/dashboard/profile", search: { focus: "name" } };
   if (step.key === "role") return { to: "/dashboard/profile", search: { focus: "role" } };
   if (step.key === "phone") return { to: "/dashboard/profile", search: { focus: "phone" } };
   return { to: "/dashboard/calendar" };
@@ -74,6 +76,8 @@ export function ActivationCard() {
       ? "missing_availability"
       : undefined;
   const steps: Step[] = [
+    { key: "first_name", done: !reasons.has("missing_first_name"), reason: "missing_first_name" },
+    { key: "last_name", done: !reasons.has("missing_last_name"), reason: "missing_last_name" },
     { key: "role", done: !reasons.has("missing_role"), reason: "missing_role" },
     { key: "phone", done: !reasons.has("missing_phone"), reason: "missing_phone" },
     { key: "availability", done: !availReason, reason: availReason },
@@ -85,7 +89,7 @@ export function ActivationCard() {
   return (
     <div className="mt-6 border border-racing-yellow bg-racing-yellow/10 p-5" data-testid="activation-card">
       <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-racing-yellow">
-        <Flag className="size-4" /> {t("activation.not_ready_label")} · {doneCount}/3
+        <Flag className="size-4" /> {t("activation.not_ready_label")} · {doneCount}/{steps.length}
       </div>
       <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("activation.title")}</h2>
       <ul className="mt-4 space-y-2">

@@ -27,6 +27,13 @@
     "nudge_missing_role": "completa il tuo ruolo professionale",
     "nudge_missing_phone": "aggiungi il numero di telefono necessario a un Team per contattarti dopo l’accettazione di una Pit Call",
     "nudge_missing_availability": "aggiungi le tue disponibilità per comparire nei match",
-    "nudge_stale_availability": "aggiorna e conferma le tue disponibilità future"
+    "nudge_stale_availability": "aggiorna e conferma le tue disponibilità future",
+    "step_first_name": "Aggiungi il tuo nome",
+    "step_last_name": "Aggiungi il tuo cognome",
+    "reason_missing_first_name": "I Team hanno bisogno del tuo nome reale prima che tu possa fare match.",
+    "reason_missing_last_name": "I Team hanno bisogno del tuo cognome reale prima che tu possa fare match.",
+    "cta_name": "Aggiungi nome e cognome",
+    "nudge_missing_first_name": "aggiungi il tuo nome",
+    "nudge_missing_last_name": "aggiungi il tuo cognome"
   }
 }

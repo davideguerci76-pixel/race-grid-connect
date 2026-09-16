@@ -114,7 +114,9 @@
         "bulk_cancel": "Annulla",
         "bulk_result": "Risultato — Inviati: {{sent}} · Saltati: {{skipped}} · Falliti: {{failed}}",
         "bulk_close": "Chiudi",
-        "bulk_delivery_note": "Email/push vengono consegnati dai dispatcher schedulati (50 email / 100 push per esecuzione)."
+        "bulk_delivery_note": "Email/push vengono consegnati dai dispatcher schedulati (50 email / 100 push per esecuzione).",
+        "r_missing_first_name": "Nome mancante",
+        "r_missing_last_name": "Cognome mancante"
       }
     },
     "teams": {
