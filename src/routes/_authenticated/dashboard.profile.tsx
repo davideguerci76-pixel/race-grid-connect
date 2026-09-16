@@ -27,6 +27,7 @@ import { PrivacyDataSection } from "@/components/privacy-data-section";
 import { toastError } from "@/lib/errors";
 import { PitcallErrorScreen } from "@/components/pitcall-error-screen";
 import { FREELANCER_PROFILE_COLUMNS, TEAM_PROFILE_COLUMNS } from "@/lib/profile-columns";
+import { IdentityPrivacyReassurance } from "@/components/identity-privacy-reassurance";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
@@ -311,6 +312,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 
   return (
     <div className="mt-4 space-y-3">
+      <IdentityPrivacyReassurance audience={isFreelancer ? "freelancer" : "team"} context="profile" />
       <div className="min-w-0 text-sm">
         <span className="text-muted-foreground">{t("sweep_profile.profile.email")}:</span>
         <span className="ml-2 font-mono break-all">{user?.email ?? "—"}</span>
@@ -346,7 +348,6 @@ function PersonalInfoSection({ profile }: { profile: any }) {
           {(editingPhone || !fp?.phone_number) && (
             <div className="mb-2 text-xs text-muted-foreground" data-testid="phone-why">
               <p>{t("activation.phone_why")}</p>
-              <p className="mt-0.5 text-[11px]">{t("activation.phone_private")}</p>
             </div>
           )}
           {editingPhone ? (
