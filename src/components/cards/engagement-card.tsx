@@ -42,12 +42,14 @@ export function EngagementCard({
   highlighted,
   actions,
   ratingSlot,
+  blacklistSlot,
 }: {
   e: any;
   userId: string | undefined;
   highlighted: boolean;
   actions: Actions;
   ratingSlot: ReactNode;
+  blacklistSlot?: ReactNode;
 }) {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
@@ -138,7 +140,9 @@ export function EngagementCard({
           )
         )}
         {ratingSlot}
+        {blacklistSlot}
       </ActionRow>
+
 
       {/* ALERTS — anti-ghosting */}
       {ghosted && (
