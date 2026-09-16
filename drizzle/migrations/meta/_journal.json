@@ -1051,6 +1051,13 @@
       "when": 1789584958145,
       "tag": "0149_ready_name_01_freelancer_legal_name_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1789600421698,
+      "tag": "0150_blacklist_02_double_blind_private_blacklist",
+      "breakpoints": true
     }
   ]
 }
