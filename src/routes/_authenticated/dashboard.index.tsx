@@ -5,7 +5,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { Calendar, CalendarRange, Coins, Star, Users, User, Briefcase, Flame, MapPin, Sparkles } from "lucide-react";
+import { Calendar, CalendarRange, Coins, Star, Users, User, Briefcase, Flame, MapPin, Sparkles, ShieldOff } from "lucide-react";
 import { ActionRow, CardBody, CardHeader, CardShell, Fact, FactGrid, cardBtn } from "@/components/cards/primitives";
 import { RelevanceScore } from "@/components/cards/match-signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -275,6 +275,7 @@ function DashboardHome() {
           )}
           <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={profile ? String(profile.token_balance) : "—"} />
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={num(matchesCount)} />
+          <DashCard to="/dashboard/blacklist" icon={ShieldOff} label={t("blacklist.dashboard_card")} value={t("blacklist.dashboard_value")} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}
           {isTeam && profile?.guided_demo_completed_at && <DashCard to="/dashboard/try-demo" icon={Sparkles} label={t("trial.entry.replay_label")} value={t("trial.entry.replay_cta")} />}
         </div>

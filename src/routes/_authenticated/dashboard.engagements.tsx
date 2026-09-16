@@ -327,6 +327,27 @@ function EngagementsPage() {
                 </button>
               );
             })();
+            const canBlacklist =
+              e.status === "cancelled" &&
+              ((e.cancellation_kind === "grace" && e.cancelled_by === user?.id) ||
+                (!isFreelancer && e.cancellation_kind === "no_show" && e.no_show === true));
+            const blacklistSlot = canBlacklist
+              ? locallyBlocked.has(e.id)
+                ? <StatusChip tone="muted">{t("blacklist.blocked_chip")}</StatusChip>
+                : (
+                  <button
+                    type="button"
+                    className={cardBtn.ghost}
+                    disabled={blockMut.isPending}
+                    onClick={async () => {
+                      if (await confirmDialog(t("blacklist.offer_confirm"))) blockMut.mutate(e.id);
+                    }}
+                    title={t("blacklist.double_blind")}
+                  >
+                    {t("blacklist.offer_cta")}
+                  </button>
+                )
+              : null;
             return (
               <EngagementCard
                 key={e.id}
@@ -334,6 +355,8 @@ function EngagementsPage() {
                 userId={user?.id}
                 highlighted={targetEngagementId === e.id}
                 ratingSlot={ratingSlot || null}
+                blacklistSlot={blacklistSlot}
+
                 actions={{
                   revealCost,
                   revealPending: revealMut.isPending,
