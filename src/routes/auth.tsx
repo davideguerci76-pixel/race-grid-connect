@@ -11,6 +11,7 @@ import logoClean from "@/assets/pitcall-logo-clean.png.asset.json";
 import { SiteFooter } from "@/components/site-footer";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { toastError } from "@/lib/errors";
+import { IdentityPrivacyReassurance } from "@/components/identity-privacy-reassurance";
 
 const searchSchema = z.object({
   mode: fallback(z.enum(["signin", "signup"]), "signin").default("signin"),
@@ -160,47 +161,53 @@ function AuthPage() {
 
           <form onSubmit={handleEmail} className="space-y-4">
             {isSignup && userType === "team" && (
-              <div>
-                <label className="label-mono">{t("auth.team_name")}</label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  required
-                  minLength={2}
-                  maxLength={80}
-                  className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
-                />
+              <div className="space-y-3">
+                <div>
+                  <label className="label-mono">{t("auth.team_name")}</label>
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={80}
+                    className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                  />
+                </div>
+                <IdentityPrivacyReassurance audience="team" context="signup" />
               </div>
             )}
             {isSignup && userType === "freelancer" && (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="label-mono">{t("auth.first_name")}</label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                    minLength={2}
-                    maxLength={60}
-                    data-testid="signup-first-name"
-                    className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
-                  />
+              <div className="space-y-3">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="label-mono">{t("auth.first_name")}</label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      minLength={2}
+                      maxLength={60}
+                      data-testid="signup-first-name"
+                      className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-mono">{t("auth.last_name")}</label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      minLength={2}
+                      maxLength={60}
+                      data-testid="signup-last-name"
+                      className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="label-mono">{t("auth.last_name")}</label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                    minLength={2}
-                    maxLength={60}
-                    data-testid="signup-last-name"
-                    className="mt-2 w-full min-w-0 border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
-                  />
-                </div>
+                <IdentityPrivacyReassurance audience="freelancer" context="signup" />
               </div>
             )}
             <div>
