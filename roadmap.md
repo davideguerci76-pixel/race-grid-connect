@@ -36,3 +36,8 @@
 
 ## OPS-MON-01 (read-only audit)
 - [x] OPS-MON-01: production monitoring & alerting audit report delivered; STOP, awaiting remediation decision
+
+## PRIVACY-UX-01
+- [ ] Add one identity privacy reassurance to Freelancer and Team signup
+- [ ] Add one identity privacy reassurance to Freelancer and Team Profile/Onboarding
+- [ ] Verify EN/IT/ES/FR/DE, responsive layout, anonymity authority, and zero LIVE business changes

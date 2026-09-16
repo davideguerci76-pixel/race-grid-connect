@@ -1,0 +1,9 @@
+{
+  "identity_privacy": {
+    "title": "La tua identità resta privata",
+    "signup_freelancer_body": "Nome, cognome, indirizzo email e numero di telefono sono nascosti ai Team durante la navigazione e il matching. I tuoi contatti vengono rivelati solo dopo una conferma esplicita del match.",
+    "signup_team_body": "I dati identificativi e di contatto del Team sono nascosti ai Freelancer durante la navigazione e il matching. I contatti vengono rivelati solo dopo una conferma esplicita del match.",
+    "profile_freelancer_body": "PITCALL ha bisogno di questi dati, ma nome, cognome, indirizzo email e numero di telefono non vengono mostrati ai Team prima di una conferma esplicita del match.",
+    "profile_team_body": "PITCALL ha bisogno di questi dati, ma i dati identificativi e di contatto del Team non vengono mostrati ai Freelancer prima di una conferma esplicita del match."
+  }
+}

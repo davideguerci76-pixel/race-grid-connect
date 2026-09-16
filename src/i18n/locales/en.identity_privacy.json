@@ -1,0 +1,9 @@
+{
+  "identity_privacy": {
+    "title": "Your identity stays private",
+    "signup_freelancer_body": "Your name, email address and phone number are hidden from Teams while browsing and matching. Your contact details are revealed only after an explicit match confirmation.",
+    "signup_team_body": "Your identifying and contact details are hidden from Freelancers while browsing and matching. Your contact details are revealed only after an explicit match confirmation.",
+    "profile_freelancer_body": "PITCALL needs these details, but your name, email address and phone number are not shown to Teams before an explicit match confirmation.",
+    "profile_team_body": "PITCALL needs these details, but your identifying and contact details are not shown to Freelancers before an explicit match confirmation."
+  }
+}
