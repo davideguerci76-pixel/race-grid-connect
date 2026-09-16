@@ -5,12 +5,14 @@ import { CheckCircle2, Circle, Flag, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useActivationStatus, type ActivationReason } from "@/hooks/use-activation-status";
 
-type Step = { key: "role" | "phone" | "availability"; done: boolean; reason?: ActivationReason };
+type StepKey = "first_name" | "last_name" | "role" | "phone" | "availability";
+type Step = { key: StepKey; done: boolean; reason?: ActivationReason };
 
 const dismissKey = (uid: string) => `pitcall.ready_dismissed.${uid}`;
 
-/** Deep-link target for the first missing requirement (role → phone → availability). */
+/** Deep-link target for the first missing requirement (name → role → phone → availability). */
 function targetFor(step: Step): { to: string; search?: Record<string, string> } {
+  if (step.key === "first_name" || step.key === "last_name") return { to: "/dashboard/profile", search: { focus: "name" } };
   if (step.key === "role") return { to: "/dashboard/profile", search: { focus: "role" } };
   if (step.key === "phone") return { to: "/dashboard/profile", search: { focus: "phone" } };
   return { to: "/dashboard/calendar" };
