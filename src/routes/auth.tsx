@@ -189,7 +189,10 @@ function AuthPage() {
                 required
                 minLength={8}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordMismatch) setPasswordMismatch(false);
+                }}
                 className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
               />
               {isSignup && (
