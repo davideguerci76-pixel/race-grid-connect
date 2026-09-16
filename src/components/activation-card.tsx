@@ -89,7 +89,7 @@ export function ActivationCard() {
   return (
     <div className="mt-6 border border-racing-yellow bg-racing-yellow/10 p-5" data-testid="activation-card">
       <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-racing-yellow">
-        <Flag className="size-4" /> {t("activation.not_ready_label")} · {doneCount}/3
+        <Flag className="size-4" /> {t("activation.not_ready_label")} · {doneCount}/{steps.length}
       </div>
       <h2 className="mt-1 text-2xl font-black uppercase italic tracking-tighter">{t("activation.title")}</h2>
       <ul className="mt-4 space-y-2">

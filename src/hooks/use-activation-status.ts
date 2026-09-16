@@ -14,6 +14,8 @@ export type ActivationStatus = {
   is_freelancer: boolean;
   ready: boolean;
   reasons: ActivationReason[];
+  has_first_name?: boolean;
+  has_last_name?: boolean;
   has_role?: boolean;
   has_phone?: boolean;
   active_days?: number;

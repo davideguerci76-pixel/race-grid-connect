@@ -48,6 +48,8 @@ const BASE: Record<string, NotificationTarget> = {
  * missing_role → Profile (role) · missing_phone → Profile (phone) · availability → Calendar.
  */
 export function readinessNudgeTarget(primaryReason: string | null | undefined): NotificationTarget {
+  if (primaryReason === "missing_first_name" || primaryReason === "missing_last_name")
+    return { title: "Get ready to match", path: "/dashboard/profile?focus=name", label: "Add your first and last name" };
   if (primaryReason === "missing_role") return { title: "Get ready to match", path: "/dashboard/profile?focus=role", label: "Add your role" };
   if (primaryReason === "missing_phone") return { title: "Get ready to match", path: "/dashboard/profile?focus=phone", label: "Add your phone number" };
   return { title: "Get ready to match", path: "/dashboard/calendar", label: "Open my calendar" };

@@ -111,7 +111,10 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
 // freelancer per environment (DB constant), no Admin bypass.
 const nudgeInput = z.object({
   user_ids: z.array(z.string().uuid()).min(1).max(1000),
-  reason: z.enum(["missing_role", "missing_phone", "missing_availability", "stale_availability"]).nullable().optional(),
+  reason: z
+    .enum(["missing_first_name", "missing_last_name", "missing_role", "missing_phone", "missing_availability", "stale_availability"])
+    .nullable()
+    .optional(),
   role: z.string().trim().max(80).nullable().optional(),
   mode: z.enum(["single", "bulk"]),
   batch_id: z.string().uuid().nullable().optional(),
