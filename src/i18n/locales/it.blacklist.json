@@ -1,0 +1,27 @@
+{
+  "blacklist": {
+    "nav": "Blacklist privata",
+    "title": "Blacklist privata",
+    "dashboard_card": "Blacklist privata",
+    "dashboard_value": "→",
+    "intro": "Persone e Team con cui hai scelto di non essere più abbinato. Questa lista è visibile solo a te.",
+    "double_blind": "L'altra parte non viene mai informata e non può in alcun modo sapere di essere nella tua blacklist.",
+    "offer_title_grace": "Non abbinarmi più a questa controparte?",
+    "offer_title_no_show": "Non abbinarmi più a questa controparte?",
+    "offer_body": "Puoi aggiungere questa controparte alla tua blacklist privata. PITCALL smetterà di abbinarvi nei match futuri.",
+    "offer_cta": "Aggiungi alla mia blacklist",
+    "offer_confirm": "Aggiungere questa controparte alla tua blacklist privata? Non verrà mai informata e PITCALL smetterà di abbinarvi nei match futuri.",
+    "added": "Aggiunta alla tua blacklist privata",
+    "add_failed": "Impossibile aggiungere alla blacklist",
+    "blocked_chip": "Nella tua blacklist",
+    "source_cancel_grace": "Dopo una cancellazione",
+    "source_no_show": "Dopo una mancata presentazione",
+    "since": "Dal {{date}}",
+    "remove": "Rimuovi",
+    "remove_confirm": "Rimuovere questo blocco? Potresti essere nuovamente abbinato a questa controparte nei match futuri.",
+    "removed": "Rimosso",
+    "remove_failed": "Impossibile rimuovere questo blocco",
+    "empty": "La tua blacklist è vuota.",
+    "unknown_counterpart": "Controparte"
+  }
+}

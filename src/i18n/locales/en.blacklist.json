@@ -1,0 +1,27 @@
+{
+  "blacklist": {
+    "nav": "Private blacklist",
+    "title": "Private blacklist",
+    "dashboard_card": "Private blacklist",
+    "dashboard_value": "→",
+    "intro": "People and Teams you chose not to be paired with again. Only you can see this list.",
+    "double_blind": "The other party is never informed and can never find out they are on your blacklist.",
+    "offer_title_grace": "Do not pair me with them again?",
+    "offer_title_no_show": "Do not pair me with them again?",
+    "offer_body": "You can add this counterpart to your private blacklist. PITCALL will stop pairing you in future matches.",
+    "offer_cta": "Add to my blacklist",
+    "offer_confirm": "Add this counterpart to your private blacklist? They will never be informed, and PITCALL will stop pairing you in future matches.",
+    "added": "Added to your private blacklist",
+    "add_failed": "Could not add to your blacklist",
+    "blocked_chip": "In your blacklist",
+    "source_cancel_grace": "After a cancellation",
+    "source_no_show": "After a no-show",
+    "since": "Since {{date}}",
+    "remove": "Remove",
+    "remove_confirm": "Remove this block? You may be paired with this counterpart again in future matches.",
+    "removed": "Removed",
+    "remove_failed": "Could not remove this block",
+    "empty": "Your blacklist is empty.",
+    "unknown_counterpart": "Counterpart"
+  }
+}

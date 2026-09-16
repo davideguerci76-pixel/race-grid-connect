@@ -1,0 +1,27 @@
+{
+  "blacklist": {
+    "nav": "Lista negra privada",
+    "title": "Lista negra privada",
+    "dashboard_card": "Lista negra privada",
+    "dashboard_value": "→",
+    "intro": "Personas y Equipos con los que has decidido no volver a emparejarte. Solo tú ves esta lista.",
+    "double_blind": "La otra parte nunca es informada y no puede saber que está en tu lista negra.",
+    "offer_title_grace": "¿No volver a emparejarme con esta contraparte?",
+    "offer_title_no_show": "¿No volver a emparejarme con esta contraparte?",
+    "offer_body": "Puedes añadir esta contraparte a tu lista negra privada. PITCALL dejará de emparejaros en futuros matches.",
+    "offer_cta": "Añadir a mi lista negra",
+    "offer_confirm": "¿Añadir esta contraparte a tu lista negra privada? Nunca será informada y PITCALL dejará de emparejaros en futuros matches.",
+    "added": "Añadida a tu lista negra privada",
+    "add_failed": "No se pudo añadir a tu lista negra",
+    "blocked_chip": "En tu lista negra",
+    "source_cancel_grace": "Tras una cancelación",
+    "source_no_show": "Tras una ausencia",
+    "since": "Desde {{date}}",
+    "remove": "Quitar",
+    "remove_confirm": "¿Quitar este bloqueo? Podrías volver a emparejarte con esta contraparte en futuros matches.",
+    "removed": "Eliminado",
+    "remove_failed": "No se pudo quitar este bloqueo",
+    "empty": "Tu lista negra está vacía.",
+    "unknown_counterpart": "Contraparte"
+  }
+}

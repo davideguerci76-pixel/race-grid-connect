@@ -275,6 +275,58 @@ export type Database = {
           },
         ]
       }
+      blocked_pairs: {
+        Row: {
+          blocked_user_id: string
+          blocker_user_id: string
+          created_at: string
+          id: string
+          is_test: boolean
+          source_engagement_id: string | null
+          source_kind: string
+        }
+        Insert: {
+          blocked_user_id: string
+          blocker_user_id: string
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          source_engagement_id?: string | null
+          source_kind: string
+        }
+        Update: {
+          blocked_user_id?: string
+          blocker_user_id?: string
+          created_at?: string
+          id?: string
+          is_test?: boolean
+          source_engagement_id?: string | null
+          source_kind?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_pairs_blocked_user_id_fkey"
+            columns: ["blocked_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_pairs_blocker_user_id_fkey"
+            columns: ["blocker_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocked_pairs_source_engagement_id_fkey"
+            columns: ["source_engagement_id"]
+            isOneToOne: false
+            referencedRelation: "engagements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_day_notes: {
         Row: {
           busy: boolean
@@ -3311,6 +3363,7 @@ export type Database = {
         }
         Returns: Json
       }
+      create_blocked_pair: { Args: { _engagement_id: string }; Returns: Json }
       create_request: {
         Args: { _payload: Json }
         Returns: {
@@ -3993,6 +4046,7 @@ export type Database = {
         }
         Returns: string
       }
+      pair_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       pitcall_creation_allowed: { Args: never; Returns: boolean }
       platform_capacity_counts: {
         Args: never
@@ -4079,6 +4133,7 @@ export type Database = {
         Args: { _is_test: boolean }
         Returns: number
       }
+      remove_blocked_pair: { Args: { _blocked_user_id: string }; Returns: Json }
       remove_pool_member: { Args: { _freelancer_id: string }; Returns: Json }
       request_confirmable_matches_left: {
         Args: { _request_id: string }

@@ -11,6 +11,7 @@ import { RatingPicker } from "@/components/rating-icons";
 import { EngagementCard } from "@/components/cards/engagement-card";
 import { StatusChip, cardBtn } from "@/components/cards/primitives";
 import { getMyEngagements, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
+import { createBlockedPair } from "@/lib/blacklist.functions";
 import { getPlatformSettings } from "@/lib/admin.functions";
 import { addPoolMemberFromEngagement } from "@/lib/pool.functions";
 import { useRouterState } from "@tanstack/react-router";
@@ -164,6 +165,20 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.engagements.cancel_failed"),
   });
 
+  // BLACKLIST-02: the only two creation authorities are a grace cancellation made
+  // by this user and a no-show engagement (Team side). The server re-verifies both.
+  const blockFn = useServerFn(createBlockedPair);
+  const [locallyBlocked, setLocallyBlocked] = useState<Set<string>>(() => new Set());
+  const blockMut = useMutation({
+    mutationFn: (engagement_id: string) => blockFn({ data: { engagement_id } }),
+    onSuccess: (_r, engagement_id) => {
+      setLocallyBlocked((prev) => new Set(prev).add(engagement_id));
+      toast.success(t("blacklist.added"));
+      qc.invalidateQueries({ queryKey: ["my-blacklist"] });
+    },
+    onError: (e) => toastError(e, "blacklist.add_failed"),
+  });
+
   const answerContactFn = useServerFn(freelancerAnswerContact);
   const answerContactMut = useMutation({
     mutationFn: (v: { engagement_id: string; contacted: boolean }) => answerContactFn({ data: v }),
@@ -312,6 +327,27 @@ function EngagementsPage() {
                 </button>
               );
             })();
+            const canBlacklist =
+              e.status === "cancelled" &&
+              ((e.cancellation_kind === "grace" && e.cancelled_by === user?.id) ||
+                (!isFreelancer && e.cancellation_kind === "no_show" && e.no_show === true));
+            const blacklistSlot = canBlacklist
+              ? locallyBlocked.has(e.id)
+                ? <StatusChip tone="muted">{t("blacklist.blocked_chip")}</StatusChip>
+                : (
+                  <button
+                    type="button"
+                    className={cardBtn.ghost}
+                    disabled={blockMut.isPending}
+                    onClick={async () => {
+                      if (await confirmDialog(t("blacklist.offer_confirm"))) blockMut.mutate(e.id);
+                    }}
+                    title={t("blacklist.double_blind")}
+                  >
+                    {t("blacklist.offer_cta")}
+                  </button>
+                )
+              : null;
             return (
               <EngagementCard
                 key={e.id}
@@ -319,6 +355,8 @@ function EngagementsPage() {
                 userId={user?.id}
                 highlighted={targetEngagementId === e.id}
                 ratingSlot={ratingSlot || null}
+                blacklistSlot={blacklistSlot}
+
                 actions={{
                   revealCost,
                   revealPending: revealMut.isPending,
