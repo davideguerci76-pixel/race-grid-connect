@@ -28,6 +28,8 @@ function AuthPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"freelancer" | "team">(type);
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,10 @@ function AuthPage() {
     setLoading(true);
     try {
       if (isSignup) {
+        if (password !== confirmPassword) {
+          setPasswordMismatch(true);
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -183,7 +189,10 @@ function AuthPage() {
                 required
                 minLength={8}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordMismatch) setPasswordMismatch(false);
+                }}
                 className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
               />
               {isSignup && (
@@ -194,6 +203,25 @@ function AuthPage() {
                 </p>
               )}
             </div>
+            {isSignup && (
+              <div>
+                <label className="label-mono">{t("auth.confirm_password")}</label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (passwordMismatch) setPasswordMismatch(false);
+                  }}
+                  className="mt-2 w-full border border-border bg-background px-4 py-3 focus:border-racing-red focus:outline-none"
+                />
+                {passwordMismatch && (
+                  <p className="mt-2 text-[11px] font-bold text-racing-red">{t("auth.passwords_mismatch")}</p>
+                )}
+              </div>
+            )}
 
             {isSignup && (
               <label className="flex items-start gap-2 text-xs text-muted-foreground">
