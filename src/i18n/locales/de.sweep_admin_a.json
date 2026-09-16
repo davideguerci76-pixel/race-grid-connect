@@ -114,7 +114,9 @@
         "bulk_cancel": "Abbrechen",
         "bulk_result": "Ergebnis — Gesendet: {{sent}} · Übersprungen: {{skipped}} · Fehlgeschlagen: {{failed}}",
         "bulk_close": "Schließen",
-        "bulk_delivery_note": "E-Mail/Push werden von den geplanten Dispatchern zugestellt (50 E-Mails / 100 Push pro Lauf)."
+        "bulk_delivery_note": "E-Mail/Push werden von den geplanten Dispatchern zugestellt (50 E-Mails / 100 Push pro Lauf).",
+        "r_missing_first_name": "Vorname fehlt",
+        "r_missing_last_name": "Nachname fehlt"
       }
     },
     "teams": {

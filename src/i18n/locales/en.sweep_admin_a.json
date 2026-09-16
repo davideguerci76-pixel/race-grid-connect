@@ -114,7 +114,9 @@
         "bulk_cancel": "Cancel",
         "bulk_result": "Result — Sent: {{sent}} · Skipped: {{skipped}} · Failed: {{failed}}",
         "bulk_close": "Close",
-        "bulk_delivery_note": "Email/push are delivered by the scheduled dispatchers (50 emails / 100 pushes per run)."
+        "bulk_delivery_note": "Email/push are delivered by the scheduled dispatchers (50 emails / 100 pushes per run).",
+        "r_missing_first_name": "Missing first name",
+        "r_missing_last_name": "Missing last name"
       }
     },
     "teams": {

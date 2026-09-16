@@ -136,7 +136,9 @@
     "type_team_desc": "Squadra corse, casa costruttrice, costruttore o altra organizzazione motorsport.",
     "which_are_you": "Chi sei?",
     "signed_in_as": "Accesso come {{email}}",
-    "forgot_password": "Password dimenticata?"
+    "forgot_password": "Password dimenticata?",
+    "first_name": "Nome",
+    "last_name": "Cognome"
   },
   "dashboard": {
     "title": "Dashboard",
