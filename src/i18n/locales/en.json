@@ -121,6 +121,8 @@
     "signup_title": "Join the Grid",
     "email": "Email",
     "password": "Password",
+    "confirm_password": "Confirm password",
+    "passwords_mismatch": "Passwords do not match.",
     "display_name": "Display name",
     "team_name": "Team name",
     "continue_email": "Continue with email",

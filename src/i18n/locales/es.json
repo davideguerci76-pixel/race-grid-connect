@@ -121,6 +121,8 @@
     "signup_title": "Únete a la parrilla",
     "email": "Email",
     "password": "Contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "passwords_mismatch": "Las contraseñas no coinciden.",
     "display_name": "Nombre",
     "team_name": "Nombre del equipo",
     "continue_email": "Continuar con email",

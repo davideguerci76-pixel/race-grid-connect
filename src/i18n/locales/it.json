@@ -121,6 +121,8 @@
     "signup_title": "Unisciti alla griglia",
     "email": "Email",
     "password": "Password",
+    "confirm_password": "Conferma password",
+    "passwords_mismatch": "Le password non corrispondono.",
     "display_name": "Nome",
     "team_name": "Nome scuderia",
     "continue_email": "Continua con email",

@@ -121,6 +121,8 @@
     "signup_title": "Rejoindre la grille",
     "email": "Email",
     "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "passwords_mismatch": "Les mots de passe ne correspondent pas.",
     "display_name": "Nom",
     "team_name": "Nom de l'écurie",
     "continue_email": "Continuer avec email",

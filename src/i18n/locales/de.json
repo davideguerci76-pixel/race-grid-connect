@@ -121,6 +121,8 @@
     "signup_title": "Tritt dem Grid bei",
     "email": "E-Mail",
     "password": "Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "passwords_mismatch": "Die Passwörter stimmen nicht überein.",
     "display_name": "Name",
     "team_name": "Teamname",
     "continue_email": "Mit E-Mail fortfahren",
