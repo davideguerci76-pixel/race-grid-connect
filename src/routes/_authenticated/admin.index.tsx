@@ -75,7 +75,7 @@ function AdminFreelancers() {
   );
 
   // Pool health = whole current ACP environment (LIVE or TEST), independent of the filters below.
-  const REASONS = ["missing_role", "missing_phone", "missing_availability", "stale_availability"] as const;
+  const REASONS = ["missing_first_name", "missing_last_name", "missing_role", "missing_phone", "missing_availability", "stale_availability"] as const;
   const pool = useMemo(() => {
     const all = data ?? [];
     const ready = all.filter((r: any) => r.ready).length;
@@ -165,7 +165,13 @@ function AdminFreelancers() {
     return c;
   }
   const ctaLabel = (primary: string | null) =>
-    primary === "missing_role" ? t("activation.cta_role") : primary === "missing_phone" ? t("activation.cta_phone") : t("activation.cta_availability");
+    primary === "missing_first_name" || primary === "missing_last_name"
+      ? t("activation.cta_name")
+      : primary === "missing_role"
+        ? t("activation.cta_role")
+        : primary === "missing_phone"
+          ? t("activation.cta_phone")
+          : t("activation.cta_availability");
 
   async function onNudgeOne(r: any) {
     if (nudging) return;
