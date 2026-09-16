@@ -1,0 +1,27 @@
+{
+  "blacklist": {
+    "nav": "Private Blacklist",
+    "title": "Private Blacklist",
+    "dashboard_card": "Private Blacklist",
+    "dashboard_value": "→",
+    "intro": "Personen und Teams, mit denen du nicht mehr zusammengebracht werden möchtest. Diese Liste sieht nur du.",
+    "double_blind": "Die Gegenseite wird nie informiert und kann nicht erfahren, dass sie auf deiner Blacklist steht.",
+    "offer_title_grace": "Nicht mehr mit dieser Gegenseite zusammenbringen?",
+    "offer_title_no_show": "Nicht mehr mit dieser Gegenseite zusammenbringen?",
+    "offer_body": "Du kannst diese Gegenseite zu deiner privaten Blacklist hinzufügen. PITCALL bringt euch in künftigen Matches nicht mehr zusammen.",
+    "offer_cta": "Zur Blacklist hinzufügen",
+    "offer_confirm": "Diese Gegenseite zu deiner privaten Blacklist hinzufügen? Sie wird nie informiert und PITCALL bringt euch in künftigen Matches nicht mehr zusammen.",
+    "added": "Zur privaten Blacklist hinzugefügt",
+    "add_failed": "Hinzufügen zur Blacklist nicht möglich",
+    "blocked_chip": "Auf deiner Blacklist",
+    "source_cancel_grace": "Nach einer Stornierung",
+    "source_no_show": "Nach einem Nichterscheinen",
+    "since": "Seit {{date}}",
+    "remove": "Entfernen",
+    "remove_confirm": "Diese Sperre entfernen? Ihr könnt in künftigen Matches wieder zusammengebracht werden.",
+    "removed": "Entfernt",
+    "remove_failed": "Sperre konnte nicht entfernt werden",
+    "empty": "Deine Blacklist ist leer.",
+    "unknown_counterpart": "Gegenseite"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "blacklist": {
+    "nav": "Liste noire privée",
+    "title": "Liste noire privée",
+    "dashboard_card": "Liste noire privée",
+    "dashboard_value": "→",
+    "intro": "Personnes et Teams avec lesquels vous ne souhaitez plus être mis en relation. Vous seul voyez cette liste.",
+    "double_blind": "L'autre partie n'est jamais informée et ne peut pas savoir qu'elle figure sur votre liste noire.",
+    "offer_title_grace": "Ne plus me mettre en relation avec cette contrepartie ?",
+    "offer_title_no_show": "Ne plus me mettre en relation avec cette contrepartie ?",
+    "offer_body": "Vous pouvez ajouter cette contrepartie à votre liste noire privée. PITCALL cessera de vous associer lors des prochains matchs.",
+    "offer_cta": "Ajouter à ma liste noire",
+    "offer_confirm": "Ajouter cette contrepartie à votre liste noire privée ? Elle ne sera jamais informée et PITCALL cessera de vous associer lors des prochains matchs.",
+    "added": "Ajoutée à votre liste noire privée",
+    "add_failed": "Impossible d'ajouter à votre liste noire",
+    "blocked_chip": "Dans votre liste noire",
+    "source_cancel_grace": "Après une annulation",
+    "source_no_show": "Après une absence",
+    "since": "Depuis le {{date}}",
+    "remove": "Retirer",
+    "remove_confirm": "Retirer ce blocage ? Vous pourriez de nouveau être mis en relation avec cette contrepartie.",
+    "removed": "Retiré",
+    "remove_failed": "Impossible de retirer ce blocage",
+    "empty": "Votre liste noire est vide.",
+    "unknown_counterpart": "Contrepartie"
+  }
+}
