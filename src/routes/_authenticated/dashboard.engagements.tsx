@@ -394,6 +394,15 @@ function EngagementsPage() {
           })}
         </div>
       </div>
+      <CancelEngagementDialog
+        request={cancelTarget ? { warning: cancelTarget.warning } : null}
+        pending={cancelMut.isPending}
+        onCancel={() => setCancelTarget(null)}
+        onConfirm={(r: CancelDialogResult) => {
+          if (!cancelTarget) return;
+          cancelMut.mutate({ engagement_id: cancelTarget.id, reason: r.reason, private_note: r.privateNote });
+        }}
+      />
       <SiteFooter />
     </div>
   );
