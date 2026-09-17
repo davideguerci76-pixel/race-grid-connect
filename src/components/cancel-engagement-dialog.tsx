@@ -51,11 +51,12 @@ export function CancelEngagementDialog({
 
 
   return (
-    <Dialog open={request !== null} onOpenChange={(next) => { if (!next && !pending) onCancel(); }}>
+    <Dialog open={engagementId !== null} onOpenChange={(next) => { if (!next && !pending) onCancel(); }}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" data-testid="cancel-engagement-dialog">
         <DialogHeader>
           <DialogTitle className="uppercase tracking-tight">{t("cancel_ux.title")}</DialogTitle>
-          <DialogDescription className="whitespace-pre-line">{request?.warning}</DialogDescription>
+          <DialogDescription className="whitespace-pre-line">{warning}</DialogDescription>
+
         </DialogHeader>
 
         <div className="grid gap-4">
