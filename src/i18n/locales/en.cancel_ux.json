@@ -1,0 +1,16 @@
+{
+  "cancel_ux": {
+    "title": "Cancel this match",
+    "public_label": "Message to the other party (optional)",
+    "public_placeholder": "Explain briefly what happened…",
+    "public_helper": "This message will be visible to the other party.",
+    "private_label": "Private cancellation note (optional)",
+    "private_placeholder": "Your own reminder about this cancellation…",
+    "private_helper": "Only you can see this note. It will remain in your Engagement history.",
+    "keep": "Keep the match",
+    "confirm": "Confirm cancellation",
+    "history_public_sent": "Message you sent to the other party",
+    "history_public_received": "Message from the other party",
+    "history_private": "Your private note"
+  }
+}
