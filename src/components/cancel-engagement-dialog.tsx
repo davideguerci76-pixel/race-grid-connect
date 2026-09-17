@@ -11,11 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-export type CancelDialogRequest = {
-  /** Already-localized explanation of the cancellation consequences. */
-  warning: string;
-};
-
 export type CancelDialogResult = { reason: string | null; privateNote: string | null };
 
 /**
@@ -24,14 +19,21 @@ export type CancelDialogResult = { reason: string | null; privateNote: string | 
  *  - message to the other party (counterparty-visible),
  *  - private cancellation note (author-only, stored in a separate RLS-protected table).
  * It carries no cancellation authority: the server decides grace/kind/actor.
+ *
+ * CANCEL-UX-02 — the draft is keyed on `engagementId` ONLY. Any re-render, refetch,
+ * query invalidation or tab-visibility refetch keeps the typed text intact; the draft
+ * is reset only when the dialog is intentionally dismissed (id -> null) or a different
+ * engagement is opened. A failed submit leaves the dialog open with both texts.
  */
 export function CancelEngagementDialog({
-  request,
+  engagementId,
+  warning,
   pending,
   onCancel,
   onConfirm,
 }: {
-  request: CancelDialogRequest | null;
+  engagementId: string | null;
+  warning: string | null;
   pending: boolean;
   onCancel: () => void;
   onConfirm: (result: CancelDialogResult) => void;
@@ -41,11 +43,12 @@ export function CancelEngagementDialog({
   const [note, setNote] = useState("");
 
   useEffect(() => {
-    if (request) {
-      setReason("");
-      setNote("");
-    }
-  }, [request]);
+    // Intentionally depends on the engagement id alone: object identity of the
+    // parent props must never wipe an in-progress draft.
+    setReason("");
+    setNote("");
+  }, [engagementId]);
+
 
   return (
     <Dialog open={request !== null} onOpenChange={(next) => { if (!next && !pending) onCancel(); }}>
