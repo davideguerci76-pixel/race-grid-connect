@@ -55,3 +55,4 @@
 - [x] Identity persistence after confirmed → cancelled
 - [x] TEST matrix A–L, desktop/mobile, LIVE delta zero — PASS WITH FINDINGS
 - [x] F-CUX-01: blocked_pairs grants narrowed (migration 0153) — CLOSED/PASS
+- [x] CANCEL-UX-02: cancel dialog draft persistence (keyed on engagement id) — CLOSED/PASS
