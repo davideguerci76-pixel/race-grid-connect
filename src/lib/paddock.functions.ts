@@ -1172,20 +1172,41 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       for (const p of (poolRows ?? []) as any[]) poolIds.add(p.freelancer_id);
     }
 
+    // CANCEL-UX-01 — author-only cancellation notes. RLS on
+    // engagement_private_notes restricts rows to author_user_id = auth.uid(),
+    // so the counterparty can never read them, whatever the client asks for.
+    const privateNotes = new Map<string, string>();
+    {
+      const { data: notes } = await supabase
+        .from("engagement_private_notes")
+        .select("engagement_id, note")
+        .in("engagement_id", rows.map((r) => r.id));
+      for (const n of (notes ?? []) as any[]) privateNotes.set(n.engagement_id, n.note);
+    }
+
+
+
     return rows.map((r) => {
       const fName = nameMap.get(r.freelancer_id);
       const tName = nameMap.get(r.team_id);
       const contact = contactsMap.get(r.freelancer_id) ?? null;
       // The freelancer's legal name is only disclosed to the team once the match is confirmed.
       const engagementSealed = r.status === "confirmed" || r.status === "completed";
+      // CANCEL-UX-01 — identity persistence. `confirmed_at` is written ONLY by
+      // accept_match_confirmation / accept_sos_call, i.e. exactly at the point the
+      // lifecycle authorises the identity reveal. A later cancellation must not
+      // re-anonymise a counterparty already legitimately known. A `proposed` row
+      // (and any pre-reveal cancelled row) has confirmed_at = NULL, so anonymity
+      // before the reveal is unchanged.
+      const everConfirmed = r.confirmed_at != null;
       // RATING-UX-02: a Team-declared no-show (SOS) always originates from a CONFIRMED
       // engagement, so the identity was already legitimately revealed to this Team —
       // keep it visible on the cancelled/no_show row (needed for the unilateral rating form).
       const noShowDeclaredByMe = r.team_id === userId && r.status === "cancelled" && r.cancellation_kind === "no_show" && r.no_show === true;
-      const disclosed = engagementSealed || noShowDeclaredByMe || r.freelancer_id === userId;
+      const disclosed = engagementSealed || everConfirmed || noShowDeclaredByMe || r.freelancer_id === userId;
       // Team identity stays anonymous for the freelancer until the engagement is
       // confirmed: a "Request confirmation" (status = proposed) must never leak it.
-      const teamDisclosed = engagementSealed || r.team_id === userId;
+      const teamDisclosed = engagementSealed || everConfirmed || r.team_id === userId;
       const rawTp = tpMap.get(r.team_id) ?? null;
       const teamProfile = rawTp
         ? teamDisclosed
@@ -1272,6 +1293,9 @@ export const getMyEngagements = createServerFn({ method: "GET" })
         team_profile: teamProfile,
         freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
         freelancer_contact: contact,
+        // Author-only: present solely on the canceller's own copy of the row.
+        my_private_cancellation_note: privateNotes.get(r.id) ?? null,
+        cancelled_by_me: r.cancelled_by != null && r.cancelled_by === userId,
       };
     });
 
@@ -2245,18 +2269,27 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
 
 
 // ---- Cancellations & SOS Call ----
+/**
+ * CANCEL-UX-01 — the two texts are pure metadata: all cancellation authority
+ * (grace window, kind, actor, lifecycle) stays server-side in
+ * cancel_engagement_internal. `reason` is the counterparty-visible message
+ * (unchanged historic semantics); `private_note` is author-only and stored in
+ * public.engagement_private_notes, protected by owner-only RLS.
+ */
 export const cancelEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z.object({
       engagement_id: z.string().uuid(),
       reason: z.string().trim().max(500).optional().nullable(),
+      private_note: z.string().trim().max(500).optional().nullable(),
     }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await context.supabase.rpc("cancel_engagement", {
+    const { data: row, error } = await context.supabase.rpc("cancel_engagement_with_notes", {
       _engagement_id: data.engagement_id,
       _reason: data.reason ?? undefined,
+      _private_note: data.private_note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return row;

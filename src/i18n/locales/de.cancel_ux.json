@@ -1,0 +1,16 @@
+{
+  "cancel_ux": {
+    "title": "Diesen Match absagen",
+    "public_label": "Nachricht an die andere Partei (optional)",
+    "public_placeholder": "Erkläre kurz, was passiert ist…",
+    "public_helper": "Diese Nachricht ist für die andere Partei sichtbar.",
+    "private_label": "Private Notiz zur Absage (optional)",
+    "private_placeholder": "Eine persönliche Notiz zu dieser Absage…",
+    "private_helper": "Nur du kannst diese Notiz sehen. Sie bleibt in deinem Engagement-Verlauf.",
+    "keep": "Match behalten",
+    "confirm": "Absage bestätigen",
+    "history_public_sent": "Von dir gesendete Nachricht",
+    "history_public_received": "Nachricht der anderen Partei",
+    "history_private": "Deine private Notiz"
+  }
+}

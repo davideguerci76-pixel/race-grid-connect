@@ -1,0 +1,16 @@
+{
+  "cancel_ux": {
+    "title": "Annulla questo match",
+    "public_label": "Messaggio all'altra parte (facoltativo)",
+    "public_placeholder": "Spiega brevemente cosa è successo…",
+    "public_helper": "Questo messaggio sarà visibile all'altra parte.",
+    "private_label": "Nota privata sull'annullamento (facoltativa)",
+    "private_placeholder": "Un promemoria personale su questo annullamento…",
+    "private_helper": "Solo tu puoi vedere questa nota. Resterà nel tuo storico Engagement.",
+    "keep": "Mantieni il match",
+    "confirm": "Conferma annullamento",
+    "history_public_sent": "Messaggio inviato all'altra parte",
+    "history_public_received": "Messaggio dall'altra parte",
+    "history_private": "La tua nota privata"
+  }
+}

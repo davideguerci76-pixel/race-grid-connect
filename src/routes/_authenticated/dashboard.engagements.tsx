@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker } from "@/components/rating-icons";
 import { EngagementCard } from "@/components/cards/engagement-card";
+import { CancelEngagementDialog, type CancelDialogResult } from "@/components/cancel-engagement-dialog";
 import { StatusChip, cardBtn } from "@/components/cards/primitives";
 import { getMyEngagements, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { createBlockedPair } from "@/lib/blacklist.functions";
@@ -152,9 +153,13 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const cancelFn = useServerFn(cancelEngagement);
+  // CANCEL-UX-01 — branded modal instead of confirm() + prompt(). It only carries
+  // the two optional texts; grace/kind/actor stay server-authoritative.
+  const [cancelTarget, setCancelTarget] = useState<{ id: string; warning: string } | null>(null);
   const cancelMut = useMutation({
-    mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
+    mutationFn: (v: { engagement_id: string; reason: string | null; private_note: string | null }) => cancelFn({ data: v }),
     onSuccess: (row: any) => {
+      setCancelTarget(null);
       const kind = row?.cancellation_kind;
       if (kind === "grace") toast.success(t("sweep_engage.engagements.cancel_grace_toast"));
       else if (kind === "team_late") toast.warning(t("sweep_engage.engagements.cancel_team_late_toast"));
@@ -368,15 +373,13 @@ function EngagementsPage() {
                   },
                   withdrawPending: withdrawMut.isPending,
                   
-                  onCancel: async (inGrace: boolean) => {
-                    const warn = inGrace
+                  onCancel: (inGrace: boolean) => {
+                    const warning = inGrace
                       ? t("sweep_engage.engagements.cancel_grace_confirm")
                       : isFreelancer
                       ? t("sweep_engage.engagements.cancel_late_freelancer_confirm")
                       : t("sweep_engage.engagements.cancel_late_team_confirm");
-                    if (!await confirmDialog(warn)) return;
-                    const reason = window.prompt(t("sweep_engage.engagements.reason_prompt"), "") ?? "";
-                    cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
+                    setCancelTarget({ id: e.id, warning });
                   },
                   onAnswerContact: (contacted: boolean) => answerContactMut.mutate({ engagement_id: e.id, contacted }),
                   answerContactPending: answerContactMut.isPending,
@@ -391,6 +394,15 @@ function EngagementsPage() {
           })}
         </div>
       </div>
+      <CancelEngagementDialog
+        request={cancelTarget ? { warning: cancelTarget.warning } : null}
+        pending={cancelMut.isPending}
+        onCancel={() => setCancelTarget(null)}
+        onConfirm={(r: CancelDialogResult) => {
+          if (!cancelTarget) return;
+          cancelMut.mutate({ engagement_id: cancelTarget.id, reason: r.reason, private_note: r.privateNote });
+        }}
+      />
       <SiteFooter />
     </div>
   );

@@ -300,6 +300,20 @@ export function EngagementCard({
         )}
 
 
+        {/* CANCEL-UX-01 — cancellation messaging. The public message is visible to
+            both parties; the private note is only ever present on the author's own
+            payload (owner-only RLS, never sent to the counterparty). */}
+        {e.cancellation_reason && (
+          <Section icon={<Mail />} title={e.cancelled_by_me ? t("cancel_ux.history_public_sent") : t("cancel_ux.history_public_received")}>
+            <p className="whitespace-pre-line text-muted-foreground">{e.cancellation_reason}</p>
+          </Section>
+        )}
+        {e.my_private_cancellation_note && (
+          <Section icon={<Lock />} title={t("cancel_ux.history_private")}>
+            <p className="whitespace-pre-line text-muted-foreground">{e.my_private_cancellation_note}</p>
+          </Section>
+        )}
+
         {e.notes && <Section icon={<StickyNote />} title={t("cards.notes")}><p className="text-muted-foreground">{e.notes}</p></Section>}
       </CardBody>
 
