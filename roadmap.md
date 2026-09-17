@@ -41,3 +41,9 @@
 - [x] Add one identity privacy reassurance to Freelancer and Team signup
 - [x] Add one identity privacy reassurance to Freelancer and Team Profile/Onboarding
 - [x] Verify EN/IT/ES/FR/DE, responsive layout, anonymity authority, and zero LIVE business changes
+
+## BLACKLIST-02 (double-blind private blacklist)
+- [x] Migration 0150: blocked_pairs table, RLS owner-only, create/remove RPC, pair_blocked helper
+- [x] Matching gates (recompute_matches_core, availability opportunities) + purge/deletion/backup coverage
+- [x] Server functions, Dashboard card, /dashboard/blacklist page, Cancel-grace and no-show entry points
+- [x] i18n EN/IT/ES/FR/DE, TEST-only authority/privacy matrix, LIVE fingerprint delta zero
