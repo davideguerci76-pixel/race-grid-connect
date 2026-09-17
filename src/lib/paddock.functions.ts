@@ -1172,6 +1172,20 @@ export const getMyEngagements = createServerFn({ method: "GET" })
       for (const p of (poolRows ?? []) as any[]) poolIds.add(p.freelancer_id);
     }
 
+    // CANCEL-UX-01 — author-only cancellation notes. RLS on
+    // engagement_private_notes restricts rows to author_user_id = auth.uid(),
+    // so the counterparty can never read them, whatever the client asks for.
+    const privateNotes = new Map<string, string>();
+    {
+      const { data: notes } = await supabase
+        .from("engagement_private_notes")
+        .select("engagement_id, note")
+        .in("engagement_id", rows.map((r) => r.id));
+      for (const n of (notes ?? []) as any[]) privateNotes.set(n.engagement_id, n.note);
+    }
+
+
+
     return rows.map((r) => {
       const fName = nameMap.get(r.freelancer_id);
       const tName = nameMap.get(r.team_id);
