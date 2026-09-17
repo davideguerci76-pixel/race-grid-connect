@@ -1072,6 +1072,13 @@
       "when": 1789631504631,
       "tag": "0152_cancel_ux_01_tighten_private_note_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1789643668758,
+      "tag": "0153_f_cux_01_tighten_blocked_pairs_grants",
+      "breakpoints": true
     }
   ]
 }
