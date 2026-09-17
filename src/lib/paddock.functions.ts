@@ -1293,6 +1293,9 @@ export const getMyEngagements = createServerFn({ method: "GET" })
         team_profile: teamProfile,
         freelancer_profile: fpMap.get(r.freelancer_id) ?? null,
         freelancer_contact: contact,
+        // Author-only: present solely on the canceller's own copy of the row.
+        my_private_cancellation_note: privateNotes.get(r.id) ?? null,
+        cancelled_by_me: r.cancelled_by != null && r.cancelled_by === userId,
       };
     });
 
