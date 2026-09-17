@@ -395,8 +395,10 @@ function EngagementsPage() {
         </div>
       </div>
       <CancelEngagementDialog
-        request={cancelTarget ? { warning: cancelTarget.warning } : null}
+        engagementId={cancelTarget?.id ?? null}
+        warning={cancelTarget?.warning ?? null}
         pending={cancelMut.isPending}
+
         onCancel={() => setCancelTarget(null)}
         onConfirm={(r: CancelDialogResult) => {
           if (!cancelTarget) return;
