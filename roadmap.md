@@ -54,4 +54,4 @@
 - [x] PITCALL cancel dialog replaces browser prompt (5 languages)
 - [x] Identity persistence after confirmed → cancelled
 - [x] TEST matrix A–L, desktop/mobile, LIVE delta zero — PASS WITH FINDINGS
-- [ ] F-CUX-01: narrow blocked_pairs grants (out of scope, reported)
+- [x] F-CUX-01: blocked_pairs grants narrowed (migration 0153) — CLOSED/PASS
