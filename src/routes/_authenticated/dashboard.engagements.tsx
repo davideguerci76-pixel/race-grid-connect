@@ -153,9 +153,13 @@ function EngagementsPage() {
     onError: (e) => toastError(e, "sweep_engage.common.failed"),
   });
   const cancelFn = useServerFn(cancelEngagement);
+  // CANCEL-UX-01 — branded modal instead of confirm() + prompt(). It only carries
+  // the two optional texts; grace/kind/actor stay server-authoritative.
+  const [cancelTarget, setCancelTarget] = useState<{ id: string; warning: string } | null>(null);
   const cancelMut = useMutation({
-    mutationFn: (v: { engagement_id: string; reason: string | null }) => cancelFn({ data: v }),
+    mutationFn: (v: { engagement_id: string; reason: string | null; private_note: string | null }) => cancelFn({ data: v }),
     onSuccess: (row: any) => {
+      setCancelTarget(null);
       const kind = row?.cancellation_kind;
       if (kind === "grace") toast.success(t("sweep_engage.engagements.cancel_grace_toast"));
       else if (kind === "team_late") toast.warning(t("sweep_engage.engagements.cancel_team_late_toast"));
