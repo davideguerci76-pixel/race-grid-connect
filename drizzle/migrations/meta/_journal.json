@@ -1065,6 +1065,13 @@
       "when": 1789631277160,
       "tag": "0151_cancel_ux_01_cancellation_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1789631504631,
+      "tag": "0152_cancel_ux_01_tighten_private_note_grants",
+      "breakpoints": true
     }
   ]
 }
