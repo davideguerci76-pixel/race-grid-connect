@@ -373,15 +373,13 @@ function EngagementsPage() {
                   },
                   withdrawPending: withdrawMut.isPending,
                   
-                  onCancel: async (inGrace: boolean) => {
-                    const warn = inGrace
+                  onCancel: (inGrace: boolean) => {
+                    const warning = inGrace
                       ? t("sweep_engage.engagements.cancel_grace_confirm")
                       : isFreelancer
                       ? t("sweep_engage.engagements.cancel_late_freelancer_confirm")
                       : t("sweep_engage.engagements.cancel_late_team_confirm");
-                    if (!await confirmDialog(warn)) return;
-                    const reason = window.prompt(t("sweep_engage.engagements.reason_prompt"), "") ?? "";
-                    cancelMut.mutate({ engagement_id: e.id, reason: reason.trim() || null });
+                    setCancelTarget({ id: e.id, warning });
                   },
                   onAnswerContact: (contacted: boolean) => answerContactMut.mutate({ engagement_id: e.id, contacted }),
                   answerContactPending: answerContactMut.isPending,
