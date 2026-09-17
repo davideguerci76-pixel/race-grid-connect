@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { RatingPicker } from "@/components/rating-icons";
 import { EngagementCard } from "@/components/cards/engagement-card";
+import { CancelEngagementDialog, type CancelDialogResult } from "@/components/cancel-engagement-dialog";
 import { StatusChip, cardBtn } from "@/components/cards/primitives";
 import { getMyEngagements, submitRatingV2, getRatableEngagements, cancelEngagement, freelancerAnswerContact, teamConfirmContact, revealMatch, withdrawMatchConfirmation } from "@/lib/paddock.functions";
 import { createBlockedPair } from "@/lib/blacklist.functions";
