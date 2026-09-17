@@ -47,3 +47,11 @@
 - [x] Matching gates (recompute_matches_core, availability opportunities) + purge/deletion/backup coverage
 - [x] Server functions, Dashboard card, /dashboard/blacklist page, Cancel-grace and no-show entry points
 - [x] i18n EN/IT/ES/FR/DE, TEST-only authority/privacy matrix, LIVE fingerprint delta zero
+
+## CANCEL-UX-01 — Cancel Grace UX + cancellation messages
+- [x] Audit reason field (reused `cancellation_reason` as public message)
+- [x] Migration 0151 private notes + 0152 grant tightening
+- [x] PITCALL cancel dialog replaces browser prompt (5 languages)
+- [x] Identity persistence after confirmed → cancelled
+- [x] TEST matrix A–L, desktop/mobile, LIVE delta zero — PASS WITH FINDINGS
+- [ ] F-CUX-01: narrow blocked_pairs grants (out of scope, reported)
