@@ -2245,18 +2245,27 @@ export const getRatableEngagements = createServerFn({ method: "GET" })
 
 
 // ---- Cancellations & SOS Call ----
+/**
+ * CANCEL-UX-01 — the two texts are pure metadata: all cancellation authority
+ * (grace window, kind, actor, lifecycle) stays server-side in
+ * cancel_engagement_internal. `reason` is the counterparty-visible message
+ * (unchanged historic semantics); `private_note` is author-only and stored in
+ * public.engagement_private_notes, protected by owner-only RLS.
+ */
 export const cancelEngagement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) =>
     z.object({
       engagement_id: z.string().uuid(),
       reason: z.string().trim().max(500).optional().nullable(),
+      private_note: z.string().trim().max(500).optional().nullable(),
     }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { data: row, error } = await context.supabase.rpc("cancel_engagement", {
+    const { data: row, error } = await context.supabase.rpc("cancel_engagement_with_notes", {
       _engagement_id: data.engagement_id,
       _reason: data.reason ?? undefined,
+      _private_note: data.private_note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return row;
