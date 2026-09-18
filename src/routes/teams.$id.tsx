@@ -138,7 +138,7 @@ function TeamProfile() {
             <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
           </div>
         </div>
-        {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+        {confirmFull && canRevealFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
         <SiteFooter />
       </div>
     );
@@ -234,7 +234,7 @@ function TeamProfile() {
           <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
         </div>
       </div>
-      {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+      {confirmFull && canRevealFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
       <SiteFooter />
     </div>
   );
