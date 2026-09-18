@@ -283,10 +283,10 @@ function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => st
  */
 function OnboardingDigestMessage({ payload }: { payload: any }) {
   const { t } = useTranslation();
-  const count = Number(payload?.new_total ?? 0);
+  const total = Number(payload?.new_total ?? 0);
   const headline = payload?.catch_up === true
-    ? t("sweep_profile.notifications.onboarding_digest_catch_up", { count })
-    : t("sweep_profile.notifications.onboarding_digest_message", { count });
+    ? t("sweep_profile.notifications.onboarding_digest_catch_up", { total })
+    : t("sweep_profile.notifications.onboarding_digest_message", { total });
   return (
     <span data-testid="onboarding-digest">
       <span className="font-bold">{headline}</span>
