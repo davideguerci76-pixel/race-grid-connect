@@ -58,8 +58,32 @@ if (!i18n.isInitialized) {
 }
 
 
+/** Normalize a BCP47 tag (any case, any region) to a PITCALL language code, or null. */
+function normalizeSupportedLang(tag?: string | null): string | null {
+  if (!tag) return null;
+  const code = tag.slice(0, 2).toLowerCase();
+  return SUPPORTED_LANGS.some((l) => l.code === code) ? code : null;
+}
+
+/** First PITCALL-supported language from browser preferences, else null. */
+function detectBrowserLanguage(): string | null {
+  try {
+    const prefs = Array.isArray(navigator.languages) && navigator.languages.length
+      ? navigator.languages
+      : [navigator.language];
+    for (const pref of prefs) {
+      const match = normalizeSupportedLang(pref);
+      if (match) return match;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
 // Language must only change after the initial SSR hydration/paint completes,
 // otherwise SSR (always 'en') and client-rendered route text can diverge.
+// Precedence: persisted manual choice (pitcall.lang) > browser detection > en.
+// Auto-detection is ephemeral: it never writes pitcall.lang, which stays the
+// exclusive marker of an explicit user selection.
 export function applySavedLanguage() {
   if (typeof window === "undefined") return;
   let cancelled = false;
@@ -67,11 +91,12 @@ export function applySavedLanguage() {
   const run = () => {
     if (cancelled) return;
     try {
-      const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
-      if (saved && saved !== i18n.language && SUPPORTED_LANGS.some((l) => l.code === saved)) {
-        void i18n.changeLanguage(saved);
-        document.documentElement.lang = saved;
+      const saved = normalizeSupportedLang(window.localStorage.getItem(LANG_STORAGE_KEY));
+      const target = saved ?? detectBrowserLanguage() ?? "en";
+      if (target !== i18n.language) {
+        void i18n.changeLanguage(target);
       }
+      document.documentElement.lang = target;
     } catch { /* ignore */ }
   };
 
