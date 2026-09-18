@@ -42,6 +42,7 @@ function AdminLaunchPage() {
     { key: FLAG_KEYS.homePreopeningClaim, fallback: true, title: t("sweep_admin_a.launch.preopening_claim_title"), body: t("sweep_admin_a.launch.preopening_claim_body") },
     { key: FLAG_KEYS.pitcallCreationDisabled, fallback: false, title: t("sweep_admin_a.launch.pitcall_off_title"), body: t("sweep_admin_a.launch.pitcall_off_body") },
     { key: FLAG_KEYS.tokenPurchases, fallback: false, title: t("sweep_admin_a.launch.token_purchases_title"), body: t("sweep_admin_a.launch.token_purchases_body") },
+    { key: FLAG_KEYS.freelancerTokenVisibility, fallback: false, title: t("sweep_admin_a.launch.freelancer_token_visibility_title"), body: t("sweep_admin_a.launch.freelancer_token_visibility_body") },
   ];
 
   if (isLoading) return <div className="text-sm text-muted-foreground">{t("sweep_admin_a.loading")}</div>;

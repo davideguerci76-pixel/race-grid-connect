@@ -148,7 +148,9 @@
       "pitcall_off_title": "Desactivar creación de Pit Call",
       "pitcall_off_body": "Congela la creación de nuevas Pit Call. Registros y calendarios siguen activos.",
       "token_purchases_title": "Compras de tokens",
-      "token_purchases_body": "Interruptor principal del flujo de compra de tokens (TEST y LIVE). OFF: los equipos ven los paquetes pero no pueden comprar; el servidor rechaza cualquier intento de pago."
+      "token_purchases_body": "Interruptor principal del flujo de compra de tokens (TEST y LIVE). OFF: los equipos ven los paquetes pero no pueden comprar; el servidor rechaza cualquier intento de pago.",
+      "freelancer_token_visibility_title": "Visibilidad de tokens para Freelancers",
+      "freelancer_token_visibility_body": "Controla si el saldo, las recompensas y la UX de tokens son visibles para los Freelancers. La contabilidad de tokens del backend sigue activa."
     },
     "home_coming_soon": {
       "coming_soon_title": "Llegamos muy pronto",

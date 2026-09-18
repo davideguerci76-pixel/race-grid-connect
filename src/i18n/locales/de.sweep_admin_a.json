@@ -148,7 +148,9 @@
       "pitcall_off_title": "Pit-Call-Erstellung deaktivieren",
       "pitcall_off_body": "Friert die Erstellung neuer Pit Calls ein. Registrierung und Kalender bleiben aktiv.",
       "token_purchases_title": "Token-Käufe",
-      "token_purchases_body": "Hauptschalter für den Token-Kaufprozess (TEST und LIVE). OFF: Teams sehen die Pakete, können aber nicht kaufen; der Server lehnt jeden Checkout-Versuch ab."
+      "token_purchases_body": "Hauptschalter für den Token-Kaufprozess (TEST und LIVE). OFF: Teams sehen die Pakete, können aber nicht kaufen; der Server lehnt jeden Checkout-Versuch ab.",
+      "freelancer_token_visibility_title": "Token-Sichtbarkeit für Freelancer",
+      "freelancer_token_visibility_body": "Steuert, ob Token-Guthaben, Belohnungen und Token-UX für Freelancer sichtbar sind. Die Token-Buchhaltung im Backend bleibt aktiv."
     },
     "home_coming_soon": {
       "coming_soon_title": "Wir sind bald da",

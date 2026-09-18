@@ -13,6 +13,7 @@ import { FreelancerMatchCard } from "@/components/cards/freelancer-match-card";
 import { TeamRequestHistoryCard } from "@/components/cards/team-request-history-card";
 
 import { toastError } from "@/lib/errors";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 export const Route = createFileRoute("/_authenticated/dashboard/matches")({
   component: MatchesPage,
@@ -28,7 +29,15 @@ function MatchesPage() {
   const fetchSettings = useServerFn(getPlatformSettings);
   const { data: revealSettings = [] } = useQuery({ queryKey: ["platform-settings"], queryFn: () => fetchSettings() });
   const revealCost = Number((revealSettings as Array<{ key: string; value_num: number }>).find((x) => x.key === "cost_reveal_match")?.value_num ?? 1);
-  const revealCta = revealCost > 0 ? t("matches.reveal_1_token", { count: revealCost }) : t("matches.reveal_cta_free");
+  // TOKEN-FL-02: with the Freelancer token UX hidden, Reveal stays fully available
+  // but is presented as a plain "Reveal" — no cost, no FREE, no token wording.
+  // The backend cost/authority is untouched.
+  const tokenUi = useFreelancerTokenUi();
+  const revealCta = !tokenUi
+    ? t("matches.reveal_cta_plain")
+    : revealCost > 0
+      ? t("matches.reveal_1_token", { count: revealCost })
+      : t("matches.reveal_cta_free");
   const getRequests = useServerFn(getMyRequests);
   const getEngs = useServerFn(getMyEngagements);
 
@@ -52,7 +61,7 @@ function MatchesPage() {
   const mut = useMutation({
     mutationFn: (id: string) => reveal({ data: { match_id: id } }),
     onSuccess: () => { toast.success(t("sweep_engage.matches.revealed_toast")); qc.invalidateQueries(); },
-    onError: (e) => toastError(e, "matches.insufficient_tokens"),
+    onError: (e) => toastError(e, tokenUi ? "matches.insufficient_tokens" : "sweep_engage.common.failed"),
   });
 
 
@@ -124,9 +133,10 @@ function MatchesPage() {
                 match={m}
                 isFreelancer={isFreelancer}
                 revealCost={revealCost}
+                hideTokenUi={!tokenUi}
                 revealCta={revealCta}
                 revealPending={mut.isPending}
-                onReveal={async () => { const who = isFreelancer ? t("nav.teams") : t("nav.freelancers"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { count: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) mut.mutate(m.id); }}
+                onReveal={async () => { const who = isFreelancer ? t("nav.teams") : t("nav.freelancers"); if (await confirmDialog(!tokenUi ? t("matches.reveal_confirm_plain", { who }) : revealCost > 0 ? t("matches.reveal_confirm", { count: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) mut.mutate(m.id); }}
               />
             ))}
           </div>

@@ -71,7 +71,8 @@
       "auth_failed": "Error de autenticación",
       "signup_desc": "Match por habilidades, requisitos y disponibilidad real.",
       "signin_desc": "Continúa donde lo dejaste.",
-      "or_divider": "— o —"
+      "or_divider": "— o —",
+      "welcome_toast_plain": "¡Bienvenido al paddock!"
     },
     "dashboard_calendar": {
       "redirecting": "Redirigiendo…",

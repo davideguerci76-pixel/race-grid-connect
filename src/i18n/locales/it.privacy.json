@@ -26,6 +26,7 @@
     "delete_done": "Account eliminato.",
     "delete_blocked": "Hai ancora ingaggi attivi. Chiudili o annullali prima di eliminare l'account.",
     "delete_blocked_pitcalls": "Hai ancora Pit Call aperti. Chiudili prima di eliminare l'account.",
-    "contact": "Richieste sui dati"
+    "contact": "Richieste sui dati",
+    "delete_desc_no_tokens": "L'eliminazione dell'account rimuove profilo, contatti, disponibilità e calendari. Le valutazioni che hai scritto restano sulla piattaforma senza il tuo testo libero. L'operazione è irreversibile."
   }
 }

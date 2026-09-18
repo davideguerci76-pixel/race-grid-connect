@@ -37,6 +37,7 @@
     "rate_below": "Votre tarif est en dessous de la fourchette",
     "no_budget": "Aucun budget déclaré par l'équipe.",
     "position": "Votre position",
-    "position_value": "{{rank}} sur {{total}} candidats par match score"
+    "position_value": "{{rank}} sur {{total}} candidats par match score",
+    "locked_body_plain": "Confirmez pour révéler les détails complets."
   }
 }

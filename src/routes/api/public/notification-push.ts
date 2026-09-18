@@ -150,6 +150,33 @@ export const Route = createFileRoute("/api/public/notification-push")({
           }
 
           const payload = (notif.payload ?? {}) as Record<string, unknown>;
+
+          // TOKEN-FL-02: never push a token-oriented notification to a Freelancer
+          // while `flag_freelancer_token_visibility` is OFF. The row itself is kept
+          // (creation, ledger and rewards are untouched) — only the push is skipped.
+          if ((notif.kind as string) === "tokens_credited") {
+            const [{ data: recipient }, { data: flagRow }] = await Promise.all([
+              supabaseAdmin
+                .from("profiles")
+                .select("user_type")
+                .eq("id", notif.user_id as string)
+                .maybeSingle(),
+              supabaseAdmin
+                .from("platform_settings")
+                .select("value_num")
+                .eq("key", "flag_freelancer_token_visibility")
+                .maybeSingle(),
+            ]);
+            const tokenUiVisible = Number((flagRow as { value_num?: number } | null)?.value_num ?? 0) > 0;
+            if ((recipient as { user_type?: string } | null)?.user_type === "freelancer" && !tokenUiVisible) {
+              await supabaseAdmin
+                .from("push_deliveries")
+                .update({ status: "gone", last_error: "freelancer token visibility off", last_attempt_at: new Date().toISOString() })
+                .eq("id", d.id as string);
+              continue;
+            }
+          }
+
           const target = resolveNotificationTarget(notif.kind as string, payload);
 
           const { count: unread } = await supabaseAdmin

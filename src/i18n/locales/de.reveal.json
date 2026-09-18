@@ -37,6 +37,7 @@
     "rate_below": "Dein Tagessatz liegt unter dem Budgetrahmen",
     "no_budget": "Kein Budget vom Team angegeben.",
     "position": "Deine Position",
-    "position_value": "{{rank}} von {{total}} Kandidaten nach Match-Score"
+    "position_value": "{{rank}} von {{total}} Kandidaten nach Match-Score",
+    "locked_body_plain": "Bestätigen, um alle Details anzuzeigen."
   }
 }

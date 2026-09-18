@@ -12,6 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { recordLegalAcceptance } from "@/lib/privacy.functions";
 import { toastError } from "@/lib/errors";
 import { IdentityPrivacyReassurance } from "@/components/identity-privacy-reassurance";
+import { usePlatformFlags } from "@/hooks/use-platform-flags";
 
 const searchSchema = z.object({
   mode: fallback(z.enum(["signin", "signup"]), "signin").default("signin"),
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const { t } = useTranslation();
+  const flags = usePlatformFlags();
   const { mode, type } = Route.useSearch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -102,7 +104,13 @@ function AuthPage() {
           navigate({ to: "/verify-email" });
           return;
         }
-        toast.success(t("sweep_public.auth.welcome_toast"));
+        // TOKEN-FL-02: the signup bonus is still credited server-side; only the
+        // wording is token-free for Freelancers while the visibility flag is OFF.
+        toast.success(
+          isFreelancer && !flags.freelancerTokenVisibility
+            ? t("sweep_public.auth.welcome_toast_plain")
+            : t("sweep_public.auth.welcome_toast"),
+        );
         navigate({ to: "/dashboard" });
 
       } else {

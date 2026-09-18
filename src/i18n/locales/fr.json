@@ -59,7 +59,7 @@
     "featured_freelancers": "Talents vérifiés",
     "see_all": "Voir tout",
     "cta_ready": "Prêt à prendre la piste ?",
-    "cta_free": "Inscription gratuite · 5 jetons",
+    "cta_free": "Inscription gratuite",
     "cta_start": "Commencer →"
   },
   "jobs": {
@@ -211,7 +211,9 @@
     "counts_banner_teams_one": "{{count}} Team correspond à votre calendrier.",
     "counts_banner_teams_other": "{{count}} Teams correspondent à votre calendrier.",
     "counts_banner_freelancers_one": "{{count}} Freelance correspond à vos Pit Calls.",
-    "counts_banner_freelancers_other": "{{count}} Freelances correspondent à vos Pit Calls."
+    "counts_banner_freelancers_other": "{{count}} Freelances correspondent à vos Pit Calls.",
+    "reveal_cta_plain": "Révéler",
+    "reveal_confirm_plain": "Révéler les coordonnées de ce {{who}} ?"
   },
   "tokens": {
     "title": "Jetons",

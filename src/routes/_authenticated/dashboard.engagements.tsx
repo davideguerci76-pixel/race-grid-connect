@@ -22,6 +22,7 @@ import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError } from "@/lib/errors";
 import { useActionCosts } from "@/hooks/use-action-costs";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 export const Route = createFileRoute("/_authenticated/dashboard/engagements")({
   component: EngagementsPage,
@@ -31,7 +32,12 @@ function EngagementsPage() {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const { user } = useAuth();
-  const { ratingBonus } = useActionCosts();
+  const { ratingBonus: rawRatingBonus } = useActionCosts();
+  // TOKEN-FL-02: the reward keeps being credited server-side; only its wording is
+  // suppressed when the current user must not see the token economy.
+  const tokenUi = useFreelancerTokenUi();
+  const ratingBonus = tokenUi ? rawRatingBonus : null;
+  const showRatingBonus = tokenUi;
   const qc = useQueryClient();
   const getFn = useServerFn(getMyEngagements);
   
@@ -219,9 +225,11 @@ function EngagementsPage() {
         toast.info(t("rating.submitted"));
       } else {
         toast.success(
-          ratingBonus != null
-            ? t("rating.submitted_bonus", { bonus: ratingBonus })
-            : t("rating.submitted_bonus_generic"),
+          !showRatingBonus
+            ? t("rating.submitted")
+            : ratingBonus != null
+              ? t("rating.submitted_bonus", { bonus: ratingBonus })
+              : t("rating.submitted_bonus_generic"),
         );
       }
       setRatingFor(null); setComment(""); setTech(5); setPunct(5); setStress(5); setOverall(5);
@@ -275,7 +283,7 @@ function EngagementsPage() {
                         <div className="mb-1 text-sm font-bold">{t("rating.rating_target", { name: other?.display_name || t("contact.user_type_freelancer") })}</div>
                         <div className="mb-2 text-[11px] text-muted-foreground">
                           {t("rating.no_show_unilateral_hint", { name: other?.display_name || t("contact.user_type_freelancer") })}{" "}
-                          {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                          {showRatingBonus ? (ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")) : ""}
                         </div>
                       </>
                     ) : (
@@ -317,18 +325,22 @@ function EngagementsPage() {
                 return (
                   <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
                     {t("rating.rate_no_show")}{" "}
-                    <span className="ml-1 text-[9px]">
-                      {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
-                    </span>
+                    {showRatingBonus && (
+                      <span className="ml-1 text-[9px]">
+                        {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                      </span>
+                    )}
                   </button>
                 );
               }
               return (
                 <button onClick={() => setRatingFor(e.id)} className={cardBtn.warn}>
                   {t("engagements.rate")}{" "}
-                  <span className="ml-1 text-[9px]">
-                    {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
-                  </span>
+                  {showRatingBonus && (
+                    <span className="ml-1 text-[9px]">
+                      {ratingBonus != null ? t("rating.rate_bonus", { bonus: ratingBonus }) : t("rating.rate_bonus_generic")}
+                    </span>
+                  )}
                 </button>
               );
             })();
@@ -366,7 +378,7 @@ function EngagementsPage() {
                   revealCost,
                   revealPending: revealMut.isPending,
                   onReveal: async () => {
-                    const who = t("nav.teams"); if (await confirmDialog(revealCost > 0 ? t("matches.reveal_confirm", { count: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) revealMut.mutate(e.match.id);
+                    const who = t("nav.teams"); if (await confirmDialog(!tokenUi ? t("matches.reveal_confirm_plain", { who }) : revealCost > 0 ? t("matches.reveal_confirm", { count: revealCost, who }) : t("matches.reveal_confirm_free", { who }))) revealMut.mutate(e.match.id);
                   },
                   onWithdraw: async () => {
                     if (await confirmDialog(t("engagements.withdraw_confirm", { defaultValue: "Withdraw this request? The freelancer's days will be released." }))) withdrawMut.mutate(e.id);

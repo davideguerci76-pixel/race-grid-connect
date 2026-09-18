@@ -59,7 +59,7 @@
     "featured_freelancers": "Talent verificati",
     "see_all": "Vedi tutti",
     "cta_ready": "Pronto a scendere in pista?",
-    "cta_free": "Iscriviti gratis · 5 token inclusi",
+    "cta_free": "Iscriviti gratis",
     "cta_start": "Inizia ora →"
   },
   "jobs": {
@@ -211,7 +211,9 @@
     "counts_banner_teams_one": "{{count}} Team compatibile con il tuo calendario.",
     "counts_banner_teams_other": "{{count}} Team compatibili con il tuo calendario.",
     "counts_banner_freelancers_one": "{{count}} Freelance compatibile con i tuoi Pit Call.",
-    "counts_banner_freelancers_other": "{{count}} Freelance compatibili con i tuoi Pit Call."
+    "counts_banner_freelancers_other": "{{count}} Freelance compatibili con i tuoi Pit Call.",
+    "reveal_cta_plain": "Rivela",
+    "reveal_confirm_plain": "Rivelare i contatti di questo {{who}}?"
   },
   "tokens": {
     "title": "Token",
@@ -967,7 +969,7 @@
       {
         "q": "PITCALL garantisce che un Freelancer sia disponibile?",
         "a": [
-          "No. PITCALL usa la disponibilità attuale dichiarata dal Freelancer. Le date diventano impegnate solo dopo l’accettazione di una Request Confirmation."
+          "Creare il profilo, gestire la disponibilità e ricevere match è gratuito."
         ]
       },
       {
@@ -1031,7 +1033,7 @@
       {
         "q": "PITCALL fa pagare i Freelancer?",
         "a": [
-          "Creare il profilo, gestire la disponibilità e ricevere match è gratuito. Qualsiasi azione facoltativa con costo in token mostra il costo prima della conferma."
+          "Creare il profilo, gestire la disponibilità e ricevere match è gratuito."
         ]
       }
     ]

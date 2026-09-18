@@ -54,7 +54,8 @@
       },
       "submit_calendar_review": {
         "title": "Zur Prüfung einreichen",
-        "body": "Sendet diesen Kalender zur Prüfung an PITCALL. Nach Freigabe wird der Kalender für die PITCALL-Community veröffentlicht und du erhältst die konfigurierte Token-Belohnung."
+        "body": "Sendet diesen Kalender zur Prüfung an PITCALL. Nach Freigabe wird der Kalender für die PITCALL-Community veröffentlicht und du erhältst die konfigurierte Token-Belohnung.",
+        "body_no_tokens": "Sendet diesen Kalender zur Prüfung an PITCALL. Nach Freigabe wird der Kalender für die PITCALL-Community veröffentlicht."
       }
     }
   }

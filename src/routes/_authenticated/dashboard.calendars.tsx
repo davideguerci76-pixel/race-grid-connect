@@ -12,6 +12,7 @@ import { BackButton } from "@/components/back-button";
 import { AvailabilityCalendar } from "@/components/availability-calendar";
 import { CalendarQuickFillDialog } from "@/components/calendar-quick-fill";
 import { HelpHint } from "@/components/help-hint";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 import { deleteCalendar, listMyCalendars, saveCalendar, submitCalendarForReview, type UserCalendar } from "@/lib/calendars.functions";
 import { buildIcsFromEvents, checkCalendarLimits, daysToEvents, eventsToDays, dateOf, isoOf, parseIcs, type CalendarEventItem, type CalendarLimitViolation } from "@/lib/ics";
 import { downloadFile } from "@/lib/calendar-contacts";
@@ -37,6 +38,9 @@ const btn =
 
 function ManageCalendarsPage() {
   const { t } = useTranslation();
+  // TOKEN-FL-02: calendar submission/approval and the +5 reward are untouched;
+  // only the reward wording is hidden when the user has no token UX.
+  const tokenUi = useFreelancerTokenUi();
   const qc = useQueryClient();
   const list = useServerFn(listMyCalendars);
   const save = useServerFn(saveCalendar);
@@ -245,7 +249,7 @@ function ManageCalendarsPage() {
                     <button type="button" className={btn} onClick={() => submitMut.mutate(c.id)}>
                       <Send className="size-3.5" /> {t("sweep_public.dashboard_calendars.submit_review")}
                     </button>
-                    <HelpHint titleKey="help.action.submit_calendar_review.title" bodyKey="help.action.submit_calendar_review.body" />
+                    <HelpHint titleKey="help.action.submit_calendar_review.title" bodyKey={tokenUi ? "help.action.submit_calendar_review.body" : "help.action.submit_calendar_review.body_no_tokens"} />
                   </span>
                 )}
                 {c.review_status !== "approved" && (

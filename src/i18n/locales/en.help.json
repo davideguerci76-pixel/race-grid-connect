@@ -54,7 +54,8 @@
       },
       "submit_calendar_review": {
         "title": "Submit for review",
-        "body": "Sends this calendar to PITCALL for review. If it is approved, the calendar is published for the PITCALL community and you receive the configured token reward."
+        "body": "Sends this calendar to PITCALL for review. If it is approved, the calendar is published for the PITCALL community and you receive the configured token reward.",
+        "body_no_tokens": "Sends this calendar to PITCALL for review. If it is approved, the calendar is published for the PITCALL community."
       }
     }
   }

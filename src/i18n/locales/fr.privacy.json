@@ -26,6 +26,7 @@
     "delete_done": "Compte supprimé.",
     "delete_blocked": "Vous avez encore des engagements actifs. Clôturez-les ou annulez-les avant de supprimer votre compte.",
     "delete_blocked_pitcalls": "Vous avez encore des Pit Calls ouverts. Clôturez-les avant de supprimer votre compte.",
-    "contact": "Demandes relatives aux données"
+    "contact": "Demandes relatives aux données",
+    "delete_desc_no_tokens": "La suppression de votre compte efface votre profil, vos contacts, vos disponibilités et vos calendriers. Les évaluations que vous avez écrites restent sur la plateforme sans votre texte libre. Action irréversible."
   }
 }

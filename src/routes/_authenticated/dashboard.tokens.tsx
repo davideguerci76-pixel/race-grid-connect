@@ -1,4 +1,4 @@
-import { createFileRoute, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -18,6 +18,7 @@ import {
 import { BackButton } from "@/components/back-button";
 import { useDateFormat } from "@/lib/date-locale";
 import { toastError, toastWarning } from "@/lib/errors";
+import { useTokenUiState } from "@/hooks/use-freelancer-token-ui";
 
 export const Route = createFileRoute("/_authenticated/dashboard/tokens")({
   component: TokensPage,
@@ -87,6 +88,14 @@ function TokensPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.checkout, search.order]);
 
+  // TOKEN-FL-02: a Freelancer with token visibility OFF is silently sent back to
+  // the Dashboard — no 404, no "unavailable" wording, no token explanation.
+  const tokenUiState = useTokenUiState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (tokenUiState === "hidden") void navigate({ to: "/dashboard", replace: true });
+  }, [tokenUiState, navigate]);
+
   async function onBuy(code: string) {
     setBusy(code);
     try {
@@ -103,6 +112,8 @@ function TokensPage() {
     }
   }
 
+
+  if (tokenUiState !== "visible") return null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">

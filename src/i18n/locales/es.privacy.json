@@ -26,6 +26,7 @@
     "delete_done": "Cuenta eliminada.",
     "delete_blocked": "Todavía tienes contrataciones activas. Ciérralas o cancélalas antes de eliminar la cuenta.",
     "delete_blocked_pitcalls": "Todavía tienes Pit Calls abiertos. Ciérralos antes de eliminar tu cuenta.",
-    "contact": "Solicitudes de datos"
+    "contact": "Solicitudes de datos",
+    "delete_desc_no_tokens": "Eliminar tu cuenta borra tu perfil, contactos, disponibilidad y calendarios. Las valoraciones que escribiste permanecen en la plataforma sin tu texto libre. No se puede deshacer."
   }
 }

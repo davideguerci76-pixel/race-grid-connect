@@ -7,6 +7,8 @@ export type PlatformFlags = {
   homeStats: boolean;
   homePreopeningClaim: boolean;
   pitcallCreationDisabled: boolean;
+  /** TOKEN-FL-02 — presentation-only gate for the Freelancer token UX. */
+  freelancerTokenVisibility: boolean;
 };
 
 export const DEFAULT_FLAGS: PlatformFlags = {
@@ -14,6 +16,8 @@ export const DEFAULT_FLAGS: PlatformFlags = {
   homeStats: true,
   homePreopeningClaim: true,
   pitcallCreationDisabled: false,
+  // Fail-safe: when the settings read fails, the Freelancer token UX stays hidden.
+  freelancerTokenVisibility: false,
 };
 
 export const FLAG_KEYS = {
@@ -23,6 +27,8 @@ export const FLAG_KEYS = {
   pitcallCreationDisabled: "flag_pitcall_creation_disabled",
   /** Launch gate: master authority for token purchases (TEST and LIVE). Admin-only, not exposed publicly. */
   tokenPurchases: "flag_token_purchase_enabled",
+  /** TOKEN-FL-02 — UX exposure of the token economy to Freelancers. Never read by any economic authority. */
+  freelancerTokenVisibility: "flag_freelancer_token_visibility",
 } as const;
 
 /** Public, unauthenticated read of the launch-control flags used by public pages. */
@@ -60,6 +66,10 @@ export const getPublicFlags = createServerFn({ method: "GET" }).handler(async ()
     pitcallCreationDisabled: read(
       FLAG_KEYS.pitcallCreationDisabled,
       DEFAULT_FLAGS.pitcallCreationDisabled,
+    ),
+    freelancerTokenVisibility: read(
+      FLAG_KEYS.freelancerTokenVisibility,
+      DEFAULT_FLAGS.freelancerTokenVisibility,
     ),
   };
 });

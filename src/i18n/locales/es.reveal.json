@@ -37,6 +37,7 @@
     "rate_below": "Tu tarifa está por debajo del rango",
     "no_budget": "El equipo no ha declarado presupuesto.",
     "position": "Tu posición",
-    "position_value": "{{rank}} de {{total}} candidatos por match score"
+    "position_value": "{{rank}} de {{total}} candidatos por match score",
+    "locked_body_plain": "Confirma para revelar los detalles completos."
   }
 }

@@ -12,6 +12,7 @@ import {
 } from "@/components/cards/primitives";
 import { CriteriaOutcome, RelevanceScore } from "@/components/cards/match-signals";
 import { HelpHint } from "@/components/help-hint";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 type Actions = {
   onReveal: () => void;
@@ -53,6 +54,7 @@ export function EngagementCard({
 }) {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
+  const tokenUi = useFreelancerTokenUi();
   const isFreelancer = userId === e.freelancer_id;
   const other = isFreelancer ? e.team : e.freelancer;
   
@@ -244,7 +246,7 @@ export function EngagementCard({
               <div className="mb-2 flex flex-wrap items-center gap-3 rounded-lg border border-dashed border-border bg-background/40 p-3">
                 <span className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">{t("matches.hidden_name")}</span>
                 <button type="button" onClick={actions.onReveal} disabled={actions.revealPending} className={cardBtn.primary}>
-                  <Eye className="size-3.5" /> {actions.revealCost > 0 ? t("matches.reveal_1_token", { count: actions.revealCost }) : t("matches.reveal_cta_free")}
+                  <Eye className="size-3.5" /> {!tokenUi ? t("matches.reveal_cta_plain") : actions.revealCost > 0 ? t("matches.reveal_1_token", { count: actions.revealCost }) : t("matches.reveal_cta_free")}
                 </button>
               </div>
             )}

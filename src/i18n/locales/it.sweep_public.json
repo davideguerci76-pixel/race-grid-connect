@@ -71,7 +71,8 @@
       "auth_failed": "Autenticazione non riuscita",
       "signup_desc": "Match in base a skill, requisiti e disponibilità reale.",
       "signin_desc": "Riprendi da dove avevi lasciato.",
-      "or_divider": "— oppure —"
+      "or_divider": "— oppure —",
+      "welcome_toast_plain": "Benvenuto nel paddock!"
     },
     "dashboard_calendar": {
       "redirecting": "Reindirizzamento in corso…",

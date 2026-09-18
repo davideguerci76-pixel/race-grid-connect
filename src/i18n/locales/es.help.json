@@ -54,7 +54,8 @@
       },
       "submit_calendar_review": {
         "title": "Enviar a revisión",
-        "body": "Envía este calendario a PITCALL para su revisión. Si se aprueba, el calendario se publica para la comunidad PITCALL y recibes la recompensa en tokens configurada."
+        "body": "Envía este calendario a PITCALL para su revisión. Si se aprueba, el calendario se publica para la comunidad PITCALL y recibes la recompensa en tokens configurada.",
+        "body_no_tokens": "Envía este calendario a PITCALL para su revisión. Si se aprueba, el calendario se publica para la comunidad PITCALL."
       }
     }
   }
