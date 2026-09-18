@@ -29,6 +29,8 @@ export const FLAG_KEYS = {
   tokenPurchases: "flag_token_purchase_enabled",
   /** TOKEN-FL-02 — UX exposure of the token economy to Freelancers. Never read by any economic authority. */
   freelancerTokenVisibility: "flag_freelancer_token_visibility",
+  /** OPS-BOARD-02B — emission of the aggregated Admin onboarding digest. Never gates signup. */
+  adminOnboardingDigest: "flag_admin_onboarding_digest",
 } as const;
 
 /** Public, unauthenticated read of the launch-control flags used by public pages. */
