@@ -99,9 +99,12 @@ function TeamProfile() {
   }
 
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
-  const { tp, requests, fullUnlocked, revealedRequestIds } = data;
+  const { tp, requests, fullUnlocked, revealedRequestIds, viewerType } = data;
   const isOwner = user.id === id;
   const canSeeFull = isOwner || fullUnlocked;
+  // ACP-COST-02: the paid full team reveal is not a Freelancer capability. The
+  // server rejects it too; this only keeps the CTA and its token wording away.
+  const canRevealFull = viewerType === "team" && !isOwner;
   const contextRequest = revealedReqId ? requests.find((r) => r.id === revealedReqId) : null;
   const hasRequestReveal = revealedReqId ? revealedRequestIds.has(revealedReqId) : false;
   // Team identity requires an earned disclosure: a paid full reveal, or a reveal
