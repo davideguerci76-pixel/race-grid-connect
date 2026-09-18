@@ -150,7 +150,9 @@
       "token_purchases_title": "Token-Käufe",
       "token_purchases_body": "Hauptschalter für den Token-Kaufprozess (TEST und LIVE). OFF: Teams sehen die Pakete, können aber nicht kaufen; der Server lehnt jeden Checkout-Versuch ab.",
       "freelancer_token_visibility_title": "Token-Sichtbarkeit für Freelancer",
-      "freelancer_token_visibility_body": "Steuert, ob Token-Guthaben, Belohnungen und Token-UX für Freelancer sichtbar sind. Die Token-Buchhaltung im Backend bleibt aktiv."
+      "freelancer_token_visibility_body": "Steuert, ob Token-Guthaben, Belohnungen und Token-UX für Freelancer sichtbar sind. Die Token-Buchhaltung im Backend bleibt aktiv.",
+      "admin_onboarding_digest_title": "Admin-Onboarding-Digest",
+      "admin_onboarding_digest_body": "Aggregierte Admin-Benachrichtigung über neue Registrierungen: ein Digest alle 5 Anmeldungen oder eine tägliche Zusammenfassung um 07:45 Europe/Rome. OFF: Anmeldungen laufen weiter und werden beim Wiedereinschalten in einem einzigen kumulativen Digest gemeldet."
     },
     "home_coming_soon": {
       "coming_soon_title": "Wir sind bald da",

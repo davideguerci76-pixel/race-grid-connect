@@ -150,7 +150,9 @@
       "token_purchases_title": "Acquisti token",
       "token_purchases_body": "Interruttore principale del flusso di acquisto token (TEST e LIVE). OFF: i team vedono i pacchetti ma non possono acquistare; il server rifiuta qualsiasi tentativo di checkout.",
       "freelancer_token_visibility_title": "Visibilità token Freelancer",
-      "freelancer_token_visibility_body": "Controlla se saldo, reward e UX legata ai token sono visibili ai Freelancer. La contabilità token lato backend resta attiva."
+      "freelancer_token_visibility_body": "Controlla se saldo, reward e UX legata ai token sono visibili ai Freelancer. La contabilità token lato backend resta attiva.",
+      "admin_onboarding_digest_title": "Digest onboarding Admin",
+      "admin_onboarding_digest_body": "Notifica aggregata per gli Admin sulle nuove registrazioni: un digest ogni 5 nuove iscrizioni, oppure un riepilogo giornaliero alle 07:45 Europe/Rome. OFF: le iscrizioni continuano e vengono comunicate in un unico digest cumulativo alla riattivazione."
     },
     "home_coming_soon": {
       "coming_soon_title": "Stiamo arrivando presto",
