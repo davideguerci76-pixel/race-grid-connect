@@ -20,6 +20,8 @@
       "cancel_failed": "Annullamento non riuscito",
       "cancel_freelancer_late_toast": "Cancellazione tardiva — quei giorni restano bloccati nel tuo calendario.",
       "cancel_grace_confirm": "Annullare questo match confermato? Sei entro la finestra di grazia di 24h: nessuna penale e il Pit Call si riapre per altri candidati.",
+      "cancel_grace_confirm_team_final": "Annullare questo Engagement? Puoi annullarlo, ma questo Pit Call ha già usato la sua riapertura in grazia. Il Pit Call non verrà riaperto e non potrai selezionare un altro Freelancer da esso.",
+      "cancel_grace_confirm_team_first": "Annullare questo Engagement? Il Pit Call verrà riaperto e il matching sarà rieseguito. Hai un'ultima opportunità di trovare un altro Freelancer con questo Pit Call.",
       "cancel_grace_label": "Annulla (grazia: {{hours}}h rimanenti)",
       "cancel_grace_toast": "Annullato entro la finestra di grazia — nessuna penale. Il Pit Call è riaperto.",
       "cancel_late_freelancer_confirm": "Hai superato la finestra di grazia. I giorni impegnati restano bloccati nel tuo calendario e il Pit Call sarà riaperto per altri candidati. Continuare?",

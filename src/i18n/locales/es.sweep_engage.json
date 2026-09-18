@@ -20,6 +20,8 @@
       "cancel_failed": "Error al cancelar",
       "cancel_freelancer_late_toast": "Cancelación tardía — esos días permanecen bloqueados en tu calendario.",
       "cancel_grace_confirm": "¿Cancelar este match confirmado? Estás dentro de la ventana de gracia de 24h: sin penalización y el Pit Call se reabre para otros candidatos.",
+      "cancel_grace_confirm_team_final": "¿Cancelar este Engagement? Puedes cancelarlo, pero este Pit Call ya ha usado su reapertura de gracia. Este Pit Call no volverá a abrirse y no podrás seleccionar otro Freelancer desde él.",
+      "cancel_grace_confirm_team_first": "¿Cancelar este Engagement? Este Pit Call se reabrirá y el matching se ejecutará de nuevo. Tienes una última oportunidad de encontrar otro Freelancer con este Pit Call.",
       "cancel_grace_label": "Cancelar (gracia: {{hours}}h restantes)",
       "cancel_grace_toast": "Cancelado dentro de la ventana de gracia — sin penalización. El Pit Call se ha reabierto.",
       "cancel_late_freelancer_confirm": "Has superado la ventana de gracia. Los días comprometidos permanecen bloqueados en tu calendario y el Pit Call se reabrirá para otros candidatos. ¿Continuar?",
