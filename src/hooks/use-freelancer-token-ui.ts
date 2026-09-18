@@ -37,7 +37,9 @@ export function useTokenUiState(): TokenUiState {
       return ((data as { user_type?: string } | null)?.user_type ?? null) as string | null;
     },
   });
-  if (!user) return "hidden";
+  // While the session or the role is not resolved yet we stay in "loading":
+  // token UX renders nothing, but no redirect is triggered either.
+  if (!user) return "loading";
   if (isLoading || userType === undefined || userType === null) return "loading";
   if (userType !== "freelancer") return "visible";
   return flags.freelancerTokenVisibility ? "visible" : "hidden";
