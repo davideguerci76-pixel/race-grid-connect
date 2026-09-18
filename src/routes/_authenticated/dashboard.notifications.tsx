@@ -182,6 +182,8 @@ function NotificationsPage() {
                             : t("sweep_profile.notifications.calendar_stale_message")
                         ) : info ? (
                           <InformationalMessage payload={n.payload} kind={n.kind} />
+                        ) : n.kind === "admin_alert" && n.payload?.type === "onboarding_digest" ? (
+                          <OnboardingDigestMessage payload={n.payload} />
                         ) : (
                           n.payload?.message ?? notificationKindLabel(n.kind)
                         )}
