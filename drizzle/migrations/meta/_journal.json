@@ -1107,6 +1107,13 @@
       "when": 1789770402079,
       "tag": "0157_ops_board_02a_cancel_engagement_row_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1789771555493,
+      "tag": "0158_acp_cost_02_block_freelancer_full_team_reveal",
+      "breakpoints": true
     }
   ]
 }
