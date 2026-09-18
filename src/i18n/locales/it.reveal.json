@@ -37,6 +37,7 @@
     "rate_below": "La tua tariffa è sotto la fascia di budget",
     "no_budget": "Nessun budget dichiarato dal team.",
     "position": "La tua posizione",
-    "position_value": "{{rank}} su {{total}} candidati per match score"
+    "position_value": "{{rank}} su {{total}} candidati per match score",
+    "locked_body_plain": "Conferma per rivelare i dettagli completi."
   }
 }

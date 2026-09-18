@@ -26,6 +26,7 @@
     "delete_done": "Konto gelöscht.",
     "delete_blocked": "Du hast noch aktive Engagements. Schließe oder storniere sie, bevor du dein Konto löschst.",
     "delete_blocked_pitcalls": "Du hast noch offene Pit Calls. Schließe sie, bevor du dein Konto löschst.",
-    "contact": "Datenanfragen"
+    "contact": "Datenanfragen",
+    "delete_desc_no_tokens": "Beim Löschen deines Kontos werden Profil, Kontakte, Verfügbarkeit und Kalender entfernt. Von dir verfasste Bewertungen bleiben ohne deinen Freitext bestehen. Nicht rückgängig zu machen."
   }
 }

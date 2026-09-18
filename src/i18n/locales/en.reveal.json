@@ -37,6 +37,7 @@
     "rate_below": "Your day rate is below the budget range",
     "no_budget": "No budget declared by the team.",
     "position": "Your position",
-    "position_value": "{{rank}} of {{total}} candidates by match score"
+    "position_value": "{{rank}} of {{total}} candidates by match score",
+    "locked_body_plain": "Confirm to reveal the full details."
   }
 }
