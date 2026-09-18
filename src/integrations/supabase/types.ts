@@ -74,6 +74,30 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_onboarding_digest_state: {
+        Row: {
+          is_test: boolean
+          last_digest_at: string | null
+          updated_at: string
+          watermark_at: string
+          watermark_id: string | null
+        }
+        Insert: {
+          is_test: boolean
+          last_digest_at?: string | null
+          updated_at?: string
+          watermark_at?: string
+          watermark_id?: string | null
+        }
+        Update: {
+          is_test?: boolean
+          last_digest_at?: string | null
+          updated_at?: string
+          watermark_at?: string
+          watermark_id?: string | null
+        }
+        Relationships: []
+      }
       admin_time_settings: {
         Row: {
           id: boolean
@@ -3728,6 +3752,11 @@ export type Database = {
       dispatch_notification_push: { Args: never; Returns: undefined }
       dispatch_ops_alerts: { Args: never; Returns: undefined }
       dispatch_platform_capacity_check: { Args: never; Returns: undefined }
+      emit_admin_onboarding_digest: {
+        Args: { _force?: boolean; _is_test: boolean; _reason?: string }
+        Returns: Json
+      }
+      emit_admin_onboarding_digest_daily: { Args: never; Returns: Json }
       emit_availability_opportunity_notifications: {
         Args: { _is_test: boolean }
         Returns: number

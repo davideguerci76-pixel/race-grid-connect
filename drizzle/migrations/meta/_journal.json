@@ -1079,6 +1079,20 @@
       "when": 1789643668758,
       "tag": "0153_f_cux_01_tighten_blocked_pairs_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1789753879914,
+      "tag": "0154_ops_board_02b_admin_onboarding_digest",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1789754158261,
+      "tag": "0155_ops_board_02b_digest_no_email",
+      "breakpoints": true
     }
   ]
 }

@@ -182,6 +182,8 @@ function NotificationsPage() {
                             : t("sweep_profile.notifications.calendar_stale_message")
                         ) : info ? (
                           <InformationalMessage payload={n.payload} kind={n.kind} />
+                        ) : n.kind === "admin_alert" && n.payload?.type === "onboarding_digest" ? (
+                          <OnboardingDigestMessage payload={n.payload} />
                         ) : (
                           n.payload?.message ?? notificationKindLabel(n.kind)
                         )}
@@ -275,6 +277,36 @@ function TeamMatchMessage({ event, t }: { event?: string; t: (key: string) => st
         : "sweep_profile.notifications.team_match_activity";
   return <span>{t(key)}</span>;
 }
+
+/**
+ * OPS-BOARD-02B — aggregated Admin onboarding digest. Counts only, never identities.
+ */
+function OnboardingDigestMessage({ payload }: { payload: any }) {
+  const { t } = useTranslation();
+  const total = Number(payload?.new_total ?? 0);
+  const headline = payload?.catch_up === true
+    ? t("sweep_profile.notifications.onboarding_digest_catch_up", { total })
+    : t("sweep_profile.notifications.onboarding_digest_message", { total });
+  return (
+    <span data-testid="onboarding-digest">
+      <span className="font-bold">{headline}</span>
+      <span className="ml-2 text-muted-foreground">
+        {t("sweep_profile.notifications.onboarding_digest_split", {
+          freelancers: Number(payload?.new_freelancers ?? 0),
+          teams: Number(payload?.new_teams ?? 0),
+        })}
+      </span>
+      <span className="ml-2 text-muted-foreground">
+        {t("sweep_profile.notifications.onboarding_digest_totals", {
+          freelancers: Number(payload?.total_freelancers ?? 0),
+          teams: Number(payload?.total_teams ?? 0),
+        })}
+      </span>
+    </span>
+  );
+}
+
+
 
 function InformationalMessage({ payload, kind }: { payload: any; kind: string }) {
   const { t } = useTranslation();

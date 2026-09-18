@@ -150,7 +150,9 @@
       "token_purchases_title": "Token purchases",
       "token_purchases_body": "Master switch for the token purchase flow (TEST and LIVE). OFF: teams see packages but cannot buy; the server rejects any checkout attempt.",
       "freelancer_token_visibility_title": "Freelancer Token Visibility",
-      "freelancer_token_visibility_body": "Controls whether token balances, rewards and token-related UX are visible to Freelancers. Backend token accounting remains active."
+      "freelancer_token_visibility_body": "Controls whether token balances, rewards and token-related UX are visible to Freelancers. Backend token accounting remains active.",
+      "admin_onboarding_digest_title": "Admin Onboarding Digest",
+      "admin_onboarding_digest_body": "Aggregated Admin notification about new registrations: one digest every 5 new sign-ups, or a daily summary at 07:45 Europe/Rome. OFF: sign-ups keep working and are reported in one cumulative digest when switched back ON."
     },
     "home_coming_soon": {
       "coming_soon_title": "We're coming soon",
