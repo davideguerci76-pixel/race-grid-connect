@@ -59,23 +59,29 @@ export function SiteHeader() {
 
   const qc = useQueryClient();
   const { data: unread } = useQuery({
-    queryKey: ["unread-notifications", user?.id],
+    // F-TFL-02 — the badge must count exactly what the Notification Center
+    // renders: with Freelancer token visibility OFF, hidden `tokens_credited`
+    // rows are excluded from the count too (never marked read, never deleted).
+    queryKey: ["unread-notifications", user?.id, tokenUi],
     enabled: !!session?.access_token && !!user?.id,
     retry: false,
     queryFn: async () => {
       // Read directly through RLS: avoids a server-function round trip that
       // 500s whenever the bearer token is missing/expired mid-session.
-      const { count, error } = await supabase
+      let q = supabase
         .from("notifications")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user!.id)
         .is("read_at", null);
+      if (!tokenUi) q = q.neq("kind", "tokens_credited");
+      const { count, error } = await q;
       if (error) return 0;
       return count ?? 0;
     },
     refetchInterval: 15000,
     refetchOnWindowFocus: true,
   });
+
 
 
   // Mirror the unread count onto the installed app icon (PWA Badging API).
