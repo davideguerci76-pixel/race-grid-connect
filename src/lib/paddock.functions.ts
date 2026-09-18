@@ -2082,14 +2082,32 @@ export const getMyNotifications = createServerFn({ method: "GET" })
 export const markAllNotificationsRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { error } = await context.supabase
+    // F-TFL-02 — notifications hidden from the Freelancer Notification Center
+    // (tokens_credited while token visibility is OFF) must keep their real
+    // read state, so "mark all read" must not touch them either.
+    const [{ data: prof }, { data: flag }] = await Promise.all([
+      context.supabase.from("profiles").select("user_type").eq("id", context.userId).maybeSingle(),
+      context.supabase
+        .from("platform_settings")
+        .select("value_num")
+        .eq("key", "flag_freelancer_token_visibility")
+        .maybeSingle(),
+    ]);
+    const hideTokenNotifs =
+      (prof as { user_type?: string } | null)?.user_type === "freelancer" &&
+      Number((flag as { value_num?: number } | null)?.value_num ?? 0) !== 1;
+
+    let q = context.supabase
       .from("notifications")
       .update({ read_at: new Date().toISOString() })
       .eq("user_id", context.userId)
       .is("read_at", null);
+    if (hideTokenNotifs) q = q.neq("kind", "tokens_credited");
+    const { error } = await q;
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 export const markNotificationRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
