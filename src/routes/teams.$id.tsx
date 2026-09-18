@@ -123,10 +123,16 @@ function TeamProfile() {
             <div className="label-mono">[LOCKED]</div>
             <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.team_hidden_title")}</h1>
             <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
-            <p className="mt-2 text-sm text-muted-foreground">{revealTeamFull != null ? t("sweep_public.team_detail.team_hidden_desc", { cost: revealTeamFull }) : t("sweep_public.team_detail.team_hidden_desc_generic")}</p>
-            <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_button_generic")}
-            </button>
+            {canRevealFull ? (
+              <>
+                <p className="mt-2 text-sm text-muted-foreground">{revealTeamFull != null ? t("sweep_public.team_detail.team_hidden_desc", { cost: revealTeamFull }) : t("sweep_public.team_detail.team_hidden_desc_generic")}</p>
+                <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+                  {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_button_generic")}
+                </button>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">{t("sweep_public.team_detail.full_reveal_unavailable")}</p>
+            )}
           </div>
           <div className="mx-auto mt-10 max-w-2xl">
             <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
