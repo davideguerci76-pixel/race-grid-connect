@@ -45,16 +45,18 @@ function TeamProfile() {
     queryKey: ["team-detail", id, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }] = await Promise.all([
+      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }, { data: me }] = await Promise.all([
         supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
         supabase.from("team_reveals").select("team_id").eq("user_id", user!.id).eq("team_id", id).maybeSingle(),
         supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id),
         supabase.rpc("team_cancellation_stats", { _team_id: id }),
+        supabase.from("profiles").select("user_type").eq("id", user!.id).maybeSingle(),
       ]);
       const stats = Array.isArray(cancelStats) ? (cancelStats[0] as any) : (cancelStats as any);
       return {
         tp,
+        viewerType: (me as { user_type?: string } | null)?.user_type ?? null,
         requests: requests ?? [],
         fullUnlocked: !!fullReveal,
         revealedRequestIds: new Set((reqReveals ?? []).map((r) => r.request_id)),
