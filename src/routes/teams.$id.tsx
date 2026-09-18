@@ -190,9 +190,11 @@ function TeamProfile() {
                 {t("sweep_public.team_detail.partial_access_desc")}
               </p>
             </div>
-            <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_profile_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_profile_button_generic")}
-            </button>
+            {canRevealFull && (
+              <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+                {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_profile_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_profile_button_generic")}
+              </button>
+            )}
           </div>
         )}
 
