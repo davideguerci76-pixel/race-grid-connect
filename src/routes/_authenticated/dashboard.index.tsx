@@ -20,6 +20,7 @@ import { InstallAppCard } from "@/components/install-app-card";
 import { ActivationCard } from "@/components/activation-card";
 import { toastError } from "@/lib/errors";
 import { usePitcallCreationDisabled } from "@/hooks/use-platform-flags";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -29,6 +30,7 @@ function DashboardHome() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const tokenUi = useFreelancerTokenUi();
   const { data: profile } = useQuery({
     queryKey: ["dashboard-profile", user?.id],
     enabled: !!user,
@@ -273,7 +275,7 @@ function DashboardHome() {
           ) : (
             <DashCard to="/dashboard/matches" icon={Users} label={t("nav.matches")} value={num(activeMatchesCount)} />
           )}
-          <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={profile ? String(profile.token_balance) : "—"} />
+          {tokenUi && <DashCard to="/dashboard/tokens" icon={Coins} label={t("dashboard.tokens_balance")} value={profile ? String(profile.token_balance) : "—"} />}
           <DashCard to="/dashboard/engagements" icon={Star} label={t("nav.engagements")} value={num(matchesCount)} />
           <DashCard to="/dashboard/blacklist" icon={ShieldOff} label={t("blacklist.dashboard_card")} value={t("blacklist.dashboard_value")} />
           {isTeam && <DashCard to="/dashboard/pool" icon={Users} label={t("pool.nav")} value="→" />}

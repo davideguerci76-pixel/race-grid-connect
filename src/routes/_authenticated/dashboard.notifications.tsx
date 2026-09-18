@@ -15,6 +15,7 @@ import { useDateFormat } from "@/lib/date-locale";
 import { PushSetupCard } from "@/components/push-setup-card";
 import { useAppBadge } from "@/hooks/use-push-notifications";
 import { formatCriterion } from "@/lib/criteria-label";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/notifications")({
@@ -46,7 +47,14 @@ function NotificationsPage() {
     queryFn: () => notifsFn(),
   });
 
-  const unreadCount = (notifications as any[]).filter((n) => !n.read_at).length;
+  // TOKEN-FL-02: token notifications keep being created and stored; they are only
+  // not rendered while the recipient must not see the token economy.
+  const tokenUi = useFreelancerTokenUi();
+  const visibleNotifications = (notifications as any[]).filter(
+    (n) => tokenUi || n.kind !== "tokens_credited",
+  );
+
+  const unreadCount = visibleNotifications.filter((n) => !n.read_at).length;
 
   // Keep the installed-app icon badge in sync with the unread count.
   useAppBadge(unreadCount);
@@ -110,11 +118,11 @@ function NotificationsPage() {
           <div className="border-b border-border px-4 py-2">
             <span className="label-mono">[INBOX]{unreadCount > 0 ? ` · ${unreadCount} ${t("sweep_profile.notifications.unread")}` : ""}</span>
           </div>
-          {notifications.length === 0 ? (
+          {visibleNotifications.length === 0 ? (
             <div className="p-12 text-center text-sm text-muted-foreground">{t("sweep_profile.notifications.no_notifications")}</div>
           ) : (
             <ul className="divide-y divide-border">
-              {(notifications as any[]).map((n) => {
+              {visibleNotifications.map((n) => {
                 const unread = !n.read_at;
                 const isStale = n.kind === "calendar_stale";
                 // UAT-ONBOARD-05 — Admin readiness nudge: localized causes + CTA on the first missing cause.

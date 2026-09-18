@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { usePlatformFlags } from "@/hooks/use-platform-flags";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 
@@ -22,6 +23,7 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const checkAdmin = useServerFn(checkAmIAdmin);
+  const tokenUi = useFreelancerTokenUi();
 
   const { data: profile } = useQuery({
     queryKey: ["profile-summary", user?.id],
@@ -163,7 +165,7 @@ export function SiteHeader() {
           <LanguageSwitcher />
           {user ? (
             <>
-              <TokenBadge balance={profile?.token_balance ?? 0} />
+              {tokenUi && <TokenBadge balance={profile?.token_balance ?? 0} />}
               <Link
                 to="/dashboard/notifications"
                 aria-label={t("sweep_profile.header.notifications")}
@@ -198,7 +200,7 @@ export function SiteHeader() {
 
         {/* Mobile/tablet: token badge + hamburger */}
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:hidden">
-          {user && <TokenBadge balance={profile?.token_balance ?? 0} />}
+          {user && tokenUi && <TokenBadge balance={profile?.token_balance ?? 0} />}
           {user && (
             <Link
               to="/dashboard/notifications"

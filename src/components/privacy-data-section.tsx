@@ -8,9 +8,13 @@ import { deleteMyAccount, exportMyData } from "@/lib/privacy.functions";
 import { openCookiePreferences } from "@/lib/iubenda";
 import { PRIVACY_EMAIL } from "@/config/iubenda";
 import { toastError } from "@/lib/errors";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 
 export function PrivacyDataSection() {
   const { t } = useTranslation();
+  // TOKEN-FL-02: copy only. The deletion law and privacy authority are unchanged;
+  // the token sentence is simply not shown to users without token UX.
+  const tokenUi = useFreelancerTokenUi();
   const runExport = useServerFn(exportMyData);
   const runDelete = useServerFn(deleteMyAccount);
   const [busy, setBusy] = useState<"export" | "delete" | null>(null);
@@ -110,10 +114,15 @@ export function PrivacyDataSection() {
           {t("privacy.danger_zone", { defaultValue: "Danger zone" })}
         </div>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {t("privacy.delete_desc", {
-            defaultValue:
-              "Deleting your account removes your profile, contacts, availability and calendars. Ratings you wrote about others stay on the platform without your free text. Unused tokens are forfeited. This cannot be undone.",
-          })}
+          {tokenUi
+            ? t("privacy.delete_desc", {
+                defaultValue:
+                  "Deleting your account removes your profile, contacts, availability and calendars. Ratings you wrote about others stay on the platform without your free text. Unused tokens are forfeited. This cannot be undone.",
+              })
+            : t("privacy.delete_desc_no_tokens", {
+                defaultValue:
+                  "Deleting your account removes your profile, contacts, availability and calendars. Ratings you wrote about others stay on the platform without your free text. This cannot be undone.",
+              })}
         </p>
         {!open ? (
           <button

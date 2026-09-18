@@ -24,6 +24,7 @@ export function FreelancerMatchCard({
   revealCta,
   onReveal,
   revealPending,
+  hideTokenUi = false,
 }: {
   match: any;
   isFreelancer: boolean;
@@ -31,6 +32,8 @@ export function FreelancerMatchCard({
   revealCta: string;
   onReveal: () => void;
   revealPending: boolean;
+  /** TOKEN-FL-02 — presentation only: hide every token/cost wording, keep Reveal available. */
+  hideTokenUi?: boolean;
 }) {
   const { t } = useTranslation();
   const cp = m.counterparty;
@@ -138,7 +141,7 @@ export function FreelancerMatchCard({
         </Section>
 
         {/* REVEAL (freelancer-side Pit Call details, economics owned by the reveal component) */}
-        {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser cost={revealCost} />)}
+        {isFreelancer && (m.revealedByMe ? <PitCallRevealDetail detail={m.requestDetail} /> : <PitCallRevealTeaser cost={revealCost} hideCost={hideTokenUi} />)}
       </CardBody>
 
       {isConfirmed && req?.start_date && req?.end_date && (

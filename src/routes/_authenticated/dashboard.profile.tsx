@@ -15,6 +15,7 @@ import { useTaxonomy } from "@/lib/use-taxonomy";
 import { ROLE_GROUPS, SUB_ROLE_LEVELS, levelLabel, parseSubRoles, roleGroupLabel, skillsForGroup, subRoleLabel, subRolesForGroup, type FreelancerSubRole, type SubRoleLevel } from "@/lib/roles";
 import { DIAL_CODES, DISCIPLINE_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_YEARS_OPTIONS, LANGUAGE_LEVELS, LANGUAGE_OPTIONS, MAX_FREELANCER_EXPERIENCES, MAX_FREELANCER_LANGUAGES, SKILL_OPTIONS, disciplineLabel, educationLabel, experienceYearsLabel, languageLabel, languageLevelLabel, skillLabel, type FreelancerExperience, type FreelancerLanguage, type LanguageLevel } from "@/lib/paddock";
 import { setMyLegalName } from "@/lib/identity.functions";
+import { useFreelancerTokenUi } from "@/hooks/use-freelancer-token-ui";
 import { BillingDetailsSection } from "@/components/billing-details-section";
 import { updateMyFreelancerProfile, updateMyPhone, updateMyTeamProfile, getUserRatingSummary } from "@/lib/paddock.functions";
 
@@ -267,6 +268,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
   const focusedRef = useRef(false);
 
   const isFreelancer = profile?.user_type === "freelancer";
+  const tokenUi = useFreelancerTokenUi();
   const fp = profile?.freelancerProfile;
 
   useEffect(() => {
@@ -338,10 +340,12 @@ function PersonalInfoSection({ profile }: { profile: any }) {
 
 
 
-      <div className="text-sm">
-        <span className="text-muted-foreground">{t("sweep_profile.profile.tokens_label")}:</span>
-        <span className="ml-2 font-mono text-racing-red font-bold">{profile?.token_balance ?? 0}</span>
-      </div>
+      {tokenUi && (
+        <div className="text-sm">
+          <span className="text-muted-foreground">{t("sweep_profile.profile.tokens_label")}:</span>
+          <span className="ml-2 font-mono text-racing-red font-bold">{profile?.token_balance ?? 0}</span>
+        </div>
+      )}
 
       {isFreelancer && (
         <div ref={phoneRef} className={`border-t border-border pt-3 ${focus === "phone" ? "-mx-2 border border-racing-yellow bg-racing-yellow/10 p-2" : ""}`} data-testid="phone-block">
