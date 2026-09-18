@@ -386,8 +386,16 @@ function EngagementsPage() {
                   withdrawPending: withdrawMut.isPending,
                   
                   onCancel: (inGrace: boolean) => {
+                    // OPS-BOARD-02A — a Pit Call can be reopened by a Team grace
+                    // cancellation only once; the server is the authority, this only
+                    // mirrors the consequence before confirming.
+                    const graceReopenUsed = Boolean((e as any).request?.team_grace_reopen_used_at);
                     const warning = inGrace
-                      ? t("sweep_engage.engagements.cancel_grace_confirm")
+                      ? isFreelancer
+                        ? t("sweep_engage.engagements.cancel_grace_confirm")
+                        : graceReopenUsed
+                        ? t("sweep_engage.engagements.cancel_grace_confirm_team_final")
+                        : t("sweep_engage.engagements.cancel_grace_confirm_team_first")
                       : isFreelancer
                       ? t("sweep_engage.engagements.cancel_late_freelancer_confirm")
                       : t("sweep_engage.engagements.cancel_late_team_confirm");
