@@ -226,7 +226,7 @@ function TeamProfile() {
           {!canSeeFull && requests.length > visibleRequests.length && (
             <div className="mt-4 flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
               <Lock className="size-4" />
-              {t("sweep_public.team_detail.locked_other_pitcalls", { count: requests.length - visibleRequests.length })}
+              {t(canRevealFull ? "sweep_public.team_detail.locked_other_pitcalls" : "sweep_public.team_detail.locked_other_pitcalls_plain", { count: requests.length - visibleRequests.length })}
             </div>
           )}
         </div>
