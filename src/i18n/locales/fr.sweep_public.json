@@ -44,7 +44,9 @@
       },
       "team_hidden_desc_generic": "Débloquez une offre spécifique depuis le tableau des offres (2 tokens) ou le profil complet du team ci-dessous.",
       "unlock_full_button_generic": "Débloquer le profil complet du team",
-      "unlock_full_profile_button_generic": "Débloquer le profil complet"
+      "unlock_full_profile_button_generic": "Débloquer le profil complet",
+      "full_reveal_unavailable": "L'identité du Team est révélée uniquement via le cycle PITCALL.",
+      "locked_other_pitcalls_plain": "{{count}} autre(s) Pit Call de ce Team ne sont pas visibles ici."
     },
     "teams_index": {
       "racing_team_default": "Team de course",

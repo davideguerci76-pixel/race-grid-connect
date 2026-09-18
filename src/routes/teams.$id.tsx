@@ -45,16 +45,18 @@ function TeamProfile() {
     queryKey: ["team-detail", id, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }] = await Promise.all([
+      const [{ data: tp }, { data: requests }, { data: fullReveal }, { data: reqReveals }, { data: cancelStats }, { data: me }] = await Promise.all([
         supabase.from("team_profiles").select(TEAM_PROFILE_COLUMNS).eq("user_id", id).maybeSingle(),
         supabase.from("requests").select("*").eq("team_id", id).eq("is_active", true).order("start_date"),
         supabase.from("team_reveals").select("team_id").eq("user_id", user!.id).eq("team_id", id).maybeSingle(),
         supabase.from("request_team_reveals").select("request_id").eq("user_id", user!.id),
         supabase.rpc("team_cancellation_stats", { _team_id: id }),
+        supabase.from("profiles").select("user_type").eq("id", user!.id).maybeSingle(),
       ]);
       const stats = Array.isArray(cancelStats) ? (cancelStats[0] as any) : (cancelStats as any);
       return {
         tp,
+        viewerType: (me as { user_type?: string } | null)?.user_type ?? null,
         requests: requests ?? [],
         fullUnlocked: !!fullReveal,
         revealedRequestIds: new Set((reqReveals ?? []).map((r) => r.request_id)),
@@ -97,9 +99,12 @@ function TeamProfile() {
   }
 
   if (isLoading || !data) return <div className="flex min-h-screen items-center justify-center">{t("common.loading")}</div>;
-  const { tp, requests, fullUnlocked, revealedRequestIds } = data;
+  const { tp, requests, fullUnlocked, revealedRequestIds, viewerType } = data;
   const isOwner = user.id === id;
   const canSeeFull = isOwner || fullUnlocked;
+  // ACP-COST-02: the paid full team reveal is not a Freelancer capability. The
+  // server rejects it too; this only keeps the CTA and its token wording away.
+  const canRevealFull = viewerType === "team" && !isOwner;
   const contextRequest = revealedReqId ? requests.find((r) => r.id === revealedReqId) : null;
   const hasRequestReveal = revealedReqId ? revealedRequestIds.has(revealedReqId) : false;
   // Team identity requires an earned disclosure: a paid full reveal, or a reveal
@@ -118,16 +123,22 @@ function TeamProfile() {
             <div className="label-mono">[LOCKED]</div>
             <h1 className="mt-2 text-3xl font-black uppercase italic tracking-tighter">{t("sweep_public.team_detail.team_hidden_title")}</h1>
             <div className="mt-3 flex justify-center"><ProfileRatingBadge userId={id} variant="headset" isOwner={isOwner} /></div>
-            <p className="mt-2 text-sm text-muted-foreground">{revealTeamFull != null ? t("sweep_public.team_detail.team_hidden_desc", { cost: revealTeamFull }) : t("sweep_public.team_detail.team_hidden_desc_generic")}</p>
-            <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_button_generic")}
-            </button>
+            {canRevealFull ? (
+              <>
+                <p className="mt-2 text-sm text-muted-foreground">{revealTeamFull != null ? t("sweep_public.team_detail.team_hidden_desc", { cost: revealTeamFull }) : t("sweep_public.team_detail.team_hidden_desc_generic")}</p>
+                <button onClick={() => setConfirmFull(true)} className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+                  {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_button_generic")}
+                </button>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">{t("sweep_public.team_detail.full_reveal_unavailable")}</p>
+            )}
           </div>
           <div className="mx-auto mt-10 max-w-2xl">
             <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
           </div>
         </div>
-        {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+        {confirmFull && canRevealFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
         <SiteFooter />
       </div>
     );
@@ -179,9 +190,11 @@ function TeamProfile() {
                 {t("sweep_public.team_detail.partial_access_desc")}
               </p>
             </div>
-            <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
-              {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_profile_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_profile_button_generic")}
-            </button>
+            {canRevealFull && (
+              <button onClick={() => setConfirmFull(true)} className="bg-racing-red px-4 py-3 text-xs font-bold uppercase tracking-widest text-white hover:brightness-110">
+                {revealTeamFull != null ? t("sweep_public.team_detail.unlock_full_profile_button", { cost: revealTeamFull }) : t("sweep_public.team_detail.unlock_full_profile_button_generic")}
+              </button>
+            )}
           </div>
         )}
 
@@ -213,7 +226,7 @@ function TeamProfile() {
           {!canSeeFull && requests.length > visibleRequests.length && (
             <div className="mt-4 flex items-center gap-3 border border-dashed border-border p-4 text-sm text-muted-foreground">
               <Lock className="size-4" />
-              {t("sweep_public.team_detail.locked_other_pitcalls", { count: requests.length - visibleRequests.length })}
+              {t(canRevealFull ? "sweep_public.team_detail.locked_other_pitcalls" : "sweep_public.team_detail.locked_other_pitcalls_plain", { count: requests.length - visibleRequests.length })}
             </div>
           )}
         </div>
@@ -221,7 +234,7 @@ function TeamProfile() {
           <AnonymousReviewsSection targetUserId={id} variant="headset" isOwner={isOwner} />
         </div>
       </div>
-      {confirmFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
+      {confirmFull && canRevealFull && <ConfirmModal cost={revealTeamFull} onCancel={() => setConfirmFull(false)} onConfirm={() => unlockFull.mutate()} pending={unlockFull.isPending} error={error} />}
       <SiteFooter />
     </div>
   );
