@@ -71,7 +71,8 @@
       "auth_failed": "Authentifizierung fehlgeschlagen",
       "signup_desc": "Match nach Skills, Anforderungen und echter Verfügbarkeit.",
       "signin_desc": "Mach dort weiter, wo du aufgehört hast.",
-      "or_divider": "— oder —"
+      "or_divider": "— oder —",
+      "welcome_toast_plain": "Willkommen im Paddock!"
     },
     "dashboard_calendar": {
       "redirecting": "Weiterleitung…",

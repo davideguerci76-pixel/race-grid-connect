@@ -71,7 +71,8 @@
       "auth_failed": "Auth failed",
       "signup_desc": "Match by skills, requirements and real availability.",
       "signin_desc": "Pick up where you left off.",
-      "or_divider": "— or —"
+      "or_divider": "— or —",
+      "welcome_toast_plain": "Welcome to the paddock!"
     },
     "dashboard_calendar": {
       "redirecting": "Redirecting…",

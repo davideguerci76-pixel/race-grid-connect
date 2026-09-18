@@ -71,7 +71,8 @@
       "auth_failed": "Échec de l'authentification",
       "signup_desc": "Match par compétences, exigences et disponibilité réelle.",
       "signin_desc": "Reprenez là où vous en étiez.",
-      "or_divider": "— ou —"
+      "or_divider": "— ou —",
+      "welcome_toast_plain": "Bienvenue dans le paddock !"
     },
     "dashboard_calendar": {
       "redirecting": "Redirection en cours…",

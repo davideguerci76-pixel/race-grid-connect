@@ -102,7 +102,13 @@ function AuthPage() {
           navigate({ to: "/verify-email" });
           return;
         }
-        toast.success(t("sweep_public.auth.welcome_toast"));
+        // TOKEN-FL-02: the signup bonus is still credited server-side; only the
+        // wording is token-free for Freelancers while the visibility flag is OFF.
+        toast.success(
+          isFreelancer && !flags.freelancerTokenVisibility
+            ? t("sweep_public.auth.welcome_toast_plain")
+            : t("sweep_public.auth.welcome_toast"),
+        );
         navigate({ to: "/dashboard" });
 
       } else {
