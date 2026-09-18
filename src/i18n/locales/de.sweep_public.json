@@ -44,7 +44,9 @@
       },
       "team_hidden_desc_generic": "Schalte eine bestimmte Stellenanzeige aus dem Job Board frei (2 Token) oder das vollständige Team-Profil unten.",
       "unlock_full_button_generic": "Vollständiges Team-Profil freischalten",
-      "unlock_full_profile_button_generic": "Vollständiges Profil freischalten"
+      "unlock_full_profile_button_generic": "Vollständiges Profil freischalten",
+      "full_reveal_unavailable": "Die Team-Identität wird ausschließlich über den PITCALL-Lifecycle offengelegt.",
+      "locked_other_pitcalls_plain": "{{count}} weitere Pit Call(s) dieses Teams sind hier nicht sichtbar."
     },
     "teams_index": {
       "racing_team_default": "Rennteam",

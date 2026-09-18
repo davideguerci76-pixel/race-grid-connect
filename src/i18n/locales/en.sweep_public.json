@@ -44,7 +44,9 @@
       },
       "team_hidden_desc_generic": "Unlock a specific job posting from the Job Board (2 tokens) or the full team profile below.",
       "unlock_full_button_generic": "Unlock full team profile",
-      "unlock_full_profile_button_generic": "Unlock full profile"
+      "unlock_full_profile_button_generic": "Unlock full profile",
+      "full_reveal_unavailable": "Team identity is disclosed through the PITCALL lifecycle only.",
+      "locked_other_pitcalls_plain": "{{count}} other Pit Call(s) from this team are not visible here."
     },
     "teams_index": {
       "racing_team_default": "Racing team",

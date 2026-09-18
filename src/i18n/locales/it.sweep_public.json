@@ -44,7 +44,9 @@
       },
       "team_hidden_desc_generic": "Sblocca un annuncio specifico dalla bacheca (2 token) o il profilo completo del team qui sotto.",
       "unlock_full_button_generic": "Sblocca profilo completo del team",
-      "unlock_full_profile_button_generic": "Sblocca profilo completo"
+      "unlock_full_profile_button_generic": "Sblocca profilo completo",
+      "full_reveal_unavailable": "L'identità del Team viene rivelata esclusivamente attraverso il lifecycle PITCALL.",
+      "locked_other_pitcalls_plain": "Altre {{count}} Pit Call di questo Team non sono visibili qui."
     },
     "teams_index": {
       "racing_team_default": "Team corse",
