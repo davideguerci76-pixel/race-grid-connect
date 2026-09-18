@@ -1892,6 +1892,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -1955,6 +1956,7 @@ export type Database = {
           sub_role?: string | null
           sub_role_hard?: boolean
           sub_role_min_level?: string
+          team_grace_reopen_used_at?: string | null
           team_id: string
           title: string
           travel_required?: boolean
@@ -2018,6 +2020,7 @@ export type Database = {
           sub_role?: string | null
           sub_role_hard?: boolean
           sub_role_min_level?: string
+          team_grace_reopen_used_at?: string | null
           team_id?: string
           title?: string
           travel_required?: boolean
@@ -3064,6 +3067,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -3136,6 +3140,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -3543,6 +3548,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -3634,6 +3640,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -4047,6 +4054,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
@@ -4454,6 +4462,7 @@ export type Database = {
           sub_role: string | null
           sub_role_hard: boolean
           sub_role_min_level: string
+          team_grace_reopen_used_at: string | null
           team_id: string
           title: string
           travel_required: boolean
