@@ -58,8 +58,8 @@
 - [x] CANCEL-UX-02: cancel dialog draft persistence (keyed on engagement id) — CLOSED/PASS
 
 ## DEMO-FL-VIDEO-01 — Freelancer onboarding video
-- [ ] Record real Freelancer signup form without submitting
-- [ ] Create faithful simulated confirmation inbox/email sequence
-- [ ] Record real relanding, Profile, and Calendar using TEST/DEMO only
-- [ ] Edit 60–90 second video with four step overlays and final READY message
-- [ ] Verify no token wording and no LIVE data changes
+- [x] Produce the original desktop reference cut
+- [x] Re-record the real PITCALL flow in a native responsive smartphone viewport
+- [x] Show touch ripples, vertical gestures, field selection, and calendar date taps without a mouse cursor
+- [x] Create the authorized mobile inbox/confirmation simulation
+- [x] Edit and verify a 9:16, 60–90 second mobile cut with no token economy or LIVE writes
