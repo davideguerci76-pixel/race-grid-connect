@@ -56,3 +56,10 @@
 - [x] TEST matrix A–L, desktop/mobile, LIVE delta zero — PASS WITH FINDINGS
 - [x] F-CUX-01: blocked_pairs grants narrowed (migration 0153) — CLOSED/PASS
 - [x] CANCEL-UX-02: cancel dialog draft persistence (keyed on engagement id) — CLOSED/PASS
+
+## DEMO-FL-VIDEO-01 — Freelancer onboarding video
+- [ ] Record real Freelancer signup form without submitting
+- [ ] Create faithful simulated confirmation inbox/email sequence
+- [ ] Record real relanding, Profile, and Calendar using TEST/DEMO only
+- [ ] Edit 60–90 second video with four step overlays and final READY message
+- [ ] Verify no token wording and no LIVE data changes
