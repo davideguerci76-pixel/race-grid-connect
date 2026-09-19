@@ -59,7 +59,7 @@
 
 ## DEMO-FL-VIDEO-01 — Freelancer onboarding video
 - [x] Produce the original desktop reference cut
-- [ ] Re-record the real PITCALL flow in a native responsive smartphone viewport
-- [ ] Show touch ripples, vertical gestures, field selection, and calendar date taps without a mouse cursor
-- [ ] Create the authorized mobile inbox/confirmation simulation
-- [ ] Edit and verify a 9:16, 60–90 second mobile cut with no token economy or LIVE writes
+- [x] Re-record the real PITCALL flow in a native responsive smartphone viewport
+- [x] Show touch ripples, vertical gestures, field selection, and calendar date taps without a mouse cursor
+- [x] Create the authorized mobile inbox/confirmation simulation
+- [x] Edit and verify a 9:16, 60–90 second mobile cut with no token economy or LIVE writes
