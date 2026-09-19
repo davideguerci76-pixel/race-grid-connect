@@ -4746,6 +4746,7 @@ export type Database = {
         | "t31_disc_zz"
         | "formula_generic"
         | "gtcup"
+        | "lmp3"
       duration_type: "full_season" | "race_weekend" | "test_session"
       engagement_status: "proposed" | "confirmed" | "completed" | "cancelled"
       freelancer_role:
@@ -5019,6 +5020,7 @@ export const Constants = {
         "t31_disc_zz",
         "formula_generic",
         "gtcup",
+        "lmp3",
       ],
       duration_type: ["full_season", "race_weekend", "test_session"],
       engagement_status: ["proposed", "confirmed", "completed", "cancelled"],
