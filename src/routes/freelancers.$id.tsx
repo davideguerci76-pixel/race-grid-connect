@@ -14,6 +14,16 @@ import { CalendarCheck, Flag, GraduationCap, MapPin, User } from "lucide-react";
 import { CardBody, CardHeader, CardShell, Chip, Chips, Fact, FactGrid, Section } from "@/components/cards/primitives";
 
 export const Route = createFileRoute("/freelancers/$id")({
+  head: () => ({
+    meta: [
+      { title: "Professional Profile — PITCALL" },
+      { name: "description", content: "View a motorsport professional profile on PITCALL." },
+      { property: "og:title", content: "Professional Profile — PITCALL" },
+      { property: "og:description", content: "View a motorsport professional profile on PITCALL." },
+      { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: FreelancerProfile,
   notFoundComponent: () => (
     <div className="flex min-h-screen items-center justify-center">Professional not found</div>
