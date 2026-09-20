@@ -30,7 +30,7 @@
       "cancel_late_team_label": "Stornieren (spät — im Profil vermerkt)",
       "cancel_team_late_toast": "Späte Stornierung im Team-Profil vermerkt.",
       "confirm_contacted_body": "Bestätigen Sie hier, sobald Sie den Profi kontaktiert haben. Andernfalls werden automatische Erinnerungen gesendet und — nach Ablauf der Frist — wird der Match freigegeben und im Team-Profil vermerkt.",
-      "confirm_contacted_title": "[BESTÄTIGEN SIE, DASS SIE DEN FREELANCER KONTAKTIERT HABEN]",
+      "confirm_contacted_title": "[BESTÄTIGEN SIE, DASS SIE DEN PROFI KONTAKTIERT HABEN]",
       "confirm_failed": "Bestätigung fehlgeschlagen",
       "contact_check_followup": "Es sind einige Tage seit dem Match vergangen — hat sich das Team bereits bei Ihnen gemeldet?",
       "contact_check_initial": "Sobald sich das Team bei Ihnen meldet, klicken Sie unten. Andernfalls erinnern wir es automatisch daran und — wenn es weiterhin nicht reagiert — geben wir den Match frei, damit Ihr Kalender wieder geöffnet wird.",
@@ -39,7 +39,7 @@
       "contact_logged_remind": "Erfasst. Wir erinnern das Team.",
       "contact_logged_thanks": "Danke — vermerkt, dass sich das Team gemeldet hat.",
       "email_label": "E-Mail",
-      "freelancer_contact_title": "[FREELANCER-KONTAKT]",
+      "freelancer_contact_title": "[PROFI-KONTAKT]",
       "i_contacted_freelancer": "Ich habe den Profi kontaktiert",
       "name_label": "Name",
       "not_yet": "Noch nicht",
@@ -49,8 +49,8 @@
       "team_no_followup_body": "Das Team hat den Kontakt nach dem Match nie bestätigt. Das Engagement wurde automatisch freigegeben, und die Tage in Ihrem Kalender wurden wieder geöffnet. Sie können unten weiterhin eine Bewertung für das Team abgeben.",
       "team_no_followup_title": "[TEAM HAT SICH NICHT GEMELDET]",
       "urgent_contact_body": "Sie haben den Kontakt mit dem Profi noch nicht bestätigt. Wenn Sie nicht bald bestätigen, wird das Engagement automatisch freigegeben, der Kalender des Profis wird wieder geöffnet, und der Vorfall wird im Team-Profil vermerkt.",
-      "urgent_contact_title": "[DRINGEND — FREELANCER KONTAKTIEREN]",
-      "waitlist_toast": "Ein anderer Profis hat zuerst angenommen — Sie stehen auf der Warteliste. Ihr Kalender bleibt offen, falls der Match wieder verfügbar wird."
+      "urgent_contact_title": "[DRINGEND — PROFI KONTAKTIEREN]",
+      "waitlist_toast": "Ein anderer Profi hat zuerst angenommen — Sie stehen auf der Warteliste. Ihr Kalender bleibt offen, falls der Match wieder verfügbar wird."
     },
     "matches": {
       "assigned_elsewhere": "Match bereits an einen anderen Profi vergeben",

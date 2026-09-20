@@ -44,7 +44,7 @@
     "how_2_t": "Teams machen einen Pit Call",
     "how_2_b": "Sag der Engine, was du brauchst: Rolle, Skills, Ort, Daten und Anforderungen.",
     "how_3_t": "Wir matchen die Startaufstellung",
-    "how_3_b": "Die PITCALL-Engine prüft sofort deine Anforderungen gegen die echte Verfügbarkeit der Profi.",
+    "how_3_b": "Die PITCALL-Engine prüft sofort deine Anforderungen gegen die echte Verfügbarkeit der Profis.",
     "how_4_t": "Du findest dein Match",
     "how_4_b": "Wähle das beste Match aus einer nach deinen Anforderungen sortierten Liste.",
     "how_5_t": "Ihr trefft euch. Ihr bewertet euch.",
@@ -210,7 +210,7 @@
     "counts_banner": "{{count}} {{who}} passen zu deinem Kalender.",
     "counts_banner_teams_one": "{{count}} Team passt zu deinem Kalender.",
     "counts_banner_teams_other": "{{count}} Teams passen zu deinem Kalender.",
-    "counts_banner_freelancers_one": "{{count}} Profis passt zu deinen Pit Calls.",
+    "counts_banner_freelancers_one": "{{count}} Profi passt zu deinen Pit Calls.",
     "counts_banner_freelancers_other": "{{count}} Profis passen zu deinen Pit Calls.",
     "reveal_cta_plain": "Anzeigen",
     "reveal_confirm_plain": "Kontaktdaten dieses {{who}} anzeigen?"
@@ -730,7 +730,7 @@
             "t": "ul",
             "v": [
               "Bewertungen sind nur nach echten Zusammenarbeiten möglich.",
-              "Doppelte Bewertung Team/Profis.",
+              "Doppelte Bewertung Team/Profi.",
               "Moderation gemeldeter Inhalte.",
               "Möglichkeit der Anfechtung.",
               "Verzögerte Veröffentlichung nach Double-Blind-Regeln."
@@ -964,7 +964,7 @@
       {
         "q": "Was ist eine Request Confirmation?",
         "a": [
-          "Das Team kann ein Angebot mit Rolle, Terminen, Budget und Notizen senden. Der Profis kann Bestätigen, bei Verfügbarkeit Mehr Zeit erbitten oder Ablehnen.",
+          "Das Team kann ein Angebot mit Rolle, Terminen, Budget und Notizen senden. Der Profi kann Bestätigen, bei Verfügbarkeit Mehr Zeit erbitten oder Ablehnen.",
           "Die erste gültige Bestätigung gewinnt, schließt konkurrierende Angebote und gibt beiden Seiten die Kontakte frei."
         ]
       },
@@ -978,7 +978,7 @@
       {
         "q": "Was ist ein SOS Call?",
         "a": [
-          "SOS ist ein Team-only-Ersatzablauf für eine geeignete Einzelveranstaltungs-Pit-Call ab ihrem ersten Tag. Meldet das Team den bestätigten Profis als No-show, bleiben dessen Tage gesperrt und PITCALL benachrichtigt geeignete Personen in der Nähe; die erste gültige Annahme gewinnt."
+          "SOS ist ein Team-only-Ersatzablauf für eine geeignete Einzelveranstaltungs-Pit-Call ab ihrem ersten Tag. Meldet das Team den bestätigten Profi als No-show, bleiben dessen Tage gesperrt und PITCALL benachrichtigt geeignete Personen in der Nähe; die erste gültige Annahme gewinnt."
         ]
       },
       {
@@ -1004,13 +1004,13 @@
       {
         "q": "Wie funktionieren Bewertungen?",
         "a": [
-          "Nach abgeschlossener Zusammenarbeit können Team und Profis einander bewerten. Bewertungen sind doppelt blind und erscheinen nach beiden Antworten oder nach Ablauf der Wartezeit."
+          "Nach abgeschlossener Zusammenarbeit können Team und Profi einander bewerten. Bewertungen sind doppelt blind und erscheinen nach beiden Antworten oder nach Ablauf der Wartezeit."
         ]
       },
       {
         "q": "Verwaltet PITCALL Verträge oder Zahlungen zwischen Nutzern?",
         "a": [
-          "Nein. PITCALL bietet Matching und Kontaktvermittlung. Verträge, Honorare und Zahlungen werden direkt zwischen Team und Profis vereinbart."
+          "Nein. PITCALL bietet Matching und Kontaktvermittlung. Verträge, Honorare und Zahlungen werden direkt zwischen Team und Profi vereinbart."
         ]
       },
       {

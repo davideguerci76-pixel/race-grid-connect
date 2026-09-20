@@ -30,7 +30,7 @@
       "cancel_late_team_label": "Cancelar (tarde — registrado en el perfil)",
       "cancel_team_late_toast": "Cancelación tardía registrada en el perfil de tu equipo.",
       "confirm_contacted_body": "Confirma aquí en cuanto contactes al profesional. Si no lo haces, se enviarán recordatorios automáticos y — tras el plazo — el match se liberará y quedará registrado en el perfil de tu equipo.",
-      "confirm_contacted_title": "[CONFIRMA QUE HAS CONTACTADO AL FREELANCER]",
+      "confirm_contacted_title": "[CONFIRMA QUE HAS CONTACTADO AL PROFESIONALES]",
       "confirm_failed": "Error al confirmar",
       "contact_check_followup": "Han pasado varios días desde el match — ¿el equipo ya te contactó?",
       "contact_check_initial": "En cuanto el equipo te contacte, haz clic abajo. Si no lo hace, le enviaremos un recordatorio automático y — si sigue sin responder — liberaremos el match para que tu calendario se reabra.",
@@ -39,7 +39,7 @@
       "contact_logged_remind": "Registrado. Se lo recordaremos al equipo.",
       "contact_logged_thanks": "Gracias — registrado que el equipo se puso en contacto.",
       "email_label": "Correo",
-      "freelancer_contact_title": "[CONTACTO DEL FREELANCER]",
+      "freelancer_contact_title": "[CONTACTO DEL PROFESIONALES]",
       "i_contacted_freelancer": "He contactado al profesional",
       "name_label": "Nombre",
       "not_yet": "Todavía no",
@@ -49,7 +49,7 @@
       "team_no_followup_body": "El equipo nunca confirmó el contacto tras el match. El compromiso se liberó automáticamente y los días de tu calendario se reabrieron. Aún puedes dejar una valoración para el equipo a continuación.",
       "team_no_followup_title": "[EL EQUIPO NO DIO SEGUIMIENTO]",
       "urgent_contact_body": "Aún no has confirmado el contacto con el profesional. Si no confirmas pronto, el compromiso se liberará automáticamente, el calendario del profesional se reabrirá y el incidente quedará registrado en el perfil de tu equipo.",
-      "urgent_contact_title": "[URGENTE — CONTACTA AL FREELANCER]",
+      "urgent_contact_title": "[URGENTE — CONTACTA AL PROFESIONALES]",
       "waitlist_toast": "Otro profesional aceptó primero — estás en lista de espera. Tu calendario permanece abierto por si el match se reabre."
     },
     "matches": {

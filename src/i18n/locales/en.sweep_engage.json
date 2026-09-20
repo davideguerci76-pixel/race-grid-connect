@@ -30,7 +30,7 @@
       "cancel_late_team_label": "Cancel (late — logged on profile)",
       "cancel_team_late_toast": "Late cancellation recorded on your team profile.",
       "confirm_contacted_body": "Confirm here as soon as you reach out to the professional. If you don't, automatic reminders will be sent and — after the deadline — the match will be released and logged on your team profile.",
-      "confirm_contacted_title": "[CONFIRM YOU'VE CONTACTED THE FREELANCER]",
+      "confirm_contacted_title": "[CONFIRM YOU'VE CONTACTED THE PROFESSIONAL]",
       "confirm_failed": "Failed to confirm",
       "contact_check_followup": "It's been a few days since the match — did the team already contact you?",
       "contact_check_initial": "As soon as the team gets in touch, click below. If they don't, we'll automatically remind them and — if they keep ghosting — release the match so your calendar reopens.",
@@ -39,7 +39,7 @@
       "contact_logged_remind": "Logged. We'll remind the team.",
       "contact_logged_thanks": "Thanks — logged that the team reached out.",
       "email_label": "Email",
-      "freelancer_contact_title": "[FREELANCER CONTACT]",
+      "freelancer_contact_title": "[PROFESSIONAL CONTACT]",
       "i_contacted_freelancer": "I contacted the professional",
       "name_label": "Name",
       "not_yet": "Not yet",
@@ -49,7 +49,7 @@
       "team_no_followup_body": "The team never confirmed contact after the match. The engagement was auto-released and your calendar days reopened. You can still leave a rating for the team below.",
       "team_no_followup_title": "[TEAM DID NOT FOLLOW UP]",
       "urgent_contact_body": "You still haven't confirmed contact with the professional. If you don't confirm soon, the engagement will be auto-released, the professional's calendar will reopen, and the incident will be recorded on your team profile.",
-      "urgent_contact_title": "[URGENT — CONTACT THE FREELANCER]",
+      "urgent_contact_title": "[URGENT — CONTACT THE PROFESSIONAL]",
       "waitlist_toast": "Another professional accepted first — you're on the waitlist. Your calendar stays open in case the match reopens."
     },
     "matches": {
