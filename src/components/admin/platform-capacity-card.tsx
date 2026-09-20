@@ -72,7 +72,7 @@ export function PlatformCapacityCard() {
 
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Metric
-          label="Freelancers"
+          label="Professionals"
           value={data.total_freelancers}
           next={nextThreshold(data.total_freelancers, CAPACITY_THRESHOLDS.freelancers)}
         />

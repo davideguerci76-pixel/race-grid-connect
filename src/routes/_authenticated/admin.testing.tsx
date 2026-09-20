@@ -61,7 +61,7 @@ function TestingLab() {
   const genMut = useMutation({
     mutationFn: () => genFn({ data: { preset, area, density } }),
     onSuccess: (r: any) => {
-      toast.success(`Generated ${r.freelancers} freelancers, ${r.teams} teams, ${r.requests} Pit Calls`);
+      toast.success(`Generated ${r.freelancers} professionals, ${r.teams} teams, ${r.requests} Pit Calls`);
       if (r.errors?.length) toast.warning(r.errors[0]);
       qc.invalidateQueries();
     },

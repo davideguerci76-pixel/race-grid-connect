@@ -57,7 +57,7 @@ const CapacityAlertEmail = ({
         <Text style={mono}>
           Overall level: {level}
           <br />
-          Total Freelancers: {freelancers}
+          Total Professionals: {freelancers}
           <br />
           Active Pit Calls: {activePitCalls}
           <br />
@@ -90,8 +90,8 @@ export const template = {
     activePitCalls: 12,
     workloadIndex: 12288,
     teams: 210,
-    drivers: 'Total Freelancers',
-    thresholds: 'Freelancers >= 1000',
+    drivers: 'Total Professionals',
+    thresholds: 'Professionals >= 1000',
     action: 'Run a manual db_health check and review Lovable Cloud usage when possible.',
   },
 } satisfies TemplateEntry

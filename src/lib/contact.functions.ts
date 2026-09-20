@@ -51,7 +51,7 @@ export const sendContactMessage = createServerFn({ method: "POST" })
       templateData: {
         name: data.name,
         email: data.email,
-        userType: data.userType === "team" ? "Team" : "Freelancer",
+        userType: data.userType === "team" ? "Team" : "Professional",
         reasons: reasonsLabel,
         subject: data.subject,
         message: data.message,
