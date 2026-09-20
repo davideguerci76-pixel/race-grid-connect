@@ -1,7 +1,7 @@
 import { getMyPitCode } from "@/lib/pool.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { teamTypeLabel } from "@/lib/labels";
+import { accountTypeLabel, teamTypeLabel } from "@/lib/labels";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -327,7 +327,7 @@ function PersonalInfoSection({ profile }: { profile: any }) {
       {isFreelancer && <PitCodeBlock />}
       <div className="text-sm">
         <span className="text-muted-foreground">{t("profile.account_type")}:</span>
-        <span className="ml-2 break-words font-mono uppercase">{profile?.user_type ?? "—"}</span>
+        <span className="ml-2 break-words font-mono uppercase">{accountTypeLabel(profile?.user_type)}</span>
         <span className="ml-2 break-words text-[11px] text-muted-foreground">({t("profile.cannot_be_changed")})</span>
       </div>
       {!isFreelancer && (

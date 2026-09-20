@@ -43,6 +43,14 @@ export function humanize(value: string | null | undefined): string {
     .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
+/** Account role for normal-user UI. Technical values remain freelancer / team. */
+export function accountTypeLabel(value: string | null | undefined): string {
+  if (!value) return "—";
+  if (value === "freelancer") return tr("contact.user_type_freelancer") ?? "Professional";
+  if (value === "team") return tr("contact.user_type_team") ?? "Team";
+  return humanize(value);
+}
+
 function tr(key: string): string | null {
   try {
     if (i18n && typeof i18n.t === "function") {
