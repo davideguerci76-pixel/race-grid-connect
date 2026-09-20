@@ -16,7 +16,7 @@ import { CardBody, CardHeader, CardShell, Chip, Chips, Fact, FactGrid, Section }
 export const Route = createFileRoute("/freelancers/$id")({
   component: FreelancerProfile,
   notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center">Freelancer not found</div>
+    <div className="flex min-h-screen items-center justify-center">Professional not found</div>
   ),
 });
 
@@ -124,7 +124,7 @@ function UnauthorizedFreelancerProfile() {
             Sign in to view this profile
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Freelancer profiles are visible to PITCALL members only.
+            Professional profiles are visible to PITCALL members only.
           </p>
           <Link to="/auth" className="mt-6 inline-block bg-racing-red px-6 py-3 text-xs font-bold uppercase tracking-widest text-white">
             Sign in / Register

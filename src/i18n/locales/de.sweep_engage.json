@@ -50,7 +50,8 @@
       "team_no_followup_title": "[TEAM HAT SICH NICHT GEMELDET]",
       "urgent_contact_body": "Sie haben den Kontakt mit dem Profi noch nicht bestätigt. Wenn Sie nicht bald bestätigen, wird das Engagement automatisch freigegeben, der Kalender des Profis wird wieder geöffnet, und der Vorfall wird im Team-Profil vermerkt.",
       "urgent_contact_title": "[DRINGEND — PROFI KONTAKTIEREN]",
-      "waitlist_toast": "Ein anderer Profi hat zuerst angenommen — Sie stehen auf der Warteliste. Ihr Kalender bleibt offen, falls der Match wieder verfügbar wird."
+      "waitlist_toast": "Ein anderer Profi hat zuerst angenommen — Sie stehen auf der Warteliste. Ihr Kalender bleibt offen, falls der Match wieder verfügbar wird.",
+      "hidden_freelancer": "Verborgener Profi"
     },
     "matches": {
       "assigned_elsewhere": "Match bereits an einen anderen Profi vergeben",

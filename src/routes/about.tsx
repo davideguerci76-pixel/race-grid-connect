@@ -12,13 +12,13 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "PITCALL is the motorsport matching platform built by paddock professionals: teams and freelancers matched by role, skills and real availability.",
+          "PITCALL is the motorsport matching platform built by paddock professionals: teams and professionals matched by role, skills and real availability.",
       },
       { property: "og:title", content: "About Pitcall — Motorsport Matching Platform" },
       {
         property: "og:description",
         content:
-          "PITCALL is the motorsport matching platform built by paddock professionals: teams and freelancers matched by role, skills and real availability.",
+          "PITCALL is the motorsport matching platform built by paddock professionals: teams and professionals matched by role, skills and real availability.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -15,9 +15,9 @@ export const Route = createFileRoute("/market")({
   head: () => ({
     meta: [
       { title: "Motorsport Market Data — Pit Call" },
-      { name: "description", content: "Live motorsport freelance market data: match volume, open Pit Calls, hot days, day-rate trends and demand by discipline." },
+      { name: "description", content: "Live motorsport professional market data: match volume, open Pit Calls, hot days, day-rate trends and demand by discipline." },
       { property: "og:title", content: "Motorsport Market Data — Pit Call" },
-      { property: "og:description", content: "Aggregated market intelligence for motorsport teams and freelancers: matches, hot days, trends and demand by discipline." },
+      { property: "og:description", content: "Aggregated market intelligence for motorsport teams and professionals: matches, hot days, trends and demand by discipline." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

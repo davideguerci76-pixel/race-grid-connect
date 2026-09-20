@@ -21,7 +21,7 @@ const BASE: Record<string, NotificationTarget> = {
   engagement_expiring: { title: "Match request expiring", path: "/dashboard/engagements", label: "Confirm now" },
   engagement_expired: { title: "Match request expired", path: "/dashboard/engagements", label: "View engagement" },
   engagement_declined: { title: "Match request declined", path: "/dashboard/engagements", label: "View engagement" },
-  engagement_more_time: { title: "Freelancer asked for more time", path: "/dashboard/engagements", label: "View engagement" },
+  engagement_more_time: { title: "Professional asked for more time", path: "/dashboard/engagements", label: "View engagement" },
   engagement_cancelled: { title: "Engagement cancelled", path: "/dashboard/engagements", label: "View engagement" },
   match_taken: { title: "Match taken", path: "/dashboard/engagements", label: "View engagement" },
   match_reopened: { title: "Match reopened", path: "/dashboard/engagements", label: "View engagement" },
@@ -152,7 +152,7 @@ export function notificationBody(kind: string, payload?: Payload | null): string
 
   if (p["audience"] === "team" && kind === "new_matches") {
     switch (p["event"]) {
-      case "team_first_match": return "A freelancer matches your Pit Call.";
+      case "team_first_match": return "A professional matches your Pit Call.";
       case "team_first_full": return "Your Pit Call has its first full match.";
       case "team_strong_reached": return "Your Pit Call has reached a strong match result.";
       case "team_match_activity": return "There is new matching activity on your Pit Call.";
