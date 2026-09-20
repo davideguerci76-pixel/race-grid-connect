@@ -16,7 +16,7 @@
       },
       "expand_outside_pool": {
         "title": "Außerhalb von My Pool suchen",
-        "body": "Dieser Pit Call wurde nur in Ihrem Pool veröffentlicht. Beim Erweitern werden auch Freelancer außerhalb des Pools durchsucht. Es kostet den auf der Schaltfläche angezeigten Token-Betrag, einmalig."
+        "body": "Dieser Pit Call wurde nur in Ihrem Pool veröffentlicht. Beim Erweitern werden auch Profis außerhalb des Pools durchsucht. Es kostet den auf der Schaltfläche angezeigten Token-Betrag, einmalig."
       }
     },
     "action": {
@@ -26,7 +26,7 @@
       },
       "request_confirmation": {
         "title": "Bestätigung anfragen",
-        "body": "Sendet dem Freelancer eine verbindliche Bestätigungsanfrage. Bei Annahme wird der Pit Call geschlossen, andere offene Vorschläge werden storniert und Kontakte ausgetauscht."
+        "body": "Sendet dem Profi eine verbindliche Bestätigungsanfrage. Bei Annahme wird der Pit Call geschlossen, andere offene Vorschläge werden storniert und Kontakte ausgetauscht."
       },
       "confirm_match": {
         "title": "Bestätigen",
@@ -50,7 +50,7 @@
       },
       "cancel_late_team": {
         "title": "Nach der Grace Window stornieren",
-        "body": "Die Grace Window ist vorbei, daher gilt dies als späte Stornierung: Das Engagement wird storniert, der Freelancer wird benachrichtigt, die Stornierung wird im öffentlichen Team-Profil vermerkt und der Pit Call wird als abgeschlossen archiviert — er wird nicht wieder geöffnet."
+        "body": "Die Grace Window ist vorbei, daher gilt dies als späte Stornierung: Das Engagement wird storniert, der Profi wird benachrichtigt, die Stornierung wird im öffentlichen Team-Profil vermerkt und der Pit Call wird als abgeschlossen archiviert — er wird nicht wieder geöffnet."
       },
       "submit_calendar_review": {
         "title": "Zur Prüfung einreichen",

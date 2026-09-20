@@ -16,7 +16,7 @@
       },
       "expand_outside_pool": {
         "title": "Chercher hors de My Pool",
-        "body": "Cette Pit Call a été publiée uniquement dans votre Pool. En l'élargissant, la recherche inclut aussi des freelances hors du Pool. Cela coûte le montant de tokens affiché sur le bouton, débité une seule fois."
+        "body": "Cette Pit Call a été publiée uniquement dans votre Pool. En l'élargissant, la recherche inclut aussi des professionnels hors du Pool. Cela coûte le montant de tokens affiché sur le bouton, débité une seule fois."
       }
     },
     "action": {
@@ -26,7 +26,7 @@
       },
       "request_confirmation": {
         "title": "Demander confirmation",
-        "body": "Envoie au freelance une demande de confirmation engageante. S'il accepte, la Pit Call est clôturée, les autres propositions en attente sont annulées et les contacts sont échangés."
+        "body": "Envoie au professionnel une demande de confirmation engageante. S'il accepte, la Pit Call est clôturée, les autres propositions en attente sont annulées et les contacts sont échangés."
       },
       "confirm_match": {
         "title": "Confirmer",
@@ -50,7 +50,7 @@
       },
       "cancel_late_team": {
         "title": "Annuler après la grace window",
-        "body": "La grace window est terminée : il s’agit donc d’une annulation tardive. L’engagement est annulé, le freelance est prévenu, l’annulation est enregistrée sur le profil public de l’équipe et le Pit Call est archivé comme terminé — il n’est pas rouvert."
+        "body": "La grace window est terminée : il s’agit donc d’une annulation tardive. L’engagement est annulé, le professionnel est prévenu, l’annulation est enregistrée sur le profil public de l’équipe et le Pit Call est archivé comme terminé — il n’est pas rouvert."
       },
       "submit_calendar_review": {
         "title": "Soumettre pour revue",

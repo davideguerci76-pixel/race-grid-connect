@@ -16,7 +16,7 @@
       },
       "expand_outside_pool": {
         "title": "Cerca fuori dal My Pool",
-        "body": "Questa Pit Call è stata pubblicata solo nel tuo Pool. Ampliandola la ricerca include anche freelance esterni al Pool. Costa i token indicati sul pulsante, addebitati una sola volta."
+        "body": "Questa Pit Call è stata pubblicata solo nel tuo Pool. Ampliandola la ricerca include anche professionista esterni al Pool. Costa i token indicati sul pulsante, addebitati una sola volta."
       }
     },
     "action": {
@@ -26,7 +26,7 @@
       },
       "request_confirmation": {
         "title": "Richiedi conferma",
-        "body": "Invia al freelance una richiesta di conferma vincolante. Se accetta, la Pit Call viene chiusa, le altre proposte in sospeso vengono annullate e i contatti vengono scambiati."
+        "body": "Invia al professionista una richiesta di conferma vincolante. Se accetta, la Pit Call viene chiusa, le altre proposte in sospeso vengono annullate e i contatti vengono scambiati."
       },
       "confirm_match": {
         "title": "Conferma",
@@ -50,7 +50,7 @@
       },
       "cancel_late_team": {
         "title": "Annullare dopo la grace window",
-        "body": "La grace window è terminata, quindi è una cancellazione tardiva: l’engagement viene annullato, il freelancer viene avvisato, la cancellazione viene registrata sul profilo pubblico del team e la Pit Call viene archiviata come completata — non viene riaperta."
+        "body": "La grace window è terminata, quindi è una cancellazione tardiva: l’engagement viene annullato, il professionista viene avvisato, la cancellazione viene registrata sul profilo pubblico del team e la Pit Call viene archiviata come completata — non viene riaperta."
       },
       "submit_calendar_review": {
         "title": "Invia per revisione",

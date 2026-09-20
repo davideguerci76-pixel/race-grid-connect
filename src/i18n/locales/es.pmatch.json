@@ -6,10 +6,10 @@
     "filled_score": "Tu match score era {{score}}%.",
     "filled_criteria_intro": "Estos criterios redujeron tu match:",
     "filled_tip": "Mantén tu perfil y tu disponibilidad al día para mejorar tus opciones en futuras Pit Calls.",
-    "filled_perfect": "Eras un match del 100%, pero otro freelance fue confirmado antes.",
+    "filled_perfect": "Eras un match del 100%, pero otro profesional fue confirmado antes.",
     "filled_perfect_tip": "Mantén tu perfil y tu disponibilidad al día — pueden llegar más Pit Calls compatibles.",
     "closed_title": "Esta Pit Call se ha cerrado.",
-    "closed_body": "El Team cerró la solicitud sin confirmar a ningún freelance.",
+    "closed_body": "El Team cerró la solicitud sin confirmar a ningún profesional.",
     "info_badge": "Solo informativa"
   }
 }
