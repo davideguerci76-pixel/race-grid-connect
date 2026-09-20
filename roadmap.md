@@ -63,3 +63,9 @@
 - [x] Show touch ripples, vertical gestures, field selection, and calendar date taps without a mouse cursor
 - [x] Create the authorized mobile inbox/confirmation simulation
 - [x] Edit and verify a 9:16, 60–90 second mobile cut with no token economy or LIVE writes
+# PROF-02
+- [ ] Read PROF-01 audit and inspect current translation/public-copy structure
+- [ ] Update user-facing terminology in all five languages
+- [ ] Update visible hardcoded copy, email/notification fallbacks, and public metadata
+- [ ] Verify technical authority, routing, token visibility, and residual occurrences
+- [ ] Produce implementation and retest report
