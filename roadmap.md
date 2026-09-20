@@ -69,3 +69,10 @@
 - [x] Update visible hardcoded copy, email/notification fallbacks, and public metadata
 - [x] Verify technical authority, routing, token visibility, and residual occurrences
 - [x] Produce implementation and retest report
+
+## PROF-03 — F-PROF-01
+- [ ] Replace raw account-role rendering with a localized presentation mapping
+- [ ] Audit all normal-user dynamic role render paths
+- [ ] Verify Profile in five languages on mobile and desktop
+- [ ] Recheck all requested user surfaces without LIVE mutations
+- [ ] Document root cause, evidence, and final finding status
