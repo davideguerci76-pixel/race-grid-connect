@@ -16,7 +16,7 @@
       },
       "expand_outside_pool": {
         "title": "Search outside My Pool",
-        "body": "This Pit Call was published to your Pool only. Expanding it also searches freelancers outside your Pool. It uses the token amount shown on the button, charged once."
+        "body": "This Pit Call was published to your Pool only. Expanding it also searches professionals outside your Pool. It uses the token amount shown on the button, charged once."
       }
     },
     "action": {
@@ -26,7 +26,7 @@
       },
       "request_confirmation": {
         "title": "Request confirmation",
-        "body": "Sends this freelancer a binding confirmation request. If they accept, the Pit Call is closed, other pending proposals are cancelled and contacts are exchanged."
+        "body": "Sends this professional a binding confirmation request. If they accept, the Pit Call is closed, other pending proposals are cancelled and contacts are exchanged."
       },
       "confirm_match": {
         "title": "Confirm",
@@ -50,7 +50,7 @@
       },
       "cancel_late_team": {
         "title": "Cancel after the grace window",
-        "body": "The grace window has passed, so this counts as a late cancellation: the engagement is cancelled, the freelancer is notified, the cancellation is recorded on your public team profile and the Pit Call is archived as completed — it is not reopened."
+        "body": "The grace window has passed, so this counts as a late cancellation: the engagement is cancelled, the professional is notified, the cancellation is recorded on your public team profile and the Pit Call is archived as completed — it is not reopened."
       },
       "submit_calendar_review": {
         "title": "Submit for review",

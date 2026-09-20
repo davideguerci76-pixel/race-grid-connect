@@ -14,10 +14,10 @@ import { getPublicFlags } from "@/lib/flags.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PITCALL — Motorsport Jobs & Freelancers" },
-      { name: "description", content: "Connect motorsport teams and freelancers by role, skills, location and real availability." },
-      { property: "og:title", content: "PITCALL — Motorsport Jobs & Freelancers" },
-      { property: "og:description", content: "Connect motorsport teams and freelancers by role, skills, location and real availability." },
+      { title: "PITCALL — Motorsport Jobs & Professionals" },
+      { name: "description", content: "Connect motorsport teams and professionals by role, skills, location and real availability." },
+      { property: "og:title", content: "PITCALL — Motorsport Jobs & Professionals" },
+      { property: "og:description", content: "Connect motorsport teams and professionals by role, skills, location and real availability." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

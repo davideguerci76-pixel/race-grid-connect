@@ -1,8 +1,8 @@
 {
   "sweep_public": {
     "freelancer_detail": {
-      "not_found": "Freelancer non trovato",
-      "sign_in_title": "Accedi per visualizzare il freelance",
+      "not_found": "Professionista non trovato",
+      "sign_in_title": "Accedi per visualizzare il professionista",
       "sign_in_button": "Accedi / Registrati",
       "day_rate": "Tariffa giornaliera",
       "calendar_confirmed": "Calendario confermato {{days}}g fa · {{date}}",
@@ -10,7 +10,7 @@
       "no_availability": "Nessuna disponibilità pubblicata."
     },
     "freelancers_index": {
-      "no_freelancers": "Ancora nessun freelance."
+      "no_freelancers": "Ancora nessun professionista."
     },
     "team_detail": {
       "not_found": "Team non trovato",

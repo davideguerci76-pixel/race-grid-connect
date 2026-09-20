@@ -103,7 +103,7 @@ export const Route = createFileRoute("/legal/$doc")({
   head: ({ loaderData }) => ({
     meta: [
       { title: `${loaderData?.title ?? "Legal"} · Pit Call` },
-      { name: "description", content: `${loaderData?.title ?? "Legal"} for Pit Call, the motorsport freelancer matching platform.` },
+      { name: "description", content: `${loaderData?.title ?? "Legal"} for Pit Call, the motorsport professional matching platform.` },
       { property: "og:title", content: `${loaderData?.title ?? "Legal"} · Pit Call` },
       { property: "og:description", content: `${loaderData?.title ?? "Legal"} for Pit Call.` },
       { property: "og:type", content: "article" },

@@ -64,7 +64,7 @@ export function HiredFreelancerCard({ hired, request }: { hired: any; request: a
               startDate: request.start_date,
               endDate: request.end_date,
               location: request.location ?? request.circuit ?? null,
-              description: `${roleGroupLabel(request.role_group)}${request.sub_role ? ` · ${subRoleLabel(request.sub_role)}` : ""} · ${disciplineLabel(request.discipline)}\nFreelancer: ${name}${hired?.contact_email ? `\nEmail: ${hired.contact_email}` : ""}${hired?.phone_number ? `\nPhone: ${hired.phone_dial_code ?? ""} ${hired.phone_number}` : ""}`,
+              description: `${roleGroupLabel(request.role_group)}${request.sub_role ? ` · ${subRoleLabel(request.sub_role)}` : ""} · ${disciplineLabel(request.discipline)}\nProfessional: ${name}${hired?.contact_email ? `\nEmail: ${hired.contact_email}` : ""}${hired?.phone_number ? `\nPhone: ${hired.phone_dial_code ?? ""} ${hired.phone_number}` : ""}`,
             }}
           />
         </Section>

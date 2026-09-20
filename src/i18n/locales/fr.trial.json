@@ -85,10 +85,10 @@
       },
       "next": {
         "title": "Que se passe-t-il ensuite dans un vrai Pit Call ?",
-        "body": "Choisissez le Freelancer avec lequel vous souhaitez travailler et envoyez-lui une Request Confirmation. S'il confirme, le Pit Call est pourvu et ses coordonnées sont révélées pour que vous puissiez le contacter.",
-        "step_choose": "Choisissez Freelancer",
+        "body": "Choisissez le Professionnel avec lequel vous souhaitez travailler et envoyez-lui une Request Confirmation. S'il confirme, le Pit Call est pourvu et ses coordonnées sont révélées pour que vous puissiez le contacter.",
+        "step_choose": "Choisissez Professionnel",
         "step_request": "Request Confirmation",
-        "step_confirm": "Le Freelancer confirme",
+        "step_confirm": "Le Professionnel confirme",
         "step_contact": "Coordonnées révélées"
       }
     },

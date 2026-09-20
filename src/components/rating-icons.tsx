@@ -11,7 +11,7 @@ type Variant = "wrench" | "headset";
 
 const ICONS: Record<Variant, { path: string; label: string }> = {
   wrench: {
-    label: "Freelancer rating",
+    label: "Professional rating",
     path:
       "M22.7 4.3a1 1 0 0 0-1.6-.3l-3.3 3.3-2.4-2.4 3.3-3.3a1 1 0 0 0-.3-1.6c-2.9-1.2-6.4-.5-8.7 1.8a7 7 0 0 0-1.7 7.2l-6.6 6.6a3 3 0 1 0 4.2 4.2l6.6-6.6a7 7 0 0 0 7.2-1.7c2.3-2.3 3-5.8 1.3-7.2z",
   },

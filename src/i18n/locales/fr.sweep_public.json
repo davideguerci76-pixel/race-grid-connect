@@ -1,8 +1,8 @@
 {
   "sweep_public": {
     "freelancer_detail": {
-      "not_found": "Freelance introuvable",
-      "sign_in_title": "Connectez-vous pour voir le freelance",
+      "not_found": "Professionnel introuvable",
+      "sign_in_title": "Connectez-vous pour voir le professionnel",
       "sign_in_button": "Se connecter / S'inscrire",
       "day_rate": "Tarif journalier",
       "calendar_confirmed": "Calendrier confirmé il y a {{days}}j · {{date}}",
@@ -10,7 +10,7 @@
       "no_availability": "Aucune disponibilité publiée."
     },
     "freelancers_index": {
-      "no_freelancers": "Aucun freelance pour le moment."
+      "no_freelancers": "Aucun professionnel pour le moment."
     },
     "team_detail": {
       "not_found": "Team introuvable",

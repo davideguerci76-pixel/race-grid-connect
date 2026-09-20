@@ -85,10 +85,10 @@
       },
       "next": {
         "title": "What happens next in a real Pit Call?",
-        "body": "Choose the Freelancer you want to work with and send them a Request Confirmation. If the Freelancer confirms, the Pit Call is filled and their contact details are revealed so you can get in touch.",
-        "step_choose": "Choose Freelancer",
+        "body": "Choose the Professional you want to work with and send them a Request Confirmation. If the Professional confirms, the Pit Call is filled and their contact details are revealed so you can get in touch.",
+        "step_choose": "Choose Professional",
         "step_request": "Request Confirmation",
-        "step_confirm": "Freelancer confirms",
+        "step_confirm": "Professional confirms",
         "step_contact": "Contact details revealed"
       }
     },

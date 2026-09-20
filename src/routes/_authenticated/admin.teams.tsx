@@ -264,7 +264,7 @@ function PoolModal({ teamId, teamName, onClose }: { teamId: string; teamName: st
           <div>
             <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-racing-red">[MY POOL]</div>
             <h2 className="text-xl font-black uppercase italic tracking-tighter">{teamName}</h2>
-            <p className="text-xs text-muted-foreground">{rows.length} freelancer(s) in pool</p>
+            <p className="text-xs text-muted-foreground">{rows.length} professional{rows.length === 1 ? "" : "s"} in pool</p>
           </div>
           <button onClick={onClose} className="border border-border p-1 hover:bg-secondary"><X className="size-4" /></button>
         </div>

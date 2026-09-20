@@ -1,7 +1,7 @@
 {
   "nav": {
     "jobs": "Bacheca",
-    "freelancers": "Freelance",
+    "freelancers": "Professionisti",
     "teams": "Scuderie",
     "dashboard": "Dashboard",
     "profile": "Il mio profilo",
@@ -22,7 +22,7 @@
     "hero_1": "SMETTI DI CERCARE.",
     "hero_2": "TROVA.",
     "hero_3": "ISTANTANEAMENTE.",
-    "sub": "La piattaforma di matching nel motorsport che mette in contatto team e freelance per ruolo, competenze, località e disponibilità reale.",
+    "sub": "La piattaforma di matching nel motorsport che mette in contatto team e professionista per ruolo, competenze, località e disponibilità reale.",
     "preopening": {
       "headline_brand": "PITCALL",
       "headline_rest": "STA COSTRUENDO LA GRIGLIA.",
@@ -34,17 +34,17 @@
       "stay_connected": "Resta connesso. La griglia sta crescendo.",
       "notification": "Ti avviseremo quando PITCALL andrà live."
     },
-    "cta_freelancer_title": "SONO UN FREELANCE",
+    "cta_freelancer_title": "SONO UN PROFESSIONISTA",
     "cta_freelancer_body": "Pubblica la tua disponibilità. Ricevi match!",
-    "cta_team_title": "SIAMO UNA SCUDERIA",
+    "cta_team_title": "SONO UN TEAM",
     "cta_team_body": "Fai un Pit Call. Trova il tuo match!",
     "how_title": "Come funziona PITCALL",
-    "how_1_t": "I freelance alimentano la griglia",
+    "how_1_t": "I professionista alimentano la griglia",
     "how_1_b": "Pubblicano profili, skill e disponibilità reale per alimentare il motore PITCALL.",
     "how_2_t": "I team fanno una Pit Call",
     "how_2_b": "Dì al motore cosa cerchi: ruolo, skill, località, date e requisiti.",
     "how_3_t": "Noi facciamo il match",
-    "how_3_b": "Il motore PITCALL confronta istantaneamente i tuoi requisiti con la disponibilità reale dei freelance.",
+    "how_3_b": "Il motore PITCALL confronta istantaneamente i tuoi requisiti con la disponibilità reale dei professionista.",
     "how_4_t": "Trovi il tuo match",
     "how_4_b": "Seleziona il miglior match da una lista ordinata in base ai tuoi requisiti.",
     "how_5_t": "Vi incontrate. Vi valutate.",
@@ -77,7 +77,7 @@
     "empty": "Nessuna Pit Call corrisponde ai filtri"
   },
   "freelancers": {
-    "title": "Freelance",
+    "title": "Professionisti",
     "sub": "{{count}} specialisti verificati pronti a lavorare.",
     "filters": {
       "role": "Ruolo",
@@ -130,9 +130,9 @@
     "no_account": "Nuovo su Pit Call?",
     "have_account": "Hai già un account?",
     "create_account": "Crea account",
-    "type_freelancer": "Sono un freelance",
+    "type_freelancer": "SONO UN PROFESSIONISTA",
     "type_freelancer_desc": "Meccanico, ingegnere, tecnico o altro professionista del motorsport.",
-    "type_team": "Siamo una squadra",
+    "type_team": "SONO UN TEAM",
     "type_team_desc": "Squadra corse, casa costruttrice, costruttore o altra organizzazione motorsport.",
     "which_are_you": "Chi sei?",
     "signed_in_as": "Accesso come {{email}}",
@@ -196,7 +196,7 @@
   "matches": {
     "title": "Match",
     "empty": "Nessun match. Aggiungi disponibilità per iniziare.",
-    "empty_team": "Nessun match. Pubblica una Pit Call per trovare freelance.",
+    "empty_team": "Nessun match. Pubblica una Pit Call per trovare professionista.",
     "hidden_name": "Rivela per vedere più info",
     "reveal_1_token_one": "Rivela ({{count}} token)",
     "reveal_1_token_other": "Rivela ({{count}} token)",
@@ -210,8 +210,8 @@
     "counts_banner": "{{count}} {{who}} corrispondono al tuo calendario.",
     "counts_banner_teams_one": "{{count}} Team compatibile con il tuo calendario.",
     "counts_banner_teams_other": "{{count}} Team compatibili con il tuo calendario.",
-    "counts_banner_freelancers_one": "{{count}} Freelance compatibile con i tuoi Pit Call.",
-    "counts_banner_freelancers_other": "{{count}} Freelance compatibili con i tuoi Pit Call.",
+    "counts_banner_freelancers_one": "{{count}} Professionista compatibile con i tuoi Pit Call.",
+    "counts_banner_freelancers_other": "{{count}} Professionista compatibili con i tuoi Pit Call.",
     "reveal_cta_plain": "Rivela",
     "reveal_confirm_plain": "Rivelare i contatti di questo {{who}}?"
   },
@@ -283,7 +283,7 @@
     "expires_in_minutes": "Scade tra {{count}} min",
     "ask_more_time_hint": "Disponibile nelle ultime 12 ore, max 5 volte e mai oltre l'inizio della Pit Call",
     "withdraw": "Ritira richiesta",
-    "withdraw_confirm": "Ritirare la richiesta? I giorni del freelance verranno liberati.",
+    "withdraw_confirm": "Ritirare la richiesta? I giorni del professionista verranno liberati.",
     "withdrawn_toast": "Richiesta ritirata"
   },
   "rating": {
@@ -534,7 +534,7 @@
         "blocks": [
           {
             "t": "p",
-            "v": "Pit Call è una piattaforma SaaS sviluppata per il matching tra Team Motorsport e professionisti freelance."
+            "v": "Pit Call è una piattaforma SaaS sviluppata per il matching tra Team Motorsport e professionisti professionista."
           },
           {
             "t": "ul",
@@ -747,7 +747,7 @@
             "t": "ul",
             "v": [
               "Recensioni consentite solo dopo collaborazioni reali.",
-              "Doppia recensione Team/Freelance.",
+              "Doppia recensione Team/Professionista.",
               "Moderazione dei contenuti segnalati.",
               "Possibilità di contestazione.",
               "Pubblicazione differita secondo le regole di double-blind."
@@ -778,7 +778,7 @@
           },
           {
             "t": "p",
-            "v": "Una volta condivisi, Team e Freelance diventano autonomi Titolari del trattamento dei dati ricevuti."
+            "v": "Una volta condivisi, Team e Professionista diventano autonomi Titolari del trattamento dei dati ricevuti."
           },
           {
             "t": "p",
@@ -889,9 +889,9 @@
     "title_a": "COS'È",
     "title_b": "PITCALL",
     "hero": "NEL MOTORSPORT, OGNI SECONDO CONTA. PERCHÉ PERDERNE ANCHE UNO A CERCARE?",
-    "p1": "PITCALL nasce da un problema semplice che vediamo da anni nel motorsport: i team hanno bisogno delle persone giuste al momento giusto, mentre i freelance qualificati devono essere dove servono, quando sono disponibili.",
+    "p1": "PITCALL nasce da un problema semplice che vediamo da anni nel motorsport: i team hanno bisogno delle persone giuste al momento giusto, mentre i professionista qualificati devono essere dove servono, quando sono disponibili.",
     "p2": "Trovarsi non dovrebbe essere la parte difficile.",
-    "p3": "Ecco perché abbiamo creato PITCALL: una piattaforma di matching progettata intorno al modo in cui il motorsport funziona davvero. I team dicono al motore esattamente ciò di cui hanno bisogno. I freelance forniscono profili, competenze e disponibilità reali. PITCALL li mette in contatto.",
+    "p3": "Ecco perché abbiamo creato PITCALL: una piattaforma di matching progettata intorno al modo in cui il motorsport funziona davvero. I team dicono al motore esattamente ciò di cui hanno bisogno. I professionista forniscono profili, competenze e disponibilità reali. PITCALL li mette in contatto.",
     "quote": "Niente ricerche infinite tra i profili. Niente annunci generici.",
     "p4": "Il motore PITCALL abbina requisiti reali a disponibilità reali e ordina i risultati in base a ciò di cui il team ha effettivamente bisogno.",
     "exp_title": "NATA DALL'ESPERIENZA",
@@ -899,7 +899,7 @@
     "exp_p2": "Non è nata da un'idea di come il paddock dovrebbe funzionare. È nata da anni passati a vedere come funziona davvero — e da una domanda:",
     "exp_p3": "Perché continuiamo a cercare, quando potremmo fare matching?",
     "mission_title": "LA NOSTRA MISSIONE",
-    "mission_p1": "Rendere più semplice e veloce per team e freelance del motorsport trovare il match giusto — così da passare meno tempo a cercare e più tempo in pista.",
+    "mission_p1": "Rendere più semplice e veloce per team e professionista del motorsport trovare il match giusto — così da passare meno tempo a cercare e più tempo in pista.",
     "cta_a": "ENTRA NELLA",
     "cta_b": "GRIGLIA"
   },
@@ -914,7 +914,7 @@
     "email_placeholder": "tu@example.com",
     "user_type": "Sono un",
     "user_type_team": "Team",
-    "user_type_freelancer": "Freelance",
+    "user_type_freelancer": "Professionista",
     "reasons": "Come possiamo aiutarti?",
     "reason_general_info": "Informazioni generali",
     "reason_technical_issue": "Problema tecnico",
@@ -949,7 +949,7 @@
       {
         "q": "Come funziona il matching di PITCALL?",
         "a": [
-          "PITCALL confronta ruolo, requisiti e date del Team con profili reali e disponibilità attuali dei Freelancer. I risultati sono ordinati in modo deterministico per rilevanza professionale; la copertura delle date è mostrata separatamente."
+          "PITCALL confronta ruolo, requisiti e date del Team con profili reali e disponibilità attuali dei Professionisti. I risultati sono ordinati in modo deterministico per rilevanza professionale; la copertura delle date è mostrata separatamente."
         ]
       },
       {
@@ -962,12 +962,12 @@
       {
         "q": "Come funzionano disponibilità e READY to Match?",
         "a": [
-          "I Freelancer indicano i giorni disponibili nel calendario e confermano periodicamente che siano ancora corretti. Le date stale smettono di essere usate nel matching finché non vengono riconfermate.",
+          "I Professionista indicano i giorni disponibili nel calendario e confermano periodicamente che siano ancora corretti. Le date stale smettono di essere usate nel matching finché non vengono riconfermate.",
           "READY to Match significa che il profilo ha macro-ruolo, telefono valido e almeno un giorno di disponibilità attivo. Indica operatività, non qualità professionale."
         ]
       },
       {
-        "q": "PITCALL garantisce che un Freelancer sia disponibile?",
+        "q": "PITCALL garantisce che un Professionista sia disponibile?",
         "a": [
           "Creare il profilo, gestire la disponibilità e ricevere match è gratuito."
         ]
@@ -981,7 +981,7 @@
       {
         "q": "Cos’è una Request Confirmation?",
         "a": [
-          "Il Team può inviare una proposta con ruolo, date, budget e note. Il Freelancer può Confermare, Chiedere più tempo quando disponibile oppure Rifiutare.",
+          "Il Team può inviare una proposta con ruolo, date, budget e note. Il Professionista può Confermare, Chiedere più tempo quando disponibile oppure Rifiutare.",
           "La prima conferma valida vince, chiude le proposte concorrenti e rivela i contatti a entrambe le parti."
         ]
       },
@@ -989,13 +989,13 @@
         "q": "Cosa succede se un Engagement confermato viene cancellato?",
         "a": [
           "Entro 24 ore dalla conferma e prima del primo giorno, entrambe le parti possono cancellare senza penalità: la Pit Call torna Active e il matching viene rieseguito.",
-          "Dopo la grace window, la cancellazione del Freelancer mantiene quei giorni bloccati e può riportare la Pit Call Active solo prima del primo giorno. La cancellazione tardiva del Team archivia la Pit Call, libera i giorni del Freelancer ed entra nelle statistiche pubbliche del Team."
+          "Dopo la grace window, la cancellazione del Professionista mantiene quei giorni bloccati e può riportare la Pit Call Active solo prima del primo giorno. La cancellazione tardiva del Team archivia la Pit Call, libera i giorni del Professionista ed entra nelle statistiche pubbliche del Team."
         ]
       },
       {
         "q": "Cos’è una SOS Call?",
         "a": [
-          "SOS è un recovery flow solo Team per una Pit Call single-event idonea dal primo giorno. Se il Team dichiara no-show il Freelancer confermato, quei giorni restano bloccati e PITCALL invia l’SOS ai Freelancer vicini idonei; vince la prima accettazione valida."
+          "SOS è un recovery flow solo Team per una Pit Call single-event idonea dal primo giorno. Se il Team dichiara no-show il Professionista confermato, quei giorni restano bloccati e PITCALL invia l’SOS ai Professionisti vicini idonei; vince la prima accettazione valida."
         ]
       },
       {
@@ -1014,24 +1014,24 @@
       {
         "q": "Cos’è My Pool?",
         "a": [
-          "My Pool è la cerchia privata del Team, composta da Freelancer aggiunti dopo un lavoro completato o tramite Pit Code. Le ricerche Pool hanno prezzo e regola di copertura propri, e i nomi dei membri sono visibili al proprietario del Pool.",
+          "My Pool è la cerchia privata del Team, composta da Professionista aggiunti dopo un lavoro completato o tramite Pit Code. Le ricerche Pool hanno prezzo e regola di copertura propri, e i nomi dei membri sono visibili al proprietario del Pool.",
           "Quando idonea, una Pit Call solo Pool può essere estesa al marketplace pagando la differenza mostrata. È un’azione distinta dalla visualizzazione dei Partial Match."
         ]
       },
       {
         "q": "Come funzionano le valutazioni?",
         "a": [
-          "Dopo un lavoro completato, Team e Freelancer possono valutarsi. Le valutazioni sono a doppio cieco e compaiono dopo l’invio di entrambe le parti o dopo il periodo di attesa previsto."
+          "Dopo un lavoro completato, Team e Professionisti possono valutarsi. Le valutazioni sono a doppio cieco e compaiono dopo l’invio di entrambe le parti o dopo il periodo di attesa previsto."
         ]
       },
       {
         "q": "PITCALL gestisce contratti o pagamenti tra utenti?",
         "a": [
-          "No. PITCALL offre matching e contatto. Contratti, tariffe e pagamenti del lavoro vengono concordati direttamente tra Team e Freelancer."
+          "No. PITCALL offre matching e contatto. Contratti, tariffe e pagamenti del lavoro vengono concordati direttamente tra Team e Professionisti."
         ]
       },
       {
-        "q": "PITCALL fa pagare i Freelancer?",
+        "q": "PITCALL fa pagare i Professionisti?",
         "a": [
           "Creare il profilo, gestire la disponibilità e ricevere match è gratuito."
         ]
@@ -1097,9 +1097,9 @@
     "team_title": "Calendario Team",
     "team_subtitle": "Solo engagement PITCALL confermati.",
     "stat_crew_days": "Giorni crew",
-    "stat_freelancers": "Freelancer",
+    "stat_freelancers": "Professionisti",
     "stat_pitcalls": "Pit Call",
-    "detail_count": "{{count}} freelancer",
+    "detail_count": "{{count}} professionista",
     "no_engagements": "Nessun engagement confermato in questa data.",
     "open_engagement": "Apri engagement →",
     "team_card": "Calendario Team",

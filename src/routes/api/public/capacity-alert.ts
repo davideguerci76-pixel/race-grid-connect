@@ -30,7 +30,7 @@ export function decideCapacityTransition(previous: CapacityLevel, current: Capac
 
 export function describeDrivers(snapshot: CapacitySnapshot) {
   const names: Record<string, string> = {
-    freelancers: "Total Freelancers",
+    freelancers: "Total Professionals",
     active_pit_calls: "Active Pit Calls",
     workload_index: "Workload Index",
   };
@@ -38,7 +38,7 @@ export function describeDrivers(snapshot: CapacitySnapshot) {
     const level = snapshot.overall_level;
     const pick = (t: { check: number; plan: number; upgrade: number }) =>
       level === "UPGRADE_NOW" ? t.upgrade : level === "PLAN_UPGRADE" ? t.plan : t.check;
-    if (key === "freelancers") return `Freelancers >= ${pick(CAPACITY_THRESHOLDS.freelancers)}`;
+    if (key === "freelancers") return `Professionals >= ${pick(CAPACITY_THRESHOLDS.freelancers)}`;
     if (key === "active_pit_calls")
       return `Active Pit Calls >= ${pick(CAPACITY_THRESHOLDS.activePitCalls)}`;
     return `Workload Index >= ${pick(CAPACITY_THRESHOLDS.workloadIndex)}`;
