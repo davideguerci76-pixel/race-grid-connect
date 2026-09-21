@@ -76,3 +76,8 @@
 - [x] Verify Profile in five languages on mobile and desktop
 - [x] Recheck all requested user surfaces without LIVE mutations
 - [x] Document root cause, evidence, and final finding status
+
+## DEMO-FL-VIDEO-02 — Professional terminology update
+- [ ] Audit the approved polished video frame-by-frame for Freelancer/Freelance wording
+- [ ] Replace every visible legacy term while preserving the approved edit and touch flow
+- [ ] Render the updated 1080×1920 master and verify zero user-facing residuals
