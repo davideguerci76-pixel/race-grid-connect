@@ -25,7 +25,7 @@ export const adminListFreelancers = createServerFn({ method: "GET" })
     const envIsTest = await currentAdminEnv(supabaseAdmin, context.userId);
     const { data: profiles, error } = await (supabaseAdmin
       .from("profiles") as any)
-      .select("id, display_name, user_type, token_balance, blocked_at, created_at, preferred_language")
+      .select("id, display_name, user_type, token_balance, blocked_at, created_at, preferred_language, deleted_at")
       .eq("is_test", envIsTest)
       .eq("user_type", "freelancer")
       .order("created_at", { ascending: false });

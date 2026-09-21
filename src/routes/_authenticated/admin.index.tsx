@@ -77,7 +77,9 @@ function AdminFreelancers() {
   // Pool health = whole current ACP environment (LIVE or TEST), independent of the filters below.
   const REASONS = ["missing_first_name", "missing_last_name", "missing_role", "missing_phone", "missing_availability", "stale_availability"] as const;
   const pool = useMemo(() => {
-    const all = data ?? [];
+    // Deleted users (profiles.deleted_at set, shown as "Deleted user") stay in the table
+    // but are not part of the current registered population for the summary counters.
+    const all = (data ?? []).filter((r: any) => !r.deleted_at);
     const ready = all.filter((r: any) => r.ready).length;
     const byReason: Record<string, number> = {};
     for (const k of REASONS) byReason[k] = all.filter((r: any) => (r.ready_reasons ?? []).includes(k)).length;
