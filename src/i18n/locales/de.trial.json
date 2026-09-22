@@ -86,9 +86,9 @@
       "next": {
         "title": "Was passiert als Nächstes bei einem echten Pit Call?",
         "body": "Wählen Sie den Profi, mit dem Sie arbeiten möchten, und senden Sie ihm eine Request Confirmation. Bestätigt der Profi, wird der Pit Call vergeben und seine Kontaktdaten freigegeben, damit Sie Kontakt aufnehmen können.",
-        "step_choose": "Profis wählen",
+        "step_choose": "Profi wählen",
         "step_request": "Request Confirmation",
-        "step_confirm": "Profis bestätigt",
+        "step_confirm": "Profi bestätigt",
         "step_contact": "Kontaktdaten freigegeben"
       }
     },
