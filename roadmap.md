@@ -81,3 +81,9 @@
 - [x] Audit the approved polished video frame-by-frame for Freelancer/Freelance wording
 - [x] Replace every visible legacy term while preserving the approved edit and touch flow
 - [x] Render the updated 1080×1920 master and verify zero user-facing residuals
+
+## PROF-04 — F-PROF-02 grammar remediation
+- [ ] Audit complete Professional terminology sentences across EN/IT/ES/FR/DE
+- [ ] Correct grammatical regressions in presentation copy only
+- [ ] Validate representative mobile and desktop runtime surfaces in all five languages
+- [ ] Complete residual article/agreement sweep and document findings
