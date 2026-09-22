@@ -1083,6 +1083,8 @@
     "stat_freelancers": "Profis",
     "stat_pitcalls": "Pit Calls",
     "detail_count": "{{count}} Profis",
+    "detail_count_one": "{{count}} Profi",
+    "detail_count_other": "{{count}} Profis",
     "no_engagements": "Keine bestätigten Engagements an diesem Datum.",
     "open_engagement": "Engagement öffnen →",
     "team_card": "Team-Kalender",

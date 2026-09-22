@@ -534,7 +534,7 @@
         "blocks": [
           {
             "t": "p",
-            "v": "Pit Call is a SaaS platform built for matching Motorsport teams and professional professionals."
+            "v": "Pit Call is a SaaS platform built for matching Motorsport teams and professionals."
           },
           {
             "t": "ul",
@@ -1099,7 +1099,9 @@
     "stat_crew_days": "Crew days",
     "stat_freelancers": "Professionals",
     "stat_pitcalls": "Pit Calls",
-    "detail_count": "{{count}} professional(s)",
+    "detail_count": "{{count}} professionals",
+    "detail_count_one": "{{count}} professional",
+    "detail_count_other": "{{count}} professionals",
     "no_engagements": "No confirmed engagements on this date.",
     "open_engagement": "Open engagement →",
     "team_card": "Team calendar",

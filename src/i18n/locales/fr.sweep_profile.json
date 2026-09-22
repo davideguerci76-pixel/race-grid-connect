@@ -24,7 +24,7 @@
     "profile": {
       "loading": "Chargement…",
       "personal_info": "Informations personnelles",
-      "freelancer_info": "Informations professionnel",
+      "freelancer_info": "Informations du professionnel",
       "team_info": "Informations du team",
       "no_ratings_yet": "Aucune évaluation pour le moment",
       "email": "E-mail",
@@ -66,7 +66,7 @@
       "add_language": "+ Ajouter une langue",
       "add_another_language": "+ Ajouter une autre langue",
       "saved": "Profil professionnel enregistré",
-      "edit_info": "Modifier les informations professionnel",
+      "edit_info": "Modifier les informations du professionnel",
       "retired_value": "Plus disponible"
     },
     "team": {

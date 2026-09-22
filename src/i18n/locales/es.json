@@ -39,12 +39,12 @@
     "cta_team_title": "SOY UN EQUIPO",
     "cta_team_body": "Haz un Pit Call. ¡Encuentra tu match!",
     "how_title": "Cómo funciona PITCALL",
-    "how_1_t": "Los profesional alimentan la parrilla",
+    "how_1_t": "Los profesionales alimentan la parrilla",
     "how_1_b": "Publican perfiles, habilidades y disponibilidad real para alimentar el motor PITCALL.",
     "how_2_t": "Los equipos hacen una Pit Call",
     "how_2_b": "Dile al motor lo que necesitas: rol, habilidades, ubicación, fechas y requisitos.",
     "how_3_t": "Nosotros hacemos el match",
-    "how_3_b": "El motor PITCALL comprueba al instante tus requisitos contra la disponibilidad real de los profesional.",
+    "how_3_b": "El motor PITCALL comprueba al instante tus requisitos contra la disponibilidad real de los profesionales.",
     "how_4_t": "Encuentras tu match",
     "how_4_b": "Selecciona el mejor match de una lista ordenada según tus requisitos.",
     "how_5_t": "Os conocéis. Os valoráis.",
@@ -517,7 +517,7 @@
         "blocks": [
           {
             "t": "p",
-            "v": "Pit Call es una plataforma SaaS creada para el matching entre equipos de Motorsport y profesionales profesional."
+            "v": "Pit Call es una plataforma SaaS creada para el matching entre equipos de Motorsport y profesionales."
           },
           {
             "t": "ul",
@@ -761,7 +761,7 @@
           },
           {
             "t": "p",
-            "v": "Una vez compartidos, Equipos y Profesional se convierten en Responsables autónomos del tratamiento de los datos recibidos."
+            "v": "Una vez compartidos, Equipos y Profesionales se convierten en Responsables autónomos del tratamiento de los datos recibidos."
           },
           {
             "t": "p",
@@ -872,9 +872,9 @@
     "title_a": "SOBRE",
     "title_b": "PITCALL",
     "hero": "EN EL MOTORSPORT, CADA SEGUNDO IMPORTA. ¿POR QUÉ PERDER NI UNO SOLO BUSCANDO?",
-    "p1": "PITCALL nació de un problema sencillo que llevamos años viendo en el automovilismo: los equipos necesitan a las personas adecuadas en el momento adecuado, mientras que los profesional cualificados necesitan estar donde se les necesita, cuando están disponibles.",
+    "p1": "PITCALL nació de un problema sencillo que llevamos años viendo en el automovilismo: los equipos necesitan a las personas adecuadas en el momento adecuado, mientras que los profesionales cualificados necesitan estar donde se les necesita, cuando están disponibles.",
     "p2": "Encontrarse no debería ser la parte difícil.",
-    "p3": "Por eso creamos PITCALL: una plataforma de matching diseñada en torno a cómo funciona realmente el automovilismo. Los equipos indican al motor exactamente lo que necesitan. Los profesional aportan sus perfiles, habilidades y disponibilidad real. PITCALL conecta a ambos.",
+    "p3": "Por eso creamos PITCALL: una plataforma de matching diseñada en torno a cómo funciona realmente el automovilismo. Los equipos indican al motor exactamente lo que necesitan. Los profesionales aportan sus perfiles, habilidades y disponibilidad real. PITCALL conecta a ambos.",
     "quote": "Sin búsquedas interminables de perfiles. Sin anuncios genéricos.",
     "p4": "El motor PITCALL combina requisitos reales con disponibilidad real y ordena los resultados según lo que el equipo realmente necesita.",
     "exp_title": "NACIDA DE LA EXPERIENCIA",
@@ -882,7 +882,7 @@
     "exp_p2": "No nació de una idea de cómo debería funcionar el paddock. Nació de años viendo cómo funciona realmente — y de una pregunta:",
     "exp_p3": "¿Por qué seguimos buscando, cuando podríamos hacer matching?",
     "mission_title": "NUESTRA MISIÓN",
-    "mission_p1": "Hacer más rápido y fácil que equipos y profesional del automovilismo encuentren el match adecuado — para que pasen menos tiempo buscando y más tiempo en parrilla.",
+    "mission_p1": "Hacer más rápido y fácil que equipos y profesionales del automovilismo encuentren el match adecuado — para que pasen menos tiempo buscando y más tiempo en parrilla.",
     "cta_a": "ÚNETE A LA",
     "cta_b": "PARRILLA"
   },
@@ -1004,7 +1004,7 @@
       {
         "q": "¿Cómo funcionan las valoraciones?",
         "a": [
-          "Tras un trabajo completado, Team y Profesional pueden valorarse. Las valoraciones son de doble ciego y aparecen cuando ambos responden o al finalizar el periodo de espera."
+          "Tras un trabajo completado, el Team y el Profesional pueden valorarse. Las valoraciones son de doble ciego y aparecen cuando ambos responden o al finalizar el periodo de espera."
         ]
       },
       {
@@ -1082,7 +1082,9 @@
     "stat_crew_days": "Días de crew",
     "stat_freelancers": "Profesionales",
     "stat_pitcalls": "Pit Calls",
-    "detail_count": "{{count}} profesional(s)",
+    "detail_count": "{{count}} profesionales",
+    "detail_count_one": "{{count}} profesional",
+    "detail_count_other": "{{count}} profesionales",
     "no_engagements": "No hay engagements confirmados en esta fecha.",
     "open_engagement": "Abrir engagement →",
     "team_card": "Calendario Team",

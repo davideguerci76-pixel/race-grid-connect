@@ -30,7 +30,7 @@
       "cancel_late_team_label": "Annuler (tardif — enregistré sur le profil)",
       "cancel_team_late_toast": "Annulation tardive enregistrée sur le profil de votre équipe.",
       "confirm_contacted_body": "Confirmez ici dès que vous contactez le professionnel. Sinon, des rappels automatiques seront envoyés et — après le délai — le match sera libéré et enregistré sur le profil de votre équipe.",
-      "confirm_contacted_title": "[CONFIRMEZ AVOIR CONTACTÉ LE PROFESSIONNELS]",
+      "confirm_contacted_title": "[CONFIRMEZ AVOIR CONTACTÉ LE PROFESSIONNEL]",
       "confirm_failed": "Échec de la confirmation",
       "contact_check_followup": "Cela fait quelques jours depuis le match — l'équipe vous a-t-elle déjà contacté ?",
       "contact_check_initial": "Dès que l'équipe vous contacte, cliquez ci-dessous. Sinon, nous le lui rappellerons automatiquement et — si elle continue à vous ignorer — nous libérerons le match afin que votre calendrier se rouvre.",
@@ -49,7 +49,7 @@
       "team_no_followup_body": "L'équipe n'a jamais confirmé le contact après le match. L'engagement a été libéré automatiquement et les jours de votre calendrier ont été rouverts. Vous pouvez toujours laisser une évaluation pour l'équipe ci-dessous.",
       "team_no_followup_title": "[L'ÉQUIPE N'A PAS DONNÉ SUITE]",
       "urgent_contact_body": "Vous n'avez pas encore confirmé le contact avec le professionnel. Si vous ne confirmez pas rapidement, l'engagement sera libéré automatiquement, le calendrier du professionnel se rouvrira et l'incident sera enregistré sur le profil de votre équipe.",
-      "urgent_contact_title": "[URGENT — CONTACTEZ LE PROFESSIONNELS]",
+      "urgent_contact_title": "[URGENT — CONTACTEZ LE PROFESSIONNEL]",
       "waitlist_toast": "Un autre professionnel a accepté en premier — vous êtes sur liste d'attente. Votre calendrier reste ouvert au cas où le match se rouvrirait."
     },
     "matches": {
@@ -270,7 +270,9 @@
       "sos_confirm": "Déclencher l'appel SOS maintenant ? PITCALL contactera automatiquement tous les professionnels dans un rayon de 150 km avec une Professional Relevance ≥40 % disponibles aujourd'hui. Le premier à confirmer obtient la mission ; les Request Confirmation manuelles sont désactivées jusqu'à la résolution du SOS. Si un professionnel est encore confirmé, ce clic déclare son no-show. Ceci est irréversible.",
       "sos_description": "Mode urgence : diffusion automatique à tous les professionnels dans un rayon de 150 km, Professional Relevance ≥40 %, disponibles aujourd'hui. Premier à confirmer = match.",
       "sos_failed": "Échec de l'appel SOS",
-      "sos_sent": "Appel SOS envoyé à {{count}} professionnel(s) dans un rayon de 150 km avec une relevance ≥{{pct}} %.",
+      "sos_sent": "Appel SOS envoyé à {{count}} professionnels dans un rayon de 150 km avec une relevance ≥{{pct}} %.",
+      "sos_sent_one": "Appel SOS envoyé à {{count}} professionnel dans un rayon de 150 km avec une relevance ≥{{pct}} %.",
+      "sos_sent_other": "Appel SOS envoyé à {{count}} professionnels dans un rayon de 150 km avec une relevance ≥{{pct}} %.",
       "tech_details_hidden_note": "Les détails techniques sont masqués jusqu'à ce que vous débloquiez ({{cost}} token(s)). Le vrai nom et les contacts n'apparaissent qu'après confirmation du match par le professionnel.",
       "tier_unlock_failed": "Échec du déblocage du niveau",
       "tier_unlock_success": "Niveau {{tier}} ({{scope}}) débloqué — {{spent}} tokens dépensés. Solde : {{balance}}",

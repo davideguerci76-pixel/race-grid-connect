@@ -83,7 +83,7 @@
 - [x] Render the updated 1080×1920 master and verify zero user-facing residuals
 
 ## PROF-04 — F-PROF-02 grammar remediation
-- [ ] Audit complete Professional terminology sentences across EN/IT/ES/FR/DE
-- [ ] Correct grammatical regressions in presentation copy only
-- [ ] Validate representative mobile and desktop runtime surfaces in all five languages
-- [ ] Complete residual article/agreement sweep and document findings
+- [x] Audit complete Professional terminology sentences across EN/IT/ES/FR/DE
+- [x] Correct grammatical regressions in presentation copy only
+- [x] Validate representative mobile and desktop runtime surfaces in all five languages
+- [x] Complete residual article/agreement sweep and document findings

@@ -517,7 +517,7 @@
         "blocks": [
           {
             "t": "p",
-            "v": "Pit Call est une plateforme SaaS conçue pour le matching entre écuries Motorsport et professionnels professionnel."
+            "v": "Pit Call est une plateforme SaaS conçue pour le matching entre écuries Motorsport et professionnels."
           },
           {
             "t": "ul",
@@ -1004,13 +1004,13 @@
       {
         "q": "Comment fonctionnent les évaluations ?",
         "a": [
-          "Après une mission terminée, Team et Professionnel peuvent s’évaluer. Les évaluations sont en double aveugle et apparaissent après les deux réponses ou après le délai prévu."
+          "Après une mission terminée, le Team et le Professionnel peuvent s’évaluer. Les évaluations sont en double aveugle et apparaissent après les deux réponses ou après le délai prévu."
         ]
       },
       {
         "q": "PITCALL gère-t-il les contrats ou paiements entre utilisateurs ?",
         "a": [
-          "Non. PITCALL fournit le matching et la mise en relation. Contrats, tarifs et paiements sont convenus directement entre Team et Professionnel."
+          "Non. PITCALL fournit le matching et la mise en relation. Contrats, tarifs et paiements sont convenus directement entre le Team et le Professionnel."
         ]
       },
       {
@@ -1082,7 +1082,9 @@
     "stat_crew_days": "Jours crew",
     "stat_freelancers": "Professionnels",
     "stat_pitcalls": "Pit Calls",
-    "detail_count": "{{count}} professionnel(s)",
+    "detail_count": "{{count}} professionnels",
+    "detail_count_one": "{{count}} professionnel",
+    "detail_count_other": "{{count}} professionnels",
     "no_engagements": "Aucun engagement confirmé à cette date.",
     "open_engagement": "Ouvrir l'engagement →",
     "team_card": "Calendrier Team",
