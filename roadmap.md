@@ -89,6 +89,6 @@
 - [x] Complete residual article/agreement sweep and document findings
 
 ## SOCIAL-IG-01 — PITCALL Instagram Reel
-- [ ] Produce the four-scene 1080×1920 Professional acquisition Reel
-- [ ] Verify exact approved copy, safe areas, timing, logo, and zero legacy terminology
-- [ ] Deliver the publication-ready MP4 without changing the PITCALL product or LIVE data
+- [x] Produce the four-scene 1080×1920 Professional acquisition Reel
+- [x] Verify exact approved copy, safe areas, timing, logo, and zero legacy terminology
+- [x] Deliver the publication-ready MP4 without changing the PITCALL product or LIVE data
