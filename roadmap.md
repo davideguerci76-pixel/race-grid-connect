@@ -97,3 +97,8 @@
 - [x] Extend the approved four-scene edit to 12 seconds with longer stable reading holds
 - [x] Synchronize an original motorsport-tech soundtrack with headline and scene accents
 - [x] Replace the final mark with the official PITCALL headset logo and verify the final master
+
+## SOCIAL-IG-03 — PITCALL Reel final cleanup
+- [x] Remove the left vertical red bar without replacing it
+- [x] Keep the final scene dark and replace only the approved closing claim
+- [x] Remove all audio and verify the final 1080×1920 H.264 master
