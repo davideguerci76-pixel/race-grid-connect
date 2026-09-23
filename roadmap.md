@@ -92,3 +92,8 @@
 - [x] Produce the four-scene 1080×1920 Professional acquisition Reel
 - [x] Verify exact approved copy, safe areas, timing, logo, and zero legacy terminology
 - [x] Deliver the publication-ready MP4 without changing the PITCALL product or LIVE data
+
+## SOCIAL-IG-02 — PITCALL Reel pacing, soundtrack, and logo refinement
+- [x] Extend the approved four-scene edit to 12 seconds with longer stable reading holds
+- [x] Synchronize an original motorsport-tech soundtrack with headline and scene accents
+- [x] Replace the final mark with the official PITCALL headset logo and verify the final master
