@@ -8,6 +8,7 @@ import { adminListSettings, adminUpdateSettings } from "@/lib/admin.functions";
 import { FLAG_KEYS } from "@/lib/flags.functions";
 import { toastError } from "@/lib/errors";
 import { PlatformCapacityCard } from "@/components/admin/platform-capacity-card";
+import { PublicStatsCard } from "@/components/admin/public-stats-card";
 
 export const Route = createFileRoute("/_authenticated/admin/launch")({
   component: AdminLaunchPage,
@@ -55,6 +56,7 @@ function AdminLaunchPage() {
         <p className="text-[11px] text-muted-foreground">{t("sweep_admin_a.launch.blurb")}</p>
       </div>
       <PlatformCapacityCard />
+      <PublicStatsCard publicOn={value(FLAG_KEYS.homeStats, true)} />
       {rows.map((r) => {
         const on = value(r.key, r.fallback);
         return (
