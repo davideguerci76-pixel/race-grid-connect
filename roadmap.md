@@ -102,3 +102,8 @@
 - [x] Remove the left vertical red bar without replacing it
 - [x] Keep the final scene dark and replace only the approved closing claim
 - [x] Remove all audio and verify the final 1080×1920 H.264 master
+
+## SOCIAL-IG-05 — Rebuild only final frame
+- [x] Use the attached penultimate master as the sole source of truth
+- [x] Preserve frames 0–358 and rebuild only frame 359
+- [x] Verify the clean RGB 1/1/1 end card, untouched official headset logo, exact claim, and no audio
